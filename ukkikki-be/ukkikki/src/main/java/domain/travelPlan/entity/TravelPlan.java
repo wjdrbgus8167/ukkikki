@@ -2,7 +2,7 @@ package domain.travelPlan.entity;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "travel_plans")
@@ -16,10 +16,10 @@ public class TravelPlan {
     private String name;
 
     @Column(nullable = false, name = "start_date")
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @Column(nullable = false, name = "end_date")
-    private LocalDateTime endDate;
+    private LocalDate endDate;
 
     @Column(length = 1000)
     private String hostComment;
