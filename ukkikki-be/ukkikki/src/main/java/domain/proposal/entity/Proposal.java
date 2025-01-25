@@ -1,5 +1,8 @@
 package domain.proposal.entity;
 
+import domain.info.City;
+import domain.member.entity.Company;
+import domain.travelPlan.entity.TravelPlan;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -63,4 +66,21 @@ public class Proposal {
 
     @Column(name = "update_time")
     private LocalDateTime updateTime;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
+    private Company company;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "travel_plan_id")
+    private TravelPlan travelPlan;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "departure_city_id")
+    private City departureCity;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "arrival_city_id")
+    private City arrivalCity;
+
 }
