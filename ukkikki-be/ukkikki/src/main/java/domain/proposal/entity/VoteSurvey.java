@@ -1,5 +1,6 @@
 package domain.proposal.entity;
 
+import domain.travelPlan.entity.TravelPlan;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -17,4 +18,8 @@ public class VoteSurvey {
 
     @Column(nullable = false, name = "survey_end_time")
     private LocalDateTime surveyEndTime;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "travel_plan_id")
+    private TravelPlan travelPlan;
 }
