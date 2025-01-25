@@ -23,4 +23,8 @@ public class Schedule {
 
     @Column(name = "image_url", length = 2000)
     private String imageUrl;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "proposal_id")
+    private Proposal proposal;
 }
