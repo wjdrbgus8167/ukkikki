@@ -1,5 +1,6 @@
 package domain.proposal.entity;
 
+import domain.travelPlan.entity.UserTravelPlan;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -29,5 +30,13 @@ public class Traveler {
 
     @Column(name = "phone_number", length = 11)
     private String phoneNumber;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "proposal_id")
+    private Proposal proposal;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_travel_plan_id")
+    private UserTravelPlan userTravelPlan;
 }
 
