@@ -2,12 +2,15 @@ package domain.proposal.entity;
 
 import domain.travelPlan.entity.MemberTravelPlan;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "inquiries")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Inquiry {
 
 	@Id

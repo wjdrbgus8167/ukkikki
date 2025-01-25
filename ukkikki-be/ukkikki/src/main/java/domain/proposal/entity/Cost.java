@@ -1,9 +1,12 @@
 package domain.proposal.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "costs")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Cost {
 
 	@Id

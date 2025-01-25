@@ -5,6 +5,8 @@ import domain.info.City;
 import domain.member.entity.Company;
 import domain.travelPlan.entity.TravelPlan;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDate;
@@ -12,6 +14,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "proposals")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Proposal {
 
 	@Id

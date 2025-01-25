@@ -4,9 +4,12 @@ import domain.travelPlan.entity.MemberTravelPlan;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "travelers")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Traveler {
 
 	@Id

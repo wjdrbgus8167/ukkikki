@@ -4,9 +4,12 @@ import domain.travelPlan.entity.TravelPlan;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "vote_surveys")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class VoteSurvey {
 
     @Id

@@ -3,9 +3,12 @@ package domain.proposal.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "schedules")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Schedule {
 
     @Id

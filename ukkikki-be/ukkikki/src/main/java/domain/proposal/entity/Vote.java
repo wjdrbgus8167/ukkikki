@@ -2,12 +2,15 @@ package domain.proposal.entity;
 
 import domain.member.entity.Member;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "votes")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Vote {
 
 	@Id
