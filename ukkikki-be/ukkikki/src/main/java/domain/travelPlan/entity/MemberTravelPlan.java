@@ -12,10 +12,10 @@ import org.springframework.data.annotation.CreatedDate;
 @Entity
 @Table(name = "user_travel_plans")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserTravelPlan {
+public class MemberTravelPlan {
 
 	@EmbeddedId
-	private UserTravelPlanId userTravelPlanId;
+	private MemberTravelPlanId memberTravelPlanId;
 
 	@Column(nullable = false, name = "host_yn")
 	private boolean hostYn;

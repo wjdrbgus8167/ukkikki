@@ -1,6 +1,6 @@
 package domain.proposal.entity;
 
-import domain.travelPlan.entity.UserTravelPlan;
+import domain.travelPlan.entity.MemberTravelPlan;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -35,6 +35,6 @@ public class Inquiry {
 	private Proposal proposal;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_travel_plan_id")
-	private UserTravelPlan userTravelPlan;
+	@JoinColumn(name = "member_travel_plan_id")
+	private MemberTravelPlan memberTravelPlan;
 }

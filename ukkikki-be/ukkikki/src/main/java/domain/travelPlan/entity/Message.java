@@ -27,6 +27,6 @@ public class Message {
 	private LocalDate createdAt;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_travel_plan_id")
-	private UserTravelPlan userTravelPlan;
+	@JoinColumn(name = "member_travel_plan_id")
+	private MemberTravelPlan memberTravelPlan;
 }

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserTravelPlanId implements Serializable {
+public class MemberTravelPlanId implements Serializable {
 
 	@Column
 	@EqualsAndHashCode.Include
@@ -21,5 +21,4 @@ public class UserTravelPlanId implements Serializable {
 	@EqualsAndHashCode.Include
 	@Column
 	private Long memberId;
-
 }
