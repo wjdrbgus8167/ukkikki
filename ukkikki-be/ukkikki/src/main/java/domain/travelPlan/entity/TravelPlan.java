@@ -1,11 +1,15 @@
 package domain.travelPlan.entity;
 
+import domain.info.City;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "travel_plans")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TravelPlan {
 
     @Id
@@ -33,4 +37,13 @@ public class TravelPlan {
 
     @Column(nullable = false, name = "max_people")
     private int maxPeople;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "departure_city_id")
+    private City departureCity;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "arrival_city_id")
+    private City arrivalCity;
+
 }
