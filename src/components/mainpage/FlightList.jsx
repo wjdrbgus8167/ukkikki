@@ -20,4 +20,4 @@ const FlightList = ({ flights, isLoading }) => {
   );
 };
 
-export default FlightList
+export default FlightList;
