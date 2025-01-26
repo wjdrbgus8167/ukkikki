@@ -19,7 +19,7 @@ export default {
          'tourism': '#FFEB3B', // 관광
          'luxury': '#9C27B0', // 럭셔리
          'food': '#FF5722', // 식도락
-         'dessert-golf': '#E91E63', // 디저트 골프
+         'golf': '#E91E63', //  골프
          'soccer': '#F44336', // 축구
          'local-culture': '#3F51B5', // 현지문화체험
          'marine-sports': '#00BCD4', // 해양스포츠
