@@ -12,6 +12,8 @@ const SearchRoom = () => {
       date: "2025-02-15",
       theme: "관광+휴양,식도락",
       country:'유럽',
+      min_people:10,
+      max_people:20,
     },
     {
       status: "예약중",
@@ -20,6 +22,8 @@ const SearchRoom = () => {
       date: "2025-03-10",
       theme: "현지문화체험,기차여행",
       country:'대한민국',
+      min_people:10,
+      max_people:80,
 
     },
     {
@@ -29,7 +33,8 @@ const SearchRoom = () => {
       date: "2025-04-01",
       theme: "골프,SNS핫플",
       country:'일본',
-
+      min_people:40,
+      max_people:100,
     },
     {
       status: "제안중",
@@ -38,6 +43,8 @@ const SearchRoom = () => {
       date: "2025-05-20",
       theme: "럭셔리",
       country:'동남아',
+      min_people:10,
+      max_people:20,
 
     },
   ];

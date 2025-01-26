@@ -4,8 +4,9 @@ export default {
   theme: {
     extend: {
       colors: {
+        'yellow':'#FFCF0E',
         'dark-green': '#4d6f7a', // 메인페이지 인디케이터 색상
-        'brown':'#A0522D', // 메인페이지 캐러셀 화살표 색상
+        'brown':'#412B2B', // 메인페이지 캐러셀 화살표 색상
         'progress': "#3b82f6", // blue-500
         'proposal': "#f97316", // orange-500
         'reservation': "#22c55e", // green-500
@@ -26,9 +27,12 @@ export default {
          'sns-hot': '#9E9E9E', // SNS핫플
          'pilgrimage': '#8B4513', // 성지순례
          'train-trip': '#FF9800', // 기차여행
-      },
-      fontFamily: {
-        'noto-sans': ['Noto Sans KR', 'sans-serif'],
+
+         // 메인페이지 달력
+         today: "#3b82f6", // 오늘 날짜 색상
+        start: "#10b981", // 출발일 색상
+        end: "#ef4444", // 도착일 색상
+        range: "#bbf7d0", // 범위 색상
       },
       
     },
