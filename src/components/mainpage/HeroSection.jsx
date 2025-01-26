@@ -1,6 +1,6 @@
 import React from 'react';
 import background from '../../assets/home_image.png'; // 배경 이미지 경로 설정
-import SearchBar from '../common/SearchBar';
+import SearchBar from '../layout/SearchBar';
 
 const HeroSection = () => {
   return (
