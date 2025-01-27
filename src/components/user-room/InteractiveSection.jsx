@@ -8,7 +8,7 @@ const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
 const InteractiveSection = () => {
   const [isLikeList, setIsLikeList] = useState(true);
-
+  
   return (
     <div className="relative p-8 bg-white flex flex-col md:flex-row h-screen">
       {/* Google Maps API는 상위 컴포넌트에서 한번만 로드 */}
