@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from 'axios';
 
 const BASE_URL = 'https://i12c204.p.ssafy.io/api/v1'
 axios.defaults.withCredentials = true
