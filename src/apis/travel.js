@@ -2,14 +2,21 @@
 
 import { publicRequest } from '../hooks/requestMethod';
 
-//여행 계획 제안서 목록 조회
+//여행 계획 제출 목록 조회
 
 export const fetchProposals = async(jwtToken) => {
-  const response = await publicRequest.get('/proposals',{
-    headers: {
-      Authorization: `Bearer ${jwtToken}`,
-    }, 
-  });
+  try {
+    const response = await publicRequest.get('/travel-plans/list',{
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      }, 
+    });
+    return response.data;
 
-  return response.data;
+  } catch(error) {
+    console.error(`Error: `, error)
+    throw error;
+  };
 };
+
+//
