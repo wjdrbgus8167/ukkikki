@@ -5,6 +5,7 @@ import About from './pages/AboutPage';
 import UserRoom from './pages/UserRoomPage/UserRoom';
 import SearchRooms from './pages/SearchRoomPage/SearchRooms';
 import AgencyRoomList from './pages/AgencyRoomListPage';
+import AgencySignUp from './pages/AgencySignUpPage';
 
 const App = () => {
   return (
@@ -15,7 +16,7 @@ const App = () => {
         <Route path="/userroom" element={<UserRoom />} />
         <Route path="/searchroom" element={<SearchRooms />} />
         <Route path="/agencyroom" element={<AgencyRoomList/>} />
-
+        <Route path="/agencySignUp" element={<AgencySignUp/>} />
       </Routes>
     </Router>
   );

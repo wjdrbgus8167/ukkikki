@@ -6,8 +6,8 @@ const UserRoom = () => {
   return (
     <div>
       <Header />
-<DashBoard />
-<InteractiveSection />
+        <DashBoard />
+        <InteractiveSection />
       <Footer />
     </div>
   );

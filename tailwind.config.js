@@ -34,6 +34,9 @@ export default {
         end: "#ef4444", // 도착일 색상
         range: "#bbf7d0", // 범위 색상
       },
+      width: {
+        
+      }
       
     },
   },
