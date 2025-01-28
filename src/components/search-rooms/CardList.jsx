@@ -1,26 +1,26 @@
-import React, { useState, useEffect } from "react";
-import useRoomModal from "./useRoomModal";  // ➀ 커스텀 훅 import
-import RoomModal from "./RoomModal";
+import React, { useState, useEffect } from 'react';
+import useRoomModal from './useRoomModal'; // ➀ 커스텀 훅 import
+import RoomModal from './RoomModal';
 
 const apiKey = import.meta.env.VITE_APP_UNSPLASH_API_KEY;
 
 // 테마에 따른 색상 반환 함수
 const getThemeColor = (theme) => {
   const themeColors = {
-    골프: "bg-golf text-white",
-    "관광+휴양": "bg-tourism-relaxation text-white",
-    식도락: "bg-food text-white",
-    현지문화체험: "bg-local-culture text-white",
-    기차여행: "bg-train-trip text-white",
-    SNS핫플: "bg-sns-hot text-white",
-    럭셔리: "bg-luxury text-white",
-    해양스포츠: "bg-marine-sports text-white",
-    온천: "bg-hot-spring text-white",
-    성지순례: "bg-pilgrimage text-white",
-    "디저트 골프": "bg-dessert-golf text-white",
-    축구: "bg-soccer text-white",
+    골프: 'bg-golf text-white',
+    '관광+휴양': 'bg-tourism-relaxation text-white',
+    식도락: 'bg-food text-white',
+    현지문화체험: 'bg-local-culture text-white',
+    기차여행: 'bg-train-trip text-white',
+    SNS핫플: 'bg-sns-hot text-white',
+    럭셔리: 'bg-luxury text-white',
+    해양스포츠: 'bg-marine-sports text-white',
+    온천: 'bg-hot-spring text-white',
+    성지순례: 'bg-pilgrimage text-white',
+    '디저트 골프': 'bg-dessert-golf text-white',
+    축구: 'bg-soccer text-white',
   };
-  return themeColors[theme] || "bg-gray-500 text-white";
+  return themeColors[theme] || 'bg-gray-500 text-white';
 };
 
 const CardList = ({ cards }) => {
@@ -50,7 +50,7 @@ const CardList = ({ cards }) => {
       for (const card of cards) {
         if (!imageUrls[card.country]) {
           const response = await fetch(
-            `https://api.unsplash.com/photos/random?query=${card.country}&client_id=${apiKey}`
+            `https://api.unsplash.com/photos/random?query=${card.country}&client_id=${apiKey}`,
           );
           const data = await response.json();
           setImageUrls((prev) => ({
@@ -75,19 +75,19 @@ const CardList = ({ cards }) => {
             <div className="relative">
               <span
                 className={`absolute top-6 left-2 px-3 py-1 rounded-full text-sm font-semibold ${
-                  card.status === "진행중"
-                    ? "bg-progress text-white"
-                    : card.status === "제안중"
-                    ? "bg-proposal text-white"
-                    : card.status === "예약중"
-                    ? "bg-reservation text-white"
-                    : "bg-confirmed text-white"
+                  card.status === '진행중'
+                    ? 'bg-progress text-white'
+                    : card.status === '제안중'
+                      ? 'bg-proposal text-white'
+                      : card.status === '예약중'
+                        ? 'bg-reservation text-white'
+                        : 'bg-confirmed text-white'
                 }`}
               >
                 {card.status}
               </span>
               <img
-                src={imageUrls[card.country] || "/default-image.jpg"}
+                src={imageUrls[card.country] || '/default-image.jpg'}
                 alt={card.country}
                 className="w-full h-64 object-cover rounded-lg shadow-md mt-4"
               />
@@ -101,7 +101,7 @@ const CardList = ({ cards }) => {
               <div className="flex flex-col space-y-2 mt-4">
                 <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-green-500"
+                    className="h-full bg-yellow"
                     style={{
                       width: `${(card.people / card.min_people) * 100}%`,
                     }}
@@ -121,11 +121,11 @@ const CardList = ({ cards }) => {
               {/* 테마 */}
               <div className="flex flex-wrap gap-2 mb-4">
                 <strong>여행 테마:</strong>
-                {card.theme.split(",").map((theme, idx) => (
+                {card.theme.split(',').map((theme, idx) => (
                   <span
                     key={idx}
                     className={`px-3 py-1 rounded-full text-sm font-semibold ${getThemeColor(
-                      theme
+                      theme,
                     )}`}
                   >
                     {theme}
@@ -136,7 +136,7 @@ const CardList = ({ cards }) => {
 
             {/* 버튼: 자세히 보기 => 모달 열기 */}
             <button
-              className="mt-4 bg-dark-green text-white px-4 py-2 rounded-md hover:bg-green-700"
+              className="mt-4 bg-brown text-white px-4 py-2 rounded-md hover:bg-yellow hover:text-brown hover:font-bold"
               onClick={() => openModal(card)} // ➂ 사용
             >
               자세히 보기

@@ -1,6 +1,7 @@
 import React from 'react';
-import background from '../../assets/home_image.png'; // 배경 이미지 경로 설정
+import background from '../../assets/home_image.png';
 import SearchBar from '../layout/SearchBar';
+import SloganText from '../common/SloganText';
 
 const HeroSection = () => {
   return (
@@ -11,14 +12,7 @@ const HeroSection = () => {
       }}
     >
       {/* 왼쪽 텍스트 */}
-      <div className="w-full md:w-1/2 text-center md:text-left mb-8 md:mb-0 leading-loose md:leading-loose fade-in-left">
-        <h1 className="text-4xl md:text-6xl font-bold text-white">
-          우리끼리
-          <br /> 만드는
-          <br />
-          패키지 여행
-        </h1>
-      </div>
+      <SloganText textColor="text-white" />
 
       {/* 오른쪽 검색바 */}
       <div className="w-full md:w-1/2 flex justify-center md:justify-end fade-in-right">

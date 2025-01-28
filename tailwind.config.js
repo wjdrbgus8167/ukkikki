@@ -33,6 +33,10 @@ export default {
         start: "#10b981", // 출발일 색상
         end: "#ef4444", // 도착일 색상
         range: "#bbf7d0", // 범위 색상
+        // 좋아요 리스트 메달 색깔
+        gold: '#FFD700',
+        silver: '#C0C0C0',
+        bronze: '#CD7F32',
       },
       width: {
         
