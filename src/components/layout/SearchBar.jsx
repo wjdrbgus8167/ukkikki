@@ -14,28 +14,30 @@ const SearchBar = () => {
   const [worldAirports, setWorldAirports] = useState([]); // 전 세계 공항 목록
   const [searchType, setSearchType] = useState('findRoom'); // 방 찾기 / 방 만들기
   const [searchResult, setSearchResult] = useState(null); // 검색 결과
-
+  const apiKey = import.meta.env.VITE_APP_AIRPORT_API_KEY;
   useEffect(() => {
     const fetchAirports = async () => {
       try {
-        const apiKey = import.meta.env.VITE_APP_AIRPORT_API_KEY;
         const worldResponse = await fetch(
-          `https://api.odcloud.kr/api/3051587/v1/uddi:007305db-cbc2-4554-8988-f9109b2dad10?page=1&perPage=100&serviceKey=${apiKey}`
+          `https://api.odcloud.kr/api/3051587/v1/uddi:007305db-cbc2-4554-8988-f9109b2dad10?page=1&perPage=100&serviceKey=${apiKey}`,
         );
 
         const koreaResponse = await fetch(
-          `https://api.odcloud.kr/api/3051587/v1/uddi:47338db4-719b-4162-9cc1-f7efd0bad374?page=1&perPage=100&serviceKey=${apiKey}`
+          `https://api.odcloud.kr/api/3051587/v1/uddi:47338db4-719b-4162-9cc1-f7efd0bad374?page=1&perPage=100&serviceKey=${apiKey}`,
         );
 
         const worldData = await worldResponse.json();
         const krData = await koreaResponse.json();
 
-        console.log('worldData',worldData);
-        console.log('krData',krData);
-
+        console.log('worldData', worldData);
+        console.log('krData', krData);
 
         const koreaAirports = krData.data
-          .filter((airport) => airport['국가명_한글'] === '대한민국' && airport['한글명'].includes('국제'))
+          .filter(
+            (airport) =>
+              airport['국가명_한글'] === '대한민국' &&
+              airport['한글명'].includes('국제'),
+          )
           .map((airport) => airport['한글명'])
           .sort();
 
@@ -60,8 +62,10 @@ const SearchBar = () => {
       return;
     }
 
-    const formattedDate = startDate.toISOString().split('T')[0].replace(/-/g, ''); // yyyyMMdd 형식
-    const apiKey = import.meta.env.VITE_APP_FLIGHT_API_KEY;
+    const formattedDate = startDate
+      .toISOString()
+      .split('T')[0]
+      .replace(/-/g, ''); // yyyyMMdd 형식
 
     try {
       const response = await fetch(
@@ -69,7 +73,7 @@ const SearchBar = () => {
           `?serviceKey=${apiKey}` +
           `&schDate=${formattedDate}` +
           `&schDeptCityCode=${departureAirport}` +
-          `&schArrvCityCode=${arrivalAirport}`
+          `&schArrvCityCode=${arrivalAirport}`,
       );
 
       if (!response.ok) {
@@ -108,7 +112,10 @@ const SearchBar = () => {
             <div
               className={`absolute h-1 w-1/2 bg-dark-green transition-transform duration-300`}
               style={{
-                transform: searchType === 'findRoom' ? 'translateX(0)' : 'translateX(100%)',
+                transform:
+                  searchType === 'findRoom'
+                    ? 'translateX(0)'
+                    : 'translateX(100%)',
                 bottom: 0,
               }}
             ></div>
@@ -116,7 +123,9 @@ const SearchBar = () => {
 
           <div className="flex space-x-4">
             <div className="w-1/2">
-              <label className="block text-sm font-medium text-gray-700">출발일</label>
+              <label className="block text-sm font-medium text-gray-700">
+                출발일
+              </label>
               <DatePicker
                 selected={startDate}
                 onChange={(date) => {
@@ -133,7 +142,9 @@ const SearchBar = () => {
               />
             </div>
             <div className="w-1/2">
-              <label className="block text-sm font-medium text-gray-700">도착일</label>
+              <label className="block text-sm font-medium text-gray-700">
+                도착일
+              </label>
               <DatePicker
                 selected={endDate}
                 onChange={(date) => setEndDate(date)}
@@ -179,8 +190,8 @@ const SearchBar = () => {
               <ul>
                 {searchResult.map((flight, index) => (
                   <li key={index}>
-                    {flight.airline} - {flight.flightNum} ({flight.departureTime} →{' '}
-                    {flight.arrivalTime})
+                    {flight.airline} - {flight.flightNum} (
+                    {flight.departureTime} → {flight.arrivalTime})
                   </li>
                 ))}
               </ul>

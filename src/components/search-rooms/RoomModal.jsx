@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const ProgressBar = ({ step, totalSteps }) => {
   const progress = (step / totalSteps) * 100;
@@ -93,14 +93,14 @@ function RoomModal({
           <div>
             <h2 className="text-xl font-bold mb-4">인원 입력</h2>
             <div className="space-y-4">
-              {["adult", "child", "infant"].map((type) => (
+              {['adult', 'child', 'infant'].map((type) => (
                 <div key={type} className="flex items-center justify-between">
                   <label className="text-gray-700 font-medium capitalize">
-                    {type === "adult"
-                      ? "성인"
-                      : type === "child"
-                      ? "아동"
-                      : "유아"}
+                    {type === 'adult'
+                      ? '성인'
+                      : type === 'child'
+                        ? '아동'
+                        : '유아'}
                   </label>
                   <div className="flex items-center space-x-2">
                     <button
@@ -147,7 +147,7 @@ function RoomModal({
                   className="px-4 py-2 bg-brown text-white rounded-md"
                   onClick={onComplete}
                 >
-                  방 만들기
+                  입장하기
                 </button>
               </div>
             </div>
