@@ -1,10 +1,7 @@
 package com.dancing_orangutan.ukkikki.global.config;
 
-import com.dancing_orangutan.ukkikki.global.security.CustomUserDetailsService;
+import com.dancing_orangutan.ukkikki.global.security.*;
 import com.dancing_orangutan.ukkikki.global.jwt.JwtTokenProvider;
-import com.dancing_orangutan.ukkikki.global.security.JwtAccessDeniedHandler;
-import com.dancing_orangutan.ukkikki.global.security.JwtAuthenticationEntryPoint;
-import com.dancing_orangutan.ukkikki.global.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +22,7 @@ public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsService customUserDetailsService;
-
+    private final CustomOAuth2UserService customOAuth2UserService;
     /**
      * 비밀번호 암호화 설정
      */
@@ -54,11 +51,17 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/members/**", "/auth/companies/**", "/swagger-ui/**").permitAll()
+                        .requestMatchers("/auth/**", "/oauth2/**", "/swagger-ui/**").permitAll()
                         .anyRequest().authenticated()
                 ) .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                         .accessDeniedHandler(new JwtAccessDeniedHandler())
+                )
+                .oauth2Login(oauth -> oauth
+                        .defaultSuccessUrl("/auth/oauth2/success")
+                        .failureUrl("/auth/oauth2/failure")
+                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+//                        .successHandler(oAuth2SuccessHandler())  // 성공 후 토큰 발급 처리
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
