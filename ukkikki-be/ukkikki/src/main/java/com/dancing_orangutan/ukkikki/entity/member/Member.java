@@ -42,11 +42,15 @@ public class Member {
     @CreatedDate
     @Column(name = "delete_time")
     private LocalDateTime deleteTime;
+
+    @Column(nullable = false, length = 10)
+    private String provider;
     @Builder
-    public Member(String email, String password, String name, String profileImageUrl) {
+    public Member(String email, String password, String name, String profileImageUrl, String provider) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.profileImageUrl = profileImageUrl;
+        this.provider = provider;
     }
 }
