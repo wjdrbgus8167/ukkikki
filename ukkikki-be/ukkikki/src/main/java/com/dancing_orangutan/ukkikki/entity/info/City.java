@@ -10,11 +10,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "cities")
+@Getter
 public class City {
 
 	@Id
@@ -27,4 +30,11 @@ public class City {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "country_id")
 	private Country country;
+
+	@Builder
+	public City(Integer cityId, String cityName, Country country) {
+		this.cityId = cityId;
+		this.cityName = cityName;
+		this.country = country;
+	}
 }
