@@ -54,7 +54,7 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/members/register", "/auth/members/login", "/swagger-ui/**").permitAll()
+                        .requestMatchers("/auth/members/**", "/auth/companies/**", "/swagger-ui/**").permitAll()
                         .anyRequest().authenticated()
                 ) .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
