@@ -50,26 +50,6 @@ public class JwtTokenProvider implements InitializingBean {
                 .compact();
     }
 
-
-    /**
-     * 토큰 유효성 검사
-     */
-    public boolean isValidToken(String token) {
-        try {
-            Jwts.parser().setSigningKey(signingKey).build().parseClaimsJws(token);
-            return true;
-        } catch (SecurityException | MalformedJwtException e) {
-            System.out.println("Invalid JWT signature.");
-        } catch (ExpiredJwtException e) {
-            System.out.println("Expired JWT token.");
-        } catch (UnsupportedJwtException e) {
-            System.out.println("Unsupported JWT token.");
-        } catch (IllegalArgumentException e) {
-            System.out.println("JWT token is empty.");
-        }
-        return false;
-    }
-
     /**
      * 토큰에서 사용자 ID 추출
      */
@@ -84,12 +64,6 @@ public class JwtTokenProvider implements InitializingBean {
         return getClaims(token).getSubject();
     }
 
-    /**
-     * 토큰이 만료되었는지 확인
-     */
-    public boolean isTokenExpired(String token) {
-        return getClaims(token).getExpiration().before(new Date());
-    }
 
     /**
      * 토큰의 Claims 파싱

@@ -1,7 +1,7 @@
-package com.dancing_orangutan.ukkikki.global.config;
+package com.dancing_orangutan.ukkikki.global.security;
 
-import com.dancing_orangutan.ukkikki.global.security.CustomUserDetailsService;
 import com.dancing_orangutan.ukkikki.global.jwt.JwtTokenProvider;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -30,29 +30,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        try {
+            // 헤더에서 access token 추출
+            String accessToken = getAccessToken(request);
 
-        // 헤더에서 access token 추출
-        String accessToken = getAccessToken(request);
+            if (accessToken != null) {
 
-        // access token이 유효한 경우 인증
-        if (accessToken != null && jwtTokenProvider.isValidToken(accessToken)) {
-            String email = jwtTokenProvider.getEmail(accessToken);
-            UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+                // access token이 유효한 경우 인증
+                String email = jwtTokenProvider.getEmail(accessToken);
+                UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+                Authentication authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities()
+                );
+                SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            Authentication authentication = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities()
-            );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
+            }
 
-        // access token이 만료된 경우 401 Unauthorized 반환
-        else if (accessToken != null && jwtTokenProvider.isTokenExpired(accessToken)) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Access token expired. Please refresh your token.");
-            return;
+        } catch (ExpiredJwtException e) {
+            request.setAttribute("expiredTokenException", e);
+        } catch (Exception e) {
+            request.setAttribute("invalidTokenException", e);
         }
 
         filterChain.doFilter(request, response);
+
     }
 
     /**

@@ -2,6 +2,9 @@ package com.dancing_orangutan.ukkikki.global.config;
 
 import com.dancing_orangutan.ukkikki.global.security.CustomUserDetailsService;
 import com.dancing_orangutan.ukkikki.global.jwt.JwtTokenProvider;
+import com.dancing_orangutan.ukkikki.global.security.JwtAccessDeniedHandler;
+import com.dancing_orangutan.ukkikki.global.security.JwtAuthenticationEntryPoint;
+import com.dancing_orangutan.ukkikki.global.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -53,6 +56,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/members/register", "/auth/members/login", "/swagger-ui/**").permitAll()
                         .anyRequest().authenticated()
+                ) .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                        .accessDeniedHandler(new JwtAccessDeniedHandler())
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
