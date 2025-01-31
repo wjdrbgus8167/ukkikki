@@ -1,7 +1,9 @@
 package com.dancing_orangutan.ukkikki.global.config;
 
+import com.dancing_orangutan.ukkikki.global.oauth.OAuth2SuccessHandler;
 import com.dancing_orangutan.ukkikki.global.security.*;
 import com.dancing_orangutan.ukkikki.global.jwt.JwtTokenProvider;
+import com.dancing_orangutan.ukkikki.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +25,7 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final MemberRepository memberRepository;
     /**
      * 비밀번호 암호화 설정
      */
@@ -31,13 +34,27 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-
     /**
      * JWT 인증 필터 설정
      */
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter(jwtTokenProvider, customUserDetailsService);
+    }
+
+    @Bean
+    public OAuth2SuccessHandler oAuth2SuccessHandler() {
+        return new OAuth2SuccessHandler(jwtTokenProvider, memberRepository);
+    }
+
+    @Bean
+    public JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint() {
+        return new JwtAuthenticationEntryPoint();
+    }
+
+    @Bean
+    public JwtAccessDeniedHandler jwtAccessDeniedHandler() {
+        return new JwtAccessDeniedHandler();
     }
 
     /**
@@ -50,18 +67,19 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/oauth2/**", "/swagger-ui/**").permitAll()
                         .anyRequest().authenticated()
                 ) .exceptionHandling(exceptions -> exceptions
-                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-                        .accessDeniedHandler(new JwtAccessDeniedHandler())
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint())
+                        .accessDeniedHandler(jwtAccessDeniedHandler())
                 )
                 .oauth2Login(oauth -> oauth
                         .defaultSuccessUrl("/auth/oauth2/success")
                         .failureUrl("/auth/oauth2/failure")
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
-//                        .successHandler(oAuth2SuccessHandler())  // 성공 후 토큰 발급 처리
+                        .successHandler(oAuth2SuccessHandler())
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
