@@ -4,9 +4,15 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+@Getter
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "companies")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Company {
@@ -33,12 +39,26 @@ public class Company {
     @Column(nullable = false, name = "phone_number", length = 11)
     private String phoneNumber;
 
+    @CreatedDate
     @Column(nullable = false, name = "create_time", updatable = false)
     private LocalDateTime createTime;
 
+    @CreatedDate
     @Column(nullable = false, name = "delete_time", updatable = false)
     private LocalDateTime deleteTime;
 
     @Column(name = "profile_image_url", nullable = false, length = 2000)
     private String profileImageUrl;
+
+    @Builder
+    public Company(String email, String password, String ceoName, String companyName,
+                   String businessRegistrationNumber, String phoneNumber, String profileImageUrl) {
+        this.email = email;
+        this.password = password;
+        this.ceoName = ceoName;
+        this.companyName = companyName;
+        this.businessRegistrationNumber = businessRegistrationNumber;
+        this.phoneNumber = phoneNumber;
+        this.profileImageUrl = profileImageUrl;
+    }
 }
