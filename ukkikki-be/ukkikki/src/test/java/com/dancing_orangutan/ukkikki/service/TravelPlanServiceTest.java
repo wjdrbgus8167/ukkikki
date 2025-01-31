@@ -3,11 +3,11 @@ package com.dancing_orangutan.ukkikki.service;
 import com.dancing_orangutan.ukkikki.travelPlan.application.TravelPlanService;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.CreateTravelPlanCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.TravelPlan;
-import com.dancing_orangutan.ukkikki.dto.travelPlan.response.CreateTravelPlanResponse;
-import com.dancing_orangutan.ukkikki.entity.info.City;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.response.CreateTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.entity.info.CityEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
-import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.CityFinder;
-import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.TravelPlanRepository;
+import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.city.CityFinder;
+import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.travelPlan.TravelPlanRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,8 +51,8 @@ class TravelPlanServiceTest {
 				.arrivalCityId(arrivalCityId)
 				.build();
 
-		City departureCity = mock(City.class);
-		City arrivalCity = mock(City.class);
+		CityEntity departureCity = mock(CityEntity.class);
+		CityEntity arrivalCity = mock(CityEntity.class);
 
 		when(cityFinder.findById(departureCityId)).thenReturn(departureCity);
 		when(cityFinder.findById(arrivalCityId)).thenReturn(arrivalCity);
@@ -121,7 +121,7 @@ class TravelPlanServiceTest {
 				.departureCityId(departureCityId)
 				.arrivalCityId(invalidArrivalCityId)
 				.build();
-		when(cityFinder.findById(departureCityId)).thenReturn(mock(City.class));
+		when(cityFinder.findById(departureCityId)).thenReturn(mock(CityEntity.class));
 		when(cityFinder.findById(invalidArrivalCityId)).thenThrow(new IllegalArgumentException("해당 도시가 존재하지 않습니다. : " + invalidArrivalCityId));
 
 		// When & Then

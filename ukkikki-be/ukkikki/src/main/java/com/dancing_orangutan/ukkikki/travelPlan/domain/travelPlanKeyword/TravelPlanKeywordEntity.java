@@ -1,9 +1,10 @@
-package com.dancing_orangutan.ukkikki.travelPlan.domain;
+package com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlanKeyword;
 
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -13,4 +14,10 @@ public class TravelPlanKeywordEntity {
 
 	@EmbeddedId
 	private TravelPlanKeywordId travelPlanKeywordId;
+
+	@Builder
+	public TravelPlanKeywordEntity(TravelPlanKeywordId travelPlanKeywordId) {
+		this.travelPlanKeywordId = travelPlanKeywordId;
+	}
+
 }
