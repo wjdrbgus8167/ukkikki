@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.travelPlan.domain;
 
-import com.dancing_orangutan.ukkikki.entity.info.City;
+import com.dancing_orangutan.ukkikki.entity.info.CityEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import jakarta.persistence.*;
 
@@ -56,16 +56,16 @@ public class TravelPlanEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "departure_city_id")
-    private City departureCity;
+    private CityEntity departureCity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "arrival_city_id")
-    private City arrivalCity;
+    private CityEntity arrivalCity;
 
     @Builder
     public TravelPlanEntity(Integer travelPlanId, String name, LocalDate startDate, LocalDate endDate,
-                            String hostComment, PlanningStatus planningStatus, LocalDateTime createTime,  int minPeople, int maxPeople,
-                            City departureCity, City arrivalCity) {
+                            String hostComment, PlanningStatus planningStatus, LocalDateTime createTime, int minPeople, int maxPeople,
+                            CityEntity departureCity, CityEntity arrivalCity) {
         this.travelPlanId = travelPlanId;
         this.name = name;
         this.startDate = startDate;

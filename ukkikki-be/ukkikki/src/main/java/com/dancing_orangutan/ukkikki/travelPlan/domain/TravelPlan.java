@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.travelPlan.domain;
 
-import com.dancing_orangutan.ukkikki.entity.info.City;
+import com.dancing_orangutan.ukkikki.entity.info.CityEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import java.time.LocalDate;
 import lombok.Builder;
@@ -26,7 +26,7 @@ public class TravelPlan {
 
 	private int maxPeople;
 
-	private City departureCity;
+	private CityEntity departureCity;
 
-	private City arrivalCity;
+	private CityEntity arrivalCity;
 }
