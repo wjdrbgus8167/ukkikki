@@ -1,7 +1,7 @@
-package com.dancing_orangutan.ukkikki.repository.travelPlan;
+package com.dancing_orangutan.ukkikki.travelPlan.infrastructure;
 
-import com.dancing_orangutan.ukkikki.domain.TravelPlanDomain;
-import com.dancing_orangutan.ukkikki.mapper.TravelPlanMapper;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.TravelPlan;
+import com.dancing_orangutan.ukkikki.travelPlan.mapper.TravelPlanMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -14,7 +14,7 @@ public class TravelPlanRepository {
 	private final TravelPlanMapper travelPlanMapper;
 
 
-	public TravelPlanDomain save(final TravelPlanDomain travelPlanDomain) {
+	public TravelPlan save(final TravelPlan travelPlanDomain) {
 		return travelPlanMapper.entityToDomain(
 				jpaTravelPlanRepository.save(travelPlanMapper.domainToEntity(travelPlanDomain)));
 	}

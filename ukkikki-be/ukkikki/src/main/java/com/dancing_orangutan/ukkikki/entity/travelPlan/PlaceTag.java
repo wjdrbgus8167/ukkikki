@@ -1,5 +1,6 @@
 package com.dancing_orangutan.ukkikki.entity.travelPlan;
 
+import com.dancing_orangutan.ukkikki.travelPlan.domain.MemberTravelPlanEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -18,12 +19,12 @@ public class PlaceTag {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "place_id")
-	private Place place;
+	private PlaceEntity place;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumns({
 			@JoinColumn(name = "travel_plan_id"),
 			@JoinColumn(name = "member_id")
 	})
-	private MemberTravelPlan memberTravelPlan;
+	private MemberTravelPlanEntity memberTravelPlan;
 }

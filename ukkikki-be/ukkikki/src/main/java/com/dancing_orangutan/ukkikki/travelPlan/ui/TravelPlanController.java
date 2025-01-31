@@ -1,11 +1,11 @@
-package com.dancing_orangutan.ukkikki.controller.travelplan;
+package com.dancing_orangutan.ukkikki.travelPlan.ui;
 
-import com.dancing_orangutan.ukkikki.command.travelPlan.CreateTravelPlanCommand;
+import com.dancing_orangutan.ukkikki.travelPlan.application.command.CreateTravelPlanCommand;
 import com.dancing_orangutan.ukkikki.dto.travelPlan.request.CreateTravelPlanRequest;
 import com.dancing_orangutan.ukkikki.dto.travelPlan.response.CreateTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.global.response.ApiUtils;
 import com.dancing_orangutan.ukkikki.global.response.ApiUtils.ApiResponse;
-import com.dancing_orangutan.ukkikki.service.TravelPlanService;
+import com.dancing_orangutan.ukkikki.travelPlan.application.TravelPlanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

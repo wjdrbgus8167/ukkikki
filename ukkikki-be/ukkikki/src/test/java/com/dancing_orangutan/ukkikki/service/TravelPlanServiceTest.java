@@ -1,12 +1,13 @@
 package com.dancing_orangutan.ukkikki.service;
 
-import com.dancing_orangutan.ukkikki.command.travelPlan.CreateTravelPlanCommand;
-import com.dancing_orangutan.ukkikki.domain.TravelPlanDomain;
+import com.dancing_orangutan.ukkikki.travelPlan.application.TravelPlanService;
+import com.dancing_orangutan.ukkikki.travelPlan.application.command.CreateTravelPlanCommand;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.TravelPlan;
 import com.dancing_orangutan.ukkikki.dto.travelPlan.response.CreateTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.entity.info.City;
-import com.dancing_orangutan.ukkikki.entity.travelPlan.PlanningStatus;
-import com.dancing_orangutan.ukkikki.repository.city.CityFinder;
-import com.dancing_orangutan.ukkikki.repository.travelPlan.TravelPlanRepository;
+import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
+import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.CityFinder;
+import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.TravelPlanRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,7 +57,7 @@ class TravelPlanServiceTest {
 		when(cityFinder.findById(departureCityId)).thenReturn(departureCity);
 		when(cityFinder.findById(arrivalCityId)).thenReturn(arrivalCity);
 
-		TravelPlanDomain savedDomain = TravelPlanDomain.builder()
+		TravelPlan savedDomain = TravelPlan.builder()
 				.travelPlanId(0)
 				.name(command.getName())
 				.startDate(command.getStartDate())
@@ -68,7 +69,7 @@ class TravelPlanServiceTest {
 				.planningStatus(PlanningStatus.IN_PROGRESS)
 				.build();
 
-		when(travelPlanRepository.save(any(TravelPlanDomain.class))).thenReturn(savedDomain);
+		when(travelPlanRepository.save(any(TravelPlan.class))).thenReturn(savedDomain);
 
 		// When
 		CreateTravelPlanResponse response = travelPlanService.createTravelPlan(command);

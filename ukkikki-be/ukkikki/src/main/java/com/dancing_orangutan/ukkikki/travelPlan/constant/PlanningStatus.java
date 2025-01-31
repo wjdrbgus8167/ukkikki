@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.entity.travelPlan;
+package com.dancing_orangutan.ukkikki.travelPlan.constant;
 
 public enum PlanningStatus {
     //진행중

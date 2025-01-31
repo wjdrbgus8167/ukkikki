@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.entity.travelPlan;
+package com.dancing_orangutan.ukkikki.travelPlan.domain;
 
 import jakarta.persistence.*;
 
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Message {
+public class MessageEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,5 +25,5 @@ public class Message {
 			@JoinColumn(name = "travel_plan_id"),
 			@JoinColumn(name = "member_id")
 	})
-	private MemberTravelPlan memberTravelPlan;
+	private MemberTravelPlanEntity memberTravelPlan;
 }

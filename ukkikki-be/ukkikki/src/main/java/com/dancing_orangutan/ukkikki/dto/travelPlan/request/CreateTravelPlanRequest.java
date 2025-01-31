@@ -1,8 +1,8 @@
 package com.dancing_orangutan.ukkikki.dto.travelPlan.request;
 
-import com.dancing_orangutan.ukkikki.command.travelPlan.CreateTravelPlanCommand;
-import com.dancing_orangutan.ukkikki.command.travelPlan.CreateTravelPlanCommand.KeywordCommand;
-import com.dancing_orangutan.ukkikki.entity.travelPlan.PlanningStatus;
+import com.dancing_orangutan.ukkikki.travelPlan.application.command.CreateTravelPlanCommand;
+import com.dancing_orangutan.ukkikki.travelPlan.application.command.CreateTravelPlanCommand.KeywordCommand;
+import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;

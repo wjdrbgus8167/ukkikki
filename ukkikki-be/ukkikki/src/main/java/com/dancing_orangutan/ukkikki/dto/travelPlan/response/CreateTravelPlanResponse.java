@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.dto.travelPlan.response;
 
-import com.dancing_orangutan.ukkikki.entity.travelPlan.PlanningStatus;
+import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import lombok.Builder;

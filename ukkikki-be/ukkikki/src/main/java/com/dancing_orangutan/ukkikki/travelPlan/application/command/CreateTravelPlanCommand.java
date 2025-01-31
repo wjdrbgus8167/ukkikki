@@ -1,6 +1,6 @@
-package com.dancing_orangutan.ukkikki.command.travelPlan;
+package com.dancing_orangutan.ukkikki.travelPlan.application.command;
 
-import com.dancing_orangutan.ukkikki.entity.travelPlan.PlanningStatus;
+import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Getter;
