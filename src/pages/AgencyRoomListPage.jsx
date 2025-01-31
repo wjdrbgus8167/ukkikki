@@ -2,12 +2,15 @@
 
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
-import AgencySideBar from "../components/agency-room/AgencySideBar";
-import UserProposals from "../components/agency-room/UserProposals";
+import AgencySideBar from "../components/agencyPlanList/AgencySideBar";
+import UserProposals from "../components/agencyPlanList/UserProposals";
+import { TravelPlanProvider } from "../contexts/TravelPlanContext";
 
 const AgencyRoomList = () => {
-  return(
+  const jwtToken = "내 토큰 설정"
 
+  return(
+    <TravelPlanProvider jwtToken={jwtToken}>
       <div className="flex flex-col min-h-screen">
       
       <Header />
@@ -27,6 +30,7 @@ const AgencyRoomList = () => {
         
       <Footer/>
     </div>  
+  </TravelPlanProvider>
 
   );
 };

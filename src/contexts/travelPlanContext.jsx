@@ -6,13 +6,13 @@ const TravelPlanContext = createContext();
 export const TravelPlanProvider = ({children, jwtToken}) => {
 
   const [proposals, setProposals] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   //여행 제안서 목록 가져오기
   useEffect(() => {
     const getProposals = async() => {
-      setLoading(true);
+      // setLoading(true);
       setError(null);
 
       try{
@@ -21,9 +21,10 @@ export const TravelPlanProvider = ({children, jwtToken}) => {
       } catch(error) {
         setError('여행 계획을 불러오는 데 실패했습니다.');
         console.error(error);
-      } finally {
-        setLoading(false);
-      }
+      } 
+      // finally {
+      //   setLoading(false);
+      // }
     };
 
     if(jwtToken) {
@@ -33,7 +34,7 @@ export const TravelPlanProvider = ({children, jwtToken}) => {
 
 
   return (
-    <TravelPlanContext.Provider value={{ proposals, loading, error}}>
+    <TravelPlanContext.Provider value={{ proposals, error}}>
       {children}
     </TravelPlanContext.Provider>
   );
