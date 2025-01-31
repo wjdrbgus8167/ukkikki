@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import apiClient from '../../apis/axiosInstance';
-import profileImage from '../../assets/profile.png';
-import Header from '../../components/layout/Header';
-import Footer from '../../components/layout/Footer';
-import HeroText from '../../components/common/SloganText'; // HeroText 컴포넌트 임포트
+import { publicRequest } from '../hooks/requestMethod';
+import profileImage from '../assets/profile.png';
+import Header from '../components/layout/Header';
+import Footer from '../components/layout/Footer';
+import HeroText from '../components/common/SloganText'; // HeroText 컴포넌트 임포트
 
 const RegisterPage = () => {
   const [email, setEmail] = useState('');
@@ -27,7 +27,7 @@ const RegisterPage = () => {
         : '/api/v1/auth/companies/register';
 
     try {
-      const response = await apiClient.post(endpoint, {
+      const response = await publicRequest.post(endpoint, {
         email,
         name,
         password,
