@@ -3,7 +3,12 @@
 
 import React from "react";
 
-const ListCard = ({imageSrc,  trip_name, dataRange, location, min_people, max_people}) => {
+const ListCard = ({imageSrc,  trip_name, dataRange, location, min_people, max_people,proposal}) => {
+  
+  const onhandleDetail = () => {
+    navigator(`/agencydetail/${proposal.id}`);
+  }
+
   return(
     <div className="card p-10">
       <div className="flex bg-white rounded-lg border-2 overflow-hidden w-full mb-6">
@@ -20,7 +25,12 @@ const ListCard = ({imageSrc,  trip_name, dataRange, location, min_people, max_pe
           <p className="text-sm text-gray-500 mb-1">최소인원: {min_people} </p>
           <p className="text-sm text-gray-500 mb-1">최대인원: {max_people} </p>
 
-          <button className="mt-auto ml-auto  bg-[#412B2B] text-white px-4 py-2 rounded-md text-sm">자세히 보기→</button>
+          <button 
+          onClick={onhandleDetail} 
+          className="mt-auto ml-auto  bg-[#412B2B] text-white px-4 py-2 rounded-md text-sm"
+          >
+            자세히 보기→
+          </button>
         </div>
       </div>
     </div>
