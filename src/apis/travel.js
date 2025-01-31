@@ -19,4 +19,4 @@ export const fetchProposals = async(jwtToken) => {
   };
 };
 
-//
+// 제안서 목록 조회

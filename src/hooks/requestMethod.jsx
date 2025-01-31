@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://i12c204.p.ssafy.io/api/v1'
-axios.defaults.withCredentials = true
+const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
 
 export const publicRequest = axios.create({
-  baseURL: BASE_URL
+  baseURL: BASE_URL,
+  withCredentials: true, 
 })
