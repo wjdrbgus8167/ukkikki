@@ -3,11 +3,15 @@ package com.dancing_orangutan.ukkikki.travelPlan.application;
 
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.CreateTravelPlanCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.TravelPlan;
-import com.dancing_orangutan.ukkikki.dto.travelPlan.response.CreateTravelPlanResponse;
-import com.dancing_orangutan.ukkikki.dto.travelPlan.response.CreateTravelPlanResponse.TravelPlanResponse;
-import com.dancing_orangutan.ukkikki.entity.info.City;
-import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.CityFinder;
-import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.TravelPlanRepository;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlanKeyword.TravelPlanKeywordEntity;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlanKeyword.TravelPlanKeywordId;
+import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.keyword.KeywordFinder;
+import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.travelPlanKeyword.TravelPlanKeywordRegistrant;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.response.CreateTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.response.CreateTravelPlanResponse.TravelPlanResponse;
+import com.dancing_orangutan.ukkikki.entity.info.CityEntity;
+import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.city.CityFinder;
+import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.travelPlan.TravelPlanRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,11 +23,13 @@ public class TravelPlanService {
 
 	private final CityFinder cityFinder;
 	private final TravelPlanRepository travelPlanRepository;
+	private final KeywordFinder keywordFinder;
+	private final TravelPlanKeywordRegistrant travelPlanKeywordRegistrant;
 
 	public CreateTravelPlanResponse createTravelPlan(CreateTravelPlanCommand command) {
 
-		City departureCity = cityFinder.findById(command.getDepartureCityId());
-		City arrivalCity = cityFinder.findById(command.getArrivalCityId());
+		CityEntity departureCity = cityFinder.findById(command.getDepartureCityId());
+		CityEntity arrivalCity = cityFinder.findById(command.getArrivalCityId());
 
 		TravelPlan domain = TravelPlan.builder()
 				.name(command.getName())
@@ -37,6 +43,18 @@ public class TravelPlanService {
 				.build();
 
 		TravelPlan savedTravelPlan = travelPlanRepository.save(domain);
+
+		command.getKeywords()
+				.stream()
+				.map(keywordCommand -> keywordFinder.findById(keywordCommand.getKeywordId()))
+				.forEach(keywordEntity -> {
+					TravelPlanKeywordEntity travelPlanKeyword = TravelPlanKeywordEntity.builder()
+									.travelPlanKeywordId(TravelPlanKeywordId.builder()
+											.travelPlanId(savedTravelPlan.getTravelPlanId())
+											.keywordId(keywordEntity.getKeywordId()).build())
+											.build();
+					travelPlanKeywordRegistrant.registerTravelPlanKeyword(travelPlanKeyword);
+				});
 
 		TravelPlanResponse response = TravelPlanResponse.builder()
 				.travelPlanId(savedTravelPlan.getTravelPlanId())

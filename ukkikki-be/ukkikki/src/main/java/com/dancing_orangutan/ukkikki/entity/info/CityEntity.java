@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "cities")
 @Getter
-public class City {
+public class CityEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +32,7 @@ public class City {
 	private Country country;
 
 	@Builder
-	public City(Integer cityId, String cityName, Country country) {
+	public CityEntity(Integer cityId, String cityName, Country country) {
 		this.cityId = cityId;
 		this.cityName = cityName;
 		this.country = country;

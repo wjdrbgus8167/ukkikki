@@ -1,7 +1,7 @@
 package com.dancing_orangutan.ukkikki.controller.travelplan;
 
-import com.dancing_orangutan.ukkikki.dto.travelPlan.request.CreateTravelPlanRequest;
-import com.dancing_orangutan.ukkikki.dto.travelPlan.response.CreateTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.request.CreateTravelPlanRequest;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.response.CreateTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.application.TravelPlanService;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.TravelPlanController;

@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.dto.travelPlan.request;
+package com.dancing_orangutan.ukkikki.travelPlan.ui.request;
 
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.CreateTravelPlanCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.CreateTravelPlanCommand.KeywordCommand;
