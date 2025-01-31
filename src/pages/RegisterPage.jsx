@@ -1,111 +1,52 @@
-import React, { useState } from 'react';
-import { publicRequest } from '../hooks/requestMethod';
-import profileImage from '../assets/profile.png';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom'; // URL 파라미터 가져오기
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
-import HeroText from '../components/common/SloganText'; // HeroText 컴포넌트 임포트
+import HeroText from '../components/common/SloganText';
+import UserRegisterForm from '../components/auth/UserRegisterForm';
+import CompanyRegisterForm from '../components/auth/CompanyRegisterForm';
 
 const RegisterPage = () => {
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [userType, setUserType] = useState('user');
-  const [errorMessage, setErrorMessage] = useState('');
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const isCompanyFromQuery = queryParams.get('type') === 'company';
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
+  // URL에서 `type=company`이면 기업 회원가입만 보이도록 설정
+  const [isCompany, setIsCompany] = useState(isCompanyFromQuery);
 
-    if (password !== confirmPassword) {
-      setErrorMessage('비밀번호가 일치하지 않습니다.');
-      return;
-    }
-
-    const endpoint =
-      userType === 'user'
-        ? '/api/v1/auth/users/register'
-        : '/api/v1/auth/companies/register';
-
-    try {
-      const response = await publicRequest.post(endpoint, {
-        email,
-        name,
-        password,
-        profileImage,
-      });
-
-      alert('회원가입 성공!');
-    } catch (error) {
-      setErrorMessage(error.response?.data?.message || '회원가입 실패');
-    }
-  };
+  // URL이 변경될 때마다 `isCompany` 상태 업데이트
+  useEffect(() => {
+    setIsCompany(isCompanyFromQuery);
+  }, [isCompanyFromQuery]);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Header />
       <main className="flex flex-1 flex-col md:flex-row items-center md:px-28 py-10">
-        {/* 왼쪽 HeroText */}
         <HeroText textColor="text-brown" />
 
-        {/* 오른쪽 회원가입 폼 */}
         <div className="w-full md:w-1/2 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            <h1 className="text-xl font-bold mb-4">회원가입</h1>
-            {errorMessage && (
-              <p className="text-red-500 text-sm mb-4">{errorMessage}</p>
-            )}
-            <form onSubmit={handleRegister}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">이메일</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 border rounded"
-                  required
-                />
+            {/* `type=company`가 없을 때만 스위치 버튼 표시 */}
+            {/* {!isCompany && (
+              <div className="flex space-x-4 mb-4">
+                <button
+                  className={`flex-1 py-2 rounded ${!isCompany ? 'bg-brown text-white' : 'bg-gray-200 text-gray-700'}`}
+                  onClick={() => setIsCompany(false)}
+                >
+                  일반 회원가입
+                </button>
+                <button
+                  className={`flex-1 py-2 rounded ${isCompany ? 'bg-brown text-white' : 'bg-gray-200 text-gray-700'}`}
+                  onClick={() => setIsCompany(true)}
+                >
+                  기업 회원가입
+                </button>
               </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">이름</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2 border rounded"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">
-                  비밀번호
-                </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-2 border rounded"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">
-                  비밀번호 확인
-                </label>
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-3 py-2 border rounded"
-                  required
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-brown text-white py-2 rounded hover:bg-yellow hover:text-brown"
-              >
-                회원가입
-              </button>
-            </form>
+            )} */}
+
+            {/* 기업/일반 회원가입 폼 렌더링 */}
+            {isCompany ? <CompanyRegisterForm /> : <UserRegisterForm />}
           </div>
         </div>
       </main>

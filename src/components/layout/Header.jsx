@@ -29,17 +29,17 @@ const Header = () => {
             >
               서비스 소개
             </Link>
-            <Link
+            {/* <Link
               to="/signup"
               className="text-gray-600 hover:text-blue-500 transition duration-300"
             >
               회원가입
-            </Link>
+            </Link> */}
             <Link
               to="/login"
               className="text-gray-600 hover:text-blue-500 transition duration-300"
             >
-              로그인
+              회원가입 | 로그인
             </Link>
           </>
         ) : (
