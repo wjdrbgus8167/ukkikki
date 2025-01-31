@@ -3,7 +3,7 @@ package com.dancing_orangutan.ukkikki.global.util;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
-public class CookieUtil {
+public class CookieUtils {
 
     /**
      * Refresh Token 쿠키 생성
