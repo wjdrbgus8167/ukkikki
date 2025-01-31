@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.entity.proposal;
 
-import com.dancing_orangutan.ukkikki.entity.travelPlan.TravelPlan;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.TravelPlanEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -24,5 +24,5 @@ public class VoteSurvey {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "travel_plan_id")
-    private TravelPlan travelPlan;
+    private TravelPlanEntity travelPlan;
 }

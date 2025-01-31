@@ -1,5 +1,6 @@
 package com.dancing_orangutan.ukkikki.entity.travelPlan;
 
+import com.dancing_orangutan.ukkikki.travelPlan.domain.TravelPlanEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "places")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Place {
+public class PlaceEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,5 +37,5 @@ public class Place {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "travel_plan_id")
-	private TravelPlan travelPlan;
+	private TravelPlanEntity travelPlan;
 }

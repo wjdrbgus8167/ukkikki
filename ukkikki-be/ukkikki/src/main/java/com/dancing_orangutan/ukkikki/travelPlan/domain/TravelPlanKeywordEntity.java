@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.entity.travelPlan;
+package com.dancing_orangutan.ukkikki.travelPlan.domain;
 
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "travel_plan_keywords")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TravelPlanKeyword {
+public class TravelPlanKeywordEntity {
 
 	@EmbeddedId
 	private TravelPlanKeywordId travelPlanKeywordId;

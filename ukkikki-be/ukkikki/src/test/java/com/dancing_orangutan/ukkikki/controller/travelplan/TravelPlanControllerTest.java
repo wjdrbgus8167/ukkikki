@@ -2,8 +2,9 @@ package com.dancing_orangutan.ukkikki.controller.travelplan;
 
 import com.dancing_orangutan.ukkikki.dto.travelPlan.request.CreateTravelPlanRequest;
 import com.dancing_orangutan.ukkikki.dto.travelPlan.response.CreateTravelPlanResponse;
-import com.dancing_orangutan.ukkikki.entity.travelPlan.PlanningStatus;
-import com.dancing_orangutan.ukkikki.service.TravelPlanService;
+import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
+import com.dancing_orangutan.ukkikki.travelPlan.application.TravelPlanService;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.TravelPlanController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

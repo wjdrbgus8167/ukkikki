@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.entity.travelPlan;
+package com.dancing_orangutan.ukkikki.travelPlan.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "keywords")
-public class Keyword {
+public class KeywordEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

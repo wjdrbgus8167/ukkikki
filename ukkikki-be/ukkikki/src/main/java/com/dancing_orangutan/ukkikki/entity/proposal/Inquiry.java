@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.entity.proposal;
 
-import com.dancing_orangutan.ukkikki.entity.travelPlan.MemberTravelPlan;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.MemberTravelPlanEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -42,5 +42,5 @@ public class Inquiry {
 			@JoinColumn(name = "travel_plan_id"),
 			@JoinColumn(name = "member_id")
 	})
-	private MemberTravelPlan memberTravelPlan;
+	private MemberTravelPlanEntity memberTravelPlan;
 }

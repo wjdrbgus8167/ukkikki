@@ -2,11 +2,13 @@ package com.dancing_orangutan.ukkikki.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.dancing_orangutan.ukkikki.domain.TravelPlanDomain;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.TravelPlan;
 import com.dancing_orangutan.ukkikki.entity.info.City;
-import com.dancing_orangutan.ukkikki.entity.travelPlan.PlanningStatus;
-import com.dancing_orangutan.ukkikki.entity.travelPlan.TravelPlan;
+import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.TravelPlanEntity;
 import java.time.LocalDate;
+
+import com.dancing_orangutan.ukkikki.travelPlan.mapper.TravelPlanMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,7 @@ public class TravelPlanMapperTest {
 	@DisplayName("도메인 에서 Entity 매핑")
 	void testDomainToEntityMapping() {
 		// Given
-		TravelPlanDomain domain = TravelPlanDomain.builder()
+		TravelPlan domain = TravelPlan.builder()
 				.name("테스트 여행")
 				.startDate(LocalDate.of(2025, 2, 1))
 				.startDate(LocalDate.of(2025, 2, 2))
@@ -40,7 +42,7 @@ public class TravelPlanMapperTest {
 				.build();
 
 		// When
-		TravelPlan entity = travelPlanMapper.domainToEntity(domain);
+		TravelPlanEntity entity = travelPlanMapper.domainToEntity(domain);
 
 		// Then
 		assertThat(entity.getName()).isEqualTo(domain.getName());
@@ -56,7 +58,7 @@ public class TravelPlanMapperTest {
 	@DisplayName("Entity 에서 Domain 매핑")
 	void testEntityToDomain() {
 		// Given
-		TravelPlan entity = TravelPlan.builder()
+		TravelPlanEntity entity = TravelPlanEntity.builder()
 				.name("겨울 여행")
 				.travelPlanId(1)
 				.endDate(LocalDate.of(2025, 02, 02))
@@ -75,7 +77,7 @@ public class TravelPlanMapperTest {
 				.build();
 
 		// When
-		TravelPlanDomain domain = travelPlanMapper.entityToDomain(entity);
+		TravelPlan domain = travelPlanMapper.entityToDomain(entity);
 
 		// Then
 		assertThat(domain.getName()).isEqualTo(entity.getName());

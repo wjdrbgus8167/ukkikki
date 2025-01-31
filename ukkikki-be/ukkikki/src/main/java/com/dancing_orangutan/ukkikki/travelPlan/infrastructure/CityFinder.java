@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.repository.city;
+package com.dancing_orangutan.ukkikki.travelPlan.infrastructure;
 
 import com.dancing_orangutan.ukkikki.entity.info.City;
 import lombok.RequiredArgsConstructor;

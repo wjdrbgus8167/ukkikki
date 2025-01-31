@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.entity.travelPlan;
+package com.dancing_orangutan.ukkikki.travelPlan.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
@@ -12,7 +12,7 @@ import org.springframework.data.annotation.CreatedDate;
 @Entity
 @Table(name = "member_travel_plans")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberTravelPlan {
+public class MemberTravelPlanEntity {
 
 	@EmbeddedId
 	private MemberTravelPlanId memberTravelPlanId;

@@ -1,23 +1,22 @@
-package com.dancing_orangutan.ukkikki.entity.travelPlan;
+package com.dancing_orangutan.ukkikki.travelPlan.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Embeddable
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Getter
-@NoArgsConstructor
-public class TravelPlanKeywordId implements Serializable {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class LikeIdEntity implements Serializable {
 
 	@Column
 	@EqualsAndHashCode.Include
-	private Integer travelPlanId;
+	private Integer placeId;
 
-	@Column
 	@EqualsAndHashCode.Include
-	private Integer keywordId;
+	@Column
+	private Integer memberId;
 }

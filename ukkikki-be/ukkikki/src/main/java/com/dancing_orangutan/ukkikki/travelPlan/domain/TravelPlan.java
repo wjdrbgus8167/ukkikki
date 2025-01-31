@@ -1,14 +1,14 @@
-package com.dancing_orangutan.ukkikki.domain;
+package com.dancing_orangutan.ukkikki.travelPlan.domain;
 
 import com.dancing_orangutan.ukkikki.entity.info.City;
-import com.dancing_orangutan.ukkikki.entity.travelPlan.PlanningStatus;
+import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-public class TravelPlanDomain {
+public class TravelPlan {
 
 	private Integer travelPlanId;
 
