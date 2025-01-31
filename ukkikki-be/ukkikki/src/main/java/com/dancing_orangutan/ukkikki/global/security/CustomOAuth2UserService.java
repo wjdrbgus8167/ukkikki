@@ -44,7 +44,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                                 .build()
                 ));
 
-        return oauth2User;
+        return new OAuth2UserDetails(member);
     }
 
 }

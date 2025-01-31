@@ -1,0 +1,42 @@
+package com.dancing_orangutan.ukkikki.global.security;
+
+import com.dancing_orangutan.ukkikki.entity.member.Member;
+import lombok.AllArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+
+@AllArgsConstructor
+public class OAuth2UserDetails implements OAuth2User, UserDetails {
+    private final Member member;
+
+    @Override
+    public String getPassword() {
+        return member.getPassword();
+    }
+
+    @Override
+    public String getUsername() {
+        return member.getEmail();
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return Map.of();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singleton(() -> "ROLE_MEMBER");
+    }
+
+    @Override
+    public String getName() {
+        return member.getMemberId().toString();
+    }
+
+}
