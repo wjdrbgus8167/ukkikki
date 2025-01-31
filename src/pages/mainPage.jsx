@@ -12,14 +12,9 @@ const Home = () => {
 
   useEffect(() => {
     setLoading(true); // 로딩 시작
-    axios
-      .get('/api/home')
-      .then((response) => {
-        console.log('홈 데이터:');
-      })
-      .finally(() => {
-        setLoading(false); // 데이터 로딩 완료 후 스피너 숨김
-      });
+    axios.get('/api/home').finally(() => {
+      setLoading(false); // 데이터 로딩 완료 후 스피너 숨김
+    });
   }, []);
 
   return (

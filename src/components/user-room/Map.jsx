@@ -6,16 +6,15 @@ const containerStyle = {
   height: '100%',
 };
 
-const center = {
-  lat: 37.7749, // 지도 중심의 위도
-  lng: -122.4194, // 지도 중심의 경도
-};
-
-const Map = () => {
+const Map = ({ coordinates }) => {
   return (
     <div className="bg-gray-300 w-full h-full rounded-lg flex items-center justify-center">
-      <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={10}>
-        <Marker position={center} />
+      <GoogleMap
+        mapContainerStyle={containerStyle}
+        center={coordinates}
+        zoom={12}
+      >
+        <Marker position={coordinates} />
       </GoogleMap>
     </div>
   );

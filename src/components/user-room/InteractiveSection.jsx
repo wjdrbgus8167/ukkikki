@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LoadScript } from '@react-google-maps/api';
 import LikeList from './LikeList';
 import Map from './Map';
@@ -6,7 +6,7 @@ import Chat from './Chat';
 
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
-const InteractiveSection = () => {
+const InteractiveSection = ({ city }) => {
   const [isLikeList, setIsLikeList] = useState(true);
   const wishlists = [
     {
@@ -23,8 +23,34 @@ const InteractiveSection = () => {
       longitude: 2.337644,
       likes: 12,
     },
-    // 나머지 wishlists 데이터 생략
   ];
+  const [coordinates, setCoordinates] = useState({
+    lat: 35.6895,
+    lng: 139.6917,
+  }); // 기본 위치: 도쿄
+
+  useEffect(() => {
+    const getCoordinates = async () => {
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${city}&key=${apiKey}`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log('data:', data);
+
+        if (data.status === 'OK') {
+          const { lat, lng } = data.results[0].geometry.location;
+          setCoordinates({ lat, lng });
+        } else {
+          console.error('Geocoding API 오류:', data.status);
+        }
+      } catch (error) {
+        console.error('API 요청 실패:', error);
+      }
+    };
+
+    getCoordinates();
+  }, [city]); // 도시 변경 시 다시 실행
 
   return (
     <div className="relative p-8 bg-white flex flex-col md:flex-row h-screen">
@@ -63,7 +89,11 @@ const InteractiveSection = () => {
         <div className="flex flex-1 mt-16">
           {/* 왼쪽: 지도 또는 리스트 */}
           <div className="w-full md:w-2/3 p-4 h-full overflow-y-auto rounded-lg shadow-md border">
-            {isLikeList ? <Map /> : <LikeList wishlists={wishlists} />}
+            {isLikeList ? (
+              <Map coordinates={coordinates} />
+            ) : (
+              <LikeList wishlists={wishlists} />
+            )}
           </div>
 
           {/* 오른쪽: 채팅방 */}
