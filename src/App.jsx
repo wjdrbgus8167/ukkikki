@@ -1,12 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './pages/MainPage/mainPage';
+import Home from './pages/mainPage';
 import About from './pages/AboutPage';
-import UserRoom from './pages/UserRoomPage/UserRoom';
-import SearchRooms from './pages/SearchRoomPage/SearchRooms';
+import UserRoom from './pages/UserRoom';
+import SearchRooms from './pages/SearchRooms';
 import AgencyRoomList from './pages/AgencyRoomListPage';
-import LoginPage from './pages/LoginPage/LoginPage';
-import RegisterPage from './pages/RegisterPage/RegisterPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import AgencySignUp from './pages/AgencySignUpPage';
 import LoadingSpinner from './components/common/LoadingSpinner';
 

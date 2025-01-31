@@ -1,9 +1,9 @@
-import Footer from '../../components/layout/Footer';
-import Header from '../../components/layout/Header';
-import HeroSection from '../../components/mainpage/HeroSection';
-import PartnerBrandSlider from '../../components/mainpage/PartnerBrandSlider';
-import TravelPackageCarousel from '../../components/mainpage/TravelPackageCarousel';
-import { useLoadingStore } from '../../stores/loadingStore';
+import Footer from '../components/layout/Footer';
+import Header from '../components/layout/Header';
+import HeroSection from '../components/mainpage/HeroSection';
+import PartnerBrandSlider from '../components/mainpage/PartnerBrandSlider';
+import TravelPackageCarousel from '../components/mainpage/TravelPackageCarousel';
+import { useLoadingStore } from '../stores/loadingStore';
 import React, { useEffect } from 'react';
 import axios from 'axios';
 
