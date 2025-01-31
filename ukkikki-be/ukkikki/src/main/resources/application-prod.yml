@@ -24,6 +24,8 @@ spring:
 logging:
   level:
     root: info
+  file:
+    name : ${LOG_FILE_PATH}
 
 jwt:
   secret_key: ${JWT_SECRET_KEY}
