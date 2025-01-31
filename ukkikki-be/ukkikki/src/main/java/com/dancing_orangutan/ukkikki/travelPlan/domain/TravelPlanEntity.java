@@ -1,9 +1,12 @@
-package com.dancing_orangutan.ukkikki.entity.travelPlan;
+package com.dancing_orangutan.ukkikki.travelPlan.domain;
 
 import com.dancing_orangutan.ukkikki.entity.info.City;
+import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "travel_plans")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TravelPlan {
+public class TravelPlanEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,6 +38,12 @@ public class TravelPlan {
     @Column(nullable = false,name = "planning_status")
     private PlanningStatus planningStatus;
 
+    @Column(nullable = false, name = "close_time")
+    private LocalDateTime closeTime;
+
+    @Column(nullable = false, name = "create_time")
+    private LocalDateTime createTime;
+
     @Column(nullable = false, name = "min_people")
     private int minPeople;
 
@@ -50,9 +59,9 @@ public class TravelPlan {
     private City arrivalCity;
 
     @Builder
-    public TravelPlan(Integer travelPlanId, String name, LocalDate startDate, LocalDate endDate,
-            String hostComment, PlanningStatus planningStatus, int minPeople, int maxPeople,
-            City departureCity, City arrivalCity) {
+    public TravelPlanEntity(Integer travelPlanId, String name, LocalDate startDate, LocalDate endDate,
+                            String hostComment, PlanningStatus planningStatus,LocalDateTime closeTime,LocalDateTime createTime,  int minPeople, int maxPeople,
+                            City departureCity, City arrivalCity) {
         this.travelPlanId = travelPlanId;
         this.name = name;
         this.startDate = startDate;
