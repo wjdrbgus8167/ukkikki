@@ -11,11 +11,14 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "travel_plans")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)  // Auditing 활성화
 public class TravelPlanEntity {
 
     @Id
@@ -38,9 +41,10 @@ public class TravelPlanEntity {
     @Column(nullable = false,name = "planning_status")
     private PlanningStatus planningStatus;
 
-    @Column(nullable = false, name = "close_time")
+    @Column(nullable = true, name = "close_time")
     private LocalDateTime closeTime;
 
+    @CreatedDate
     @Column(nullable = false, name = "create_time")
     private LocalDateTime createTime;
 
@@ -60,7 +64,7 @@ public class TravelPlanEntity {
 
     @Builder
     public TravelPlanEntity(Integer travelPlanId, String name, LocalDate startDate, LocalDate endDate,
-                            String hostComment, PlanningStatus planningStatus,LocalDateTime closeTime,LocalDateTime createTime,  int minPeople, int maxPeople,
+                            String hostComment, PlanningStatus planningStatus, LocalDateTime createTime,  int minPeople, int maxPeople,
                             City departureCity, City arrivalCity) {
         this.travelPlanId = travelPlanId;
         this.name = name;
@@ -68,6 +72,7 @@ public class TravelPlanEntity {
         this.endDate = endDate;
         this.hostComment = hostComment;
         this.planningStatus = planningStatus;
+        this.createTime = createTime;
         this.minPeople = minPeople;
         this.maxPeople = maxPeople;
         this.departureCity = departureCity;
