@@ -2,7 +2,7 @@ package com.dancing_orangutan.ukkikki.service;
 
 import com.dancing_orangutan.ukkikki.dto.*;
 import com.dancing_orangutan.ukkikki.entity.member.Company;
-import com.dancing_orangutan.ukkikki.entity.member.Member;
+import com.dancing_orangutan.ukkikki.entity.member.MemberEntity;
 import com.dancing_orangutan.ukkikki.global.jwt.JwtTokenProvider;
 import com.dancing_orangutan.ukkikki.repository.member.CompanyRepository;
 import com.dancing_orangutan.ukkikki.repository.member.MemberRepository;
@@ -31,7 +31,7 @@ public class AuthService {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
 
-        memberRepository.save(Member.builder()
+        memberRepository.save(MemberEntity.builder()
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
                 .name(request.name())
@@ -44,7 +44,7 @@ public class AuthService {
      *  일반 사용자 로그인 - access token(body 응답), refresh token(쿠키 전송) 발급
      */
     public AuthTokens memberLogin(MemberLoginRequest request) {
-        Member member = memberRepository.findByEmail(request.email())
+        MemberEntity member = memberRepository.findByEmail(request.email())
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
 
         if (!passwordEncoder.matches(request.password(), member.getPassword())) {

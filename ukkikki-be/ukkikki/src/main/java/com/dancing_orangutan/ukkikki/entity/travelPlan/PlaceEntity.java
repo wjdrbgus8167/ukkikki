@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.entity.travelPlan;
 
-import com.dancing_orangutan.ukkikki.travelPlan.domain.TravelPlanEntity;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

@@ -1,9 +1,10 @@
-package com.dancing_orangutan.ukkikki.travelPlan.domain;
+package com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,4 +22,10 @@ public class MemberTravelPlanId implements Serializable {
 	@EqualsAndHashCode.Include
 	@Column
 	private Integer memberId;
+
+	@Builder
+	public MemberTravelPlanId(Integer travelPlanId, Integer memberId) {
+		this.travelPlanId = travelPlanId;
+		this.memberId = memberId;
+	}
 }
