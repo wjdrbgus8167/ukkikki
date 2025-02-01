@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.entity.proposal;
 
-import com.dancing_orangutan.ukkikki.travelPlan.domain.MemberTravelPlanEntity;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -23,7 +23,7 @@ public class Inquiry {
 	@Column(nullable = false, length = 1000)
 	private String content;
 
-	@Column(nullable = false, length = 1000)
+	@Column(nullable = true, length = 1000)
 	private String answer;
 
 	@CreatedDate
