@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.travelPlan.domain;
+package com.dancing_orangutan.ukkikki.travelPlan.domain.like;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

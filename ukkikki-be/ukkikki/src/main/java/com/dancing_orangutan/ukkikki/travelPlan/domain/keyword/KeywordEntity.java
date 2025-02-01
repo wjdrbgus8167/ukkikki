@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.travelPlan.domain;
+package com.dancing_orangutan.ukkikki.travelPlan.domain.keyword;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

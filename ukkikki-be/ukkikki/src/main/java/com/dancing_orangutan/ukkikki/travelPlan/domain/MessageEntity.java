@@ -1,5 +1,6 @@
 package com.dancing_orangutan.ukkikki.travelPlan.domain;
 
+import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;

@@ -10,8 +10,7 @@ public class CityFinder {
 
 	private final JpaCityRepository jpaCityRepository;
 
-	public CityEntity findById(Integer cityId) {
-		return jpaCityRepository.findById(cityId)
-				.orElseThrow(() -> new IllegalArgumentException("해당 도시가 존재하지 않습니다. : " + cityId));
+	public CityEntity getReferenceById(Integer cityId) {
+		return jpaCityRepository.getReferenceById(cityId);
 	}
 }
