@@ -35,11 +35,12 @@ public class CreateTravelPlanCommand {
 
 	private PlanningStatus planningStatus;
 
+	private Integer memberId;
+
 	@Getter
 	@Builder
 	public static class KeywordCommand {
 
 		private Integer keywordId;
 	}
-
 }

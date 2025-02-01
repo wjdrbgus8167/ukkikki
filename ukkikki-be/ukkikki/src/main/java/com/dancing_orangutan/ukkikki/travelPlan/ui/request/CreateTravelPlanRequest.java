@@ -82,7 +82,7 @@ public class CreateTravelPlanRequest {
 	}
 
 	// Command 변환 메서드
-	public CreateTravelPlanCommand toCommand() {
+	public CreateTravelPlanCommand toCommand(Integer memberId) {
 		return CreateTravelPlanCommand.builder()
 				.departureCityId(travelPlanRequest.getDepartureCityId())
 				.arrivalCityId(travelPlanRequest.getArrivalCityId())
@@ -96,6 +96,7 @@ public class CreateTravelPlanRequest {
 				.childCount(host.getChildCount())
 				.infantCount(host.getInfantCount())
 				.planningStatus(travelPlanRequest.getPlanningStatus())
+				.memberId(memberId)
 				.build();
 	}
 
