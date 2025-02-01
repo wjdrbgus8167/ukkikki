@@ -7,11 +7,15 @@ import LoginForm from '../components/auth/LoginForm';
 import kakaoLogo from '../assets/icon.png';
 import googleLogo from '../assets/google.png';
 import logo from '../assets/logo.png';
+import bgImage from '../assets/login-bg.png';
 const LoginPage = () => {
   const [isCompanyLogin, setIsCompanyLogin] = useState(false);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
+    <div
+      className="flex flex-col min-h-screen"
+      style={{ backgroundImage: `url(${bgImage})` }}
+    >
       <Header />
       <main className="flex flex-1 flex-col md:flex-row items-center md:px-28 py-10">
         <HeroText textColor="text-brown" />
