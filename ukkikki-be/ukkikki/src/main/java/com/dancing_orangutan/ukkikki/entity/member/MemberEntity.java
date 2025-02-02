@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "members")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class MemberEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,7 +43,7 @@ public class Member {
     @Column(name = "delete_time")
     private LocalDateTime deleteTime;
     @Builder
-    public Member(String email, String password, String name, String profileImageUrl) {
+    public MemberEntity(String email, String password, String name, String profileImageUrl) {
         this.email = email;
         this.password = password;
         this.name = name;

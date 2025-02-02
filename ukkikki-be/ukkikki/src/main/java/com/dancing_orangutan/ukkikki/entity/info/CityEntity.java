@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.entity.travelPlan;
+package com.dancing_orangutan.ukkikki.entity.info;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,32 +9,32 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.math.BigDecimal;
 import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "places")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Place {
+@Table(name = "cities")
+@Getter
+public class CityEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer placeId;
+	private Integer cityId;
 
-	@Column(nullable = false, length = 50)
-	private String name;
-
-	@Column(nullable = false, length = 100)
-	private String address;
-
-	@Column(nullable = false)
-	private BigDecimal latitude;
-
-	@Column(nullable = false)
-	private BigDecimal longitude;
+	@Column(nullable = false, name = "city_name", length = 20)
+	private String cityName;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "travel_plan_id")
-	private TravelPlan travelPlan;
+	@JoinColumn(name = "country_id")
+	private Country country;
+
+	@Builder
+	public CityEntity(Integer cityId, String cityName, Country country) {
+		this.cityId = cityId;
+		this.cityName = cityName;
+		this.country = country;
+	}
 }
