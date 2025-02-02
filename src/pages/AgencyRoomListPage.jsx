@@ -5,7 +5,7 @@ import Footer from "../components/layout/Footer";
 import AgencySideBar from "../components/agencyPlanList/AgencySideBar";
 import UserProposals from "../components/agencyPlanList/UserProposals";
 import AgencyProposals from "../components/agencyPlanList/AgencyProposals";
-import { TravelPlanProvider } from "../contexts/TravelPlanContext";
+import { TravelPlanProvider } from "../contexts/travelPlanContext";
 
 
 const AgencyRoomList = () => {
