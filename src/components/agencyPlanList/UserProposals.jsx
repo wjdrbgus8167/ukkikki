@@ -1,7 +1,7 @@
 // 사용자가 제안한 제안 목록
 
 import React,{ useContext} from "react";
-import TravelPlanContext from "../../contexts/TravelPlanContext";
+import TravelPlanContext from "../../contexts/travelPlanContext";
 import ListCard from "../common/ListCard";
 
 

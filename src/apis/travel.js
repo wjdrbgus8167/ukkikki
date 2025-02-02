@@ -33,11 +33,11 @@ export const fetchAgencyProposals = async(jwtToken) => {
   };
 };
 
-//제안서 상세 조회(여행사)
+//여행계획 세부 조회
 
-export const AgencyProposalDetail =  async(jwtToken,ProposalId) => {
+export const AgencyProposalDetail =  async(jwtToken,travelPlanId) => {
   try{
-    const response = await publicRequest.get(`/proposals/${ProposalId}`, {
+    const response = await publicRequest.get(`/travel-plans/${travelPlanId}`, {
       headers: {
         Authorization: `Bearer ${jwtToken}`,
       },
@@ -47,3 +47,5 @@ export const AgencyProposalDetail =  async(jwtToken,ProposalId) => {
     console.log('Error:', error)
   };
 };
+
+//
