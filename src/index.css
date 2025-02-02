@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import 'slick-carousel/slick/slick.css';
+@import 'slick-carousel/slick/slick-theme.css';
+/* 애니메이션 정의 */
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px); /* 왼쪽에서 들어오기 */
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px); /* 오른쪽에서 들어오기 */
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 텍스트 애니메이션 (왼쪽에서 오른쪽) */
+.fade-in-left {
+  animation: fadeInLeft 1s ease-out forwards;
+  animation-delay: 0.3s;
+  opacity: 0; /* 초기값 숨김 */
+}
+
+/* 검색바 애니메이션 (오른쪽에서 왼쪽) */
+.fade-in-right {
+  animation: fadeInRight 1s ease-out forwards;
+  animation-delay: 0.8s;
+  opacity: 0; /* 초기값 숨김 */
+}
+
+@keyframes slow-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-slow-spin {
+  animation: slow-spin 2s linear infinite;
+}
