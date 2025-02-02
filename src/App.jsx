@@ -10,6 +10,7 @@ import RegisterPage from './pages/RegisterPage';
 import AgencySignUp from './pages/AgencySignUpPage';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import ProposalDetail from './pages/ProposalDetailPage';
+import MyPage from './pages/UserMyPage';
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<RegisterPage />} />
+        <Route path="/mypage" element={<MyPage />} />
         <Route path="/userroom" element={<UserRoom />} />
         <Route path="/searchroom" element={<SearchRooms />} />
         <Route path="/agencyroom" element={<AgencyRoomList />} />

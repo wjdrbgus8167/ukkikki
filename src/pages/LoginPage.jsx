@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import HeroText from '../components/common/SloganText';
@@ -8,27 +8,52 @@ import kakaoLogo from '../assets/icon.png';
 import googleLogo from '../assets/google.png';
 import logo from '../assets/logo.png';
 import bgImage from '../assets/login-bg.png';
+
 const LoginPage = () => {
+  const [user, setUser] = useState(null);
   const [isCompanyLogin, setIsCompanyLogin] = useState(false);
+  const navigate = useNavigate();
+
+  // ✅ 로그인 상태 확인 (localStorage에서 불러오기)
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  // ✅ 로그인 성공 시 실행될 함수 (LoginForm에서 전달)
+  const handleLogin = (userData) => {
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+    navigate('/'); // 메인 페이지로 이동
+  };
+
+  // ✅ 로그아웃 함수
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('accessToken'); // 엑세스 토큰 삭제
+    setUser(null);
+    navigate('/login');
+  };
 
   return (
     <div
       className="flex flex-col min-h-screen"
-      style={{ backgroundImage: `url(${bgImage})` }}
+      style={{ backgroundImage: `url(${bgImage})`, backgroundSize: 'cover' }}
     >
-      <Header />
+      {/* ✅ 로그인 상태를 Header에 전달 */}
+      <Header user={user} onLogout={handleLogout} />
+
       <main className="flex flex-1 flex-col md:flex-row items-center md:px-28 py-10">
         <HeroText textColor="text-brown" />
 
         <div className="w-full md:w-1/2 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
             <img src={logo} className="mx-auto my-6 w-48 h-auto" alt="로고" />
-            {/* <h1 className="text-xl font-bold mb-4">
-              {isCompanyLogin ? '기업 로그인' : '로그인'}
-            </h1> */}
 
-            {/* 로그인 폼 렌더링 */}
-            <LoginForm isCompany={isCompanyLogin} />
+            {/* ✅ 로그인 폼 (로그인 성공 시 handleLogin 실행) */}
+            <LoginForm isCompany={isCompanyLogin} onLogin={handleLogin} />
 
             {!isCompanyLogin && (
               <div className="mt-6 space-y-4">

@@ -13,21 +13,22 @@ const packages = [
 
 // 화살표 커스터마이징 컴포넌트
 const PrevArrow = ({ onClick }) => (
-    <button
-    className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-white/30 text-white p-3 rounded-full shadow-lg focus:outline-none"      onClick={onClick}
-    >
-      &#9664; {/* 왼쪽 화살표 */}
-    </button>
-  );
-  
-  const NextArrow = ({ onClick }) => (
-    <button
-      className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-white/30 text-white p-3 rounded-full shadow-lg focus:outline-none"
-      onClick={onClick}
-    >
-      &#9654; {/* 오른쪽 화살표 */}
-    </button>
-  );
+  <button
+    className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-white/30 text-white p-3 rounded-full shadow-lg focus:outline-none"
+    onClick={onClick}
+  >
+    &#9664; {/* 왼쪽 화살표 */}
+  </button>
+);
+
+const NextArrow = ({ onClick }) => (
+  <button
+    className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-white/30 text-white p-3 rounded-full shadow-lg focus:outline-none"
+    onClick={onClick}
+  >
+    &#9654; {/* 오른쪽 화살표 */}
+  </button>
+);
 
 const TravelPackageCarousel = () => {
   const settings = {
@@ -49,8 +50,8 @@ const TravelPackageCarousel = () => {
   };
 
   return (
-    <div className="travel-carousel px-6 py-8">
-      <h2 className="text-xl font-bold text-gray-800 mb-4">추천 여행 패키지</h2>
+    <div className="travel-carousel px-6 py-8 my-16">
+      <h2 className="text-xl font-bold text-gray-800 p-4">추천 여행 패키지</h2>
       <Slider {...settings}>
         {packages.map((pkg) => (
           <div key={pkg.id} className="p-4">

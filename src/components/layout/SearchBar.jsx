@@ -277,40 +277,6 @@ const SearchBar = () => {
             )}
           </div>
         )}
-
-        {/* 왕복 결과 */}
-        {searchType === 'createGroup' && (
-          <div className="mt-6">
-            <h3 className="font-bold text-lg mb-2">왕복 결과</h3>
-            <p className="mb-2 font-semibold">출발편</p>
-            {roundTripResult?.departure?.length > 0 ? (
-              <ul>
-                {roundTripResult.departure.map((flight, idx) => (
-                  <li key={idx}>
-                    {flight.airline} - {flight.flightNum} (
-                    {flight.departureTime} → {flight.arrivalTime})
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>해당 날짜/도시의 출발편이 없습니다.</p>
-            )}
-
-            <p className="mt-4 mb-2 font-semibold">도착편 (돌아오는 편)</p>
-            {roundTripResult?.arrival?.length > 0 ? (
-              <ul>
-                {roundTripResult.arrival.map((flight, idx) => (
-                  <li key={idx}>
-                    {flight.airline} - {flight.flightNum} (
-                    {flight.departureTime} → {flight.arrivalTime})
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>해당 날짜/도시의 도착편이 없습니다.</p>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );
