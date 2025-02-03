@@ -67,6 +67,8 @@ public class TravelPlanRepository {
                 .travelPlanInfo(TravelPlanInfo.builder()
                         .name(entity.getName())
                         .departureCityId(entity.getDepartureCity().getCityId())
+                        .maxPeople(entity.getMaxPeople())
+                        .minPeople(entity.getMinPeople())
                         .arrivalCityId(entity.getArrivalCity().getCityId())
                         .planningStatus(entity.getPlanningStatus())
                         .startDate(entity.getStartDate())

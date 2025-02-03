@@ -37,6 +37,8 @@ public class TravelPlanService {
 						.planningStatus(command.planningStatus())
 						.startDate(command.startDate())
 						.endDate(command.endDate())
+						.minPeople(command.minPeople())
+						.maxPeople(command.maxPeople())
 						.build())
 				.host(Host.builder()
 						.adultCount(command.adultCount())
