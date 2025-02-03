@@ -32,6 +32,16 @@ public class CreateTravelPlanRequest {
 			this.adultCount = adultCount;
 			this.childCount = childCount;
 			this.infantCount = infantCount;
+			validate();
+		}
+
+		private void validate() {
+			if (adultCount < 0 || childCount < 0 || infantCount < 0) {
+				throw new IllegalArgumentException("인원 수는 음수일 수 없습니다.");
+			}
+			if (adultCount + childCount + infantCount < 1) {
+				throw new IllegalArgumentException("최소 1명 이상의 호스트가 필요합니다.");
+			}
 		}
 	}
 
@@ -43,6 +53,13 @@ public class CreateTravelPlanRequest {
 		@Builder
 		public KeywordRequest(Integer keywordId) {
 			this.keywordId = keywordId;
+			validate();
+		}
+
+		private void validate() {
+			if (keywordId == null || keywordId <= 0) {
+				throw new IllegalArgumentException("키워드 ID는 필수이며 양수여야 합니다.");
+			}
 		}
 	}
 
@@ -72,6 +89,32 @@ public class CreateTravelPlanRequest {
 			this.minPeople = minPeople;
 			this.maxPeople = maxPeople;
 			this.planningStatus = planningStatus;
+			validate();
+		}
+
+		private void validate() {
+			if (departureCityId == null || departureCityId <= 0) {
+				throw new IllegalArgumentException("출발 도시 ID는 필수이며 양수여야 합니다.");
+			}
+			if (arrivalCityId == null || arrivalCityId <= 0) {
+				throw new IllegalArgumentException("도착 도시 ID는 필수이며 양수여야 합니다.");
+			}
+			if (name == null || name.isBlank()) {
+				throw new IllegalArgumentException("여행 계획 이름은 필수입니다.");
+			}
+			if (startDate == null || endDate == null || startDate.isAfter(endDate)) {
+				throw new IllegalArgumentException("시작일과 종료일이 유효하지 않습니다.");
+			}
+			if (minPeople <= 0 || maxPeople <= 0 || minPeople > maxPeople) {
+				throw new IllegalArgumentException("최소 및 최대 인원이 유효하지 않습니다.");
+			}
+			if (planningStatus == null) {
+				throw new IllegalArgumentException("계획 상태는 필수입니다.");
+			}
+
+			if (keywords != null) {
+				keywords.forEach(KeywordRequest::validate);
+			}
 		}
 	}
 
@@ -81,8 +124,20 @@ public class CreateTravelPlanRequest {
 		this.host = host;
 	}
 
-	// Command 변환 메서드
 	public CreateTravelPlanCommand toCommand(Integer memberId) {
+		if (travelPlanRequest == null) {
+			throw new IllegalArgumentException("여행 계획 정보는 필수입니다.");
+		}
+		if (host == null) {
+			throw new IllegalArgumentException("호스트 정보는 필수입니다.");
+		}
+		if (memberId == null || memberId <= 0) {
+			throw new IllegalArgumentException("회원 ID는 필수이며 양수여야 합니다.");
+		}
+
+		travelPlanRequest.validate();
+		host.validate();
+
 		return CreateTravelPlanCommand.builder()
 				.departureCityId(travelPlanRequest.getDepartureCityId())
 				.arrivalCityId(travelPlanRequest.getArrivalCityId())
