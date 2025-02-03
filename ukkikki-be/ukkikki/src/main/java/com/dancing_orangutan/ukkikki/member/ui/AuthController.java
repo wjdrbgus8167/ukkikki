@@ -37,13 +37,11 @@ public class AuthController {
             HttpServletResponse response
     ) {
         AuthTokens tokens = authService.memberLogin(request);
+        CookieUtils.addAccessTokenCookie(response, tokens.accessToken());
         CookieUtils.addRefreshTokenCookie(response, tokens.refreshToken());
 
         return ResponseEntity.ok(
-                ApiUtils.success(MemberLoginResponse.builder()
-                        .accessToken(tokens.accessToken())
-                        .build()
-                )
+                ApiUtils.success("로그인이 완료되었습니다.")
         );
     }
 

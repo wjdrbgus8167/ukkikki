@@ -23,19 +23,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsService customUserDetailsService;
-    private final static String HEADER_AUTHORIZATION = "Authorization";
-    private final static String TOKEN_PREFIX = "Bearer ";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
-            // 헤더에서 access token 추출
-            String accessToken = getAccessToken(request);
-
-            if (accessToken != null) {
-
+            getAccessToken(request).ifPresent(accessToken -> {
                 // access token이 유효한 경우 인증
                 String email = jwtTokenProvider.getEmail(accessToken);
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
@@ -43,8 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         userDetails, null, userDetails.getAuthorities()
                 );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            }
+            });
 
         } catch (ExpiredJwtException e) {
             request.setAttribute("expiredTokenException", e);
@@ -56,15 +49,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     }
 
+
     /**
      * 헤더에서 액세스 토큰 추출
      */
-    public String getAccessToken(HttpServletRequest request) {
-        String authorizationHeader = request.getHeader(HEADER_AUTHORIZATION);
-
-        return (authorizationHeader != null && authorizationHeader.startsWith(TOKEN_PREFIX))
-                ? authorizationHeader.substring(TOKEN_PREFIX.length())
-                : null;
+    public Optional<String> getAccessToken(HttpServletRequest request) {
+        if (request.getCookies() == null) {
+            return Optional.empty();
+        }
+        return Arrays.stream(request.getCookies())
+                .filter(cookie -> "access_token".equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .findFirst();
     }
 
     /***
