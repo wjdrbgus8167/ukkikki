@@ -1,18 +1,22 @@
 package com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan;
 
 import com.dancing_orangutan.ukkikki.entity.info.CityEntity;
+import com.dancing_orangutan.ukkikki.entity.member.MemberEntity;
+import com.dancing_orangutan.ukkikki.entity.travelPlan.PlaceEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.MessageEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanId;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.keyword.KeywordEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlanKeyword.TravelPlanKeywordEntity;
 import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -64,10 +68,16 @@ public class TravelPlanEntity {
 	private CityEntity arrivalCity;
 
 	@OneToMany(mappedBy = "travelPlan", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<TravelPlanKeywordEntity> travelPlanKeywords = new ArrayList<>();
+	private Set<TravelPlanKeywordEntity> travelPlanKeywords;
 
 	@OneToMany(mappedBy = "travelPlan", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<MemberTravelPlanEntity> memberTravelPlans = new ArrayList<>();
+	private Set<MemberTravelPlanEntity> memberTravelPlans;
+
+	@OneToMany(mappedBy = "travelPlan", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<PlaceEntity> places;
+
+	@OneToMany(mappedBy = "travelPlan", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<MessageEntity> messages;
 
 	@Builder
 	public TravelPlanEntity(String name, LocalDate startDate, LocalDate endDate,
@@ -84,12 +94,13 @@ public class TravelPlanEntity {
 		this.maxPeople = maxPeople;
 		this.departureCity = departureCity;
 		this.arrivalCity = arrivalCity;
-
-		addTravelKeywords(keywords);
-		addMemberTravel(memberId, adultCount, infantCount, childCount);
+		this.travelPlanKeywords = new HashSet<>();
+		this.memberTravelPlans = new HashSet<>();
+		this.places = new HashSet<>();
+		this.messages = new HashSet<>();
 	}
 
-	private void addTravelKeywords(List<KeywordEntity> keywords) {
+	public void addTravelKeywords(List<KeywordEntity> keywords) {
 		if (keywords != null) {
 			keywords.forEach(this::addTravelKeyword);
 		}
@@ -104,7 +115,8 @@ public class TravelPlanEntity {
 		);
 	}
 
-	private void addMemberTravel(Integer memberId, int adultCount, int infantCount,
+	public void addMemberTravel(MemberEntity member, Integer memberId, int adultCount,
+			int infantCount,
 			int childCount) {
 		this.memberTravelPlans.add(
 				MemberTravelPlanEntity.builder()
@@ -114,6 +126,7 @@ public class TravelPlanEntity {
 										.memberId(memberId)
 										.build())
 						.travelPlan(this)
+						.member(member)
 						.hostYn(true)
 						.adultCount(adultCount)
 						.childCount(childCount)

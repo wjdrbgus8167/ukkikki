@@ -3,11 +3,13 @@ package com.dancing_orangutan.ukkikki.entity.travelPlan;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "place_tags")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class PlaceTag {
 
 	@Id

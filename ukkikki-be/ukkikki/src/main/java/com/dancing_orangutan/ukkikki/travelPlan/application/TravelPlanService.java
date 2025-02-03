@@ -2,14 +2,18 @@ package com.dancing_orangutan.ukkikki.travelPlan.application;
 
 
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.CreateTravelPlanCommand;
+import com.dancing_orangutan.ukkikki.travelPlan.application.command.JoinTravelPlanCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlan;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanRead;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.CreateTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.CreateTravelPlanResponse.TravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.travelPlan.TravelPlanRepository;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.response.JoinTravelPlanResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +22,7 @@ public class TravelPlanService {
 
 	private final TravelPlanRepository travelPlanRepository;
 
+	@Transactional
 	public CreateTravelPlanResponse createTravelPlan(CreateTravelPlanCommand command) {
 
 		List<Integer> keywords = command.getKeywords().stream()
@@ -56,4 +61,18 @@ public class TravelPlanService {
 						.build()
 				).build();
 	}
+
+	public TravelPlanRead joinTravelPlan(JoinTravelPlanCommand command) {
+
+		TravelPlan domain = TravelPlan.builder()
+				.adultCount(command.getAdultCount())
+				.childCount(command.getChildCount())
+				.infantCount(command.getInfantCount())
+				.memberId(command.getMemberId())
+				.travelPlanId(command.getTravelPlanId())
+				.build();
+
+		return travelPlanRepository.joinTravelPlan(domain);
+	}
+
 }

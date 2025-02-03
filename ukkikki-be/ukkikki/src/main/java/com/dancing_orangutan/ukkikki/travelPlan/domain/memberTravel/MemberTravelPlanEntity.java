@@ -1,5 +1,6 @@
 package com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel;
 
+import com.dancing_orangutan.ukkikki.entity.member.MemberEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
@@ -60,13 +61,19 @@ public class MemberTravelPlanEntity {
 	@JoinColumn(name = "travel_plan_id")
 	private TravelPlanEntity travelPlan;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@MapsId("memberId")
+	@JoinColumn(name = "member_id")
+	private MemberEntity member;
+
 	@Builder
 	public MemberTravelPlanEntity(MemberTravelPlanId memberTravelPlanId,
-			TravelPlanEntity travelPlan,
+			TravelPlanEntity travelPlan, MemberEntity member,
 			boolean hostYn, int adultCount, int childCount, int infantCount,
 			boolean exitYn, LocalDateTime exitTime) {
 		this.memberTravelPlanId = memberTravelPlanId;
 		this.travelPlan = travelPlan;
+		this.member = member;
 		this.hostYn = hostYn;
 		this.adultCount = adultCount;
 		this.childCount = childCount;
