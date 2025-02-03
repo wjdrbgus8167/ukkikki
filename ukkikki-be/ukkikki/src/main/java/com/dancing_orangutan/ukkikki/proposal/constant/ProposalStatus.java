@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.entity.proposal;
+package com.dancing_orangutan.ukkikki.proposal.constant;
 
 public enum ProposalStatus {
     //거절
