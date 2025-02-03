@@ -1,9 +1,8 @@
-package com.dancing_orangutan.ukkikki.controller.member;
+package com.dancing_orangutan.ukkikki.member.ui;
 
-import com.dancing_orangutan.ukkikki.dto.*;
 import com.dancing_orangutan.ukkikki.global.response.ApiUtils;
 import com.dancing_orangutan.ukkikki.global.util.CookieUtil;
-import com.dancing_orangutan.ukkikki.service.AuthService;
+import com.dancing_orangutan.ukkikki.member.application.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

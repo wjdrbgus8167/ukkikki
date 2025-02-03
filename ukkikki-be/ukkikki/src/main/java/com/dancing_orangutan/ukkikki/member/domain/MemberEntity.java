@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.entity.member;
+package com.dancing_orangutan.ukkikki.member.domain;
 
 
 import jakarta.persistence.*;

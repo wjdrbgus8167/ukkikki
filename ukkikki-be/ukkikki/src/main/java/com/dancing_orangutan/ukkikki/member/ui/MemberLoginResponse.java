@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.dto;
+package com.dancing_orangutan.ukkikki.member.ui;
 
 import lombok.Builder;
 
