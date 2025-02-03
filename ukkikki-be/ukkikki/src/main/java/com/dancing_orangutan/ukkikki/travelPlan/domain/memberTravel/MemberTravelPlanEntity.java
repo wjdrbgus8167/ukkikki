@@ -81,6 +81,10 @@ public class MemberTravelPlanEntity {
 		this.exitYn = exitYn;
 		this.exitTime = exitTime;
 	}
+
+	public void updateLastJoinTime() {
+		this.lastJoinTime = LocalDateTime.now();
+	}
 }
 
 
