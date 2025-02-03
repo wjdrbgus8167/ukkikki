@@ -1,7 +1,9 @@
 package com.dancing_orangutan.ukkikki.entity.member;
 
 
+import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,35 +20,39 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_id")
-    private Integer memberId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "member_id")
+	private Integer memberId;
 
-    @Column(nullable = false, length = 30)
-    private String email;
+	@Column(nullable = false, length = 30)
+	private String email;
 
-    @Column(nullable = false, length = 64)
-    private String password;
+	@Column(nullable = false, length = 64)
+	private String password;
 
-    @Column(nullable = false, length = 20)
-    private String name;
+	@Column(nullable = false, length = 20)
+	private String name;
 
-    @Column(name = "profile_image_url", nullable = false, length = 2000)
-    private String profileImageUrl;
+	@Column(name = "profile_image_url", nullable = false, length = 2000)
+	private String profileImageUrl;
 
-    @CreatedDate
-    @Column(name = "create_time", nullable = false, updatable = false)
-    private LocalDateTime createTime;
+	@CreatedDate
+	@Column(name = "create_time", nullable = false, updatable = false)
+	private LocalDateTime createTime;
 
-    @CreatedDate
-    @Column(name = "delete_time")
-    private LocalDateTime deleteTime;
-    @Builder
-    public MemberEntity(String email, String password, String name, String profileImageUrl) {
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.profileImageUrl = profileImageUrl;
-    }
+	@CreatedDate
+	@Column(name = "delete_time")
+	private LocalDateTime deleteTime;
+
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<MemberTravelPlanEntity> memberTravelPlans;
+
+	@Builder
+	public MemberEntity(String email, String password, String name, String profileImageUrl) {
+		this.email = email;
+		this.password = password;
+		this.name = name;
+		this.profileImageUrl = profileImageUrl;
+	}
 }
