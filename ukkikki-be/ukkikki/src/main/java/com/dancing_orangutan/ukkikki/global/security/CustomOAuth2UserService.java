@@ -1,9 +1,9 @@
 package com.dancing_orangutan.ukkikki.global.security;
 
-import com.dancing_orangutan.ukkikki.entity.member.Member;
+import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
 import com.dancing_orangutan.ukkikki.global.oauth.ProviderUserMapper;
 import com.dancing_orangutan.ukkikki.global.oauth.ProviderUserMapperFactory;
-import com.dancing_orangutan.ukkikki.repository.member.MemberRepository;
+import com.dancing_orangutan.ukkikki.member.infrastructure.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -33,9 +33,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String profileImageUrl = (String) attributes.get("profileImageUrl");
 
         // 회원이 존재하지 않으면 새로 저장
-        Member member = memberRepository.findByEmail(email)
+        MemberEntity member = memberRepository.findByEmail(email)
                 .orElseGet(() -> memberRepository.save(
-                        Member.builder()
+                        MemberEntity.builder()
                                 .email(email)
                                 .name(name)
                                 .password("")

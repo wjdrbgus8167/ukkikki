@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.global.security;
 
-import com.dancing_orangutan.ukkikki.entity.member.Member;
+import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,7 +12,7 @@ import java.util.Map;
 
 @AllArgsConstructor
 public class OAuth2UserDetails implements OAuth2User, UserDetails {
-    private final Member member;
+    private final MemberEntity member;
 
     @Override
     public String getPassword() {

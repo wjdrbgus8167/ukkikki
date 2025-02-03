@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.entity.member;
+package com.dancing_orangutan.ukkikki.member.domain;
 
 
 import jakarta.persistence.*;
@@ -46,7 +46,7 @@ public class MemberEntity {
     @Column(nullable = false, length = 10)
     private String provider;
     @Builder
-    public MemberEntity(String email, String password, String name, String profileImageUrl) {
+    public MemberEntity(String email, String password, String name, String profileImageUrl, String provider) {
         this.email = email;
         this.password = password;
         this.name = name;

@@ -1,12 +1,12 @@
 package com.dancing_orangutan.ukkikki.global.oauth;
 
-import com.dancing_orangutan.ukkikki.entity.member.Member;
 import com.dancing_orangutan.ukkikki.global.jwt.JwtTokenProvider;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.global.security.OAuth2UserDetails;
 import com.dancing_orangutan.ukkikki.global.util.CookieUtils;
 import com.dancing_orangutan.ukkikki.global.util.JsonResponseUtils;
-import com.dancing_orangutan.ukkikki.repository.member.MemberRepository;
+import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
+import com.dancing_orangutan.ukkikki.member.infrastructure.MemberRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,7 +27,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         OAuth2UserDetails userDetails = (OAuth2UserDetails) authentication.getPrincipal();
 
-        Member member = memberRepository.findByEmail(userDetails.getUsername())
+        MemberEntity member = memberRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
 
         String accessToken = jwtTokenProvider.createAccessToken(member.getMemberId(), member.getEmail());
