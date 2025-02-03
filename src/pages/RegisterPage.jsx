@@ -31,24 +31,6 @@ const RegisterPage = () => {
 
         <div className="w-full md:w-1/2 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            {/* `type=company`가 없을 때만 스위치 버튼 표시 */}
-            {/* {!isCompany && (
-              <div className="flex space-x-4 mb-4">
-                <button
-                  className={`flex-1 py-2 rounded ${!isCompany ? 'bg-brown text-white' : 'bg-gray-200 text-gray-700'}`}
-                  onClick={() => setIsCompany(false)}
-                >
-                  일반 회원가입
-                </button>
-                <button
-                  className={`flex-1 py-2 rounded ${isCompany ? 'bg-brown text-white' : 'bg-gray-200 text-gray-700'}`}
-                  onClick={() => setIsCompany(true)}
-                >
-                  기업 회원가입
-                </button>
-              </div>
-            )} */}
-
             {/* 기업/일반 회원가입 폼 렌더링 */}
             {isCompany ? <CompanyRegisterForm /> : <UserRegisterForm />}
           </div>

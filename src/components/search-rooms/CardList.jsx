@@ -78,10 +78,10 @@ const CardList = ({ cards }) => {
                   card.status === '진행중'
                     ? 'bg-progress text-white'
                     : card.status === '제안중'
-                      ? 'bg-proposal text-white'
-                      : card.status === '예약중'
-                        ? 'bg-reservation text-white'
-                        : 'bg-confirmed text-white'
+                    ? 'bg-proposal text-white'
+                    : card.status === '예약중'
+                    ? 'bg-reservation text-white'
+                    : 'bg-confirmed text-white'
                 }`}
               >
                 {card.status}
@@ -115,7 +115,7 @@ const CardList = ({ cards }) => {
 
               {/* 여행 날짜 */}
               <p className="text-gray-600">
-                <strong>여행 날짜:</strong> {card.date}
+                <strong>여행 날짜:</strong> {card.start_date} ~ {card.end_date}
               </p>
 
               {/* 테마 */}
