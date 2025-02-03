@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // ✅ useNavigate 추가
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { ko } from 'date-fns/locale';
@@ -15,9 +16,31 @@ const SearchBar = () => {
   const [searchType, setSearchType] = useState('findRoom'); // ✅ 방 찾기 / 방 만들기 선택 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const navigate = useNavigate(); // ✅ 페이지 이동을 위한 useNavigate 사용
+
   const API_KEY = import.meta.env.VITE_APP_AIRPORT_API_KEY;
   const API_BASE_URL = "/api/flight/getIflightScheduleList"; // 프록시 사용
 
+  // ✅ 방 찾기 버튼 클릭 시 검색 조건을 쿼리 파라미터로 전달하며 SearchRoom 페이지로 이동
+  const handleFindRoom = () => {
+    if (!startDate || !endDate || !departureAirport || !arrivalAirport) {
+      alert('출발일, 돌아오는 날, 출발 공항, 도착 공항을 모두 선택해주세요.');
+      return;
+    }
+
+    // ✅ 검색 조건을 쿼리 파라미터에 추가
+    const queryParams = new URLSearchParams({
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0],
+      departureCityId: departureAirport,
+      arrivalCityId: arrivalAirport,
+      keywords: '',
+      status: '전체보기',
+    });
+
+    // ✅ SearchRoom 페이지로 이동하면서 검색 조건 전달
+    navigate(`/searchroom?${queryParams.toString()}`);
+  };
 
   // ✅ 왕복 항공권 조회 함수
   const checkRoundTripFlights = async () => {
@@ -40,7 +63,6 @@ const SearchBar = () => {
           pageNo: 1,
         },
       });
-      console.log('departureResponse:', departureResponse.data);
 
       // ✅ 도착편 조회
       const returnResponse = await axios.get(API_BASE_URL, {
@@ -53,14 +75,11 @@ const SearchBar = () => {
         },
       });
 
-      const departureFlights =
-        departureResponse.data.response?.body?.items?.item || [];
-      const returnFlights =
-        returnResponse.data.response?.body?.items?.item || [];
+      const departureFlights = departureResponse.data.response?.body?.items?.item || [];
+      const returnFlights = returnResponse.data.response?.body?.items?.item || [];
 
       // ✅ 왕복 항공권 존재 여부 확인 후 모달 띄우기
       if (departureFlights.length > 0 && returnFlights.length > 0) {
-        console.log('✅ 왕복 항공편이 있습니다.');
         setIsModalOpen(true);
       } else {
         alert('❌ 해당 날짜에 왕복 항공편이 없습니다.');
@@ -75,7 +94,7 @@ const SearchBar = () => {
     <div className="flex justify-center mt-10">
       <div className="bg-white bg-opacity-30 p-6 rounded-md shadow-lg w-full max-w-3xl backdrop-blur-md">
         <form className="space-y-6">
-          {/* ✅ 방 찾기 vs 방 만들기 선택 스위치 정상 동작 */}
+          {/* ✅ 방 찾기 vs 방 만들기 선택 스위치 */}
           <div className="relative flex justify-between items-center border-gray-300 pb-2">
             <button
               type="button"
@@ -106,9 +125,7 @@ const SearchBar = () => {
           {/* ✅ 날짜 선택 */}
           <div className="flex space-x-4">
             <div className="w-1/2">
-              <label className="block text-sm font-medium text-gray-700">
-                출발일
-              </label>
+              <label className="block text-sm font-medium text-gray-700">출발일</label>
               <DatePicker
                 selected={startDate}
                 onChange={(date) => setStartDate(date)}
@@ -120,9 +137,7 @@ const SearchBar = () => {
               />
             </div>
             <div className="w-1/2">
-              <label className="block text-sm font-medium text-gray-700">
-                돌아오는 날
-              </label>
+              <label className="block text-sm font-medium text-gray-700">돌아오는 날</label>
               <DatePicker
                 selected={endDate}
                 onChange={(date) => setEndDate(date)}
@@ -137,14 +152,8 @@ const SearchBar = () => {
 
           {/* ✅ 출발/도착 공항 선택 */}
           <div className="flex space-x-4">
-            <KoreaAirportSelector
-              selectedAirport={departureAirport}
-              onChange={(e) => setDepartureAirport(e.target.value)}
-            />
-            <WorldAirportSelector
-              selectedAirport={arrivalAirport}
-              onChange={(e) => setArrivalAirport(e.target.value)}
-            />
+            <KoreaAirportSelector selectedAirport={departureAirport} onChange={(e) => setDepartureAirport(e.target.value)} />
+            <WorldAirportSelector selectedAirport={arrivalAirport} onChange={(e) => setArrivalAirport(e.target.value)} />
           </div>
 
           {/* ✅ 검색하기 / 방 만들기 버튼 */}
@@ -152,6 +161,7 @@ const SearchBar = () => {
             {searchType === 'findRoom' ? (
               <button
                 type="button"
+                onClick={handleFindRoom} // ✅ SearchRoom 페이지로 이동
                 className="w-full bg-dark-green text-white px-8 py-3 rounded-md font-semibold"
               >
                 검색하기
@@ -170,12 +180,7 @@ const SearchBar = () => {
       </div>
 
       {/* ✅ 방 만들기 모달 (왕복 항공권이 있는 경우에만 오픈) */}
-      {isModalOpen && (
-        <CreateRoomModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        />
-      )}
+      {isModalOpen && <CreateRoomModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />}
     </div>
   );
 };
