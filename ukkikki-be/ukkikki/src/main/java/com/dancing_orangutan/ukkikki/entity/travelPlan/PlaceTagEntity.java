@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "place_tags")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class PlaceTag {
+public class PlaceTagEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

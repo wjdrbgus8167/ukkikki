@@ -3,13 +3,13 @@ package com.dancing_orangutan.ukkikki.travelPlan.ui;
 import com.dancing_orangutan.ukkikki.global.security.MemberUserDetails;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.CreateTravelPlanCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.JoinTravelPlanCommand;
-import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanRead;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.request.CreateTravelPlanRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.request.JoinTravelPlanRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.CreateTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.global.response.ApiUtils;
 import com.dancing_orangutan.ukkikki.global.response.ApiUtils.ApiResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.application.TravelPlanService;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.response.JoinTravelPlanResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,7 +35,7 @@ public class TravelPlanController {
 	}
 
 	@PostMapping("/{travelPlanId}")
-	public ApiResponse<TravelPlanRead> joinTravelPlan(
+	public ApiResponse<JoinTravelPlanResponse> joinTravelPlan(
 			@PathVariable(name = "travelPlanId") Integer travelPlanId,
 			@AuthenticationPrincipal MemberUserDetails memberUserDetails,
 			@RequestBody JoinTravelPlanRequest request) {
