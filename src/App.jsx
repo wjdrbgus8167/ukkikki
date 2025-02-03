@@ -12,6 +12,7 @@ import LoadingSpinner from './components/common/LoadingSpinner';
 import ProposalDetail from './pages/ProposalDetailPage';
 import MyPage from './pages/UserMyPage';
 
+
 const App = () => {
   return (
     <Router>
@@ -26,7 +27,6 @@ const App = () => {
         <Route path="/searchroom" element={<SearchRooms />} />
         <Route path="/agencyroom" element={<AgencyRoomList />} />
         <Route path="/agencySignUp" element={<AgencySignUp />} />
-        <Route path="/proposaldetail" element={<ProposalDetail />} />
       </Routes>
     </Router>
   );
