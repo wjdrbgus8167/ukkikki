@@ -1,15 +1,18 @@
 package com.dancing_orangutan.ukkikki.entity.proposal;
 
+import com.dancing_orangutan.ukkikki.proposal.domain.ProposalEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "travelers")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Traveler {
 
 	@Id
@@ -36,7 +39,7 @@ public class Traveler {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "proposal_id")
-	private Proposal proposal;
+	private ProposalEntity proposal;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumns({

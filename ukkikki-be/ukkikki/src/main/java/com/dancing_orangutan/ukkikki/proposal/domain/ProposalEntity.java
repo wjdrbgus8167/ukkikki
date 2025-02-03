@@ -1,20 +1,28 @@
-package com.dancing_orangutan.ukkikki.entity.proposal;
+package com.dancing_orangutan.ukkikki.proposal.domain;
 
-import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import com.dancing_orangutan.ukkikki.entity.info.Airport;
 import com.dancing_orangutan.ukkikki.member.domain.CompanyEntity;
+import com.dancing_orangutan.ukkikki.proposal.constant.ProposalStatus;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+
 @Entity
 @Table(name = "proposals")
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Proposal {
+@EntityListeners(AuditingEntityListener.class)
+
+public class ProposalEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -72,7 +80,7 @@ public class Proposal {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "company_id")
-	private CompanyEntity companyEntity;
+	private CompanyEntity company;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "travel_plan_id")
@@ -85,5 +93,35 @@ public class Proposal {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "arrival_airport_code")
 	private Airport arrivalAirport;
+
+	@Builder
+	public ProposalEntity(Integer proposalId, LocalDate startDate, LocalDate endDate, String airline
+	, LocalDateTime startDateBoardingTime, LocalDateTime startDateArrivalTime, LocalDateTime endDateBoardingTime
+	, LocalDateTime endDateArrivalTime, int deposit, int minPeople, boolean guideIncluded, String productIntroduction
+	, String refundPolicy, boolean insuranceIncluded, ProposalStatus proposalStatus, LocalDateTime createTime
+	, LocalDateTime updateTime, CompanyEntity company, TravelPlanEntity travelPlan, Airport departureAirport, Airport arrivalAirport) {
+
+		this.proposalId = proposalId;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.airline = airline;
+		this.startDateBoardingTime = startDateBoardingTime;
+		this.startDateArrivalTime = startDateArrivalTime;
+		this.endDateBoardingTime = endDateBoardingTime;
+		this.endDateArrivalTime = endDateArrivalTime;
+		this.deposit = deposit;
+		this.minPeople = minPeople;
+		this.guideIncluded = guideIncluded;
+		this.productIntroduction = productIntroduction;
+		this.refundPolicy = refundPolicy;
+		this.insuranceIncluded = insuranceIncluded;
+		this.proposalStatus = proposalStatus;
+		this.createTime = createTime;
+		this.updateTime = updateTime;
+		this.company = company;
+		this.travelPlan = travelPlan;
+		this.departureAirport = departureAirport;
+		this.arrivalAirport = arrivalAirport;
+	}
 
 }

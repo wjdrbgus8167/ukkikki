@@ -1,12 +1,15 @@
 package com.dancing_orangutan.ukkikki.entity.proposal;
 
+import com.dancing_orangutan.ukkikki.proposal.domain.ProposalEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "costs")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Cost {
 
 	@Id
@@ -24,5 +27,5 @@ public class Cost {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "proposal_id")
-	private Proposal proposal;
+	private ProposalEntity proposal;
 }
