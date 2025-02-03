@@ -115,7 +115,7 @@ public class TravelPlanEntity {
 		);
 	}
 
-	public void addMemberTravelPlan(MemberEntity member, int adultCount, int infantCount, int childCount) {
+	public void addMemberTravelPlan(MemberEntity member, int adultCount, int infantCount, int childCount, boolean hostYn) {
 		MemberTravelPlanEntity memberTravelPlan = MemberTravelPlanEntity.builder()
 				.memberTravelPlanId(
 						MemberTravelPlanId.builder()
@@ -125,7 +125,7 @@ public class TravelPlanEntity {
 				)
 				.travelPlan(this)
 				.member(member)
-				.hostYn(true)
+				.hostYn(hostYn)
 				.adultCount(adultCount)
 				.childCount(childCount)
 				.infantCount(infantCount)
