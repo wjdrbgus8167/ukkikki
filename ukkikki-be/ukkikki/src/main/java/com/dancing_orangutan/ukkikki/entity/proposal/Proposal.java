@@ -1,8 +1,8 @@
 package com.dancing_orangutan.ukkikki.entity.proposal;
 
-import com.dancing_orangutan.ukkikki.entity.travelPlan.TravelPlan;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import com.dancing_orangutan.ukkikki.entity.info.Airport;
-import com.dancing_orangutan.ukkikki.entity.member.Company;
+import com.dancing_orangutan.ukkikki.member.domain.CompanyEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -72,11 +72,11 @@ public class Proposal {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "company_id")
-	private Company company;
+	private CompanyEntity companyEntity;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "travel_plan_id")
-	private TravelPlan travelPlan;
+	private TravelPlanEntity travelPlan;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "departure_airport_code")

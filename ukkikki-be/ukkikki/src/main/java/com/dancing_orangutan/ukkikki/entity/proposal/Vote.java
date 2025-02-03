@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.entity.proposal;
 
-import com.dancing_orangutan.ukkikki.entity.member.Member;
+import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -18,8 +18,8 @@ public class Vote {
 	private Integer voteId;
 
 	@CreatedDate
-	@Column(nullable = false)
-	private LocalDateTime voteDate;
+	@Column(nullable = false, name = "vote_time")
+	private LocalDateTime voteTime;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "vote_survey_id")
@@ -27,7 +27,7 @@ public class Vote {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
-	private Member member;
+	private MemberEntity member;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "proposal_id")

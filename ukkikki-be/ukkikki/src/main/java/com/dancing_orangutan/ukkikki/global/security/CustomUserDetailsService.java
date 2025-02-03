@@ -1,7 +1,7 @@
 package com.dancing_orangutan.ukkikki.global.security;
 
-import com.dancing_orangutan.ukkikki.repository.member.CompanyRepository;
-import com.dancing_orangutan.ukkikki.repository.member.MemberRepository;
+import com.dancing_orangutan.ukkikki.member.infrastructure.CompanyRepository;
+import com.dancing_orangutan.ukkikki.member.infrastructure.MemberRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

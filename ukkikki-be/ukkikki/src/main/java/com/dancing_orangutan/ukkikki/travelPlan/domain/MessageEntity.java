@@ -1,25 +1,25 @@
-package com.dancing_orangutan.ukkikki.entity.travelPlan;
+package com.dancing_orangutan.ukkikki.travelPlan.domain;
 
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "place_tags")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PlaceTag {
+public class MessageEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer placeTagId;
+	private Integer messageId;
 
-	@Column(nullable = false, name = "place_tag_name", length = 50)
-	private String placeTagName;
+	@Column(nullable = false, length = 1000)
+	private String content;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "place_id")
-	private PlaceEntity place;
+	@Column(nullable = false, name = "created_at")
+	private LocalDate createdAt;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumns({
