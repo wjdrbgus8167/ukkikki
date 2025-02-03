@@ -1,11 +1,11 @@
-package com.dancing_orangutan.ukkikki.service;
+package com.dancing_orangutan.ukkikki.member.application;
 
-import com.dancing_orangutan.ukkikki.dto.*;
-import com.dancing_orangutan.ukkikki.entity.member.Company;
-import com.dancing_orangutan.ukkikki.entity.member.MemberEntity;
+import com.dancing_orangutan.ukkikki.member.domain.CompanyEntity;
+import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
 import com.dancing_orangutan.ukkikki.global.jwt.JwtTokenProvider;
-import com.dancing_orangutan.ukkikki.repository.member.CompanyRepository;
-import com.dancing_orangutan.ukkikki.repository.member.MemberRepository;
+import com.dancing_orangutan.ukkikki.member.ui.*;
+import com.dancing_orangutan.ukkikki.member.infrastructure.CompanyRepository;
+import com.dancing_orangutan.ukkikki.member.infrastructure.MemberRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -67,7 +67,7 @@ public class AuthService {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
 
-        companyRepository.save(Company.builder()
+        companyRepository.save(CompanyEntity.builder()
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
                 .ceoName(request.ceoName())
@@ -82,15 +82,15 @@ public class AuthService {
      * 여행사 로그인
      */
     public AuthTokens companyLogin(CompanyLoginRequest request) {
-        Company company = companyRepository.findByEmail(request.email())
+        CompanyEntity companyEntity = companyRepository.findByEmail(request.email())
                 .orElseThrow(() -> new IllegalArgumentException("해당 이메일로 등록된 회사가 없습니다."));
 
-        if (!passwordEncoder.matches(request.password(), company.getPassword())) {
+        if (!passwordEncoder.matches(request.password(), companyEntity.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        String accessToken = jwtTokenProvider.createAccessToken(company.getCompanyId(), company.getEmail());
-        String refreshToken = jwtTokenProvider.createRefreshToken(company.getCompanyId(), company.getEmail());
+        String accessToken = jwtTokenProvider.createAccessToken(companyEntity.getCompanyId(), companyEntity.getEmail());
+        String refreshToken = jwtTokenProvider.createRefreshToken(companyEntity.getCompanyId(), companyEntity.getEmail());
 
         return new AuthTokens(accessToken, refreshToken);
     }

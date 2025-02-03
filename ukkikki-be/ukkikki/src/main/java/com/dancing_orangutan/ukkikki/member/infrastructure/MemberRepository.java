@@ -1,6 +1,6 @@
-package com.dancing_orangutan.ukkikki.repository.member;
+package com.dancing_orangutan.ukkikki.member.infrastructure;
 
-import com.dancing_orangutan.ukkikki.entity.member.MemberEntity;
+import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

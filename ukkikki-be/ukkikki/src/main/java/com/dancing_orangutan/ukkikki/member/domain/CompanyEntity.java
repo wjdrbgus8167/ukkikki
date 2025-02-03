@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.entity.member;
+package com.dancing_orangutan.ukkikki.member.domain;
 
 import jakarta.persistence.*;
 
@@ -15,7 +15,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "companies")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Company {
+public class CompanyEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,8 +51,8 @@ public class Company {
     private String profileImageUrl;
 
     @Builder
-    public Company(String email, String password, String ceoName, String companyName,
-                   String businessRegistrationNumber, String phoneNumber, String profileImageUrl) {
+    public CompanyEntity(String email, String password, String ceoName, String companyName,
+                         String businessRegistrationNumber, String phoneNumber, String profileImageUrl) {
         this.email = email;
         this.password = password;
         this.ceoName = ceoName;
