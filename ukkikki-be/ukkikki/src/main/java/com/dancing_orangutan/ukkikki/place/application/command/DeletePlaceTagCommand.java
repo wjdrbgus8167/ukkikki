@@ -7,15 +7,13 @@ import lombok.Getter;
 public class DeletePlaceTagCommand {
 
     private final Integer placeTagId;
-    private final Integer placeId;
     private final Integer travelPlanId;
     private final Integer memberId;
 
     @Builder
-    public DeletePlaceTagCommand(Integer placeTagId, Integer placeId,
+    public DeletePlaceTagCommand(Integer placeTagId,
                                  Integer travelPlanId, Integer memberId) {
         this.placeTagId = placeTagId;
-        this.placeId = placeId;
         this.travelPlanId = travelPlanId;
         this.memberId = memberId;
     }
