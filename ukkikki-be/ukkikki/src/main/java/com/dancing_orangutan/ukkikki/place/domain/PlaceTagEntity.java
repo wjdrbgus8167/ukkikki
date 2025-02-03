@@ -1,6 +1,5 @@
-package com.dancing_orangutan.ukkikki.placeTag;
+package com.dancing_orangutan.ukkikki.place.domain;
 
-import com.dancing_orangutan.ukkikki.place.domain.PlaceEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

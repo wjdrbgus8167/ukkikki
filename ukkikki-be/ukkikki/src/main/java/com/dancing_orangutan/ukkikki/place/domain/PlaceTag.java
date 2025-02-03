@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.placeTag;
+package com.dancing_orangutan.ukkikki.place.domain;
 
 public class PlaceTag {
 

@@ -1,6 +1,5 @@
 package com.dancing_orangutan.ukkikki.place.domain;
 
-import com.dancing_orangutan.ukkikki.placeTag.PlaceTag;
 import lombok.Builder;
 import lombok.Getter;
 
