@@ -7,7 +7,6 @@ const CompanyRegisterForm = () => {
   const [formData, setFormData] = useState({
     email: '',
     representativeName: '',
-    birthDate: '',
     password: '',
     confirmPassword: '',
     companyName: '',
@@ -61,7 +60,6 @@ const CompanyRegisterForm = () => {
     if (
       !formData.email ||
       !formData.representativeName ||
-      !formData.birthDate ||
       !formData.password ||
       !formData.confirmPassword
     ) {
@@ -163,7 +161,9 @@ const CompanyRegisterForm = () => {
 
   return (
     <div className="w-full max-w-md mx-auto bg-white p-6 rounded-lg ">
-      <h2 className="text-xl font-bold text-center mb-4">기업 회원가입</h2>
+      <h1 className="text-3xl text-brown font-bold text-center mb-6">
+        기업회원 회원가입
+      </h1>
 
       {errorMessage && (
         <p className="text-red-500 text-sm mb-4">{errorMessage}</p>
@@ -173,65 +173,49 @@ const CompanyRegisterForm = () => {
         // ✅ **1단계: 대표자 정보 입력**
         <form>
           <div className="mb-4">
-            <label className="block text-sm font-medium">이메일</label>
             <input
               name="email"
               type="email"
               placeholder="이메일"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-3 py-2 border rounded"
+              className="w-full px-3 py-4 border rounded"
               required
             />
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium">대표자 이름</label>
             <input
               type="text"
               name="representativeName"
               placeholder="대표자 이름"
               value={formData.representativeName}
               onChange={handleChange}
-              className="w-full px-3 py-2 border rounded"
+              className="w-full px-3 py-4 border rounded"
               required
             />
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium">생년월일</label>
-            <input
-              type="date"
-              name="birthDate"
-              value={formData.birthDate}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded"
-              required
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-sm font-medium">비밀번호</label>
             <input
               type="password"
               name="password"
               placeholder="비밀번호"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-3 py-2 border rounded"
+              className="w-full px-3 py-4 border rounded"
               required
             />
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium">비밀번호 확인</label>
             <input
               type="password"
               name="confirmPassword"
               placeholder="비밀번호 확인"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="w-full px-3 py-2 border rounded"
+              className="w-full px-3 py-4 border rounded"
               required
             />
           </div>
@@ -239,7 +223,7 @@ const CompanyRegisterForm = () => {
           <button
             type="button"
             onClick={handleNextStep}
-            className="w-full bg-brown text-white py-2 rounded hover:bg-yellow hover:text-brown"
+            className="w-full bg-brown text-white py-3 rounded-lg mt-4"
           >
             다음
           </button>
@@ -248,14 +232,13 @@ const CompanyRegisterForm = () => {
         // ✅ **2단계: 회사 정보 입력**
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-sm font-medium">사명</label>
             <input
               type="text"
               name="companyName"
-              placeholder="사명"
+              placeholder="여행사명"
               value={formData.companyName}
               onChange={handleChange}
-              className="w-full px-3 py-2 border rounded"
+              className="w-full px-3 py-4 border rounded"
               required
             />
           </div>
@@ -274,7 +257,9 @@ const CompanyRegisterForm = () => {
             {isChecking && <p className="text-gray-500 text-sm">조회 중...</p>}
             {businessCheckResult && (
               <p
-                className={`text-sm ${businessCheckResult.valid ? 'text-green-500' : 'text-red-500'}`}
+                className={`text-sm ${
+                  businessCheckResult.valid ? 'text-green-500' : 'text-red-500'
+                }`}
               >
                 {businessCheckResult.message}
               </p>
@@ -308,13 +293,6 @@ const CompanyRegisterForm = () => {
                 required
                 readOnly
               />
-              {/* <button
-                type="button"
-                onClick={handleAddressSearch}
-                className="ml-2 bg-yellow font-semibold text-brown text- px-4 py-1.5 h-12 rounded text-sm flex items-center justify-center whitespace-nowrap min-w-[90px]"
-              >
-                주소 검색
-              </button> */}
             </div>
           </div>
 
@@ -338,14 +316,14 @@ const CompanyRegisterForm = () => {
             <button
               type="button"
               onClick={handlePreviousStep}
-              className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+              className="bg-gray-400 text-white px-4 py-2 rounded"
             >
               이전
             </button>
 
             <button
               type="submit"
-              className="bg-brown text-white px-4 py-2 rounded hover:bg-yellow hover:text-brown hover:font-semibold"
+              className="bg-brown text-white px-4 py-2 rounded"
             >
               회원가입 완료
             </button>
