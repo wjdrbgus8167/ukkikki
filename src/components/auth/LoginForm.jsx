@@ -38,28 +38,28 @@ const LoginForm = ({ isCompany, onLogin }) => {
         <p className="text-red-500 text-sm mb-4">{errorMessage}</p>
       )}
       <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">이메일</label>
         <input
           type="email"
+          placeholder="이메일"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-3 py-2 border rounded"
+          className="w-full px-3 py-4 border rounded"
           required
         />
       </div>
       <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">비밀번호</label>
         <input
           type="password"
+          placeholder="비밀번호"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-3 py-2 border rounded"
+          className="w-full px-3 py-4 border rounded"
           required
         />
       </div>
       <button
         type="submit"
-        className="w-full bg-brown text-white py-2 rounded hover:bg-yellow hover:text-brown"
+        className="w-full bg-brown text-white py-3 rounded-xl "
       >
         {isCompany ? '기업 로그인' : '로그인'}
       </button>
