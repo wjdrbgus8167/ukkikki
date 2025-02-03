@@ -52,3 +52,8 @@
 .animate-slow-spin {
   animation: slow-spin 2s linear infinite;
 }
+
+/* src/components/createplan/travelPlan.jsx */
+.max-h-96.overflow-y-auto::-webkit-scrollbar {
+  display: none;
+}
