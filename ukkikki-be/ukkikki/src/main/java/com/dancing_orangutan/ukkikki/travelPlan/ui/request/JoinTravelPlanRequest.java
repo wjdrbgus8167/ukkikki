@@ -22,7 +22,8 @@ public class JoinTravelPlanRequest {
 
 	public JoinTravelPlanCommand requestToDomain(Integer memberId, Integer travelPlanId) {
 		validate(memberId, travelPlanId);
-		return JoinTravelPlanCommand.builder()
+		return JoinTravelPlanCommand
+				.builder()
 				.adultCount(adultCount)
 				.childCount(childCount)
 				.infantCount(infantCount)
