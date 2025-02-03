@@ -6,6 +6,7 @@ import com.dancing_orangutan.ukkikki.repository.member.MemberFinder;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.keyword.KeywordEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlan;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanRead;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.city.CityFinder;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.keyword.KeywordFinder;
 import com.dancing_orangutan.ukkikki.travelPlan.mapper.TravelPlanMapper;
@@ -53,7 +54,26 @@ public class TravelPlanRepository {
 				.childCount(travelPlanDomain.getChildCount())
 				.build();
 
+		travelPlanEntity.addTravelKeywords(keywords);
+		travelPlanEntity.addMemberTravel(member,member.getMemberId(),
+				travelPlanDomain.getAdultCount(), travelPlanDomain.getInfantCount(),
+				travelPlanDomain.getInfantCount());
+
 		return travelPlanMapper.entityToDomain(
 				jpaTravelPlanRepository.save(travelPlanEntity));
+	}
+
+	public TravelPlanRead joinTravelPlan(final TravelPlan travelPlanDomain) {
+		TravelPlanEntity travelPlanEntity = jpaTravelPlanRepository.findAllByTravelPlanId(
+				travelPlanDomain.getTravelPlanId()).orElseThrow(
+				() -> new IllegalArgumentException("잘못된 여행계획 ID입니다." + travelPlanDomain.getTravelPlanId()));
+		MemberEntity member = memberFinder.getReferenceById(travelPlanDomain.getMemberId());
+
+
+		travelPlanEntity.addMemberTravel(member,member.getMemberId(),
+				travelPlanDomain.getAdultCount(), travelPlanDomain.getInfantCount(),
+				travelPlanDomain.getInfantCount());
+
+		return TravelPlanRead.fromEntity(travelPlanEntity, member.getMemberId());
 	}
 }
