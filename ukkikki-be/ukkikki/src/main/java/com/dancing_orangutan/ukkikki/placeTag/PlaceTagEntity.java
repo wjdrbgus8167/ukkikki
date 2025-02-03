@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.entity.travelPlan;
+package com.dancing_orangutan.ukkikki.placeTag;
 
 import com.dancing_orangutan.ukkikki.place.domain.PlaceEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "place_tags")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PlaceTag {
+public class PlaceTagEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,7 +20,7 @@ public class PlaceTag {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "place_id")
-	private PlaceEntity place;
+	private PlaceEntity placeEntity;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumns({
