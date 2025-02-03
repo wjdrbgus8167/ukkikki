@@ -56,7 +56,9 @@ function RoomModal({
         {/* 1단계: 방 정보 확인 */}
         {step === 1 && selectedCard && (
           <div>
-            <h2 className="text-xl font-bold mb-4">방 정보 확인</h2>
+            <h2 className="text-xl font-bold mb-4 pb-2 border-b-2">
+              방 정보 확인
+            </h2>
             <p className="mb-2">
               <strong>방 이름:</strong> {selectedCard.title}
             </p>
@@ -91,7 +93,9 @@ function RoomModal({
         {/* 2단계: 인원 입력 */}
         {step === 2 && (
           <div>
-            <h2 className="text-xl font-bold mb-4">인원 입력</h2>
+            <h2 className="text-xl font-bold mb-4 pb-2 border-b-2">
+              인원 입력
+            </h2>
             <div className="space-y-4">
               {['adult', 'child', 'infant'].map((type) => (
                 <div key={type} className="flex items-center justify-between">
@@ -99,8 +103,8 @@ function RoomModal({
                     {type === 'adult'
                       ? '성인'
                       : type === 'child'
-                        ? '아동'
-                        : '유아'}
+                      ? '아동'
+                      : '유아'}
                   </label>
                   <div className="flex items-center space-x-2">
                     <button
