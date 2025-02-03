@@ -3,6 +3,7 @@ import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import logo from '../../assets/brand_example.png';
+import ukiki from '../../assets/logo.png';
 const brands = [
   { id: 1, name: 'Brand A', logo: logo },
   { id: 2, name: 'Brand B', logo: logo },
@@ -30,9 +31,19 @@ const PartnerBrandSlider = () => {
   };
 
   return (
-    <div className="partner-slider px-6 py-8">
-      <h2 className="text-xl font-bold text-gray-800 mb-4">제휴 브랜드</h2>
-      <Slider {...settings}>
+    <div className="partner-slider px-6 py-8 text-center">
+      {/* ✅ 제휴업체 소개 제목 (둥근 직사각형을 중앙에 배치) */}
+      <div className="bg-brown text-white text-lg font-bold px-6 py-3 rounded-3xl shadow-md inline-block mx-auto mt-16">
+        제휴업체 소개
+      </div>
+
+      {/* ✅ 추가 문구 */}
+      <h1 className="text-2xl font-bold text-gray-700 my-16 flex items-center justify-center">
+        <img src={ukiki} /> 와 함께하는 사육사를 소개합니다.
+      </h1>
+
+      {/* ✅ 브랜드 슬라이더 */}
+      <Slider {...settings} className="my-16">
         {brands.map((brand) => (
           <div
             key={brand.id}

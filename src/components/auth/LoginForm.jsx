@@ -1,24 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { publicRequest } from '../../hooks/requestMethod';
 
-const LoginForm = ({ isCompany }) => {
+const LoginForm = ({ isCompany, onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate(); // 페이지 이동을 위한 Hook
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    // 기업 로그인과 일반 로그인 API 엔드포인트 구분
     const endpoint = isCompany
       ? '/api/v1/auth/companies/login'
-      : '/api/v1/auth/users/login';
+      : '/api/v1/auth/members/login';
 
     try {
       const response = await publicRequest.post(endpoint, { email, password });
-      alert('로그인 성공!');
-      console.log('로그인 성공:', response.data);
-      // TODO: 로그인 후 페이지 이동 또는 상태 업데이트
+
+      // ✅ 엑세스 토큰 로컬스토리지에 저장
+      localStorage.setItem('accessToken', response.data.accessToken);
+
+      // ✅ 로그인 상태 업데이트 (부모 컴포넌트로 전달)
+      onLogin(response.data.user); // 사용자 정보 전달
+
+      // ✅ 메인 페이지로 이동
+      navigate('/');
     } catch (error) {
       console.error('로그인 실패:', error.response?.data);
       setErrorMessage(error.response?.data?.message || '로그인 실패');

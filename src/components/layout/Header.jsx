@@ -1,15 +1,26 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // react-router-dom에서 Link 가져오기
-import logo from '../../assets/logo.png'; // 로고 파일
-import profileImage from '../../assets/profile.png'; // 프로필 이미지 파일 (예제)
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import logo from '../../assets/logo.png'; // 로고 이미지
+import defaultProfile from '../../assets/profile.png'; // 기본 프로필 이미지
 
 const Header = () => {
-  const [menuOpen, setMenuOpen] = useState(false); // 메뉴 상태 관리
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // ✅ 로그인한 사용자 정보 가져오기
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    setUser(storedUser);
+  }, []);
 
   const handleLogout = () => {
-    // 로그아웃 로직 (예: API 호출 후 상태 초기화)
-    setIsLoggedIn(false);
+    // ✅ 로그아웃 시 로컬 스토리지에서 토큰 삭제
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('user');
+    setUser(null);
+    navigate('/');
   };
 
   return (
@@ -21,7 +32,7 @@ const Header = () => {
 
       {/* 오른쪽 메뉴 */}
       <nav className="hidden md:flex space-x-6 mr-10">
-        {!isLoggedIn ? (
+        {!user ? (
           <>
             <Link
               to="/about"
@@ -29,12 +40,6 @@ const Header = () => {
             >
               서비스 소개
             </Link>
-            {/* <Link
-              to="/signup"
-              className="text-gray-600 hover:text-blue-500 transition duration-300"
-            >
-              회원가입
-            </Link> */}
             <Link
               to="/login"
               className="text-gray-600 hover:text-blue-500 transition duration-300"
@@ -43,27 +48,45 @@ const Header = () => {
             </Link>
           </>
         ) : (
-          <div className="flex items-center space-x-4">
-            <img
-              src={profileImage}
-              alt="Profile"
-              className="w-10 h-10 rounded-full object-cover"
-            />
+          <div className="relative">
+            {/* ✅ 프로필 클릭 시 드롭다운 메뉴 */}
             <button
-              className="text-gray-600 hover:text-blue-500 transition duration-300"
-              onClick={handleLogout}
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center space-x-2 focus:outline-none"
             >
-              로그아웃
+              <img
+                src={user.profile_image_url || defaultProfile}
+                alt="프로필"
+                className="w-10 h-10 rounded-full border border-gray-300"
+              />
             </button>
+
+            {/* ✅ 드롭다운 메뉴 */}
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg">
+                <Link
+                  to="/mypage"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  마이페이지
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  로그아웃
+                </button>
+              </div>
+            )}
           </div>
         )}
       </nav>
 
-      {/* 햄버거 메뉴 (작은 화면) */}
+      {/* 햄버거 메뉴 (모바일) */}
       <div className="md:hidden relative">
         <button
           className="text-xl focus:outline-none"
-          onClick={() => setMenuOpen(!menuOpen)} // 클릭 시 메뉴 상태 변경
+          onClick={() => setMenuOpen(!menuOpen)}
         >
           ☰
         </button>
@@ -71,7 +94,7 @@ const Header = () => {
         {/* 드롭다운 메뉴 */}
         {menuOpen && (
           <div className="absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-md">
-            {!isLoggedIn ? (
+            {!user ? (
               <>
                 <Link
                   to="/about"
@@ -95,10 +118,16 @@ const Header = () => {
             ) : (
               <div className="px-4 py-2">
                 <img
-                  src={profileImage}
+                  src={user.profile_image_url || defaultProfile}
                   alt="Profile"
                   className="w-10 h-10 rounded-full object-cover mb-2"
                 />
+                <Link
+                  to="/mypage"
+                  className="block px-4 py-2 text-gray-600 hover:text-blue-500 hover:bg-gray-100 transition duration-300"
+                >
+                  마이페이지
+                </Link>
                 <button
                   className="block w-full text-left px-4 py-2 text-gray-600 hover:text-blue-500 hover:bg-gray-100 transition duration-300"
                   onClick={handleLogout}
