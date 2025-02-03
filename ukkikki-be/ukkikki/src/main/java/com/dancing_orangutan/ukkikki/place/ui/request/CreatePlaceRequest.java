@@ -1,7 +1,6 @@
 package com.dancing_orangutan.ukkikki.place.ui.request;
 
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 public class CreatePlaceRequest {
