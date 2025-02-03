@@ -6,13 +6,13 @@ import lombok.Getter;
 @Getter
 public class CreatePlaceTagCommand {
 
-    private final Integer placeTagName;
+    private final String placeTagName;
     private final Integer placeId;
     private final Integer travelPlanId;
     private final Integer memberId;
 
     @Builder
-    public CreatePlaceTagCommand(Integer placeTagName, Integer placeId,
+    public CreatePlaceTagCommand(String placeTagName, Integer placeId,
                                  Integer travelPlanId, Integer memberId) {
         this.placeTagName = placeTagName;
         this.placeId = placeId;
