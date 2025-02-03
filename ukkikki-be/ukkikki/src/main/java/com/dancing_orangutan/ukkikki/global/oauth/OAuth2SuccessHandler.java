@@ -4,7 +4,7 @@ import com.dancing_orangutan.ukkikki.global.jwt.JwtTokenProvider;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.global.security.OAuth2UserDetails;
 import com.dancing_orangutan.ukkikki.global.util.CookieUtils;
-import com.dancing_orangutan.ukkikki.global.util.ResponseUtils;
+import com.dancing_orangutan.ukkikki.global.util.JsonResponseUtils;
 import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
 import com.dancing_orangutan.ukkikki.member.infrastructure.MemberRepository;
 import jakarta.servlet.ServletException;
@@ -36,6 +36,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         CookieUtils.addRefreshTokenCookie(response, refreshToken);
         CookieUtils.addAccessTokenCookie(response, accessToken);
 
-        ResponseUtils.sendJsonResponse(response, HttpStatus.OK, ApiUtils.success(null));
+        JsonResponseUtils.sendJsonResponse(response, HttpStatus.OK, ApiUtils.success(null));
     }
 }
