@@ -13,6 +13,7 @@ const CompanyRegisterForm = () => {
     businessNumber: '',
     companyPhone: '',
     companyAddress: '',
+    companyDetailAddress: '',
   });
   const [errorMessage, setErrorMessage] = useState('');
   const [businessCheckResult, setBusinessCheckResult] = useState(null);
@@ -36,7 +37,33 @@ const CompanyRegisterForm = () => {
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    // ✅ 사업자번호 및 전화번호 숫자만 입력 가능
+    if (name === 'businessNumber' || name === 'companyPhone') {
+      const numericValue = value.replace(/[^0-9]/g, ''); // 숫자만 허용
+
+      setFormData((prev) => ({
+        ...prev,
+        [name]: numericValue, // ✅ 입력한 필드만 업데이트
+      }));
+
+      // ✅ 사업자번호일 경우 10자리 검사
+      if (name === 'businessNumber') {
+        if (numericValue.length === 10) {
+          verifyBusinessNumber(numericValue);
+        } else {
+          setBusinessCheckResult({
+            valid: false,
+            message: '사업자 등록번호는 10자리여야 합니다.',
+          });
+        }
+      }
+      return;
+    }
+
+    // 기타 필드 업데이트
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   // ✅ 카카오 주소 검색 API 실행 함수
@@ -82,24 +109,14 @@ const CompanyRegisterForm = () => {
     setStep(1);
   };
 
-  // 사업자등록번호 유효성 검사 (API 요청)
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      if (formData.businessNumber.length === 10) {
-        verifyBusinessNumber();
-      }
-    }, 1000); // 1초 후 실행
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [formData.businessNumber]);
-
-  const verifyBusinessNumber = async () => {
+  // ✅ 사업자등록번호 검사 로직 수정
+  const verifyBusinessNumber = async (businessNumber) => {
     setIsChecking(true);
 
     const apiUrl = `https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey=${apiKey}`;
 
     const requestData = {
-      b_no: [formData.businessNumber], // 사업자번호 배열 형식 유지
+      b_no: [businessNumber],
     };
 
     try {
@@ -119,17 +136,26 @@ const CompanyRegisterForm = () => {
       ) {
         setBusinessCheckResult({
           valid: false,
-          message: '조회된 사업자 정보가 없습니다.',
+          message: '국세청에 등록되지 않은 사업자등록번호입니다.',
         });
         return;
       }
 
       const businessData = response.data.data[0];
 
-      setBusinessCheckResult({
-        valid: true,
-        message: `유효한 사업자등록번호입니다. (상태: ${businessData.tax_type})`,
-      });
+      if (
+        businessData.tax_type === '국세청에 등록되지 않은 사업자등록번호입니다.'
+      ) {
+        setBusinessCheckResult({
+          valid: false,
+          message: '국세청에 등록되지 않은 사업자등록번호입니다.',
+        });
+      } else {
+        setBusinessCheckResult({
+          valid: true,
+          message: `유효한 사업자등록번호입니다. (상태: ${businessData.tax_type})`,
+        });
+      }
     } catch (error) {
       console.error('📌 API 요청 실패:', error);
       setBusinessCheckResult({ valid: false, message: '사업자번호 조회 실패' });
@@ -137,6 +163,7 @@ const CompanyRegisterForm = () => {
       setIsChecking(false);
     }
   };
+
   //회원가입 요청
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -148,6 +175,11 @@ const CompanyRegisterForm = () => {
       !formData.companyAddress
     ) {
       setErrorMessage('모든 필드를 입력해주세요.');
+      return;
+    }
+    // ❌ 사업자번호가 유효하지 않으면 가입 불가
+    if (!businessCheckResult?.valid) {
+      setErrorMessage('유효한 사업자등록번호를 입력해주세요.');
       return;
     }
 
@@ -244,14 +276,13 @@ const CompanyRegisterForm = () => {
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium">사업자등록번호</label>
             <input
               type="text"
               name="businessNumber"
               placeholder="사업자 등록번호 (10자리)"
               value={formData.businessNumber}
               onChange={handleChange}
-              className="w-full px-3 py-2 border rounded focus:ring focus:ring-yellow-400"
+              className="w-full px-3 py-4 border rounded focus:ring focus:ring-yellow-400"
               required
             />
             {isChecking && <p className="text-gray-500 text-sm">조회 중...</p>}
@@ -267,20 +298,18 @@ const CompanyRegisterForm = () => {
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium">회사 전화번호</label>
             <input
               type="text"
               name="companyPhone"
               placeholder="회사 전화번호"
               value={formData.companyPhone}
               onChange={handleChange}
-              className="w-full px-3 py-2 border rounded"
+              className="w-full px-3 py-4 border rounded"
               required
             />
           </div>
           {/* ✅ 카카오 주소 입력 필드 */}
           <div className="mb-4">
-            <label className="block text-sm font-medium">회사 주소</label>
             <div className="flex">
               <input
                 type="text"
@@ -289,7 +318,7 @@ const CompanyRegisterForm = () => {
                 value={formData.companyAddress}
                 onChange={handleChange}
                 onClick={handleAddressSearch}
-                className="w-full px-3 py-2 border rounded"
+                className="w-full px-3 py-4 border rounded"
                 required
                 readOnly
               />
@@ -299,15 +328,13 @@ const CompanyRegisterForm = () => {
           {/* ✅ 상세 주소 입력 필드 추가 */}
           {formData.companyAddress && (
             <div className="mb-4">
-              <label className="block text-sm font-medium">상세 주소</label>
               <input
                 type="text"
                 name="companyDetailAddress"
                 placeholder="상세 주소 입력"
-                value={formData.companyDetailAddress}
+                value={formData.companyDetailAddress || ''} // ✅ undefined 방지
                 onChange={handleChange}
-                className="w-full px-3 py-2 border rounded"
-                required
+                className="w-full px-3 py-4 border rounded"
               />
             </div>
           )}
@@ -323,7 +350,8 @@ const CompanyRegisterForm = () => {
 
             <button
               type="submit"
-              className="bg-brown text-white px-4 py-2 rounded"
+              className="bg-brown text-white px-4 py-2 rounded hover:bg-yellow hover:text-brown hover:font-semibold"
+              disabled={!businessCheckResult?.valid} // ❌ 유효하지 않으면 버튼 비활성화
             >
               회원가입 완료
             </button>
