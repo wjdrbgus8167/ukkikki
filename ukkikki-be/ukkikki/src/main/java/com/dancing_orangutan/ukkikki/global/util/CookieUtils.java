@@ -8,6 +8,20 @@ public class CookieUtils {
     /**
      * Refresh Token 쿠키 생성
      */
+    public static void addAccessTokenCookie(HttpServletResponse response, String token) {
+        Cookie cookie = new Cookie("access_token", token);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(7 * 24 * 60 * 60);
+
+        response.addCookie(cookie);
+    }
+
+
+    /**
+     * Refresh Token 쿠키 생성
+     */
     public static void addRefreshTokenCookie(HttpServletResponse response, String token) {
         Cookie cookie = new Cookie("refresh_token", token);
         cookie.setHttpOnly(true);
