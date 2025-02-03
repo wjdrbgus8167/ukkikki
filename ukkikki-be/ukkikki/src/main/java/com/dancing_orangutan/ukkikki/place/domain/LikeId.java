@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.travelPlan.domain.like;
+package com.dancing_orangutan.ukkikki.place.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LikeIdEntity implements Serializable {
+public class LikeId implements Serializable {
 
 	@Column
 	@EqualsAndHashCode.Include

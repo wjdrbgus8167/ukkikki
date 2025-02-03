@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.travelPlan.domain.like;
+package com.dancing_orangutan.ukkikki.place.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
@@ -15,7 +15,7 @@ import org.springframework.data.annotation.CreatedDate;
 public class LikeEntity {
 
 	@EmbeddedId
-	private LikeIdEntity likeId;
+	private LikeId likeId;
 
 	@Column(nullable = false,name = "likes_cnt")
 	private int likesCnt;
