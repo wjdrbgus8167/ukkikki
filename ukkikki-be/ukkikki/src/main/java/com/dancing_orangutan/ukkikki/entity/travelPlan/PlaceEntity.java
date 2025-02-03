@@ -46,7 +46,7 @@ public class PlaceEntity {
 	private TravelPlanEntity travelPlan;
 
 	@OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<PlaceTag> placeTags;
+	private List<PlaceTagEntity> placeTags;
 
 	@OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<LikeEntity> likes;

@@ -4,7 +4,7 @@ package com.dancing_orangutan.ukkikki.travelPlan.application;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.CreateTravelPlanCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.JoinTravelPlanCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlan;
-import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanRead;
+import com.dancing_orangutan.ukkikki.travelPlan.mapper.TravelPlanMapper;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.CreateTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.CreateTravelPlanResponse.TravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.travelPlan.TravelPlanRepository;
@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TravelPlanService {
 
 	private final TravelPlanRepository travelPlanRepository;
+	private final TravelPlanMapper travelPlanMapper;
 
 	@Transactional
 	public CreateTravelPlanResponse createTravelPlan(CreateTravelPlanCommand command) {
@@ -62,7 +63,7 @@ public class TravelPlanService {
 				).build();
 	}
 
-	public TravelPlanRead joinTravelPlan(JoinTravelPlanCommand command) {
+	public JoinTravelPlanResponse joinTravelPlan(JoinTravelPlanCommand command) {
 
 		TravelPlan domain = TravelPlan.builder()
 				.adultCount(command.getAdultCount())
@@ -72,7 +73,7 @@ public class TravelPlanService {
 				.travelPlanId(command.getTravelPlanId())
 				.build();
 
-		return travelPlanRepository.joinTravelPlan(domain);
+		return travelPlanMapper.toJoinTravelResponse(travelPlanRepository.joinTravelPlan(domain));
 	}
 
 }
