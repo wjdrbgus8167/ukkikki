@@ -66,6 +66,7 @@ public class AuthController {
             HttpServletResponse response
     ) {
         AuthTokens tokens = authService.companyLogin(request);
+        CookieUtils.addAccessTokenCookie(response, tokens.accessToken());
         CookieUtils.addRefreshTokenCookie(response, tokens.refreshToken());
 
         return ResponseEntity.ok(
