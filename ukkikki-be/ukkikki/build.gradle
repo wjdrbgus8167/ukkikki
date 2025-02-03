@@ -26,8 +26,6 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	implementation 'mysql:mysql-connector-java:8.0.32'
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-
 
 	// security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
