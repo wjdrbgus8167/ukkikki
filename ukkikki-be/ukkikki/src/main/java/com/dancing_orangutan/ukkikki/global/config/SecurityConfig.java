@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.CorsFilter;
 
 
 @Configuration
@@ -26,6 +27,9 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final MemberRepository memberRepository;
+    private final CorsFilter corsFilter;
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
+
     /**
      * 비밀번호 암호화 설정
      */
@@ -57,6 +61,8 @@ public class SecurityConfig {
         return new JwtAccessDeniedHandler();
     }
 
+
+
     /**
      * Spring Security 설정
      */
@@ -64,22 +70,25 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)  // CORS 필터 추가
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/oauth2/**", "/swagger-ui/**").permitAll()
+                        .requestMatchers("/auth/**", "/oauth2/**", "/swagger-ui/**", "/login/oauth2/code/**").permitAll()
                         .anyRequest().authenticated()
                 ) .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint())
                         .accessDeniedHandler(jwtAccessDeniedHandler())
                 )
                 .oauth2Login(oauth -> oauth
-                        .defaultSuccessUrl("/auth/oauth2/success")
-                        .failureUrl("/auth/oauth2/failure")
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler())
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/auth/logout")
+                        .logoutSuccessHandler(customLogoutSuccessHandler)  // 커스텀 핸들러 설정
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
