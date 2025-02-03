@@ -9,8 +9,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AgencySignUp from './pages/AgencySignUpPage';
 import LoadingSpinner from './components/common/LoadingSpinner';
-import ProposalDetail from './pages/ProposalDetailPage';
 import MyPage from './pages/UserMyPage';
+import TravelCreate from './pages/TravelCreatePage';
 
 
 const App = () => {
@@ -27,6 +27,7 @@ const App = () => {
         <Route path="/searchroom" element={<SearchRooms />} />
         <Route path="/agencyroom" element={<AgencyRoomList />} />
         <Route path="/agencySignUp" element={<AgencySignUp />} />
+        <Route path="/travelCreate" element={<TravelCreate />}/>
       </Routes>
     </Router>
   );
