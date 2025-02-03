@@ -1,3 +1,7 @@
+server:
+  servlet:
+    contextPath: /api/v1
+
 spring:
   h2:
     console:
@@ -5,10 +9,10 @@ spring:
       path: /h2-console
 
   datasource:
-      url: jdbc:mysql://${MYSQL_URL}
-      username: ${MYSQL_USERNAME}
-      password: ${MYSQL_PASSWORD}
-      driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_URL}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     generate-ddl: 'true'
@@ -25,4 +29,8 @@ logging:
   level:
     root: info
 
+jwt:
+  secret_key: nD/99zQMrX/fypNsi0J2IG+h46ePk0hddF3uCwRQITw=
+  access_expiration: 3600000
+  refresh_expiration: 604800000
 
