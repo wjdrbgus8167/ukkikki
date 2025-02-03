@@ -57,7 +57,9 @@ const UserRegisterForm = () => {
 
   return (
     <div className="w-full max-w-md mx-auto bg-white p-6 rounded-lg">
-      <h2 className="text-xl font-bold text-center mb-4">회원가입</h2>
+      <h1 className="text-3xl text-brown font-bold text-center mb-6">
+        이메일로 회원가입
+      </h1>
 
       {errorMessage && (
         <p className="text-red-500 text-sm mb-4 text-center">{errorMessage}</p>
@@ -65,60 +67,56 @@ const UserRegisterForm = () => {
 
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label className="block text-sm font-medium">이메일</label>
           <input
             name="email"
             type="email"
             placeholder="이메일"
             value={formData.email}
             onChange={handleChange}
-            className="w-full px-3 py-2 border rounded focus:ring focus:ring-yellow-400"
+            className="w-full px-3 py-4 border rounded focus:ring focus:ring-yellow-400"
             required
           />
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium">이름</label>
           <input
             name="name"
             type="text"
             placeholder="이름"
             value={formData.name}
             onChange={handleChange}
-            className="w-full px-3 py-2 border rounded focus:ring focus:ring-yellow-400"
+            className="w-full px-3 py-4 border rounded focus:ring focus:ring-yellow-400"
             required
           />
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium">비밀번호</label>
           <input
             name="password"
             type="password"
             placeholder="비밀번호"
             value={formData.password}
             onChange={handleChange}
-            className="w-full px-3 py-2 border rounded focus:ring focus:ring-yellow-400"
+            className="w-full px-3 py-4 border rounded focus:ring focus:ring-yellow-400"
             required
           />
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium">비밀번호 확인</label>
           <input
             name="confirmPassword"
             type="password"
             placeholder="비밀번호 확인"
             value={formData.confirmPassword}
             onChange={handleChange}
-            className="w-full px-3 py-2 border rounded focus:ring focus:ring-yellow-400"
+            className="w-full px-3 py-4 border rounded focus:ring focus:ring-yellow-400"
             required
           />
         </div>
 
         <button
           type="submit"
-          className="w-full mt-6 bg-brown text-white py-2 rounded hover:bg-yellow hover:text-brown transition"
+          className="w-full mt-6 bg-brown text-white py-3 rounded-lg"
         >
           회원가입
         </button>

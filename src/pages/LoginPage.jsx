@@ -49,7 +49,7 @@ const LoginPage = () => {
         <HeroText textColor="text-brown" />
 
         <div className="w-full md:w-1/2 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+          <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
             <img src={logo} className="mx-auto my-6 w-48 h-auto" alt="로고" />
 
             {/* ✅ 로그인 폼 (로그인 성공 시 handleLogin 실행) */}
@@ -57,7 +57,7 @@ const LoginPage = () => {
 
             {!isCompanyLogin && (
               <div className="mt-6 space-y-4">
-                <button className="w-full bg-white text-black py-2 rounded border border-gray-300 transition flex items-center relative">
+                <button className="w-full bg-white text-black py-3 rounded-xl  border border-gray-200 transition flex items-center relative">
                   <img
                     src={googleLogo}
                     alt="Google"
@@ -67,7 +67,7 @@ const LoginPage = () => {
                     구글 계정으로 로그인하기
                   </span>
                 </button>
-                <button className="w-full bg-yellow text-brown py-2 rounded transition flex items-center relative">
+                <button className="w-full bg-yellow text-brown py-3 rounded-xl transition flex items-center relative">
                   <img
                     src={kakaoLogo}
                     alt="Kakao"

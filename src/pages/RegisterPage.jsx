@@ -29,12 +29,8 @@ const RegisterPage = () => {
       <main className="flex flex-1 flex-col md:flex-row items-center md:px-28 py-10">
         <HeroText textColor="text-brown" />
 
-        <div className="w-full md:w-1/2 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            {/* 기업/일반 회원가입 폼 렌더링 */}
-            {isCompany ? <CompanyRegisterForm /> : <UserRegisterForm />}
-          </div>
-        </div>
+        {/* 기업/일반 회원가입 폼 렌더링 */}
+        {isCompany ? <CompanyRegisterForm /> : <UserRegisterForm />}
       </main>
       <Footer />
     </div>

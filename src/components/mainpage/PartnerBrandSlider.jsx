@@ -2,13 +2,24 @@ import React from 'react';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import logo from '../../assets/brand_example.png';
 import ukiki from '../../assets/logo.png';
+import partner1 from '../../assets/partner1.png';
+import partner2 from '../../assets/partner2.png';
+import partner3 from '../../assets/partner3.png';
+import partner4 from '../../assets/partner4.png';
+import partner5 from '../../assets/partner5.png';
+import partner6 from '../../assets/partner6.png';
+import partner7 from '../../assets/partner7.png';
+import partner8 from '../../assets/partner8.png';
 const brands = [
-  { id: 1, name: 'Brand A', logo: logo },
-  { id: 2, name: 'Brand B', logo: logo },
-  { id: 3, name: 'Brand C', logo: logo },
-  { id: 4, name: 'Brand D', logo: logo },
+  { id: 1, name: 'Brand A', logo: partner1 },
+  { id: 2, name: 'Brand B', logo: partner2 },
+  { id: 3, name: 'Brand C', logo: partner3 },
+  { id: 4, name: 'Brand D', logo: partner4 },
+  { id: 5, name: 'Brand E', logo: partner5 },
+  { id: 6, name: 'Brand F', logo: partner6 },
+  { id: 7, name: 'Brand G', logo: partner7 },
+  { id: 8, name: 'Brand H', logo: partner8 },
 ];
 
 const PartnerBrandSlider = () => {
