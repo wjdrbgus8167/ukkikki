@@ -115,25 +115,25 @@ public class TravelPlanEntity {
 		);
 	}
 
-	public void addMemberTravel(MemberEntity member, Integer memberId, int adultCount,
-			int infantCount,
-			int childCount) {
-		this.memberTravelPlans.add(
-				MemberTravelPlanEntity.builder()
-						.memberTravelPlanId(
-								MemberTravelPlanId.builder()
-										.travelPlanId(this.travelPlanId)
-										.memberId(memberId)
-										.build())
-						.travelPlan(this)
-						.member(member)
-						.hostYn(true)
-						.adultCount(adultCount)
-						.childCount(childCount)
-						.infantCount(infantCount)
-						.exitYn(false)
-						.exitTime(null)
-						.build()
-		);
+	public void addMemberTravelPlan(MemberEntity member, int adultCount, int infantCount, int childCount) {
+		MemberTravelPlanEntity memberTravelPlan = MemberTravelPlanEntity.builder()
+				.memberTravelPlanId(
+						MemberTravelPlanId.builder()
+								.travelPlanId(this.travelPlanId)
+								.memberId(member.getMemberId())
+								.build()
+				)
+				.travelPlan(this)
+				.member(member)
+				.hostYn(true)
+				.adultCount(adultCount)
+				.childCount(childCount)
+				.infantCount(infantCount)
+				.exitYn(false)
+				.exitTime(null)
+				.build();
+
+		this.memberTravelPlans.add(memberTravelPlan);
 	}
+
 }
