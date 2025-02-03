@@ -15,8 +15,8 @@ public class CreatePlaceTagCommand {
     public CreatePlaceTagCommand(String placeTagName, Integer placeId,
                                  Integer travelPlanId, Integer memberId) {
         this.placeTagName = placeTagName;
-        this.placeId = placeId;
         this.travelPlanId = travelPlanId;
         this.memberId = memberId;
+        this.placeId = placeId;
     }
 }

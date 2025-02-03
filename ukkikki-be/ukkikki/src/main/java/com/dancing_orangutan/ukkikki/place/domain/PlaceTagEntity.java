@@ -3,6 +3,7 @@ package com.dancing_orangutan.ukkikki.place.domain;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -27,4 +28,12 @@ public class PlaceTagEntity {
 			@JoinColumn(name = "member_id")
 	})
 	private MemberTravelPlanEntity memberTravelPlan;
+	
+	@Builder
+    PlaceTagEntity(String placeTagName, PlaceEntity placeEntity,
+				   MemberTravelPlanEntity memberTravelPlan) {
+        this.placeTagName = placeTagName;
+        this.placeEntity = placeEntity;
+        this.memberTravelPlan = memberTravelPlan;
+    }
 }
