@@ -5,5 +5,5 @@ import lombok.Getter;
 @Getter
 public class CreatePlaceTagRequest {
 
-    private String name;
+    private String placeTagName;
 }
