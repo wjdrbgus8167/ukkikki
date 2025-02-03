@@ -59,7 +59,7 @@ public class TravelPlanRepository {
         travelPlanEntity.addTravelKeywords(keywords);
         travelPlanEntity.addMemberTravelPlan(member,
                 travelPlanDomain.getHost().adultCount(), travelPlanDomain.getHost().childCount(),
-                travelPlanDomain.getHost().infantCount());
+                travelPlanDomain.getHost().infantCount(),true);
 
         TravelPlanEntity entity = jpaTravelPlanRepository.save(travelPlanEntity);
 
@@ -81,7 +81,7 @@ public class TravelPlanRepository {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 여행 계획입니다."));
         MemberEntity memberEntity = memberFinder.getById(travelPlanDomain.getHost().memberId());
 
-        travelPlan.addMemberTravelPlan(memberEntity, travelPlanDomain.getHost().adultCount(), travelPlanDomain.getHost().childCount(), travelPlanDomain.getHost().infantCount());
+        travelPlan.addMemberTravelPlan(memberEntity, travelPlanDomain.getHost().adultCount(), travelPlanDomain.getHost().childCount(), travelPlanDomain.getHost().infantCount(),false);
     }
 
 	public TravelPlanRead findAllByTravelPlanId(final Integer travelPlanId, final Integer memberId) {
