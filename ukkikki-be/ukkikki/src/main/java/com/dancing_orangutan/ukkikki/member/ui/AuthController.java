@@ -1,7 +1,7 @@
 package com.dancing_orangutan.ukkikki.member.ui;
 
-import com.dancing_orangutan.ukkikki.global.response.ApiUtils;
-import com.dancing_orangutan.ukkikki.global.util.CookieUtil;
+import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
+import com.dancing_orangutan.ukkikki.global.util.CookieUtils;
 import com.dancing_orangutan.ukkikki.member.application.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -37,13 +37,11 @@ public class AuthController {
             HttpServletResponse response
     ) {
         AuthTokens tokens = authService.memberLogin(request);
-        CookieUtil.addRefreshTokenCookie(response, tokens.refreshToken());
+        CookieUtils.addAccessTokenCookie(response, tokens.accessToken());
+        CookieUtils.addRefreshTokenCookie(response, tokens.refreshToken());
 
         return ResponseEntity.ok(
-                ApiUtils.success(MemberLoginResponse.builder()
-                        .accessToken(tokens.accessToken())
-                        .build()
-                )
+                ApiUtils.success("로그인이 완료되었습니다.")
         );
     }
 
@@ -68,7 +66,8 @@ public class AuthController {
             HttpServletResponse response
     ) {
         AuthTokens tokens = authService.companyLogin(request);
-        CookieUtil.addRefreshTokenCookie(response, tokens.refreshToken());
+        CookieUtils.addAccessTokenCookie(response, tokens.accessToken());
+        CookieUtils.addRefreshTokenCookie(response, tokens.refreshToken());
 
         return ResponseEntity.ok(
                 ApiUtils.success(CompanyLoginResponse.builder()
@@ -77,4 +76,5 @@ public class AuthController {
                 )
         );
     }
+
 }

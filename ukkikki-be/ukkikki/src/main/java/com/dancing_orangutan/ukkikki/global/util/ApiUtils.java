@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.global.response;
+package com.dancing_orangutan.ukkikki.global.util;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
