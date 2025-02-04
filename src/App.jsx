@@ -7,10 +7,10 @@ import SearchRooms from './pages/SearchRoomsPage';
 import AgencyRoomList from './pages/AgencyRoomListPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import AgencySignUp from './pages/AgencySignUpPage';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import MyPage from './pages/UserMyPage';
 import TravelCreate from './pages/TravelCreatePage';
+import ProposalDetail from './pages/ProposalDetailPage';
 
 
 const App = () => {
@@ -26,8 +26,8 @@ const App = () => {
         <Route path="/userroom" element={<UserRoom />} />
         <Route path="/searchroom" element={<SearchRooms />} />
         <Route path="/agencyroom" element={<AgencyRoomList />} />
-        <Route path="/agencySignUp" element={<AgencySignUp />} />
-        <Route path="/travelCreate" element={<TravelCreate />}/>
+        <Route path="/travel-create" element={<TravelCreate />} />
+        <Route path="/proposaldetail" element={<ProposalDetail />}/>
       </Routes>
     </Router>
   );
