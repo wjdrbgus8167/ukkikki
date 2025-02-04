@@ -11,13 +11,16 @@ public class TravelPlan {
 
 	private final TravelPlanInfo travelPlanInfo;
 	private final Host host;
-	private final List<Integer> keywords;
+
 
 	@Builder()
-	public TravelPlan(final TravelPlanInfo travelPlanInfo, final Host host, final List<Integer> keywords) {
+	public TravelPlan(final TravelPlanInfo travelPlanInfo, final Host host) {
 		this.travelPlanInfo = travelPlanInfo;
 		this.host = host;
-		this.keywords = keywords;
+	}
+
+	public int calPeopleCount() {
+		return host.adultCount() + host.childCount() + host.infantCount();
 	}
 }
 
