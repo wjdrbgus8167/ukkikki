@@ -2,6 +2,7 @@ package com.dancing_orangutan.ukkikki.place.application;
 
 import com.dancing_orangutan.ukkikki.place.application.command.CreatePlaceCommand;
 import com.dancing_orangutan.ukkikki.place.application.command.CreatePlaceTagCommand;
+import com.dancing_orangutan.ukkikki.place.application.command.DeletePlaceTagCommand;
 import com.dancing_orangutan.ukkikki.place.domain.Place;
 import com.dancing_orangutan.ukkikki.place.domain.PlaceEntity;
 import com.dancing_orangutan.ukkikki.place.domain.PlaceTag;
@@ -81,5 +82,24 @@ public class PlaceServiceImpl implements PlaceService {
             // PlaceTag save
             placeTagRepository.save(placeTagEntity);
         }
+    }
+
+    @Override
+    public void deletePlaceTag(DeletePlaceTagCommand command) {
+
+        // PlaceTag 영속성 객체 불러오기
+        Optional<PlaceTagEntity> optionalPlaceTagEntity = placeTagRepository.findById(command.getPlaceTagId());
+        PlaceTagEntity placeTagEntity = optionalPlaceTagEntity.orElseThrow(() -> {
+            logger.error("PlaceTagEntity not found for id: {}", command.getPlaceTagId());
+            return new IllegalArgumentException("No PlaceTagEntity found for id: " + command.getPlaceTagId());
+        });
+
+        // 영속성 객체 도메인 객체로 매핑
+        PlaceTag placeTag = PlaceTagMapper.mapToDomain(placeTagEntity);
+
+        // 비즈니스 로직 수행
+
+        // PlaceTag delete
+        placeTagRepository.delete(placeTagEntity);
     }
 }

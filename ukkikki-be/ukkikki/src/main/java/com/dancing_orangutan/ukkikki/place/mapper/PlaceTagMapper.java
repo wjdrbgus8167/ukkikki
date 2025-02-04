@@ -16,4 +16,14 @@ public class PlaceTagMapper {
                 .memberTravelPlan(memberTravelPlanEntity)
                 .build();
     }
+
+    public static PlaceTag mapToDomain(PlaceTagEntity placeTagEntity) {
+
+        return PlaceTag.builder()
+                .placeTagName(placeTagEntity.getPlaceTagName())
+                .placeTagId(placeTagEntity.getPlaceTagId())
+                .creatorId(placeTagEntity.getMemberTravelPlan().getMemberTravelPlanId().getMemberId())
+                .placeId(placeTagEntity.getPlaceEntity().getPlaceId())
+                .build();
+    }
 }

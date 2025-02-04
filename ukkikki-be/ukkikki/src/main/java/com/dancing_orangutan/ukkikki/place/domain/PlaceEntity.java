@@ -4,13 +4,13 @@ import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEnti
 import jakarta.persistence.*;
 
 import lombok.*;
-
 import java.util.List;
 
 @Entity
 @Table(name = "places")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Getter
 @Builder
 @Getter
 public class PlaceEntity {
