@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel;
 
-import com.dancing_orangutan.ukkikki.entity.member.MemberEntity;
+import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;

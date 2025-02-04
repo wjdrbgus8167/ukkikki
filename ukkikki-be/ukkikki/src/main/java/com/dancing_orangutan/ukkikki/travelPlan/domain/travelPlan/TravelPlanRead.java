@@ -1,10 +1,9 @@
 package com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan;
 
-import com.dancing_orangutan.ukkikki.entity.travelPlan.PlaceEntity;
-import com.dancing_orangutan.ukkikki.entity.travelPlan.PlaceTagEntity;
+import com.dancing_orangutan.ukkikki.place.domain.LikeEntity;
+import com.dancing_orangutan.ukkikki.place.domain.PlaceEntity;
+import com.dancing_orangutan.ukkikki.place.domain.PlaceTagEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.MessageEntity;
-import com.dancing_orangutan.ukkikki.travelPlan.domain.like.LikeEntity;
-import java.math.BigDecimal;
 import java.util.stream.Collectors;
 
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
@@ -62,8 +61,8 @@ public class TravelPlanRead {
 		private Integer placeId;
 		private String name;
 		private String address;
-		private BigDecimal latitude;
-		private BigDecimal longitude;
+		private double latitude;
+		private double longitude;
 		private List<PlaceTagInfo> placeTags;
 		private int likesCnt;
 		private boolean likeYn;

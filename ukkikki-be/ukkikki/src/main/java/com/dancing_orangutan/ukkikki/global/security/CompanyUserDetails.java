@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.global.security;
 
-import com.dancing_orangutan.ukkikki.entity.member.Company;
+import com.dancing_orangutan.ukkikki.member.domain.CompanyEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,7 +12,7 @@ import java.util.Collections;
 @AllArgsConstructor
 public class CompanyUserDetails implements UserDetails {
 
-    private final Company company;
+    private final CompanyEntity companyEntity;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -21,15 +21,15 @@ public class CompanyUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return company.getPassword();
+        return companyEntity.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return company.getEmail();
+        return companyEntity.getEmail();
     }
 
     public Integer getCompanyId() {
-        return company.getCompanyId();
+        return companyEntity.getCompanyId();
     }
 }

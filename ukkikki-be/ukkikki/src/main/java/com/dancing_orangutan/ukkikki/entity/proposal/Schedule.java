@@ -1,14 +1,17 @@
 package com.dancing_orangutan.ukkikki.entity.proposal;
 
+import com.dancing_orangutan.ukkikki.proposal.domain.ProposalEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "schedules")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Schedule {
 
     @Id
@@ -29,5 +32,5 @@ public class Schedule {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "proposal_id")
-    private Proposal proposal;
+    private ProposalEntity proposal;
 }
