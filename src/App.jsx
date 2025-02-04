@@ -12,7 +12,6 @@ import MyPage from './pages/UserMyPage';
 import TravelCreate from './pages/TravelCreatePage';
 import ProposalDetail from './pages/ProposalDetailPage';
 
-
 const App = () => {
   return (
     <Router>
@@ -23,11 +22,11 @@ const App = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<RegisterPage />} />
         <Route path="/mypage" element={<MyPage />} />
-        <Route path="/userroom" element={<UserRoom />} />
+        <Route path="/user-room" element={<UserRoom />} />
         <Route path="/searchroom" element={<SearchRooms />} />
         <Route path="/agencyroom" element={<AgencyRoomList />} />
         <Route path="/travel-create" element={<TravelCreate />} />
-        <Route path="/proposaldetail" element={<ProposalDetail />}/>
+        <Route path="/proposaldetail" element={<ProposalDetail />} />
       </Routes>
     </Router>
   );

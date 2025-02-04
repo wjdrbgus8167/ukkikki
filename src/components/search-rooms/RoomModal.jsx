@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; // React Router 사용
 
 const ProgressBar = ({ step, totalSteps }) => {
   const progress = (step / totalSteps) * 100;
@@ -32,6 +33,8 @@ function RoomModal({
   onDecrement,
   onComplete,
 }) {
+  const navigate = useNavigate();
+
   if (!isOpen) return null;
 
   // 오버레이 클릭 핸들러
@@ -41,7 +44,11 @@ function RoomModal({
       onClose();
     }
   };
-
+  // 입장하기 버튼 클릭 시 UserRoom으로 라우팅
+  const handleEnterRoom = () => {
+    // `selectedCard`를 상태로 전달하며 UserRoom으로 라우팅
+    navigate('/user-room', { state: { selectedCard } });
+  };
   return (
     // 클릭 이벤트를 배경(오버레이) div에 등록
     <div
@@ -149,7 +156,7 @@ function RoomModal({
                 </button>
                 <button
                   className="px-4 py-2 bg-brown text-white rounded-md"
-                  onClick={onComplete}
+                  onClick={handleEnterRoom}
                 >
                   입장하기
                 </button>

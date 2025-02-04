@@ -8,12 +8,12 @@ const SearchRoom = () => {
   const cards = [
     {
       status: '진행중',
-      title: '유럽 여행 동행 모집',
+      title: '프랑스 여행 동행 모집',
       people: 5,
       start_date: '2025-02-15',
       end_date: '2025-02-25',
       theme: '관광+휴양,식도락',
-      country: '유럽',
+      country: '프랑스',
       min_people: 10,
       max_people: 20,
     },
