@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -23,4 +24,11 @@ public class LikeEntity {
 	@CreatedDate
 	@Column
 	private LocalDate createdAt;
+
+	@Builder
+	public LikeEntity(LikeId likeId, int likesCnt, LocalDate createdAt) {
+		this.likeId = likeId;
+		this.likesCnt = likesCnt;
+		this.createdAt = createdAt;
+	}
 }
