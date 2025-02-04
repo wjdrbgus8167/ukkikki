@@ -23,7 +23,7 @@ public record CreateTravelPlanResponse(TravelPlanInfoUi travelPlan) {
 				travelPlan.getTravelPlanInfo().minPeople(),
 				travelPlan.getTravelPlanInfo().maxPeople(),
 				travelPlan.getTravelPlanInfo().planningStatus(),
-				mapKeywords(travelPlan.getKeywords())
+				mapKeywords(travelPlan.getTravelPlanInfo().keywords())
 		);
 
 		return new CreateTravelPlanResponse(travelPlanInfoUi);
