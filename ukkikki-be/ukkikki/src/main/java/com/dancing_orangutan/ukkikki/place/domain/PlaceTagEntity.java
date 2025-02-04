@@ -12,7 +12,6 @@ import lombok.Getter;
 @Getter
 @Table(name = "place_tags")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
 public class PlaceTagEntity {
 
 	@Id

@@ -12,7 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Builder
-@Getter
 public class PlaceEntity {
 
 	@Id
@@ -35,9 +34,9 @@ public class PlaceEntity {
 	@JoinColumn(name = "travel_plan_id", nullable = false)
 	private TravelPlanEntity travelPlan;
 
-	@OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "placeEntity", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<PlaceTagEntity> placeTags;
 
-	@OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "placeEntity", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<LikeEntity> likes;
 }

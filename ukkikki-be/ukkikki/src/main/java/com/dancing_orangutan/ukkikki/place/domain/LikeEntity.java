@@ -34,7 +34,7 @@ public class LikeEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@MapsId("placeId")
 	@JoinColumn(name = "place_id")
-	private PlaceEntity place;
+	private PlaceEntity placeEntity;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@MapsId("memberId")
