@@ -4,8 +4,6 @@ package com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
-
 @Getter
 public class TravelPlan {
 

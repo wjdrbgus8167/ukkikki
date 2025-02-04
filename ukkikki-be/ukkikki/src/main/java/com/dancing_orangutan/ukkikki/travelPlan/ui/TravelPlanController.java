@@ -8,7 +8,6 @@ import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPl
 import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.request.CreateTravelPlanRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.request.JoinTravelPlanRequest;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.request.KeywordUi;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.CreateTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.application.TravelPlanService;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.JoinTravelPlanResponse;
