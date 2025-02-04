@@ -109,7 +109,10 @@ public class TravelPlanRepository {
 				travelPlanDomain.getTravelPlanInfo().startDate(),
 				travelPlanDomain.getTravelPlanInfo().endDate(),
 				travelPlanDomain.getTravelPlanInfo().departureCityId(),
-				travelPlanDomain.getTravelPlanInfo().arrivalCityId());
+				travelPlanDomain.getTravelPlanInfo().arrivalCityId(),
+				travelPlanDomain.getTravelPlanInfo().planningStatus(),
+				travelPlanDomain.getTravelPlanInfo().keywords()
+		);
 
 		return travelPlanEntities.stream()
 				.map(entity -> TravelPlan.builder()

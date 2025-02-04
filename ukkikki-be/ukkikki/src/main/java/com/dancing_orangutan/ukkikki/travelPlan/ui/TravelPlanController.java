@@ -55,7 +55,7 @@ public class TravelPlanController {
 			@RequestParam(value = "endDate") LocalDate endDate,
 			@RequestParam(value = "departureCityId") Integer departureCityId,
 			@RequestParam(value = "arrivalCityId") Integer arrivalCityId,
-			@RequestParam(value ="keyword",required = false) List<KeywordUi> keywords,
+			@RequestParam(value ="keyword",required = false) List<Integer> keywords,
 			@RequestParam(value = "status",required = false)PlanningStatus status){
 
 		SearchTravelPlanQuery searchQuery = SearchTravelPlanQuery
@@ -64,7 +64,7 @@ public class TravelPlanController {
 				.endDate(endDate)
 				.departureCityId(departureCityId)
 				.arrivalCityId(arrivalCityId)
-				.keywords(keywords!= null ? keywords.stream().map(KeywordUi::keywordId).toList():null)
+				.keywords(keywords)
 				.status(status)
 				.build();
 

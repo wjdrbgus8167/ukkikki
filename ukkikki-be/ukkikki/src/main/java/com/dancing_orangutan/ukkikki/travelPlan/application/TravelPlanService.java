@@ -59,11 +59,13 @@ public class TravelPlanService {
 
 	@Transactional
 	public JoinTravelPlanResponse joinTravelPlan(JoinTravelPlanCommand command) {
-		boolean isJoining = memberTravelPlanFinder.isJoiningTravelPlan(command.getMemberId(), command.getTravelPlanId());
+		boolean isJoining = memberTravelPlanFinder.isJoiningTravelPlan(command.getMemberId(),
+				command.getTravelPlanId());
 
 		// 현재 방에 참여중일 경우 마지막 참여시간만 변경
 		if (isJoining) {
-			memberTravelPlanModifier.modifyLastJoinTime(command.getMemberId(), command.getTravelPlanId());
+			memberTravelPlanModifier.modifyLastJoinTime(command.getMemberId(),
+					command.getTravelPlanId());
 		}
 
 		//아니라면 여행 계획에 참여
@@ -83,18 +85,22 @@ public class TravelPlanService {
 		}
 
 		// 여행 계획 ID와 관련된 모든 데이터 조회
-		return travelPlanMapper.toJoinTravelResponse(travelPlanRepository.findAllByTravelPlanId(command.getTravelPlanId(),command.getMemberId()));
+		return travelPlanMapper.toJoinTravelResponse(
+				travelPlanRepository.findAllByTravelPlanId(command.getTravelPlanId(),
+						command.getMemberId()));
 	}
 
 	public SearchTravelPlanResponse searchTravelPlan(SearchTravelPlanQuery query) {
 		TravelPlan domain = TravelPlan.builder()
 				.travelPlanInfo(
 						TravelPlanInfo.builder()
-						.departureCityId(query.departureCityId())
-						.arrivalCityId(query.arrivalCityId())
-						.startDate(query.startDate())
-						.endDate(query.endDate())
-						.build())
+								.departureCityId(query.departureCityId())
+								.arrivalCityId(query.arrivalCityId())
+								.startDate(query.startDate())
+								.endDate(query.endDate())
+								.planningStatus(query.status())
+								.keywords(query.keywords())
+								.build())
 				.build();
 		List<TravelPlan> travelPlans = travelPlanRepository.searchTravelPlan(domain);
 
