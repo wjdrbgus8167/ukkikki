@@ -1,8 +1,8 @@
 package com.dancing_orangutan.ukkikki.place.ui;
 
-import com.dancing_orangutan.ukkikki.global.response.ApiUtils;
-import com.dancing_orangutan.ukkikki.global.response.ApiUtils.ApiResponse;
+
 import com.dancing_orangutan.ukkikki.global.security.MemberUserDetails;
+import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.place.application.PlaceService;
 import com.dancing_orangutan.ukkikki.place.application.command.CreatePlaceCommand;
 import com.dancing_orangutan.ukkikki.place.application.command.CreatePlaceTagCommand;
@@ -23,8 +23,8 @@ public class PlaceController {
     private final PlaceService placeService;
 
     @PostMapping("/places")
-    public ApiResponse<?> createPlace(@PathVariable Integer travelPlanId,
-                                           @RequestBody CreatePlaceRequest createPlaceRequest) {
+    public ApiUtils.ApiResponse<?> createPlace(@PathVariable Integer travelPlanId,
+                                               @RequestBody CreatePlaceRequest createPlaceRequest) {
 
         CreatePlaceCommand command = CreatePlaceCommand.builder()
                 .travelPlanId(travelPlanId)
@@ -57,10 +57,10 @@ public class PlaceController {
     }
     
     @PostMapping("/places/{placeId}/tags")
-    public ApiResponse<?> createPlaceTag(@PathVariable Integer travelPlanId,
-                                         @PathVariable Integer placeId,
-                                         @AuthenticationPrincipal MemberUserDetails userDetails,
-                                         @RequestBody CreatePlaceTagRequest createPlaceTagRequest) {
+    public ApiUtils.ApiResponse<?> createPlaceTag(@PathVariable Integer travelPlanId,
+                                                  @PathVariable Integer placeId,
+                                                  @AuthenticationPrincipal MemberUserDetails userDetails,
+                                                  @RequestBody CreatePlaceTagRequest createPlaceTagRequest) {
 
         CreatePlaceTagCommand command = CreatePlaceTagCommand.builder()
                 .travelPlanId(travelPlanId)

@@ -1,7 +1,7 @@
 package com.dancing_orangutan.ukkikki.proposal.ui;
 
 
-import com.dancing_orangutan.ukkikki.global.response.ApiUtils;
+import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.proposal.application.ProposalService;
 import com.dancing_orangutan.ukkikki.proposal.application.command.CreateProposalCommand;
 import com.dancing_orangutan.ukkikki.proposal.domain.Proposal;
