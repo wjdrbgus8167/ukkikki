@@ -1,10 +1,10 @@
 import Footer from '../components/layout/Footer';
 import Header from '../components/layout/Header';
-import DashBoard from '../components/user-room/DashBoard';
+import DashBoard from '../components/userroom/DashBoard';
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom'; // useLocation 훅 사용
 
-import InteractiveSection from '../components/user-room/InteractiveSection';
+import InteractiveSection from '../components/userroom/InteractiveSection';
 const UserRoom = () => {
   const [selectedCity, setSelectedCity] = useState('상하이'); // 기본 도시
   const location = useLocation(); // location에서 전달된 상태를 받음

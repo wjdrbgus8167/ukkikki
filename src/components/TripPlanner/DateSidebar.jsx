@@ -9,11 +9,12 @@ const DateSidebar = ({ travelDays, selectedDayId, onDaySelect }) => {
           <button
             key={day.id}
             onClick={() => onDaySelect(day.id)}
-            className={`px-4 py-2 rounded transition-colors ${
-              day.id === selectedDayId
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-black'
-            }`}
+            className={`add-button bg-white text-black text-x font-semibold py-2 px-4 border-2 border-gray-300 rounded-lg w-24 h-16 transition-colors 
+              ${
+                day.id === selectedDayId
+                  ? 'bg-yellow text-brown border-blue-500'
+                  : 'hover:bg-gray-100'
+              }`}
           >
             {day.label}
           </button>

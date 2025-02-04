@@ -1,4 +1,3 @@
-// src/components/user-room/InteractiveSection.jsx
 import React, { useState, useEffect } from 'react';
 import { LoadScript } from '@react-google-maps/api';
 import LikeList from './LikeList';

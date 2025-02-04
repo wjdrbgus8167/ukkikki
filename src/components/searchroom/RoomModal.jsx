@@ -47,7 +47,7 @@ function RoomModal({
   // 입장하기 버튼 클릭 시 UserRoom으로 라우팅
   const handleEnterRoom = () => {
     // `selectedCard`를 상태로 전달하며 UserRoom으로 라우팅
-    navigate('/user-room', { state: { selectedCard } });
+    navigate('/userroom', { state: { selectedCard } });
   };
   return (
     // 클릭 이벤트를 배경(오버레이) div에 등록

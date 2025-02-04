@@ -19,7 +19,7 @@ const SearchBar = () => {
   const navigate = useNavigate(); // ✅ 페이지 이동을 위한 useNavigate 사용
 
   const API_KEY = import.meta.env.VITE_APP_AIRPORT_API_KEY;
-  const API_BASE_URL = "/api/flight/getIflightScheduleList"; // 프록시 사용
+  const API_BASE_URL = '/api/flight/getIflightScheduleList'; // 프록시 사용
 
   // ✅ 방 찾기 버튼 클릭 시 검색 조건을 쿼리 파라미터로 전달하며 SearchRoom 페이지로 이동
   const handleFindRoom = () => {
@@ -39,7 +39,7 @@ const SearchBar = () => {
     });
 
     // ✅ SearchRoom 페이지로 이동하면서 검색 조건 전달
-    navigate(`/searchroom?${queryParams.toString()}`);
+    navigate(`/search-room?${queryParams.toString()}`);
   };
 
   // ✅ 왕복 항공권 조회 함수
@@ -75,8 +75,10 @@ const SearchBar = () => {
         },
       });
 
-      const departureFlights = departureResponse.data.response?.body?.items?.item || [];
-      const returnFlights = returnResponse.data.response?.body?.items?.item || [];
+      const departureFlights =
+        departureResponse.data.response?.body?.items?.item || [];
+      const returnFlights =
+        returnResponse.data.response?.body?.items?.item || [];
 
       // ✅ 왕복 항공권 존재 여부 확인 후 모달 띄우기
       if (departureFlights.length > 0 && returnFlights.length > 0) {
@@ -99,7 +101,9 @@ const SearchBar = () => {
             <button
               type="button"
               className={`flex-1 text-center py-2 rounded-md ${
-                searchType === 'findRoom' ? 'text-white font-bold' : 'text-gray-300'
+                searchType === 'findRoom'
+                  ? 'text-white font-bold'
+                  : 'text-gray-300'
               }`}
               onClick={() => setSearchType('findRoom')}
             >
@@ -108,7 +112,9 @@ const SearchBar = () => {
             <button
               type="button"
               className={`flex-1 text-center py-2 rounded-md ${
-                searchType === 'createGroup' ? 'text-white font-bold' : 'text-gray-300'
+                searchType === 'createGroup'
+                  ? 'text-white font-bold'
+                  : 'text-gray-300'
               }`}
               onClick={() => setSearchType('createGroup')}
             >
@@ -117,7 +123,10 @@ const SearchBar = () => {
             <div
               className="absolute bottom-0 h-1 w-1/2 bg-dark-green transition-transform duration-300"
               style={{
-                transform: searchType === 'findRoom' ? 'translateX(0)' : 'translateX(100%)',
+                transform:
+                  searchType === 'findRoom'
+                    ? 'translateX(0)'
+                    : 'translateX(100%)',
               }}
             />
           </div>
@@ -125,7 +134,9 @@ const SearchBar = () => {
           {/* ✅ 날짜 선택 */}
           <div className="flex space-x-4">
             <div className="w-1/2">
-              <label className="block text-sm font-medium text-gray-700">출발일</label>
+              <label className="block text-sm font-medium text-gray-700">
+                출발일
+              </label>
               <DatePicker
                 selected={startDate}
                 onChange={(date) => setStartDate(date)}
@@ -137,7 +148,9 @@ const SearchBar = () => {
               />
             </div>
             <div className="w-1/2">
-              <label className="block text-sm font-medium text-gray-700">돌아오는 날</label>
+              <label className="block text-sm font-medium text-gray-700">
+                돌아오는 날
+              </label>
               <DatePicker
                 selected={endDate}
                 onChange={(date) => setEndDate(date)}
@@ -152,8 +165,14 @@ const SearchBar = () => {
 
           {/* ✅ 출발/도착 공항 선택 */}
           <div className="flex space-x-4">
-            <KoreaAirportSelector selectedAirport={departureAirport} onChange={(e) => setDepartureAirport(e.target.value)} />
-            <WorldAirportSelector selectedAirport={arrivalAirport} onChange={(e) => setArrivalAirport(e.target.value)} />
+            <KoreaAirportSelector
+              selectedAirport={departureAirport}
+              onChange={(e) => setDepartureAirport(e.target.value)}
+            />
+            <WorldAirportSelector
+              selectedAirport={arrivalAirport}
+              onChange={(e) => setArrivalAirport(e.target.value)}
+            />
           </div>
 
           {/* ✅ 검색하기 / 방 만들기 버튼 */}
@@ -180,7 +199,12 @@ const SearchBar = () => {
       </div>
 
       {/* ✅ 방 만들기 모달 (왕복 항공권이 있는 경우에만 오픈) */}
-      {isModalOpen && <CreateRoomModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />}
+      {isModalOpen && (
+        <CreateRoomModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

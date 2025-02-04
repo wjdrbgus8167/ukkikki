@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import Footer from '../components/layout/Footer';
 import Header from '../components/layout/Header';
-import CardList from '../components/search-rooms/CardList';
-import Sidebar from '../components/search-rooms/SideBar';
+import CardList from '../components/searchroom/CardList';
+import Sidebar from '../components/searchroom/SideBar';
 
 const SearchRoom = () => {
   const cards = [
