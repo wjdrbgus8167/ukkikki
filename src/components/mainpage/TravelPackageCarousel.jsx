@@ -66,7 +66,7 @@ const TravelPackageCarousel = () => {
           </h2>
           <button
             className="mt-6 px-6 py-3 bg-brown text-white text-lg font-semibold rounded-full shadow-md "
-            onClick={() => navigate('/searchroom')}
+            onClick={() => navigate('/search-room')}
           >
             자세히 알아보기 →
           </button>

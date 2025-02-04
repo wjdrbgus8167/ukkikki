@@ -4,15 +4,27 @@ import Footer from "../components/layout/Footer";
 import ProposalContent from '../components/agencyDetail/ProposalContent.jsx'
 import PlaceList from "../components/agencyDetail/PlaceList.jsx";
 import { ProposalDetailProvider } from "../contexts/proposalDetailContext.jsx";
-
+import UserLocationMap from "../components/agencyDetail/UserLocationMap.jsx";
 const ProposalDetail = ({jwtToken, travelPlanId}) => {
 
     return(
       <ProposalDetailProvider jwtToken={jwtToken} travelPlanId={travelPlanId}>
         <div>
             <Header />
-                <ProposalContent />
-                <PlaceList />
+             <div className=" p-10">
+              <div className=" pl-10">
+              <ProposalContent />
+              </div>
+                <div className="flex gap-5  p-10">
+                  <div className="flex-1 bg-gray-300">
+                    <UserLocationMap />
+                  </div>
+                  <div className="w-1/3 ">
+                    <PlaceList />
+                  </div>
+                </div>
+             </div>
+                
             <Footer />
         </div>
       </ProposalDetailProvider>

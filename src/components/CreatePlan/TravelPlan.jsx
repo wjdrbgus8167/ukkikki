@@ -1,37 +1,49 @@
-import React, { useState } from "react";
-import SaveButton from "./button/SaveButton";
-import AddDayButton from "./button/AddDayButton";
-import DayList from "./button/DayList";
+// 장소 선택 및 등록 하는 컴포넌트 인데 (작성중)
 
+import React, { useState } from "react";
+import SearchBar from "./SearchBar";
+import UserWishPlaces from "./place-list/UserWishPlaces";
 
 const TravelPlan = () => {
+  
+  const [showWishlist, setShowWishlist] = useState(false);
+  const [showGooglePlace, setsShowGooglePlace] = useState(false);
 
-    const [days, setDays] = useState(['1일차','2일차','3일차','4일차']);
-    const [clicked, setClicked] = useState(null);
+  //클릭 시 사용자 위시 리스트 
+  const handleWishlistClick = () => {
+    setShowWishlist(!showWishlist);
+  };
 
-    
-    const maxDay = 10;
+  const handleGooglePlaceClick= () => {
+    setsShowGooglePlace(!showGooglePlace);
+  };
+  
+  return (
+    <div>
+      <h1 className="travel-country text-lg mt-4 mb-2">영국(스코틀랜드)</h1>
+      <p className="travel-dates text-x text-gray-600 mb-2">2025.03.10 ~ 2025.03.20</p>
+      <SearchBar />
+      <div className="btn mt-2">
+        <button 
+        onClick={handleWishlistClick}
+        className="user-wishlist border-2 rounded-md border-gray-300 mx-1"
+        >
+          우랑이 pick!
+        </button>
 
-    const addDay = () => {
-        if (days.length < maxDay) {
-            setDays([...days, `${days.length + 1}일차`])
-        }
-    };
+        <button 
+        onClick={handleGooglePlaceClick}
+        className='Google-place border-2 rounded-md border-gray-300'
+        >
+          구글 추천
+        </button>
 
-    const handleButtonClick = (index) => {
-        setClicked(index);
-    }
-    return (
-        <div className="travel-day flex flex-col space-y-4">
-            <div className="max-h-96 overflow-y-auto">
-                <DayList days={days} onClick={handleButtonClick} clicked={clicked} />
-            </div>
-            
-            <div className="flex flex-col space-y-4 items-start">
-                <AddDayButton onClick={addDay}/>
-                <SaveButton />
-            </div>
-        </div>
-    )
+
+        {showWishlist && <UserWishPlaces />}
+      </div>
+      
+      
+    </div>
+  );
 };
 export default TravelPlan;
