@@ -2,14 +2,13 @@
 
 import Footer from '../components/layout/Footer';
 import Header from '../components/layout/Header';
-import PlanDateSideBar from '../components/CreatePlan/PlanDateSideBar'
-
+import MainLayout from '../components/CreatePlan/MainLayout';
 const TravelCreate =  () => {
 
     return (
         <div>
             <Header />
-            <PlanDateSideBar />
+                <MainLayout />
             <Footer />
         </div>
     )

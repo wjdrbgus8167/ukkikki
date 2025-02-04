@@ -1,10 +1,10 @@
 //사이드 바
-import TravelPlan from "./TravelPlan";
+import TravelSchedule from "./TravelSchedule";
 
 const SideBar = () => {
     return (
         <div className="p-4">
-            <TravelPlan />       
+            <TravelSchedule />       
         </div>
     )
 };
