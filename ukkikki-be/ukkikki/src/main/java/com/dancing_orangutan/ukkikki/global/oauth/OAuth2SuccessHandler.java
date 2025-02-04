@@ -1,17 +1,13 @@
 package com.dancing_orangutan.ukkikki.global.oauth;
 
 import com.dancing_orangutan.ukkikki.global.jwt.JwtTokenProvider;
-import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
-import com.dancing_orangutan.ukkikki.global.security.OAuth2UserDetails;
 import com.dancing_orangutan.ukkikki.global.util.CookieUtils;
-import com.dancing_orangutan.ukkikki.global.util.JsonResponseUtils;
 import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
 import com.dancing_orangutan.ukkikki.member.infrastructure.MemberRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -36,6 +32,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         CookieUtils.addRefreshTokenCookie(response, refreshToken);
         CookieUtils.addAccessTokenCookie(response, accessToken);
 
-        response.sendRedirect("http://localhost:3000/oauth/success");
+        response.sendRedirect("http://localhost:5173/oauth/success");
     }
 }
