@@ -12,8 +12,9 @@ public class PlaceTag {
     Integer creatorId; // 태그 작성자의 Id
 
     @Builder
-    public PlaceTag(String placeTagName,
+    public PlaceTag(Integer placeTagId, String placeTagName,
                     Integer placeId, Integer creatorId) {
+        this.placeTagId = placeTagId;
         this.placeTagName = placeTagName;
         this.placeId = placeId;
         this.creatorId = creatorId;

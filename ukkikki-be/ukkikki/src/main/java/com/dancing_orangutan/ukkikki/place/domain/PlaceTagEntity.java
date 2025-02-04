@@ -4,11 +4,13 @@ import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravel
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "place_tags")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class PlaceTagEntity {
 
 	@Id
