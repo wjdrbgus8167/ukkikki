@@ -91,7 +91,7 @@ public class PlaceController {
     }
 
     @DeleteMapping("/tags/{tagId}")
-    public ApiResponse<?> deletePlaceTag(@PathVariable Integer travelPlanId,
+    public ApiUtils.ApiResponse<?> deletePlaceTag(@PathVariable Integer travelPlanId,
                                          @PathVariable Integer tagId,
                                          @AuthenticationPrincipal MemberUserDetails userDetails) {
 
