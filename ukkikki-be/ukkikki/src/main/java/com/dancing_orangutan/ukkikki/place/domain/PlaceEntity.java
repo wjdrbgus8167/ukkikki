@@ -4,6 +4,7 @@ import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEnti
 import jakarta.persistence.*;
 
 import lombok.*;
+import java.util.List;
 
 @Entity
 @Table(name = "places")
@@ -11,6 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Builder
+@Getter
 public class PlaceEntity {
 
 	@Id
@@ -32,4 +34,10 @@ public class PlaceEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "travel_plan_id", nullable = false)
 	private TravelPlanEntity travelPlan;
+
+	@OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<PlaceTagEntity> placeTags;
+
+	@OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<LikeEntity> likes;
 }
