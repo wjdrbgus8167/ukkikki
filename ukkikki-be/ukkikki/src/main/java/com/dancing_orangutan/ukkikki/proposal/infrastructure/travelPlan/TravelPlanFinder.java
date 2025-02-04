@@ -5,7 +5,7 @@ import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.travelPlan.JpaTra
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("proposalTravelPlanFinder")
 @RequiredArgsConstructor
 public class TravelPlanFinder {
 
