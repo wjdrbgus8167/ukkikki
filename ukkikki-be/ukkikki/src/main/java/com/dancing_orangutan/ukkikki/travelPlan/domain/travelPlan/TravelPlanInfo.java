@@ -1,6 +1,7 @@
 package com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan;
 
 import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
+import java.util.List;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -15,7 +16,8 @@ public record TravelPlanInfo(
         int minPeople,
         int maxPeople,
         PlanningStatus planningStatus,
-        String comment
+        String comment,
+        List<Integer> keywords
 ) {
 
     @Builder
