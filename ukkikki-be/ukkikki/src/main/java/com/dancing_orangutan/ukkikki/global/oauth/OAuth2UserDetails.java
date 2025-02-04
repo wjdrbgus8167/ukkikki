@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.global.security;
+package com.dancing_orangutan.ukkikki.global.oauth;
 
 import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
 import lombok.AllArgsConstructor;
