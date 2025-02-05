@@ -16,7 +16,7 @@ public record TravelPlanInfo(
         int minPeople,
         int maxPeople,
         PlanningStatus planningStatus,
-        String comment,
+        String hostComment,
         List<Integer> keywords
 ) {
 

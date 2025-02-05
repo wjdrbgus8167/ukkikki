@@ -3,6 +3,7 @@ package com.dancing_orangutan.ukkikki.travelPlan.application;
 
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.CreateTravelPlanCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.JoinTravelPlanCommand;
+import com.dancing_orangutan.ukkikki.travelPlan.application.command.WriteCommentCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchSuggestedTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.Host;
@@ -155,6 +156,20 @@ public class TravelPlanService {
 						))
 						.toList()
 		);
-
 	}
+
+
+	@Transactional
+	public void writeComment(WriteCommentCommand command) {
+		TravelPlan domain = TravelPlan
+				.builder()
+				.travelPlanInfo(TravelPlanInfo.builder()
+						.travelPlanId(command.travelPlanId())
+						.hostComment(command.hostComment())
+						.build())
+				.build();
+
+		travelPlanRepository.writeComment(domain);
+	}
+
 }

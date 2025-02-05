@@ -197,8 +197,14 @@ public class TravelPlanRepository {
 						.build()
 				)
 				.toList();
+	}
 
+	public void writeComment(final TravelPlan domain) {
+		TravelPlanEntity entity = jpaTravelPlanRepository.findById(
+						domain.getTravelPlanInfo().travelPlanId())
+				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 여행 계획입니다."));
 
+		entity.updateComment(domain.getTravelPlanInfo().hostComment());
 	}
 
 }
