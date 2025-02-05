@@ -5,6 +5,7 @@ import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.ProposalEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -36,4 +37,14 @@ public class VoteEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "proposal_id")
 	private ProposalEntity proposal;
+
+	@Builder
+	public VoteEntity(Integer voteId,LocalDateTime voteTime,VoteSurveyEntity voteSurvey,MemberEntity member,ProposalEntity proposal){
+		this.voteId = voteId;
+		this.voteTime = voteTime;
+		this.voteSurvey = voteSurvey;
+		this.member = member;
+		this.proposal = proposal;
+
+	}
 }

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,4 +28,12 @@ public class VoteSurveyEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "travel_plan_id")
     private TravelPlanEntity travelPlan;
+
+    @Builder
+    public VoteSurveyEntity(Integer voteSurveyId, LocalDateTime surveyStartTime, LocalDateTime surveyEndTime, TravelPlanEntity travelPlan) {
+        this.voteSurveyId = voteSurveyId;
+        this.surveyStartTime = surveyStartTime;
+        this.surveyEndTime = surveyEndTime;
+        this.travelPlan = travelPlan;
+    }
 }
