@@ -1,7 +1,9 @@
 package com.dancing_orangutan.ukkikki.member.domain;
 
 
+import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,6 +47,10 @@ public class MemberEntity {
 
     @Column(nullable = false, length = 10)
     private String provider;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberTravelPlanEntity> memberTravelPlans;
+
     @Builder
     public MemberEntity(String email, String password, String name, String profileImageUrl, String provider) {
         this.email = email;

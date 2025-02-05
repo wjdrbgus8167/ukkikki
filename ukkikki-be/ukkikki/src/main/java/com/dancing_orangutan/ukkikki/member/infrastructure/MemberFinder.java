@@ -13,4 +13,9 @@ public class MemberFinder {
 	public MemberEntity getReferenceById(Integer memberId) {
 		return memberRepository.getReferenceById(memberId);
 	}
+
+	public MemberEntity getById(Integer memberId) {
+		return memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 멤버 ID입니다."));
+	}
+
 }

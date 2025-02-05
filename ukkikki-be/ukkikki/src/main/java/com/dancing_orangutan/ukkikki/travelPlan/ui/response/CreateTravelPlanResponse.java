@@ -1,59 +1,38 @@
 package com.dancing_orangutan.ukkikki.travelPlan.ui.response;
 
-import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlan;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.request.KeywordUi;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.request.TravelPlanInfoUi;
 
-import java.time.LocalDate;
 
-import lombok.Builder;
-import lombok.Getter;
+import java.util.List;
+import java.util.stream.Collectors;
 
-@Getter
-public class CreateTravelPlanResponse {
+public record CreateTravelPlanResponse(TravelPlanInfoUi travelPlan) {
 
-	private final TravelPlanResponse travelPlan;
-
-	@Getter
-	public static class TravelPlanResponse {
-
-		private final Integer travelPlanId;
-
-		private final String name;
-
-		private final Integer departureCityId;
-
-		private final Integer arrivalCityId;
-
-		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-		private final LocalDate startDate;
-
-		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-		private final LocalDate endDate;
-
-		private final PlanningStatus planningStatus;
-
-		private final int minPeople;
-
-		private final int maxPeople;
-
-		@Builder
-		public TravelPlanResponse(Integer travelPlanId, String name, Integer departureCityId,
-				Integer arrivalCityId, LocalDate startDate, LocalDate endDate,
-				PlanningStatus planningStatus, int minPeople, int maxPeople) {
-			this.travelPlanId = travelPlanId;
-			this.name = name;
-			this.departureCityId = departureCityId;
-			this.arrivalCityId = arrivalCityId;
-			this.startDate = startDate;
-			this.endDate = endDate;
-			this.planningStatus = planningStatus;
-			this.minPeople = minPeople;
-			this.maxPeople = maxPeople;
+	public static CreateTravelPlanResponse toResponse(TravelPlan travelPlan) {
+		if (travelPlan == null) {
+			return null;
 		}
+		TravelPlanInfoUi travelPlanInfoUi = new TravelPlanInfoUi(
+				travelPlan.getTravelPlanInfo().name(),
+				travelPlan.getTravelPlanInfo().departureCityId(),
+				travelPlan.getTravelPlanInfo().arrivalCityId(),
+				travelPlan.getTravelPlanInfo().startDate(),
+				travelPlan.getTravelPlanInfo().endDate(),
+				travelPlan.getTravelPlanInfo().minPeople(),
+				travelPlan.getTravelPlanInfo().maxPeople(),
+				travelPlan.getTravelPlanInfo().planningStatus(),
+				mapKeywords(travelPlan.getTravelPlanInfo().keywords())
+		);
+
+		return new CreateTravelPlanResponse(travelPlanInfoUi);
 	}
 
-	@Builder
-	public CreateTravelPlanResponse(TravelPlanResponse travelPlan) {
-		this.travelPlan = travelPlan;
+	private static List<KeywordUi> mapKeywords(List<Integer> keywordIds) {
+		if (keywordIds == null) {
+			return null;
+		}
+		return keywordIds.stream().map(KeywordUi::new).collect(Collectors.toList());
 	}
 }

@@ -1,10 +1,11 @@
-package com.dancing_orangutan.ukkikki.entity.proposal;
+package com.dancing_orangutan.ukkikki.proposal.domain.schedule;
 
-import com.dancing_orangutan.ukkikki.proposal.domain.ProposalEntity;
+import com.dancing_orangutan.ukkikki.proposal.domain.proposal.ProposalEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "schedules")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Schedule {
+public class ScheduleEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,4 +34,14 @@ public class Schedule {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "proposal_id")
     private ProposalEntity proposal;
+
+    @Builder
+    public ScheduleEntity(Integer scheduleId, String scheduleName, LocalDateTime startTime, LocalDateTime endTime, String imageUrl, ProposalEntity proposal) {
+        this.scheduleId = scheduleId;
+        this.scheduleName = scheduleName;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.imageUrl = imageUrl;
+        this.proposal = proposal;
+    }
 }

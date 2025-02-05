@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.entity.proposal;
+package com.dancing_orangutan.ukkikki.proposal.domain.voteSurvey;
 
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import jakarta.persistence.*;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "vote_surveys")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class VoteSurvey {
+public class VoteSurveyEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

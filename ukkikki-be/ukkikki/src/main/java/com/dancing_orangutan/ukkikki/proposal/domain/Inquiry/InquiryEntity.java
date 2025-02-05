@@ -1,6 +1,6 @@
-package com.dancing_orangutan.ukkikki.entity.proposal;
+package com.dancing_orangutan.ukkikki.proposal.domain.Inquiry;
 
-import com.dancing_orangutan.ukkikki.proposal.domain.ProposalEntity;
+import com.dancing_orangutan.ukkikki.proposal.domain.proposal.ProposalEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Table(name = "inquiries")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Inquiry {
+public class InquiryEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,8 +1,9 @@
-package com.dancing_orangutan.ukkikki.entity.proposal;
+package com.dancing_orangutan.ukkikki.proposal.domain.cost;
 
-import com.dancing_orangutan.ukkikki.proposal.domain.ProposalEntity;
+import com.dancing_orangutan.ukkikki.proposal.domain.proposal.ProposalEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "costs")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Cost {
+public class CostEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,4 +29,13 @@ public class Cost {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "proposal_id")
 	private ProposalEntity proposal;
+
+	@Builder
+	public CostEntity(Integer costId,int maxPeople, int minPeople, int cost, ProposalEntity proposal) {
+		this.costId = costId;
+		this.maxPeople = maxPeople;
+		this.minPeople = minPeople;
+		this.cost = cost;
+		this.proposal = proposal;
+	}
 }
