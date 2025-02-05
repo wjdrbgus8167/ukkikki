@@ -139,4 +139,8 @@ public class TravelPlanEntity {
 	public void updateComment(String hostComment) {
 		this.hostComment = hostComment;
 	}
+
+	public void updateCloseTime(LocalDateTime closeTime) {
+		this.closeTime = closeTime;
+	}
 }
