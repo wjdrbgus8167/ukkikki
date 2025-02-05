@@ -107,6 +107,7 @@ public class PlaceServiceImpl implements PlaceService {
         Like like = Like.builder()
                 .creatorId(command.getMemberId())
                 .placeId(command.getPlaceId())
+                .travelPlanId(command.getTravelPlanId())
                 .build();
 
         // 비즈니스 로직 수행
