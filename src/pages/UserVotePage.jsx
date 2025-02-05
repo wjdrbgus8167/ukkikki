@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Footer from '../components/layout/Footer';
 import Header from '../components/layout/Header';
 import KakaoPayTest from '../services/KakaoPayTest';
-import AgencyList from '../components/\bvote/AgencyList';
+import AgencyList from '../components/vote/AgencyList';
 
 const UserVotePage = () => {
   const [agencies, setAgencies] = useState([
