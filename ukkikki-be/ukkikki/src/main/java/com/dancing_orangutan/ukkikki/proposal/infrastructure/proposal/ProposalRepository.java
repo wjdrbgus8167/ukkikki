@@ -2,13 +2,14 @@ package com.dancing_orangutan.ukkikki.proposal.infrastructure.proposal;
 
 import com.dancing_orangutan.ukkikki.entity.info.Airport;
 import com.dancing_orangutan.ukkikki.member.domain.CompanyEntity;
-import com.dancing_orangutan.ukkikki.proposal.domain.Proposal;
-import com.dancing_orangutan.ukkikki.proposal.domain.ProposalEntity;
+import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
+import com.dancing_orangutan.ukkikki.proposal.domain.proposal.ProposalEntity;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.airport.AirportFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.company.CompanyFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.travelPlan.TravelPlanFinder;
 import com.dancing_orangutan.ukkikki.proposal.mapper.ProposalMapper;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -55,5 +56,12 @@ public class ProposalRepository  {
         return proposalMapper.entityToDomain(jpaProposalRepository.save(proposalEntity));
     }
 
+    public Proposal findById(Integer proposalId) {
+
+        ProposalEntity entity = jpaProposalRepository.findById(proposalId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 제안서를 찾을 수 없습니다."));
+
+        return proposalMapper.entityToDomain(entity);
+    }
 
 }
