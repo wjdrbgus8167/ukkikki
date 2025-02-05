@@ -3,11 +3,15 @@ package com.dancing_orangutan.ukkikki.proposal.ui;
 
 
 import com.dancing_orangutan.ukkikki.global.security.CompanyUserDetails;
+import com.dancing_orangutan.ukkikki.global.security.MemberUserDetails;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.proposal.application.ProposalService;
+import com.dancing_orangutan.ukkikki.proposal.application.command.CreateInquiryCommand;
 import com.dancing_orangutan.ukkikki.proposal.application.command.CreateProposalCommand;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
+import com.dancing_orangutan.ukkikki.proposal.ui.request.CreateInquiryRequest;
 import com.dancing_orangutan.ukkikki.proposal.ui.request.CreateProposalRequest;
+import com.dancing_orangutan.ukkikki.proposal.ui.response.CreateInquiryResponse;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.ProposalDetailResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -47,4 +51,17 @@ public class ProposalController {
         return ApiUtils.success(response);
     }
 
+    // 제안서 문의 작성
+    @PostMapping("/{proposalId}/inquiries")
+    public ApiUtils.ApiResponse<CreateInquiryResponse> createInquiry(
+            @PathVariable Integer travelPlanId,
+            @PathVariable Integer proposalId,
+            @AuthenticationPrincipal MemberUserDetails memberUserDetails,
+            @Validated @RequestBody CreateInquiryRequest request) {
+
+        CreateInquiryCommand command = request.requestToDomain(proposalId,travelPlanId,memberUserDetails.getMemberId());
+
+
+        return ApiUtils.success(proposalService.createInquiry(command));
+    }
 }
