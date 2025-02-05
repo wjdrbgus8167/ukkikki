@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import ListCard from "../common/ListCard";
-import { fetchAgencyProposals } from "../../apis/travel";
+import { fetchAgencyProposals } from "../../apis/agency";
 
 const jwtToken = '내 토큰'
 
