@@ -103,13 +103,7 @@ const Header = () => {
                   서비스 소개
                 </Link>
                 <Link
-                  to="/registerpage"
-                  className="block px-4 py-2 text-gray-600 hover:text-blue-500 hover:bg-gray-100 transition duration-300"
-                >
-                  회원가입
-                </Link>
-                <Link
-                  to="/loginpage"
+                  to="/login"
                   className="block px-4 py-2 text-gray-600 hover:text-blue-500 hover:bg-gray-100 transition duration-300"
                 >
                   로그인
