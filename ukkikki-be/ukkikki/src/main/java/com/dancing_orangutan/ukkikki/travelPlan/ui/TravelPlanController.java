@@ -4,11 +4,13 @@ import com.dancing_orangutan.ukkikki.global.security.MemberUserDetails;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.CreateTravelPlanCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.JoinTravelPlanCommand;
+import com.dancing_orangutan.ukkikki.travelPlan.application.command.WriteCommentCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchSuggestedTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.request.CreateTravelPlanRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.request.JoinTravelPlanRequest;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.request.WriteCommentRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.CreateTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.application.TravelPlanService;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.FetchSuggestedTravelPlanResponse;
@@ -79,5 +81,18 @@ public class TravelPlanController {
 	public ApiUtils.ApiResponse<FetchSuggestedTravelPlanResponse> fetchSuggestedTravelPlans(){
 		FetchSuggestedTravelPlanQuery query = new FetchSuggestedTravelPlanQuery(PlanningStatus.BIDDING);
 		return ApiUtils.success(travelPlanService.fetchSuggestedTravelPlans(query));
+	}
+
+	@PutMapping("/{travelPlanId}/comments")
+	public ApiUtils.ApiResponse<String> writeComments(@RequestBody WriteCommentRequest request, @PathVariable(name = "travelPlanId") Integer travelPlanId) {
+		WriteCommentCommand command = WriteCommentCommand.builder()
+				.travelPlanId(travelPlanId)
+				.hostComment(request.hostComment())
+				.build();
+		command.validate();
+
+		travelPlanService.writeComment(command);
+
+		return ApiUtils.success("코멘트가 성공적으로 등록되었습니다.");
 	}
 }
