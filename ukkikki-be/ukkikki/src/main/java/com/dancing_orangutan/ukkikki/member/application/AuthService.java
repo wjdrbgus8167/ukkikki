@@ -36,6 +36,7 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.password()))
                 .name(request.name())
                 .profileImageUrl(request.profileImageUrl())
+                .provider("")
                 .build()
         );
     }

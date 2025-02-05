@@ -4,9 +4,12 @@ import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravel
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Getter;
 
 @Entity
+@Getter
 @Table(name = "place_tags")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PlaceTagEntity {
@@ -28,12 +31,13 @@ public class PlaceTagEntity {
 			@JoinColumn(name = "member_id")
 	})
 	private MemberTravelPlanEntity memberTravelPlan;
-	
+
 	@Builder
-    PlaceTagEntity(String placeTagName, PlaceEntity placeEntity,
+	PlaceTagEntity(String placeTagName, PlaceEntity placeEntity,
 				   MemberTravelPlanEntity memberTravelPlan) {
-        this.placeTagName = placeTagName;
-        this.placeEntity = placeEntity;
-        this.memberTravelPlan = memberTravelPlan;
-    }
+		this.placeTagName = placeTagName;
+		this.placeEntity = placeEntity;
+		this.memberTravelPlan = memberTravelPlan;
+	}
+
 }

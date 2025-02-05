@@ -1,7 +1,9 @@
 package com.dancing_orangutan.ukkikki.member.domain;
 
 
+import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,11 +44,19 @@ public class MemberEntity {
     @CreatedDate
     @Column(name = "delete_time")
     private LocalDateTime deleteTime;
+
+    @Column(nullable = false, length = 10)
+    private String provider;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberTravelPlanEntity> memberTravelPlans;
+
     @Builder
-    public MemberEntity(String email, String password, String name, String profileImageUrl) {
+    public MemberEntity(String email, String password, String name, String profileImageUrl, String provider) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.profileImageUrl = profileImageUrl;
+        this.provider = provider;
     }
 }

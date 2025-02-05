@@ -3,15 +3,14 @@ package com.dancing_orangutan.ukkikki.place.domain;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import jakarta.persistence.*;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import java.util.List;
 
 @Entity
 @Table(name = "places")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Getter
 @Builder
 public class PlaceEntity {
 
@@ -34,4 +33,10 @@ public class PlaceEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "travel_plan_id", nullable = false)
 	private TravelPlanEntity travelPlan;
+
+	@OneToMany(mappedBy = "placeEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<PlaceTagEntity> placeTags;
+
+	@OneToMany(mappedBy = "placeEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<LikeEntity> likes;
 }
