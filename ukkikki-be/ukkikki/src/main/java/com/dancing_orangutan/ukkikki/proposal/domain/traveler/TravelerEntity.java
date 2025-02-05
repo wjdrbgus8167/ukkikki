@@ -1,6 +1,6 @@
-package com.dancing_orangutan.ukkikki.entity.proposal;
+package com.dancing_orangutan.ukkikki.proposal.domain.traveler;
 
-import com.dancing_orangutan.ukkikki.proposal.domain.ProposalEntity;
+import com.dancing_orangutan.ukkikki.proposal.domain.proposal.ProposalEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import jakarta.persistence.*;
 
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "travelers")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Traveler {
+public class TravelerEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

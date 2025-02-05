@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.proposal.domain;
+package com.dancing_orangutan.ukkikki.proposal.domain.proposal;
 
 import com.dancing_orangutan.ukkikki.proposal.constant.ProposalStatus;
 import lombok.Builder;
