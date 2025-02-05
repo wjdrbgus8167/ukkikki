@@ -2,8 +2,8 @@ package com.dancing_orangutan.ukkikki.proposal.mapper;
 
 import com.dancing_orangutan.ukkikki.entity.info.Airport;
 import com.dancing_orangutan.ukkikki.member.domain.CompanyEntity;
-import com.dancing_orangutan.ukkikki.proposal.domain.Proposal;
-import com.dancing_orangutan.ukkikki.proposal.domain.ProposalEntity;
+import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
+import com.dancing_orangutan.ukkikki.proposal.domain.proposal.ProposalEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -24,6 +24,7 @@ public interface ProposalMapper {
     static String airportToId(Airport airport) {
         return airport !=null ? airport.getAirportCode() :null;
     }
+
     @Named("travelPlanToId")
     static Integer travelPlanToId(TravelPlanEntity travelPlan) {
         return travelPlan !=null ? travelPlan.getTravelPlanId() :null;
