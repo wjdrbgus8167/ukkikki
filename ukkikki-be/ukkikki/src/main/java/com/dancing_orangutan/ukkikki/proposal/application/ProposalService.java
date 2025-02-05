@@ -1,14 +1,24 @@
 package com.dancing_orangutan.ukkikki.proposal.application;
 
 
+import com.dancing_orangutan.ukkikki.proposal.application.command.CreateInquiryCommand;
 import com.dancing_orangutan.ukkikki.proposal.application.command.CreateProposalCommand;
+import com.dancing_orangutan.ukkikki.proposal.domain.Inquiry.Inquiry;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
+import com.dancing_orangutan.ukkikki.proposal.infrastructure.inquiry.InquiryRepository;
+import com.dancing_orangutan.ukkikki.proposal.infrastructure.memberTravelPlan.MemberTravelPlanFinder;
+import com.dancing_orangutan.ukkikki.proposal.infrastructure.proposal.ProposalFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.proposal.ProposalRepository;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.schedule.ScheduleFinder;
+import com.dancing_orangutan.ukkikki.proposal.ui.response.CreateInquiryResponse;
+import com.dancing_orangutan.ukkikki.proposal.ui.response.CreateProposalResponse;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.ProposalDetailResponse;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.ScheduleResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,11 +26,15 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-
+@Slf4j
 public class ProposalService {
 
     private final ProposalRepository proposalRepository;
     private final ScheduleFinder scheduleFinder;
+    private final MemberTravelPlanFinder memberTravelPlanFinder;
+    private final ProposalFinder proposalFinder;
+    private final InquiryRepository inquiryRepository;
+
     // 제안서 작성
    public Proposal createProposal(CreateProposalCommand command){
 
@@ -65,6 +79,46 @@ public class ProposalService {
                 .collect(Collectors.toList());
 
         return new ProposalDetailResponse(proposal,schedules);
+    }
+
+    @Transactional
+    public CreateInquiryResponse createInquiry(CreateInquiryCommand command) {
+
+        // 사용자가 여행 계획에 참가하고 있는지 확인
+        boolean isJoining = memberTravelPlanFinder.isJoiningTravelPlan(
+                command.getMemberId(), command.getTravelPlanId());
+
+
+        if (!isJoining) {
+            throw new IllegalArgumentException("회원이 여행 계획에 속하지 않습니다.");
+        }
+
+        MemberTravelPlanEntity memberTravelPlan = memberTravelPlanFinder
+                .findByTravelPlanIdAndMemberId(command.getTravelPlanId(), command.getMemberId());
+
+
+        // ProposalEntity 조회
+        Proposal proposal = proposalFinder.getProposalDomain(command.getProposalId());
+
+        if (proposal == null) {
+            throw new IllegalArgumentException("제안서를 찾을 수 없습니다.");
+        }
+
+
+        Inquiry inquiry = Inquiry.builder()
+                .title(command.getTitle())
+                .content(command.getContent())
+                .createTIme(LocalDateTime.now())
+                .proposalId(proposal.getProposalId())
+                .memberId(memberTravelPlan.getMemberTravelPlanId().getMemberId())
+                .travelPlanId(memberTravelPlan.getMemberTravelPlanId().getTravelPlanId())
+                .build();
+
+
+        Inquiry savedInquiry = inquiryRepository.save(inquiry);
+
+
+        return CreateInquiryResponse.from(savedInquiry);
     }
 
 }
