@@ -51,4 +51,22 @@ public class QueryDslTravelPlanRepository {
 				.distinct()
 				.fetch();
 	}
+
+	public List<TravelPlanEntity> fetchSuggestedTravelPlan(
+			PlanningStatus status
+	) {
+		QTravelPlanEntity entity = QTravelPlanEntity.travelPlanEntity;
+		BooleanBuilder booleanBuilder = new BooleanBuilder();
+
+		// 추가 조건(상태)
+		if (status != null) {
+			booleanBuilder.and(entity.planningStatus.eq(status));
+		}
+
+		return queryFactory
+				.selectFrom(entity)
+				.where(booleanBuilder)
+				.distinct()
+				.fetch();
+	}
 }
