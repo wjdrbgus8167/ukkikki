@@ -4,12 +4,14 @@ import com.dancing_orangutan.ukkikki.global.security.MemberUserDetails;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.CreateTravelPlanCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.JoinTravelPlanCommand;
+import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchSuggestedTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.request.CreateTravelPlanRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.request.JoinTravelPlanRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.CreateTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.application.TravelPlanService;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.response.FetchSuggestedTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.JoinTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.SearchTravelPlanResponse;
 import java.time.LocalDate;
@@ -70,5 +72,12 @@ public class TravelPlanController {
 		searchQuery.validate();
 
 		return ApiUtils.success(travelPlanService.searchTravelPlan(searchQuery));
+	}
+
+	//여행사 제안받은 여행 계획서 조회
+	@GetMapping("/list")
+	public ApiUtils.ApiResponse<FetchSuggestedTravelPlanResponse> fetchSuggestedTravelPlans(){
+		FetchSuggestedTravelPlanQuery query = new FetchSuggestedTravelPlanQuery(PlanningStatus.BIDDING);
+		return ApiUtils.success(travelPlanService.fetchSuggestedTravelPlans(query));
 	}
 }

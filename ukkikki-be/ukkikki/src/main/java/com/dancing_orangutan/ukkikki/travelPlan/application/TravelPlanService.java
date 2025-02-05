@@ -3,6 +3,7 @@ package com.dancing_orangutan.ukkikki.travelPlan.application;
 
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.CreateTravelPlanCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.JoinTravelPlanCommand;
+import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchSuggestedTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.Host;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlan;
@@ -13,6 +14,7 @@ import com.dancing_orangutan.ukkikki.travelPlan.mapper.TravelPlanMapper;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.request.KeywordUi;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.CreateTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.travelPlan.TravelPlanRepository;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.response.FetchSuggestedTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.JoinTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.SearchTravelPlanResponse;
 import java.util.List;
@@ -122,5 +124,37 @@ public class TravelPlanService {
 						))
 						.toList()
 		);
+	}
+
+	public FetchSuggestedTravelPlanResponse fetchSuggestedTravelPlans(FetchSuggestedTravelPlanQuery query) {
+		TravelPlan domain = TravelPlan.builder()
+				.travelPlanInfo(
+						TravelPlanInfo.builder()
+								.planningStatus(query.status())
+								.build()
+				).build();
+
+		List<TravelPlan> travelPlans = travelPlanRepository.fetchTravelPlan(domain);
+
+		return new FetchSuggestedTravelPlanResponse(
+				travelPlans.stream()
+						.map(travelPlan -> new FetchSuggestedTravelPlanResponse.FetchSuggestedTravelPlanInfo(
+								travelPlan.getTravelPlanInfo().travelPlanId(),
+								travelPlan.getTravelPlanInfo().name(),
+								travelPlan.getTravelPlanInfo().departureCityId(),
+								travelPlan.getTravelPlanInfo().arrivalCityId(),
+								travelPlan.getTravelPlanInfo().startDate(),
+								travelPlan.getTravelPlanInfo().endDate(),
+								travelPlan.calPeopleCount(),
+								travelPlan.getTravelPlanInfo().minPeople(),
+								travelPlan.getTravelPlanInfo().maxPeople(),
+								travelPlan.getTravelPlanInfo().planningStatus(),
+								travelPlan.getTravelPlanInfo().keywords().stream()
+										.map(KeywordUi::new)
+										.toList()
+						))
+						.toList()
+		);
+
 	}
 }

@@ -154,4 +154,51 @@ public class TravelPlanRepository {
 				.toList();
 	}
 
+
+	//TODO : 반복되는 코드 매퍼로 분리해야함
+	public List<TravelPlan> fetchTravelPlan(final TravelPlan travelPlanDomain) {
+		List<TravelPlanEntity> travelPlanEntities = queryDslTravelPlanRepository.fetchSuggestedTravelPlan(travelPlanDomain.getTravelPlanInfo().planningStatus());
+
+		return travelPlanEntities.stream()
+				.map(entity -> TravelPlan.builder()
+						.travelPlanInfo(
+								TravelPlanInfo.builder()
+										.travelPlanId(entity.getTravelPlanId())
+										.name(entity.getName())
+										.startDate(entity.getStartDate())
+										.endDate(entity.getEndDate())
+										.departureCityId(entity.getDepartureCity().getCityId())
+										.arrivalCityId(entity.getArrivalCity().getCityId())
+										.planningStatus(entity.getPlanningStatus())
+										.maxPeople(entity.getMaxPeople())
+										.keywords(
+												entity.getTravelPlanKeywords().stream()
+														.map(keywordEntity -> keywordEntity.getKeyword().getKeywordId())
+														.toList()
+										)
+										.build()
+						)
+						.host(
+								Host.builder()
+										.adultCount(entity.getMemberTravelPlans().
+												stream()
+												.mapToInt(MemberTravelPlanEntity::getAdultCount)
+												.sum()
+										).childCount(entity.getMemberTravelPlans().
+												stream()
+												.mapToInt(MemberTravelPlanEntity::getChildCount)
+												.sum())
+										.infantCount(entity.getMemberTravelPlans().
+												stream()
+												.mapToInt(MemberTravelPlanEntity::getInfantCount)
+												.sum())
+										.build()
+						)
+						.build()
+				)
+				.toList();
+
+
+	}
+
 }
