@@ -107,9 +107,9 @@ const CreateRoomModal = ({ isOpen, onClose }) => {
         >
           {/* ✅ 모달 헤더 */}
           <div className="flex justify-between items-center mb-5 border-b-2 pb-2">
-          <h1 className="text-xl font-semibold border-gray-300 pb-2">
-  {step === 1 ? '방 만들기 - 기본 정보' : '방 만들기 - 인원 설정'}
-</h1>
+            <h1 className="text-xl font-semibold border-gray-300 pb-2">
+              {step === 1 ? '방 만들기 - 기본 정보' : '방 만들기 - 인원 설정'}
+            </h1>
 
             <button
               onClick={handleModalClose}
@@ -219,8 +219,8 @@ const CreateRoomModal = ({ isOpen, onClose }) => {
                     {type === 'adults'
                       ? '성인'
                       : type === 'teens'
-                        ? '청소년'
-                        : '유아'}
+                      ? '청소년'
+                      : '유아'}
                   </span>
                   <div className="flex items-center space-x-2">
                     <button

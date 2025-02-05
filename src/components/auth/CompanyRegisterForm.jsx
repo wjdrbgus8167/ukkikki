@@ -6,14 +6,12 @@ const CompanyRegisterForm = () => {
   const [step, setStep] = useState(1); // 현재 단계 (1 or 2)
   const [formData, setFormData] = useState({
     email: '',
-    representativeName: '',
+    ceoName: '',
     password: '',
     confirmPassword: '',
     companyName: '',
-    businessNumber: '',
+    businessRegistrationNumber: '',
     companyPhone: '',
-    companyAddress: '',
-    companyDetailAddress: '',
   });
   const [errorMessage, setErrorMessage] = useState('');
   const [businessCheckResult, setBusinessCheckResult] = useState(null);
@@ -21,15 +19,6 @@ const CompanyRegisterForm = () => {
   const [isScriptLoaded, setIsScriptLoaded] = useState(false); // ✅ 스크립트 로딩 상태
 
   const apiKey = import.meta.env.VITE_APP_ODCLOUD_API_KEY; // 환경 변수에서 API 키 가져오기
-  // ✅ 카카오 주소 API 스크립트 로드
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src =
-      'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
-    script.async = true;
-    script.onload = () => setIsScriptLoaded(true); // ✅ 로딩 완료 시 상태 변경
-    document.body.appendChild(script);
-  }, []);
 
   // ✅ 이메일 형식 검사 함수
   const validateEmail = (email) => {
@@ -40,7 +29,7 @@ const CompanyRegisterForm = () => {
     const { name, value } = e.target;
 
     // ✅ 사업자번호 및 전화번호 숫자만 입력 가능
-    if (name === 'businessNumber' || name === 'companyPhone') {
+    if (name === 'businessRegistrationNumber' || name === 'companyPhone') {
       const numericValue = value.replace(/[^0-9]/g, ''); // 숫자만 허용
 
       setFormData((prev) => ({
@@ -49,7 +38,7 @@ const CompanyRegisterForm = () => {
       }));
 
       // ✅ 사업자번호일 경우 10자리 검사
-      if (name === 'businessNumber') {
+      if (name === 'businessRegistrationNumber') {
         if (numericValue.length === 10) {
           verifyBusinessNumber(numericValue);
         } else {
@@ -66,27 +55,10 @@ const CompanyRegisterForm = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ 카카오 주소 검색 API 실행 함수
-  const handleAddressSearch = () => {
-    if (!isScriptLoaded) {
-      alert('주소 검색 기능을 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
-      return;
-    }
-
-    new window.daum.Postcode({
-      oncomplete: function (data) {
-        setFormData((prev) => ({
-          ...prev,
-          companyAddress: data.address,
-        }));
-      },
-    }).open();
-  };
-
   const handleNextStep = () => {
     if (
       !formData.email ||
-      !formData.representativeName ||
+      !formData.ceoName ||
       !formData.password ||
       !formData.confirmPassword
     ) {
@@ -110,13 +82,13 @@ const CompanyRegisterForm = () => {
   };
 
   // ✅ 사업자등록번호 검사 로직 수정
-  const verifyBusinessNumber = async (businessNumber) => {
+  const verifyBusinessNumber = async (businessRegistrationNumber) => {
     setIsChecking(true);
 
     const apiUrl = `https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey=${apiKey}`;
 
     const requestData = {
-      b_no: [businessNumber],
+      b_no: [businessRegistrationNumber],
     };
 
     try {
@@ -170,9 +142,8 @@ const CompanyRegisterForm = () => {
 
     if (
       !formData.companyName ||
-      !formData.businessNumber ||
-      !formData.companyPhone ||
-      !formData.companyAddress
+      !formData.businessRegistrationNumber ||
+      !formData.companyPhone
     ) {
       setErrorMessage('모든 필드를 입력해주세요.');
       return;
@@ -183,8 +154,17 @@ const CompanyRegisterForm = () => {
       return;
     }
 
+    const requestBody = {
+      companyName: formData.companyName,
+      ceoName: formData.ceoName,
+      businessRegistrationNumber: formData.businessRegistrationNumber,
+      email: formData.email,
+      password: formData.password,
+      phoneNumber: formData.phoneNumber,
+    };
+
     try {
-      await publicRequest.post('/api/v1/auth/companies/register', formData);
+      await publicRequest.post('/api/v1/auth/companies/register', requestBody);
       alert('기업 회원가입 성공!');
     } catch (error) {
       setErrorMessage(error.response?.data?.message || '회원가입 실패');
@@ -219,9 +199,9 @@ const CompanyRegisterForm = () => {
           <div className="mb-4">
             <input
               type="text"
-              name="representativeName"
+              name="ceoName"
               placeholder="대표자 이름"
-              value={formData.representativeName}
+              value={formData.ceoName}
               onChange={handleChange}
               className="w-full px-3 py-4 border rounded"
               required
@@ -278,9 +258,9 @@ const CompanyRegisterForm = () => {
           <div className="mb-4">
             <input
               type="text"
-              name="businessNumber"
+              name="businessRegistrationNumber"
               placeholder="사업자 등록번호 (10자리)"
-              value={formData.businessNumber}
+              value={formData.businessRegistrationNumber}
               onChange={handleChange}
               className="w-full px-3 py-4 border rounded focus:ring focus:ring-yellow-400"
               required
@@ -308,36 +288,6 @@ const CompanyRegisterForm = () => {
               required
             />
           </div>
-          {/* ✅ 카카오 주소 입력 필드 */}
-          <div className="mb-4">
-            <div className="flex">
-              <input
-                type="text"
-                name="companyAddress"
-                placeholder="회사 주소"
-                value={formData.companyAddress}
-                onChange={handleChange}
-                onClick={handleAddressSearch}
-                className="w-full px-3 py-4 border rounded"
-                required
-                readOnly
-              />
-            </div>
-          </div>
-
-          {/* ✅ 상세 주소 입력 필드 추가 */}
-          {formData.companyAddress && (
-            <div className="mb-4">
-              <input
-                type="text"
-                name="companyDetailAddress"
-                placeholder="상세 주소 입력"
-                value={formData.companyDetailAddress || ''} // ✅ undefined 방지
-                onChange={handleChange}
-                className="w-full px-3 py-4 border rounded"
-              />
-            </div>
-          )}
 
           <div className="flex justify-between">
             <button

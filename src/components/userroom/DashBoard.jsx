@@ -24,11 +24,13 @@ const DashBoard = ({ selectedCard }) => {
   return (
     <div className="flex flex-col md:flex-row justify-between items-center bg-gray-100 p-8">
       {/* 여행 이미지 */}
-      <img
-        src={imageUrl}
-        alt="Travel"
-        className="w-full md:w-96 h-64 object-cover rounded-lg shadow-md"
-      />
+      {imageUrl && (
+        <img
+          src={imageUrl}
+          alt="Travel"
+          className="w-full md:w-96 h-64 object-cover rounded-lg shadow-md"
+        />
+      )}
 
       {/* 여행 패키지 정보 */}
       <div className="md:w-1/3 p-4">

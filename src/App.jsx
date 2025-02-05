@@ -11,6 +11,7 @@ import LoadingSpinner from './components/common/LoadingSpinner';
 import MyPage from './pages/UserMyPage';
 import TravelCreate from './pages/TravelCreatePage';
 import ProposalDetail from './pages/ProposalDetailPage';
+import UserVotePage from './pages/UserVotePage';
 
 const App = () => {
   return (
@@ -22,11 +23,12 @@ const App = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<RegisterPage />} />
         <Route path="/mypage" element={<MyPage />} />
-        <Route path="/userroom" element={<UserRoom />} />
+        <Route path="/user-room" element={<UserRoom />} />
         <Route path="/search-room" element={<SearchRooms />} />
         <Route path="/agencyroom" element={<AgencyRoomList />} />
         <Route path="/travel-create" element={<TravelCreate />} />
         <Route path="/proposal-detail" element={<ProposalDetail />} />
+        <Route path="/user-vote" element={<UserVotePage />} />
       </Routes>
     </Router>
   );

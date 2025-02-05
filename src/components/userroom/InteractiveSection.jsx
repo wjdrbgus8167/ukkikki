@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { LoadScript } from '@react-google-maps/api';
 import LikeList from './LikeList';
-import Map from '../../services/Map';
+import Map from '../../services/Map/Map';
 import Chat from './Chat';
 
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
