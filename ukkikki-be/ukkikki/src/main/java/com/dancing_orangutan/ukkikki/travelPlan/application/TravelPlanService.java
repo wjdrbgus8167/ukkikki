@@ -3,6 +3,7 @@ package com.dancing_orangutan.ukkikki.travelPlan.application;
 
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.CreateTravelPlanCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.JoinTravelPlanCommand;
+import com.dancing_orangutan.ukkikki.travelPlan.application.command.UpdateCloseTimeCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.WriteCommentCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchSuggestedTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
@@ -127,7 +128,8 @@ public class TravelPlanService {
 		);
 	}
 
-	public FetchSuggestedTravelPlanResponse fetchSuggestedTravelPlans(FetchSuggestedTravelPlanQuery query) {
+	public FetchSuggestedTravelPlanResponse fetchSuggestedTravelPlans(
+			FetchSuggestedTravelPlanQuery query) {
 		TravelPlan domain = TravelPlan.builder()
 				.travelPlanInfo(
 						TravelPlanInfo.builder()
@@ -158,7 +160,6 @@ public class TravelPlanService {
 		);
 	}
 
-
 	@Transactional
 	public void writeComment(WriteCommentCommand command) {
 		TravelPlan domain = TravelPlan
@@ -172,4 +173,18 @@ public class TravelPlanService {
 		travelPlanRepository.writeComment(domain);
 	}
 
+	@Transactional
+	public void updateCloseTime(UpdateCloseTimeCommand command) {
+
+		TravelPlan domain = TravelPlan.builder()
+				.travelPlanInfo(TravelPlanInfo
+						.builder()
+						.travelPlanId(command.travelPlanId())
+						.closeTime(command.closeTime())
+						.build())
+				.build();
+
+		TravelPlan result = travelPlanRepository.updateCloseTime(domain);
+		result.validateCreatedAndCloseTime();
+	}
 }
