@@ -1,7 +1,8 @@
-package com.dancing_orangutan.ukkikki.entity.proposal;
+package com.dancing_orangutan.ukkikki.proposal.domain.vote;
 
+import com.dancing_orangutan.ukkikki.proposal.domain.voteSurvey.VoteSurveyEntity;
 import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
-import com.dancing_orangutan.ukkikki.proposal.domain.ProposalEntity;
+import com.dancing_orangutan.ukkikki.proposal.domain.proposal.ProposalEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @Table(name = "votes")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Vote {
+public class VoteEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +27,7 @@ public class Vote {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "vote_survey_id")
-	private VoteSurvey voteSurvey;
+	private VoteSurveyEntity voteSurvey;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
