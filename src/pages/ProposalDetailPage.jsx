@@ -3,7 +3,7 @@ import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
 import ProposalContent from '../components/agencyDetail/ProposalContent.jsx'
 import PlaceList from "../components/agencyDetail/PlaceList.jsx";
-import { ProposalDetailProvider } from "../contexts/proposalDetailContext.jsx";
+import { ProposalDetailProvider } from "../contexts/ProposalDetailContext.jsx";
 import UserLocationMap from "../components/agencyDetail/UserLocationMap.jsx";
 const ProposalDetail = ({jwtToken, travelPlanId}) => {
 
@@ -12,7 +12,7 @@ const ProposalDetail = ({jwtToken, travelPlanId}) => {
         <div>
             <Header />
              <div className=" p-10">
-              <div className=" pl-10">
+              <div className=" p-10">
               <ProposalContent />
               </div>
                 <div className="flex gap-5  p-10">
