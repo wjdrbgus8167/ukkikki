@@ -5,6 +5,7 @@ import Footer from '../components/layout/Footer';
 import MainLayout from '../components/TripPlanner/MainLayout';
 
 const TravelCreate = () => {
+  //임의 데이터
   const travelPlan = {
     destinationCity: 'Paris',
     travelStart: '2025-03-01', // 여행 시작일

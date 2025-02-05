@@ -4,6 +4,7 @@ import PlaceSelection from './PlaceSelection';
 import PlaceSelectionResult from './PlaceSelectionResult';
 import MapDisplay from './MapDisplay';
 import { LoadScript } from '@react-google-maps/api';
+
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
 const MainLayout = ({ travelPlan }) => {
@@ -28,10 +29,12 @@ const MainLayout = ({ travelPlan }) => {
   const [travelDays, setTravelDays] = useState(initialTravelDays);
   const [selectedDayId, setSelectedDayId] = useState(travelDays[0]?.id || 1);
 
+  //날짜 선택 시 호출
   const handleDaySelect = (dayId) => {
     setSelectedDayId(dayId);
   };
 
+  //장소 선택 시 해당 날짜에 장소 추가
   const handleAddPlace = (place) => {
     setTravelDays((prevDays) =>
       prevDays.map((day) =>
@@ -44,6 +47,8 @@ const MainLayout = ({ travelPlan }) => {
       ),
     );
   };
+
+  //선택한 장소 추가 및 삭제
   const handleTogglePlace = (place) => {
     console.log('handleTogglePlace 실행됨:', place); // ✅ 디버깅
     if (!place.latitude || !place.longitude) {
