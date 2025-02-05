@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
@@ -19,4 +20,9 @@ public class LikeId implements Serializable {
 	@EqualsAndHashCode.Include
 	@Column
 	private Integer memberId;
+
+	public LikeId(Integer placeId, Integer memberId) {
+		this.placeId = placeId;
+		this.memberId = memberId;
+	}
 }
