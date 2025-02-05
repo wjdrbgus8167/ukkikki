@@ -47,7 +47,7 @@ const UserRegisterForm = () => {
         email: formData.email,
         name: formData.name,
         password: formData.password,
-        profile_image_url: 'https://source.unsplash.com/random',
+        profileImageUrl: 'https://source.unsplash.com/random',
       });
       alert('회원가입 성공!');
     } catch (error) {

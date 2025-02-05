@@ -3,6 +3,8 @@ import DateSidebar from './DateSidebar';
 import PlaceSelection from './PlaceSelection';
 import PlaceSelectionResult from './PlaceSelectionResult';
 import MapDisplay from './MapDisplay';
+import { LoadScript } from '@react-google-maps/api';
+const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
 const MainLayout = ({ travelPlan }) => {
   const { travelStart, travelEnd, placeList, destinationCity } = travelPlan;
@@ -75,17 +77,22 @@ const MainLayout = ({ travelPlan }) => {
         />
       </div>
 
-      {/* 장소 선택 (비율 3) */}
-      <div className="border-r ">
-        <PlaceSelection
-          destinationCity={destinationCity}
-          travelStart={travelStart}
-          travelEnd={travelEnd}
-          placeList={placeList}
-          onTogglePlace={handleTogglePlace} // ✅ 함수 전달
-          selectedPlaces={selectedDay?.selectedPlaces || []}
-        />
-      </div>
+      <LoadScript
+        googleMapsApiKey={apiKey} // 본인의 API 키
+        libraries={['places']} // ★ Autocomplete에 필요한 'places' 라이브러리 명시
+      >
+        {/* 장소 선택 (비율 3) */}
+        <div className="border-r ">
+          <PlaceSelection
+            destinationCity={destinationCity}
+            travelStart={travelStart}
+            travelEnd={travelEnd}
+            placeList={placeList}
+            onTogglePlace={handleTogglePlace} // ✅ 함수 전달
+            selectedPlaces={selectedDay?.selectedPlaces || []}
+          />
+        </div>
+      </LoadScript>
 
       {/* 선택한 장소 결과 (비율 3) */}
       <div className="border-r">
