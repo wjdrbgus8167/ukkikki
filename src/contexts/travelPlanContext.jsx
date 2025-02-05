@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import { fetchUserProposals } from "../apis/travel";
+import { fetchUserProposals } from "../apis/agency";
 
 const TravelPlanContext = createContext();
 

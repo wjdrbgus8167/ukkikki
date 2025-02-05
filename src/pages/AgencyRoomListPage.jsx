@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
-import AgencySideBar from "../components/agencyPlanList/AgencySideBar";
 import UserProposals from "../components/agencyPlanList/UserProposals";
 import AgencyProposals from "../components/agencyPlanList/AgencyProposals";
 import { TravelPlanProvider } from "../contexts/travelPlanContext";
@@ -19,10 +18,7 @@ const AgencyRoomList = () => {
         <Header />
 
         <div className="main flex flex-1" >
-          {/* sidebar */}
-          <aside className="w-1/5 bg-gray-100 p-4">
-            <AgencySideBar />
-          </aside>
+
 
           <div className="w-3/4 bg-white flex-1 overflow-auto">
             <div className="flex space-x-4 mb-4 justify-center">

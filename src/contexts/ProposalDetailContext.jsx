@@ -1,6 +1,6 @@
 //제안서 디테일
 import React, { createContext, useEffect, useState } from "react";
-import { AgencyProposalDetail } from "../apis/travel";
+import { AgencyProposalDetail } from "../apis/agency";
 
 const ProposalDetailContext = createContext();
 
