@@ -85,6 +85,12 @@ public class MemberTravelPlanEntity {
 	public void updateLastJoinTime() {
 		this.lastJoinTime = LocalDateTime.now();
 	}
+
+	public void updateHost(int adultCount, int childCount, int infantCount) {
+		this.adultCount = adultCount;
+		this.childCount = childCount;
+		this.infantCount = infantCount;
+	}
 }
 
 

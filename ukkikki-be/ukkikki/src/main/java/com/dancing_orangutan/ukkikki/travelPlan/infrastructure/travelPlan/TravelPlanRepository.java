@@ -224,4 +224,11 @@ public class TravelPlanRepository {
 						.build())
 				.build();
 	}
+
+	public void updateHost(final TravelPlan domain) {
+		TravelPlanEntity travelPlanEntity = jpaTravelPlanRepository.findById(
+				domain.getTravelPlanInfo().travelPlanId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 여행 계획입니다."));
+
+		travelPlanEntity.updateHostInfo(domain.getHost().memberId(), domain.getHost().adultCount(), domain.getHost().childCount(), domain.getHost().infantCount());
+	}
 }
