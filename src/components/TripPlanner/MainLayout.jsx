@@ -92,7 +92,9 @@ const MainLayout = ({ travelPlan }) => {
       </div>
       
       {showDetailFrom ? (
-        <DetailForm />
+        <div className='flex-grow h-full'>
+          <DetailForm />
+        </div>
       ) : (
         <>
           <LoadScript
