@@ -203,4 +203,25 @@ public class TravelPlanRepository {
         travelPlanEntity.updateStatus(travelPlanDomain.getTravelPlanInfo().planningStatus());
 	}
 
+	public void writeComment(final TravelPlan domain) {
+		TravelPlanEntity entity = jpaTravelPlanRepository.findById(
+						domain.getTravelPlanInfo().travelPlanId())
+				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 여행 계획입니다."));
+
+		entity.updateComment(domain.getTravelPlanInfo().hostComment());
+	}
+
+	public TravelPlan updateCloseTime(final TravelPlan domain) {
+		TravelPlanEntity entity = jpaTravelPlanRepository.findById(
+						domain.getTravelPlanInfo().travelPlanId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 여행 계획입니다."));
+
+		entity.updateCloseTime(domain.getTravelPlanInfo().closeTime());
+
+		return TravelPlan.builder()
+				.travelPlanInfo(TravelPlanInfo.builder().
+						createTime(entity.getCreateTime())
+						.closeTime(entity.getCloseTime())
+						.build())
+				.build();
+	}
 }

@@ -139,4 +139,12 @@ public class TravelPlanEntity {
 	public void updateStatus(PlanningStatus planningStatus) {
 		this.planningStatus = planningStatus;
 	}
+
+	public void updateComment(String hostComment) {
+		this.hostComment = hostComment;
+	}
+
+	public void updateCloseTime(LocalDateTime closeTime) {
+		this.closeTime = closeTime;
+	}
 }

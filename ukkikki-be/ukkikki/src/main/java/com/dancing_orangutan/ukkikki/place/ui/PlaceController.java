@@ -5,6 +5,7 @@ import com.dancing_orangutan.ukkikki.global.security.MemberUserDetails;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.place.application.PlaceService;
 import com.dancing_orangutan.ukkikki.place.application.command.CreatePlaceCommand;
+import com.dancing_orangutan.ukkikki.place.application.command.CreatePlaceLikeCommand;
 import com.dancing_orangutan.ukkikki.place.application.command.CreatePlaceTagCommand;
 import com.dancing_orangutan.ukkikki.place.application.command.DeletePlaceTagCommand;
 import com.dancing_orangutan.ukkikki.place.ui.request.CreatePlaceRequest;
@@ -82,7 +83,7 @@ public class PlaceController {
             return ApiUtils.success("여행 계획 장소 태그를 등록하였습니다.");
         } catch (Exception e) {
             // 에러 발생 로깅
-            log.error("여행 계획 장소 등록 중 오류 발생 - travelPlanId: {}, 요청 데이터: {}",
+            log.error("여행 계획 장소 태그 등록 중 오류 발생 - travelPlanId: {}, 요청 데이터: {}",
                     travelPlanId, createPlaceTagRequest, e);
 
             // 에러 처리 후 클라이언트에 에러 메시지 반환
@@ -92,8 +93,8 @@ public class PlaceController {
 
     @DeleteMapping("/tags/{tagId}")
     public ApiUtils.ApiResponse<?> deletePlaceTag(@PathVariable Integer travelPlanId,
-                                         @PathVariable Integer tagId,
-                                         @AuthenticationPrincipal MemberUserDetails userDetails) {
+                                                  @PathVariable Integer tagId,
+                                                  @AuthenticationPrincipal MemberUserDetails userDetails) {
 
         DeletePlaceTagCommand deletePlaceTagCommand = DeletePlaceTagCommand.builder()
                 .memberId(userDetails.getMemberId())
@@ -105,4 +106,35 @@ public class PlaceController {
 
         return ApiUtils.success("태그를 삭제했습니다.");
     }
+
+    @PostMapping("/places/{placeId}/likes")
+    public ApiUtils.ApiResponse<?> createPlaceLike(@PathVariable Integer travelPlanId,
+                                                   @PathVariable Integer placeId,
+                                                   @AuthenticationPrincipal MemberUserDetails userDetails) {
+
+        CreatePlaceLikeCommand command = CreatePlaceLikeCommand.builder()
+                .placeId(placeId)
+                .memberId(userDetails.getMemberId())
+                .travelPlanId(travelPlanId)
+                .build();
+
+        try{
+            // PlaceService 호출 로깅
+            log.info("PlaceService의 createPlaceLike 호출 - {}", command);
+            placeService.createPlaceLike(command);
+
+            // 성공 응답 로깅
+            log.info("여행 계획 장소 좋아요 등록 성공 - travelPlanId: {}, placeId: {}, memberName: {}",
+                    travelPlanId, placeId, userDetails.getUsername());
+            return ApiUtils.success("여행 계획 장소 좋아요를 등록하였습니다.");
+        } catch (Exception e) {
+            // 에러 발생 로깅
+            log.error("여행 계획 장소 좋아요 등록 중 오류 발생 - travelPlanId: {}",
+                    travelPlanId, e);
+
+            // 에러 처리 후 클라이언트에 에러 메시지 반환
+            return ApiUtils.error("여행 계획 장소 좋아요 등록 중 오류가 발생했습니다.", e, HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }

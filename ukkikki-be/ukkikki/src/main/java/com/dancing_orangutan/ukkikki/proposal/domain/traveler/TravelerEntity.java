@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -47,5 +48,20 @@ public class TravelerEntity {
 			@JoinColumn(name = "member_id")
 	})
 	private MemberTravelPlanEntity memberTravelPlan;
+
+	@Builder
+	public TravelerEntity( Integer travelerId,String koreanName,String englishName,String passportNumber,LocalDate expirationDate,LocalDate birthDate,String phoneNumber,ProposalEntity proposal
+	,MemberTravelPlanEntity memberTravelPlan) {
+		this.travelerId = travelerId;
+		this.koreanName = koreanName;
+		this.englishName = englishName;
+		this.passportNumber = passportNumber;
+		this.expirationDate = expirationDate;
+		this.birthDate = birthDate;
+		this.phoneNumber = phoneNumber;
+		this.proposal = proposal;
+		this.memberTravelPlan = memberTravelPlan;
+
+	}
 }
 
