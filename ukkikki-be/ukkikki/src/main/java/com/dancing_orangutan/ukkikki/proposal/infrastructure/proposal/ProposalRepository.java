@@ -1,7 +1,7 @@
 package com.dancing_orangutan.ukkikki.proposal.infrastructure.proposal;
 
 import com.dancing_orangutan.ukkikki.entity.info.Airport;
-import com.dancing_orangutan.ukkikki.member.domain.CompanyEntity;
+import com.dancing_orangutan.ukkikki.member.domain.company.CompanyEntity;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.ProposalEntity;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.airport.AirportFinder;

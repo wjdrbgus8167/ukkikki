@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.global.config;
 
-import com.dancing_orangutan.ukkikki.member.infrastructure.RefreshTokenRepository;
+import com.dancing_orangutan.ukkikki.member.infrastructure.refreshToken.RefreshTokenRepository;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;

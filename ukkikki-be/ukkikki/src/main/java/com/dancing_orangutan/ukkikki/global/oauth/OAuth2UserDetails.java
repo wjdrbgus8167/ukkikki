@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.global.oauth;
 
-import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
+import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

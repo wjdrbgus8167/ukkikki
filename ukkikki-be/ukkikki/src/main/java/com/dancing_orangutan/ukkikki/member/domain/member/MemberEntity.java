@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.member.domain;
+package com.dancing_orangutan.ukkikki.member.domain.member;
 
 
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;

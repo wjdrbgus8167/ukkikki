@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.member.domain;
+package com.dancing_orangutan.ukkikki.member.domain.refreshToken;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;

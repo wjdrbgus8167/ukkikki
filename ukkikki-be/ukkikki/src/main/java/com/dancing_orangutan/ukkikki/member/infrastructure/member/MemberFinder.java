@@ -1,6 +1,6 @@
-package com.dancing_orangutan.ukkikki.member.infrastructure;
+package com.dancing_orangutan.ukkikki.member.infrastructure.member;
 
-import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
+import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

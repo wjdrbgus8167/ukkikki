@@ -2,8 +2,8 @@ package com.dancing_orangutan.ukkikki.global.oauth;
 
 import com.dancing_orangutan.ukkikki.global.jwt.JwtTokenProvider;
 import com.dancing_orangutan.ukkikki.global.util.CookieUtils;
-import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
-import com.dancing_orangutan.ukkikki.member.infrastructure.MemberRepository;
+import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
+import com.dancing_orangutan.ukkikki.member.infrastructure.member.MemberRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

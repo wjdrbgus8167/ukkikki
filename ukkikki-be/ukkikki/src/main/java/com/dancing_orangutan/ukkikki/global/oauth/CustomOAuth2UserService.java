@@ -1,7 +1,7 @@
 package com.dancing_orangutan.ukkikki.global.oauth;
 
-import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
-import com.dancing_orangutan.ukkikki.member.infrastructure.MemberRepository;
+import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
+import com.dancing_orangutan.ukkikki.member.infrastructure.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;

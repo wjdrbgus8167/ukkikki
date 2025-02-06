@@ -4,7 +4,7 @@ import com.dancing_orangutan.ukkikki.global.oauth.CustomOAuth2UserService;
 import com.dancing_orangutan.ukkikki.global.oauth.OAuth2SuccessHandler;
 import com.dancing_orangutan.ukkikki.global.security.*;
 import com.dancing_orangutan.ukkikki.global.jwt.JwtTokenProvider;
-import com.dancing_orangutan.ukkikki.member.infrastructure.MemberRepository;
+import com.dancing_orangutan.ukkikki.member.infrastructure.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
