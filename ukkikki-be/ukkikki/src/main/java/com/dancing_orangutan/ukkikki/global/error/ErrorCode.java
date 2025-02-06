@@ -10,6 +10,7 @@ public enum ErrorCode {
 
     // MEMBER
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND,"M001", "사용자를 찾을 수 없습니다."),
+    EMAIL_ALREADY_IN_USE(HttpStatus.CONFLICT, "M002", "이미 사용 중인 이메일입니다."),
 
 
     // 인증 관련

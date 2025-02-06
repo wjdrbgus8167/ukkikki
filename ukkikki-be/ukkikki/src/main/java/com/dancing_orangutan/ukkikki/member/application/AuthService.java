@@ -1,5 +1,7 @@
 package com.dancing_orangutan.ukkikki.member.application;
 
+import com.dancing_orangutan.ukkikki.global.error.ApiException;
+import com.dancing_orangutan.ukkikki.global.error.ErrorCode;
 import com.dancing_orangutan.ukkikki.member.domain.CompanyEntity;
 import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
 import com.dancing_orangutan.ukkikki.global.jwt.JwtTokenProvider;
@@ -28,7 +30,7 @@ public class AuthService {
     public void memberRegister(MemberRegisterRequest request){
         // 이메일 중복 체크
         if(memberRepository.findByEmail(request.email()).isPresent() || companyRepository.findByEmail(request.email()).isPresent()){
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+            throw new ApiException(ErrorCode.EMAIL_ALREADY_IN_USE);
         }
 
         memberRepository.save(MemberEntity.builder()
@@ -46,7 +48,7 @@ public class AuthService {
      */
     public AuthTokens memberLogin(MemberLoginRequest request) {
         MemberEntity member = memberRepository.findByEmail(request.email())
-                .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
+                .orElseThrow(() -> new ApiException(ErrorCode.MEMBER_NOT_FOUND));
 
         if (!passwordEncoder.matches(request.password(), member.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
@@ -65,7 +67,7 @@ public class AuthService {
     public void companyRegister(CompanyRegisterRequest request) {
         // 이메일 중복 체크
         if(memberRepository.findByEmail(request.email()).isPresent() || companyRepository.findByEmail(request.email()).isPresent()){
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+            throw new ApiException(ErrorCode.EMAIL_ALREADY_IN_USE);
         }
 
         companyRepository.save(CompanyEntity.builder()
