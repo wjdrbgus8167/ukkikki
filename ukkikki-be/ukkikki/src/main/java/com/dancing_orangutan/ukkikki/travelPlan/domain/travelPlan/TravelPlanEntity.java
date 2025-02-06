@@ -136,6 +136,10 @@ public class TravelPlanEntity {
 		this.memberTravelPlans.add(memberTravelPlan);
 	}
 
+	public void updateStatus(PlanningStatus planningStatus) {
+		this.planningStatus = planningStatus;
+	}
+
 	public void updateComment(String hostComment) {
 		this.hostComment = hostComment;
 	}

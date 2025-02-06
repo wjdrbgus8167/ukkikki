@@ -154,7 +154,6 @@ public class TravelPlanRepository {
 				.toList();
 	}
 
-
 	//TODO : 반복되는 코드 매퍼로 분리해야함
 	public List<TravelPlan> fetchTravelPlan(final TravelPlan travelPlanDomain) {
 		List<TravelPlanEntity> travelPlanEntities = queryDslTravelPlanRepository.fetchSuggestedTravelPlan(travelPlanDomain.getTravelPlanInfo().planningStatus());
@@ -197,6 +196,11 @@ public class TravelPlanRepository {
 						.build()
 				)
 				.toList();
+	}
+
+	public void updateTravelPlanStatus(final TravelPlan travelPlanDomain) {
+		TravelPlanEntity travelPlanEntity = jpaTravelPlanRepository.findById(travelPlanDomain.getTravelPlanInfo().travelPlanId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 여행 계획입니다."));
+        travelPlanEntity.updateStatus(travelPlanDomain.getTravelPlanInfo().planningStatus());
 	}
 
 	public void writeComment(final TravelPlan domain) {
