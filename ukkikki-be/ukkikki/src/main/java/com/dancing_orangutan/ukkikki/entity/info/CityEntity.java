@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.entity.info;
+package com.dancing_orangutan.ukkikki.geography.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,16 +25,16 @@ public class CityEntity {
 	private Integer cityId;
 
 	@Column(nullable = false, name = "city_name", length = 20)
-	private String cityName;
+	private String name;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "country_id")
-	private Country country;
+	private CountryEntity countryEntity;
 
 	@Builder
-	public CityEntity(Integer cityId, String cityName, Country country) {
+	public CityEntity(Integer cityId, String name, CountryEntity countryEntity) {
 		this.cityId = cityId;
-		this.cityName = cityName;
-		this.country = country;
+		this.name = name;
+		this.countryEntity = countryEntity;
 	}
 }
