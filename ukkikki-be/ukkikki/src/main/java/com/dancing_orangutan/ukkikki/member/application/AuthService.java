@@ -58,12 +58,12 @@ public class AuthService {
                 .orElseThrow(() -> new ApiException(ErrorCode.MEMBER_NOT_FOUND));
 
         if (!passwordEncoder.matches(command.getPassword(), member.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
+            throw new ApiException(ErrorCode.INVALID_PASSWORD);
         }
 
         String accessToken = jwtTokenProvider.createAccessToken(member.getMemberId(), member.getEmail());
         String refreshToken = jwtTokenProvider.createRefreshToken(member.getMemberId(), member.getEmail());
-//        saveRefreshToken(member.getEmail(), refreshToken);
+        saveRefreshToken(member.getEmail(), refreshToken);
 
         return AuthTokens.builder()
                 .accessToken(accessToken)
@@ -97,16 +97,20 @@ public class AuthService {
      */
     public AuthTokens companyLogin(CompanyLoginCommand command) {
         CompanyEntity companyEntity = companyRepository.findByEmail(command.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("해당 이메일로 등록된 회사가 없습니다."));
+                .orElseThrow(() -> new ApiException(ErrorCode.COMPANY_NOT_FOUND));
 
         if (!passwordEncoder.matches(command.getPassword(), companyEntity.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new ApiException(ErrorCode.INVALID_PASSWORD);
         }
 
         String accessToken = jwtTokenProvider.createAccessToken(companyEntity.getCompanyId(), companyEntity.getEmail());
         String refreshToken = jwtTokenProvider.createRefreshToken(companyEntity.getCompanyId(), companyEntity.getEmail());
+        saveRefreshToken(companyEntity.getEmail(), refreshToken);
 
-        return new AuthTokens(accessToken, refreshToken);
+        return AuthTokens.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
 
