@@ -2,7 +2,7 @@ package com.dancing_orangutan.ukkikki.travelPlan.application;
 
 
 import com.dancing_orangutan.ukkikki.event.eventPublisher.SpringEventPublisher;
-import com.dancing_orangutan.ukkikki.event.travelPlanEvent.UpdateHostEvent;
+import com.dancing_orangutan.ukkikki.event.travelPlanEvent.UpdatedHostEvent;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.*;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchSuggestedTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
@@ -217,7 +217,7 @@ public class TravelPlanService {
 
 		travelPlanRepository.updateHost(domain);
 
-		springEventPublisher.publish(UpdateHostEvent.builder()
+		springEventPublisher.publish(UpdatedHostEvent.builder()
 				.adultCount(domain.getHost().adultCount())
 				.childCount(domain.getHost().childCount())
 				.infantCount(domain.getHost().infantCount())
