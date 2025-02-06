@@ -47,7 +47,7 @@ const ProposalContent = () => {
             <br />
             증류소 여행
           </span>
-        <div className="proposal-contentfont-['Pretendard']  text-[30px] font-semibold leading-[50px]">
+        <div className="proposal-content font-['Pretendard']  text-[30px] font-semibold leading-[50px]">
           <p>출발: 서울(인천)</p>
           <p>도착: 영국(스코틀랜드)</p>
           <p>여행 예상 날짜: 2025.03.10 ~ 2025.03.</p>

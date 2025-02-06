@@ -2,6 +2,11 @@
 
 import React, { useState } from "react";
 import KoreaAirportSelector from "../../services/airport/KoreaAirportSelector";
+import CurrencyInput from "react-currency-input-field";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { ko } from "date-fns/locale";
+import { format } from "date-fns";
 
 const DetailForm = () => {
 
@@ -25,6 +30,7 @@ const DetailForm = () => {
         insuranceIncluded: '',
         proposalStatus: 'V',
     });
+
     const [error, setError] = useState('');
 
 
@@ -34,48 +40,87 @@ const DetailForm = () => {
             [e.target.name]: e.target.value
         });
     };
+    //Date객체로 변환하기 위한 함수
+    const getDateValue = (field) => {
+        return proposal[field] ? new Date(proposal[field]) : null
+    }
+    
+      // 필드명을 인자로 받아 해당 필드의 값만 업데이트하는 핸들러 함수
+    const handleDateChange = (field) => (date) => {
+        let formattedValue = "";
+        if (date) {
+        // startDate, endDate는 날짜 형식만 적용
+            if (field === "startDate" || field === "endDate") {
+                formattedValue = date.toISOString().split("T")[0];
+            } else {
+                // 나머지 필드는 날짜와 시간 형식을 적용
+                formattedValue = format(date, "yyyy-MM-dd'T'HH:mm");
+            }
+        }
+        setProposal((prev) => ({
+        ...prev,
+        [field]: formattedValue,
+        }));
+    };
+
 
     return (
         <div className="detail-form-container">
             <h1 className="detail-form-title
-            font-extrabold text-lg
+            font-['Pretendard'] font-extrabold text-[80px] text-center pt-5
             ">여행 상세 내용</h1>
+            <hr className="my-3 border-t-[3.5px] border-gray-300 w-[800px] mx-auto"/>
 
             <form action="">
                 {/* 여행 시작일 */}
-                <div className="mb-4">
-                    <label 
-                    htmlFor="startDate"
-                    className="startDate"
-                    >
-                        여행시작일
-                    </label>
-                    <input 
-                    id='startDate'
-                    name="start-date"
-                    type="date" 
-                    value={proposal.startDate}
-                    onChange={handleChange}
-                    />
+                <div className="m-4">
+                    <p>여행일정</p>
+                    <div className="flex space-x-40 mb-4">
+                        <div className="mb-4 text-center border-[3px] border-gray-200 rounded-lg">
+                            <label 
+                            htmlFor="startDate"
+                            className="startDate border-"
+                            >
+                                여행시작일
+                            </label>
+                            <br />
+                            <DatePicker 
+                            id="startDate"
+                            selected={getDateValue("startDate")}
+                            onChange={handleDateChange("startDate")}
+                            dateFormat="yyyy/MM/dd"
+                            minDate={new Date()}
+                            locale={ko}
+                            className="startdate-input text-center "
+                            placeholderText="yyyy/MM/dd"
+                            />
+                        </div>
+                        {/* 여행 종료일 */}
+                        <div className="mb-4 text-center border-[3px] border-gray-200 rounded-lg">
+                            <label 
+                            htmlFor="endDate"
+                            className="end-date"
+                            >
+                                여행 종료일
+                            </label>
+                            <br />
+                            <DatePicker 
+                            id="endDate"
+                            selected={getDateValue("endDate")}
+                            onChange={handleDateChange("endDate")}
+                            dateFormat="yyyy/MM/dd"
+                            minDate={new Date()}
+                            locale={ko}
+                            className="enddate-input text-center"
+                            placeholderText="yyyy/MM/dd"
+                            />
+                        </div>
+                    </div>
                 </div>
-                {/* 여행 종료일 */}
-                <div className="mb-4">
-                    <label 
-                    htmlFor="endDate"
-                    className="end-date"
-                    >
-                        여행 종료일
-                    </label>
-                    <input 
-                    id='endDate'
-                    name='endDate'
-                    type="date" 
-                    value={proposal.endDate}
-                    onChange={handleChange}
-                    />
-                </div>
+                
+                
                 {/* 항공사 */}
-                <div>
+                <div className="">
                     <label htmlFor="airLine"
                     className="">항공사</label>
                     <input 
@@ -87,76 +132,106 @@ const DetailForm = () => {
                     className="airline-input border-gray-300"
                     />
                 </div>
-                {/* 출발일 탑승 일시 */}
-                <div>
-                    <label 
-                    className="title text-xl font-bold"
-                    htmlFor="startDateBoardingTime">출발일 탑승일시</label>
-                    <br />
-                    <input 
-                    id="startDateBoardingTime"
-                    name="startDateBoardingTime"
-                    type="datetime-local"
-                    value={proposal.startDateBoardingTime}
-                    onChange={handleChange}
-                    className="start-boarding-time-input"
-                    />
+
+                <div className=" m-4">
+                    <div className="flex space-x-40 mb-4">
+                        <div className="text-center border-[3px] border-gray-200 rounded-lg">
+                            {/* 출발일 탑승 일시 */}
+                            <div>
+                                <label 
+                                className="title"
+                                htmlFor="startDateBoardingTime">출발일 탑승일시</label>
+                                <br />
+                                <DatePicker
+                                id="startDateBoardingTime"
+                                selected={getDateValue("startDateBoardingTime")}
+                                onChange={handleDateChange("startDateBoardingTime")}
+                                showTimeInput
+                                timeFormat="HH:mm"
+                                timeIntervals={1}
+                                dateFormat="yyyy-MM-dd'T'HH:mm"
+                                className="start-boarding-time text-center"
+                                placeholderText="yyyy-MM-dd'T'HH:mm"
+
+                                />
+                            </div>
+                                {/* 출발일 도착 일시 */}
+                            <div>
+                                <label 
+                                className="title"
+                                htmlFor="startDateArrivalTime">출발일 도착 일시</label>
+                                <br />
+                                <DatePicker
+                                id="startDateArrivalTime"
+                                selected={getDateValue("startDateArrivalTime")}
+                                onChange={handleDateChange("startDateArrivalTime")}
+                                showTimeInput
+                                timeFormat="HH:mm"
+                                timeIntervals={1}
+                                dateFormat="yyyy-MM-dd'T'HH:mm"
+                                className="start-date-arrival-time text-center"
+                                placeholderText="yyyy-MM-dd'T'HH:mm"
+                                />
+                            </div>
+                        </div>
+                        <div className="text-center border-[3px] border-gray-200 rounded-lg">
+                                {/* 도착일 탑승 일시 */}
+                            <div>
+                                <label 
+                                className="title"
+                                htmlFor="endDateBoardingTime">도착일 탑승 일시</label>
+                                <br />
+                                <DatePicker
+                                id="endDateBoardingTime"
+                                selected={getDateValue("endDateBoardingTime")}
+                                onChange={handleDateChange("endDateBoardingTime")}
+                                showTimeInput
+                                timeFormat="HH:mm"
+                                timeIntervals={1}
+                                dateFormat="yyyy-MM-dd'T'HH:mm"
+                                className="end-date-boarding-time text-center"
+                                placeholderText="yyyy-MM-dd'T'HH:mm"
+                                />
+                            </div>
+                            {/* 도착일 도착 일시 */}
+                            <div>
+                                <label 
+                                className="title"
+                                htmlFor="endDateArrivalTime">도착일 도착 일시</label>
+                                <br />
+                                <DatePicker
+                                id="endDateArrivalTime"
+                                selected={getDateValue("endDateArrivalTime")}
+                                onChange={handleDateChange("endDateArrivalTime")}
+                                showTimeInput
+                                timeFormat="HH:mm"
+                                timeIntervals={1}
+                                dateFormat="yyyy-MM-dd'T'HH:mm"
+                                className="end-date-arrival-time text-center"
+                                placeholderText="yyyy-MM-dd'T'HH:mm"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                {/* 출발일 도착 일시시 */}
-                <div>
-                    <label 
-                    className="title text-xl font-bold"
-                    htmlFor="startDateArrivalTime">출발일 도착 일시</label>
-                    <br />
-                    <input 
-                    id="startDateArrivalTime"
-                    name="startDateArrivalTime"
-                    type="datetime-local"
-                    value={proposal.startDateArrivalTime}
-                    onChange={handleChange}
-                    className="start-arrival-time-input"
-                    />
-                </div>
-                {/* 도착일 탑승 일시 */}
-                <div>
-                    <label 
-                    className="title text-xl font-bold"
-                    htmlFor="endDateBoardingTime">도착일 탑승 일시</label>
-                    <input 
-                    id="endDateBoardingTime"
-                    name="endDateBoardingTime"
-                    type="datetime-local"
-                    value={proposal.endDateBoardingTime}
-                    onChange={handleChange}
-                    className="end-boarding-time-input"
-                    />
-                </div>
-                {/* 도착일 도착 일시 */}
-                <div>
-                    <label 
-                    className="title text-xl font-bold"
-                    htmlFor="endDateArrivalTime">도착일 도착 일시</label>
-                    <input 
-                    id="endDateArrivalTime"
-                    name="endDateArrivalTime"
-                    type="datetime-local"
-                    value={proposal.endDateArrivalTime}
-                    onChange={handleChange}
-                    className="end-arrival-time-input"
-                    />
-                </div>
+                
+                
                 {/* 예약금 */}
                 <div>
                     <label 
                     className="title text-xl font-bold"
                     htmlFor="deposit">예약금</label>
-                    <input 
-                    id="deposit"
-                    name="deposit"
-                    type="text"
-                    value={proposal.deposit}
-                    onChange={handleChange}
-                    className="deposit-input"
+                    <CurrencyInput 
+                        id="deposit"
+                        name="deposit"
+                        placeholder="예약금을 입력하세요"
+                        defaultValue={proposal.deposit}
+                        decimalScale={2}
+                        prefix="₩"
+                        onValueChange={(value) =>
+                            setProposal((prev) => ({ ...prev, deposit: value }))
+                          }
+                        className="deposit-input"
                     />
                 </div>
                 {/* 최소 인원 */}
@@ -196,16 +271,28 @@ const DetailForm = () => {
                 </div>  
                     {/* 여행자보험 포함 여부 */}
                 <div>
-                    <label htmlFor="insuranceIncluded">여행자 보험 포함 여부</label>
+                    <label 
+                    className="title text-xl font-bold"
+                    htmlFor="insuranceIncluded">여행자 보험 포함 여부</label>
                     <input 
                     id="insuranceIncluded"
                     name="guideIncluded"
                     type="checkbox"
-                    checked={proposal.insuranceIncluded} />
+                    checked={proposal.insuranceIncluded}
+                    onChange={(e)=>
+                        setProposal((prev) => ({
+                            ...prev,
+                            insuranceIncluded: e.target.checked,
+                        }))
+                    }
+                    />
                 </div>
                 {/* 상품소개 */}
                 <div>
-                    <label htmlFor="productIntroduction">상품소개</label>
+                    <label 
+                    className="title text-xl font-bold"
+                    htmlFor="productIntroduction">상품소개</label>
+                    <br />
                     <input 
                     id="productIntroduction"
                     name="productIntroduction"
@@ -217,7 +304,18 @@ const DetailForm = () => {
                 </div>
                     {/* 취소/환불정책 */}
                 <div>
-                    <label htmlFor=""></label>
+                    <label 
+                    className="title text-xl font-bold"
+                    htmlFor="refundPolicy">취소/환불정책</label>
+                    <br />
+                    <input 
+                    id="refundPolicy"
+                    name="refundPolicy"
+                    type="text"
+                    value={proposal.refundPolicy}
+                    onChange={handleChange}
+                    className="refundpolicy-input "
+                    />
                 </div>
             </form>
 
