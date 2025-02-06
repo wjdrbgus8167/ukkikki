@@ -13,6 +13,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Repository
 public class ProposalRepository  {
@@ -64,4 +66,17 @@ public class ProposalRepository  {
         return proposalMapper.entityToDomain(entity);
     }
 
+    public List<ProposalEntity> findByCompanyId(Integer companyId) {
+
+        List<ProposalEntity> proposals = jpaProposalRepository.findByCompany_CompanyId(companyId);
+
+        if (proposals.isEmpty()) {
+
+            throw new EntityNotFoundException("제안서를 찾을 수 없습니다.");
+
+        }else{
+            return proposals;
+        }
+
+    }
 }

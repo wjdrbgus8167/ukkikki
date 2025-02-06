@@ -15,6 +15,7 @@ import com.dancing_orangutan.ukkikki.proposal.ui.response.CreateInquiryResponse;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.InquiryListResponse;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.ProposalDetailResponse;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.ScheduleResponse;
+import com.dancing_orangutan.ukkikki.proposal.ui.response.CompanyProposalListResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -133,5 +134,27 @@ public class ProposalService {
         return inquiries.stream()
                 .map(InquiryListResponse::from)
                 .collect(Collectors.toList());
+    }
+
+    //여행사 입장 제안서 목록 조회
+    public List<CompanyProposalListResponse> getCompanyProposalList(Integer companyId) {
+
+        List<CompanyProposalListResponse> proposals = proposalRepository.findByCompanyId(companyId).stream()
+                .map(proposal -> CompanyProposalListResponse.builder()
+                        .proposalId(proposal.getProposalId())
+                        .travelPlanId(proposal.getTravelPlan().getTravelPlanId())
+                        .startDate(proposal.getStartDate())
+                        .endDate(proposal.getEndDate())
+                        .airline(proposal.getAirline())
+                        .departureAirportName(proposal.getDepartureAirport().getAirportName())
+                        .arrivalAirportName(proposal.getArrivalAirport().getAirportName())
+                        .deposit(proposal.getDeposit())
+                        .minPeople(proposal.getMinPeople())
+                        .proposalStatus(proposal.getProposalStatus().name())
+                        .createTime(proposal.getCreateTime())
+                        .build())
+                .collect(Collectors.toList());
+
+        return proposals;
     }
 }
