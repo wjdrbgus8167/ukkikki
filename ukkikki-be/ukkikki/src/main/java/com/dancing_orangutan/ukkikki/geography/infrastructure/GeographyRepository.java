@@ -1,7 +1,7 @@
 package com.dancing_orangutan.ukkikki.geography.infrastructure;
 
 
-import com.dancing_orangutan.ukkikki.geography.domain.CityEntity;
+import com.dancing_orangutan.ukkikki.entity.info.CityEntity;
 import com.dancing_orangutan.ukkikki.geography.domain.ContinentEntity;
 import com.dancing_orangutan.ukkikki.geography.domain.CountryEntity;
 import com.dancing_orangutan.ukkikki.geography.domain.City;

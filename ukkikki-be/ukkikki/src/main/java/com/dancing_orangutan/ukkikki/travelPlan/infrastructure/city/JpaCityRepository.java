@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.travelPlan.infrastructure.city;
 
-import com.dancing_orangutan.ukkikki.geography.domain.CityEntity;
+import com.dancing_orangutan.ukkikki.entity.info.CityEntity;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
