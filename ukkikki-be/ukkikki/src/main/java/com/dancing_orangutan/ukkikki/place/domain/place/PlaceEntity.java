@@ -1,5 +1,7 @@
-package com.dancing_orangutan.ukkikki.place.domain;
+package com.dancing_orangutan.ukkikki.place.domain.place;
 
+import com.dancing_orangutan.ukkikki.place.domain.placeTag.PlaceTagEntity;
+import com.dancing_orangutan.ukkikki.place.domain.like.LikeEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import jakarta.persistence.*;
 

@@ -4,7 +4,12 @@ import com.dancing_orangutan.ukkikki.place.application.command.CreatePlaceComman
 import com.dancing_orangutan.ukkikki.place.application.command.CreatePlaceLikeCommand;
 import com.dancing_orangutan.ukkikki.place.application.command.CreatePlaceTagCommand;
 import com.dancing_orangutan.ukkikki.place.application.command.DeletePlaceTagCommand;
-import com.dancing_orangutan.ukkikki.place.domain.*;
+import com.dancing_orangutan.ukkikki.place.domain.like.Like;
+import com.dancing_orangutan.ukkikki.place.domain.like.LikeEntity;
+import com.dancing_orangutan.ukkikki.place.domain.place.Place;
+import com.dancing_orangutan.ukkikki.place.domain.place.PlaceEntity;
+import com.dancing_orangutan.ukkikki.place.domain.placeTag.PlaceTag;
+import com.dancing_orangutan.ukkikki.place.domain.placeTag.PlaceTagEntity;
 import com.dancing_orangutan.ukkikki.place.infrastructure.*;
 import com.dancing_orangutan.ukkikki.place.mapper.PlaceLikeMapper;
 import com.dancing_orangutan.ukkikki.place.mapper.PlaceMapper;

@@ -1,10 +1,9 @@
-package com.dancing_orangutan.ukkikki.place.domain;
+package com.dancing_orangutan.ukkikki.place.domain.like;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
