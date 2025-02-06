@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // ✅ useNavigate 추가
+import { useNavigate } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { ko } from 'date-fns/locale';
@@ -7,6 +7,7 @@ import axios from 'axios';
 import KoreaAirportSelector from '../../services/airport/KoreaAirportSelector';
 import WorldAirportSelector from '../../services/airport/WorldAirportSelector';
 import CreateRoomModal from '../mainpage/CreateRoomModal';
+import { useCookies } from 'react-cookie';
 
 const SearchBar = () => {
   const [startDate, setStartDate] = useState(null);
@@ -16,7 +17,9 @@ const SearchBar = () => {
   const [searchType, setSearchType] = useState('findRoom'); // ✅ 방 찾기 / 방 만들기 선택 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const navigate = useNavigate(); // ✅ 페이지 이동을 위한 useNavigate 사용
+  const [cookies] = useCookies(['accessToken']); // ✅ 컴포넌트 내부에서 useCookies 사용
+  const navigate = useNavigate();
+  const isAuthenticated = !!cookies.accessToken; // ✅ accessToken 존재 여부 확인
 
   const API_KEY = import.meta.env.VITE_APP_AIRPORT_API_KEY;
   const API_BASE_URL = '/api/flight/getIflightScheduleList'; // 프록시 사용
@@ -28,7 +31,6 @@ const SearchBar = () => {
       return;
     }
 
-    // ✅ 검색 조건을 쿼리 파라미터에 추가
     const queryParams = new URLSearchParams({
       startDate: startDate.toISOString().split('T')[0],
       endDate: endDate.toISOString().split('T')[0],
@@ -38,12 +40,17 @@ const SearchBar = () => {
       status: '전체보기',
     });
 
-    // ✅ SearchRoom 페이지로 이동하면서 검색 조건 전달
     navigate(`/search-room?${queryParams.toString()}`);
   };
 
-  // ✅ 왕복 항공권 조회 함수
-  const checkRoundTripFlights = async () => {
+  // ✅ 방 만들기 버튼 클릭 시 로그인 여부 확인 후 동작
+  const handleCreateRoom = async () => {
+    if (!isAuthenticated) {
+      alert('로그인이 필요합니다.');
+      navigate('/login'); // ✅ 로그인 페이지로 이동
+      return;
+    }
+
     if (!startDate || !endDate || !departureAirport || !arrivalAirport) {
       alert('출발일, 돌아오는 날, 출발 공항, 도착 공항을 모두 선택해주세요.');
       return;
@@ -53,7 +60,6 @@ const SearchBar = () => {
     const arrDate = endDate.toISOString().split('T')[0].replace(/-/g, '');
 
     try {
-      // ✅ 출발편 조회
       const departureResponse = await axios.get(API_BASE_URL, {
         params: {
           serviceKey: API_KEY,
@@ -64,7 +70,6 @@ const SearchBar = () => {
         },
       });
 
-      // ✅ 도착편 조회
       const returnResponse = await axios.get(API_BASE_URL, {
         params: {
           serviceKey: API_KEY,
@@ -80,7 +85,6 @@ const SearchBar = () => {
       const returnFlights =
         returnResponse.data.response?.body?.items?.item || [];
 
-      // ✅ 왕복 항공권 존재 여부 확인 후 모달 띄우기
       if (departureFlights.length > 0 && returnFlights.length > 0) {
         setIsModalOpen(true);
       } else {
@@ -180,7 +184,7 @@ const SearchBar = () => {
             {searchType === 'findRoom' ? (
               <button
                 type="button"
-                onClick={handleFindRoom} // ✅ SearchRoom 페이지로 이동
+                onClick={handleFindRoom}
                 className="w-full bg-dark-green text-white px-8 py-3 rounded-md font-semibold"
               >
                 검색하기
@@ -188,7 +192,7 @@ const SearchBar = () => {
             ) : (
               <button
                 type="button"
-                onClick={checkRoundTripFlights} // ✅ 왕복 항공권 조회 후 모달 띄우기
+                onClick={handleCreateRoom}
                 className="w-full bg-dark-green text-white px-8 py-3 rounded-md font-semibold"
               >
                 방 만들기
