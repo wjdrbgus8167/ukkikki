@@ -25,9 +25,9 @@ public class ApiUtils {
 	}
 
 	// 메시지로 인한 오류 API 응답 생성
-	public static ApiResponse<?> error(ErrorCode errorCode, HttpStatus status) {
+	public static ApiResponse<?> error(ErrorCode errorCode) {
 		return new ApiResponse<>(
-				status.value(),
+				errorCode.getStatus().value(),
 				FAILED,
 				null,
 				new ApiError(errorCode)
