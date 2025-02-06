@@ -8,7 +8,7 @@ import KoreaAirportSelector from '../../services/airport/KoreaAirportSelector';
 import WorldAirportSelector from '../../services/airport/WorldAirportSelector';
 import CreateRoomModal from '../mainpage/CreateRoomModal';
 import { useCookies } from 'react-cookie';
-
+import { publicRequest } from '../../hooks/requestMethod';
 const SearchBar = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -24,23 +24,32 @@ const SearchBar = () => {
   const API_KEY = import.meta.env.VITE_APP_AIRPORT_API_KEY;
   const API_BASE_URL = '/api/flight/getIflightScheduleList'; // 프록시 사용
 
-  // ✅ 방 찾기 버튼 클릭 시 검색 조건을 쿼리 파라미터로 전달하며 SearchRoom 페이지로 이동
-  const handleFindRoom = () => {
+  // ✅ 방 찾기 버튼 클릭 시 검색 조건을 API에 전달 후 SearchRoom 페이지로 이동
+  const handleFindRoom = async () => {
     if (!startDate || !endDate || !departureAirport || !arrivalAirport) {
       alert('출발일, 돌아오는 날, 출발 공항, 도착 공항을 모두 선택해주세요.');
       return;
     }
+    const endpoint = '/travel-plans/search';
 
-    const queryParams = new URLSearchParams({
-      startDate: startDate.toISOString().split('T')[0],
-      endDate: endDate.toISOString().split('T')[0],
-      departureCityId: departureAirport,
-      arrivalCityId: arrivalAirport,
-      keywords: '',
-      status: '전체보기',
-    });
+    try {
+      const response = await publicRequest.get(endpoint, {
+        params: {
+          startDate: startDate.toISOString().split('T')[0],
+          endDate: endDate.toISOString().split('T')[0],
+          departureCityId: departureAirport,
+          arrivalCityId: arrivalAirport,
+        },
+      });
 
-    navigate(`/search-room?${queryParams.toString()}`);
+      if (response.status === 200) {
+        console.log('🔍 검색 결과:', response.data);
+        navigate('/search-room', { state: { rooms: response.data } }); // ✅ 결과 전달
+      }
+    } catch (error) {
+      console.error('🚨 방 찾기 실패:', error);
+      alert('🚨 방 찾기 중 오류가 발생했습니다.');
+    }
   };
 
   // ✅ 방 만들기 버튼 클릭 시 로그인 여부 확인 후 동작
