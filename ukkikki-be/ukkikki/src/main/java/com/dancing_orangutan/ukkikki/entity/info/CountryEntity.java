@@ -10,21 +10,23 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "countries")
-public class Country {
+@Getter
+public class CountryEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer countryId;
 
 	@Column(nullable = false, name = "country_name", length = 20)
-	private String countryName;
+	private String name;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "continent_id")
-	private Continent continent;
+	private ContinentEntity continentEntity;
 }
