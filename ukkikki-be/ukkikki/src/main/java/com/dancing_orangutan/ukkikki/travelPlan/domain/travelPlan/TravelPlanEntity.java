@@ -2,7 +2,7 @@ package com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan;
 
 import com.dancing_orangutan.ukkikki.entity.info.CityEntity;
 import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
-import com.dancing_orangutan.ukkikki.place.domain.PlaceEntity;
+import com.dancing_orangutan.ukkikki.place.domain.place.PlaceEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.MessageEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;

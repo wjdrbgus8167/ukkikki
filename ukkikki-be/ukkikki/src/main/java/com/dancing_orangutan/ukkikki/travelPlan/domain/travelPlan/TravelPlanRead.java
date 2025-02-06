@@ -1,8 +1,8 @@
 package com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan;
 
-import com.dancing_orangutan.ukkikki.place.domain.LikeEntity;
-import com.dancing_orangutan.ukkikki.place.domain.PlaceEntity;
-import com.dancing_orangutan.ukkikki.place.domain.PlaceTagEntity;
+import com.dancing_orangutan.ukkikki.place.domain.like.LikeEntity;
+import com.dancing_orangutan.ukkikki.place.domain.place.PlaceEntity;
+import com.dancing_orangutan.ukkikki.place.domain.placeTag.PlaceTagEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.MessageEntity;
 import java.util.stream.Collectors;
 

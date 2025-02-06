@@ -1,9 +1,6 @@
 package com.dancing_orangutan.ukkikki.place.application;
 
-import com.dancing_orangutan.ukkikki.place.application.command.CreatePlaceCommand;
-import com.dancing_orangutan.ukkikki.place.application.command.CreatePlaceLikeCommand;
-import com.dancing_orangutan.ukkikki.place.application.command.CreatePlaceTagCommand;
-import com.dancing_orangutan.ukkikki.place.application.command.DeletePlaceTagCommand;
+import com.dancing_orangutan.ukkikki.place.application.command.*;
 
 public interface PlaceService {
 
@@ -14,4 +11,6 @@ public interface PlaceService {
     void deletePlaceTag(DeletePlaceTagCommand command);
 
     void createPlaceLike(CreatePlaceLikeCommand command);
+
+    void deletePlaceLike(DeletePlaceLikeCommand command);
 }

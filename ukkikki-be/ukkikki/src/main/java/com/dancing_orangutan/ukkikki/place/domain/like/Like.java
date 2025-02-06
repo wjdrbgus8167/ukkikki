@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.place.domain;
+package com.dancing_orangutan.ukkikki.place.domain.like;
 
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import jakarta.validation.constraints.NotNull;

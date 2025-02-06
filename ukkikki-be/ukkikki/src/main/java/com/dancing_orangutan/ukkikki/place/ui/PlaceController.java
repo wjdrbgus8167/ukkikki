@@ -4,10 +4,7 @@ package com.dancing_orangutan.ukkikki.place.ui;
 import com.dancing_orangutan.ukkikki.global.security.MemberUserDetails;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.place.application.PlaceService;
-import com.dancing_orangutan.ukkikki.place.application.command.CreatePlaceCommand;
-import com.dancing_orangutan.ukkikki.place.application.command.CreatePlaceLikeCommand;
-import com.dancing_orangutan.ukkikki.place.application.command.CreatePlaceTagCommand;
-import com.dancing_orangutan.ukkikki.place.application.command.DeletePlaceTagCommand;
+import com.dancing_orangutan.ukkikki.place.application.command.*;
 import com.dancing_orangutan.ukkikki.place.ui.request.CreatePlaceRequest;
 import com.dancing_orangutan.ukkikki.place.ui.request.CreatePlaceTagRequest;
 import lombok.RequiredArgsConstructor;
@@ -129,12 +126,41 @@ public class PlaceController {
             return ApiUtils.success("여행 계획 장소 좋아요를 등록하였습니다.");
         } catch (Exception e) {
             // 에러 발생 로깅
-            log.error("여행 계획 장소 좋아요 등록 중 오류 발생 - travelPlanId: {}",
-                    travelPlanId, e);
+            log.error("여행 계획 장소 좋아요 등록 중 오류 발생 - travelPlanId: {}, placeId: {}, memberName: {}",
+                    travelPlanId, placeId, userDetails.getUsername(), e);
 
             // 에러 처리 후 클라이언트에 에러 메시지 반환
             return ApiUtils.error("여행 계획 장소 좋아요 등록 중 오류가 발생했습니다.", e, HttpStatus.BAD_REQUEST);
         }
     }
 
+    @DeleteMapping("/places/{placeId}/likes")
+    public ApiUtils.ApiResponse<?> deletePlaceLike(@PathVariable Integer travelPlanId,
+                                                   @PathVariable Integer placeId,
+                                                   @AuthenticationPrincipal MemberUserDetails userDetails) {
+
+        DeletePlaceLikeCommand command = DeletePlaceLikeCommand.builder()
+                .travelPlanId(travelPlanId)
+                .placeId(placeId)
+                .memberId(userDetails.getMemberId())
+                .build();
+
+        try {
+            // PlaceService 호출 로깅
+            log.info("PlaceService의 deletePlaceLike 호출 - {}", command);
+            placeService.deletePlaceLike(command);
+
+            // 성공 응답 로깅
+            log.info("여행 계획 장소 좋아요 삭제 성공 - travelPlanId: {}, placeId: {}, memberName: {}",
+                    travelPlanId, placeId, userDetails.getUsername());
+            return ApiUtils.success("여행 계획 장소 좋아요를 삭제하였습니다.");
+        } catch(Exception e) {
+            // 에러 발생 로깅
+            log.error("여행 계획 장소 좋아요 등록 중 오류 발생 - travelPlanId: {}, placeId: {}, memberName: {}",
+                    travelPlanId, placeId, userDetails.getUsername(), e);
+
+            // 에러 처리 후 클라이언트에 에러 메시지 반환
+            return ApiUtils.error("여행 계획 장소 좋아요 삭제 중 오류가 발생했습니다.", e, HttpStatus.BAD_REQUEST);
+        }
+    }
 }
