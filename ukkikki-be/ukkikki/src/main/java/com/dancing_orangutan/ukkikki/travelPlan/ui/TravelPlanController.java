@@ -4,11 +4,13 @@ import com.dancing_orangutan.ukkikki.global.security.MemberUserDetails;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.CreateTravelPlanCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.JoinTravelPlanCommand;
+import com.dancing_orangutan.ukkikki.travelPlan.application.command.UpdateTravelPlanStatusCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchSuggestedTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.request.CreateTravelPlanRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.request.JoinTravelPlanRequest;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.request.UpdateTravelPlanStatusRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.CreateTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.application.TravelPlanService;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.FetchSuggestedTravelPlanResponse;
@@ -79,5 +81,19 @@ public class TravelPlanController {
 	public ApiUtils.ApiResponse<FetchSuggestedTravelPlanResponse> fetchSuggestedTravelPlans(){
 		FetchSuggestedTravelPlanQuery query = new FetchSuggestedTravelPlanQuery(PlanningStatus.BIDDING);
 		return ApiUtils.success(travelPlanService.fetchSuggestedTravelPlans(query));
+	}
+
+	@PutMapping("/{travelPlanId}")
+	public ApiUtils.ApiResponse<String> updateTravelPlanStatus(@PathVariable(name = "travelPlanId") Integer travelPlanId,
+															   @RequestBody UpdateTravelPlanStatusRequest request) {
+		UpdateTravelPlanStatusCommand command = UpdateTravelPlanStatusCommand.builder()
+				.travelPlanId(travelPlanId)
+				.planningStatus(request.planningStatus())
+				.build();
+
+		command.validate();
+
+		travelPlanService.updateTravelPlanStatus(command);
+		return ApiUtils.success("여행 계획 상태가 성공적으로 변경되었습니다.");
 	}
 }
