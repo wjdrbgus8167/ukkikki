@@ -1,8 +1,9 @@
 package com.dancing_orangutan.ukkikki.geography.ui;
 
 import com.dancing_orangutan.ukkikki.geography.application.GeographyService;
+import com.dancing_orangutan.ukkikki.geography.application.query.FetchCitiesQuery;
 import com.dancing_orangutan.ukkikki.geography.application.query.FetchCountriesQuery;
-import com.dancing_orangutan.ukkikki.geography.mapper.CountryMapper;
+import com.dancing_orangutan.ukkikki.geography.ui.response.FetchCitiesResponse;
 import com.dancing_orangutan.ukkikki.geography.ui.response.FetchContinentsResponse;
 import com.dancing_orangutan.ukkikki.geography.ui.response.FetchCountriesResponse;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
@@ -17,7 +18,6 @@ import java.util.List;
 public class GeographyController {
 
     private final GeographyService geographyService;
-    private final CountryMapper countryMapper;
 
     @GetMapping("/continents")
     public ApiUtils.ApiResponse<List<FetchContinentsResponse>> getContinents() {
@@ -32,5 +32,17 @@ public class GeographyController {
                 .continentId(continentId)
                 .build();
         return ApiUtils.success(geographyService.getCountries(query));
+    }
+
+    @GetMapping("/continents/{continentId}/countries/{countryId}/cities")
+    public ApiUtils.ApiResponse<List<FetchCitiesResponse>> getCities(
+            @PathVariable(name = "continentId") Integer continentId,
+            @PathVariable(name = "countryId") Integer countryId
+    ) {
+        FetchCitiesQuery query = FetchCitiesQuery.builder()
+                .countryId(countryId)
+                .continentId(continentId)
+                .build();
+        return ApiUtils.success(geographyService.getCities(query));
     }
 }
