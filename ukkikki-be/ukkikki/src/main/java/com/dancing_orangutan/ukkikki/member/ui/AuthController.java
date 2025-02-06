@@ -3,6 +3,11 @@ package com.dancing_orangutan.ukkikki.member.ui;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.global.util.CookieUtils;
 import com.dancing_orangutan.ukkikki.member.application.AuthService;
+import com.dancing_orangutan.ukkikki.member.application.command.CompanyLoginCommand;
+import com.dancing_orangutan.ukkikki.member.application.command.CompanyRegisterCommand;
+import com.dancing_orangutan.ukkikki.member.application.command.MemberLoginCommand;
+import com.dancing_orangutan.ukkikki.member.application.command.MemberRegisterCommand;
+import com.dancing_orangutan.ukkikki.member.ui.request.*;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +26,15 @@ public class AuthController {
     @PostMapping("/members/register")
 
     public ResponseEntity<ApiUtils.ApiResponse> memberRegister(@RequestBody MemberRegisterRequest request){
-        authService.memberRegister(request);
+
+        MemberRegisterCommand command = MemberRegisterCommand.builder()
+                .name(request.getName())
+                .email(request.getEmail())
+                .password(request.getPassword())
+                .profileImageUrl(request.getProfileImageUrl())
+                .build();
+
+        authService.memberRegister(command);
 
         return ResponseEntity.ok(
                 ApiUtils.success("회원가입이 완료되었습니다.")
@@ -36,7 +49,12 @@ public class AuthController {
             @RequestBody MemberLoginRequest request,
             HttpServletResponse response
     ) {
-        AuthTokens tokens = authService.memberLogin(request);
+        MemberLoginCommand command = MemberLoginCommand.builder()
+                .email(request.getEmail())
+                .password(request.getPassword())
+                .build();
+
+        AuthTokens tokens = authService.memberLogin(command);
         CookieUtils.addAccessTokenCookie(response, tokens.accessToken());
         CookieUtils.addRefreshTokenCookie(response, tokens.refreshToken());
 
@@ -50,7 +68,18 @@ public class AuthController {
      */
     @PostMapping("/companies/register")
     public ResponseEntity<ApiUtils.ApiResponse<?>> companyRegister(@RequestBody CompanyRegisterRequest request) {
-        authService.companyRegister(request);
+
+        CompanyRegisterCommand command = CompanyRegisterCommand.builder()
+                .email(request.getEmail())
+                .password(request.getPassword())
+                .ceoName(request.getCeoName())
+                .companyName(request.getCompanyName())
+                .businessRegistrationNumber(request.getBusinessRegistrationNumber())
+                .phoneNumber(request.getPhoneNumber())
+                .profileImageUrl(request.getProfileImageUrl())
+                .build();
+
+        authService.companyRegister(command);
 
         return ResponseEntity.ok(
                 ApiUtils.success("회원가입이 완료되었습니다.")
@@ -65,15 +94,17 @@ public class AuthController {
             @RequestBody CompanyLoginRequest request,
             HttpServletResponse response
     ) {
-        AuthTokens tokens = authService.companyLogin(request);
+        CompanyLoginCommand command = CompanyLoginCommand.builder()
+                .email(request.getEmail())
+                .password(request.getPassword())
+                .build();
+
+        AuthTokens tokens = authService.companyLogin(command);
         CookieUtils.addAccessTokenCookie(response, tokens.accessToken());
         CookieUtils.addRefreshTokenCookie(response, tokens.refreshToken());
 
         return ResponseEntity.ok(
-                ApiUtils.success(CompanyLoginResponse.builder()
-                        .accessToken(tokens.accessToken())
-                        .build()
-                )
+                ApiUtils.success("로그인이 완료되었습니다.")
         );
     }
 
