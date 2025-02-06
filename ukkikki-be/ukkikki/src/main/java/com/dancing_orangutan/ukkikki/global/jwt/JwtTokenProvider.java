@@ -77,4 +77,11 @@ public class JwtTokenProvider implements InitializingBean {
                 .getBody();
     }
 
+    /**
+     *  리프레시 토큰 유효시간 반환
+     */
+    public long getRefreshExpiration() {
+        return jwtProperties.getRefreshExpiration();
+    }
+
 }
