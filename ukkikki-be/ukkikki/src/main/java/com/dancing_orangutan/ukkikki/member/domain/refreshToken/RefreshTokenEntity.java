@@ -14,14 +14,18 @@ public class RefreshTokenEntity {
     private String email;
 
     @Indexed
+    private Integer userId;
+
+    @Indexed
     private String refreshToken;
 
     @TimeToLive
     private long expiration;
 
     @Builder
-    public RefreshTokenEntity(String email, String refreshToken, long expiration) {
+    public RefreshTokenEntity(String email, Integer userId, String refreshToken, long expiration) {
         this.email = email;
+        this.userId = userId;
         this.refreshToken = refreshToken;
         this.expiration = expiration;
     }
