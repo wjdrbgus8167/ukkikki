@@ -22,7 +22,12 @@ public enum ErrorCode {
     MISSING_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "A006", "Refresh Token이 존재하지 않습니다."),
     INVALID_TOKEN_SIGNATURE(HttpStatus.UNAUTHORIZED, "A007", "잘못된 JWT 서명입니다."),
     UNSUPPORTED_TOKEN(HttpStatus.BAD_REQUEST, "A008", "지원되지 않는 JWT 토큰입니다."),
-    INVALID_TOKEN_FORMAT(HttpStatus.BAD_REQUEST, "A009", "JWT 토큰 형식이 잘못되었습니다.");
+    INVALID_TOKEN_FORMAT(HttpStatus.BAD_REQUEST, "A009", "JWT 토큰 형식이 잘못되었습니다."),
+
+    // GEOGRAPHY
+    GEOGRAPHY_CONTINENT_VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "G001", "대륙 조회 필수 파라미터가 유효하지 않습니다."),
+    GEOGRAPHY_COUNTRY_VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "G001", "도시 조회 필수 파라미터가 유효하지 않습니다.");
+
 
     private final HttpStatus status;
     private final String code;

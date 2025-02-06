@@ -4,10 +4,12 @@ import com.dancing_orangutan.ukkikki.proposal.domain.Inquiry.Inquiry;
 import com.dancing_orangutan.ukkikki.proposal.domain.Inquiry.InquiryEntity;
 import com.dancing_orangutan.ukkikki.proposal.mapper.InquiryMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
 @Repository
+@Slf4j
 public class InquiryRepository {
 
     private final JpaInquiryRepository jpaInquiryRepository;
@@ -17,6 +19,12 @@ public class InquiryRepository {
 
         InquiryEntity entity = inquiryMapper.domainToEntity(inquiry);
 
-        return inquiryMapper.entityToDomain(jpaInquiryRepository.save(entity));
+        if (entity.getMemberTravelPlan() == null) {
+            throw new IllegalStateException("MemberTravelPlan is null after mapping.");
+        }
+
+        InquiryEntity inquiryEntity = jpaInquiryRepository.save(entity);
+
+        return inquiryMapper.entityToDomain(inquiryEntity);
     }
 }

@@ -147,4 +147,17 @@ public class TravelPlanEntity {
 	public void updateCloseTime(LocalDateTime closeTime) {
 		this.closeTime = closeTime;
 	}
+
+	public void updateHostInfo(Integer memberId, int adultCount, int childCount, int infantCount) {
+		MemberTravelPlanEntity memberTravelPlan = findMemberTravelPlan(memberId);
+		memberTravelPlan.updateHost(adultCount, childCount, infantCount);
+	}
+
+	private MemberTravelPlanEntity findMemberTravelPlan(Integer memberId) {
+		return memberTravelPlans
+				.stream()
+				.filter(mtp -> mtp.getMemberTravelPlanId().getMemberId().equals(memberId))
+				.findFirst()
+				.orElseThrow(() -> new IllegalArgumentException("해당 멤버는 여행 계획에 포함되지 않습니다."));
+	}
 }

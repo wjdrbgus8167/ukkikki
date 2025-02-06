@@ -1,11 +1,9 @@
 package com.dancing_orangutan.ukkikki.travelPlan.application;
 
 
-import com.dancing_orangutan.ukkikki.travelPlan.application.command.CreateTravelPlanCommand;
-import com.dancing_orangutan.ukkikki.travelPlan.application.command.JoinTravelPlanCommand;
-import com.dancing_orangutan.ukkikki.travelPlan.application.command.UpdateTravelPlanStatusCommand;
-import com.dancing_orangutan.ukkikki.travelPlan.application.command.UpdateCloseTimeCommand;
-import com.dancing_orangutan.ukkikki.travelPlan.application.command.WriteCommentCommand;
+import com.dancing_orangutan.ukkikki.event.eventPublisher.SpringEventPublisher;
+import com.dancing_orangutan.ukkikki.event.travelPlanEvent.UpdatedHostEvent;
+import com.dancing_orangutan.ukkikki.travelPlan.application.command.*;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchSuggestedTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.Host;
@@ -35,6 +33,7 @@ public class TravelPlanService {
 	private final TravelPlanMapper travelPlanMapper;
 	private final MemberTravelPlanFinder memberTravelPlanFinder;
 	private final MemberTravelPlanModifier memberTravelPlanModifier;
+	private final SpringEventPublisher springEventPublisher;
 
 	@Transactional
 	public CreateTravelPlanResponse createTravelPlan(CreateTravelPlanCommand command) {
@@ -199,5 +198,31 @@ public class TravelPlanService {
 
 		TravelPlan result = travelPlanRepository.updateCloseTime(domain);
 		result.validateCreatedAndCloseTime();
+	}
+
+	@Transactional
+	public void updateHost(UpdateHostCommand command) {
+
+		TravelPlan domain = TravelPlan.builder()
+				.travelPlanInfo(TravelPlanInfo.builder()
+						.travelPlanId(command.travelPlanId())
+						.build())
+				.host(Host.builder()
+						.memberId(command.memberId())
+						.adultCount(command.adultCount())
+						.childCount(command.childCount())
+						.infantCount(command.infantCount())
+						.build())
+				.build();
+
+		travelPlanRepository.updateHost(domain);
+
+		springEventPublisher.publish(UpdatedHostEvent.builder()
+				.adultCount(domain.getHost().adultCount())
+				.childCount(domain.getHost().childCount())
+				.infantCount(domain.getHost().infantCount())
+				.memberId(domain.getHost().memberId())
+				.travelPlanId(domain.getTravelPlanInfo().travelPlanId())
+				.build());
 	}
 }
