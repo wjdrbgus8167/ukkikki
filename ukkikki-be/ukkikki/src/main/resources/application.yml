@@ -50,6 +50,10 @@ spring:
             user-name-attribute: id
           google:
             user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: 6379
 
 logging:
   level:
