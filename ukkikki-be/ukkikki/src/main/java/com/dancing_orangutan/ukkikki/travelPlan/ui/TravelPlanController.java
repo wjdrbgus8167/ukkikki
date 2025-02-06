@@ -1,20 +1,13 @@
 package com.dancing_orangutan.ukkikki.travelPlan.ui;
 
+import com.dancing_orangutan.ukkikki.event.eventPublisher.SpringEventPublisher;
 import com.dancing_orangutan.ukkikki.global.security.MemberUserDetails;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
-import com.dancing_orangutan.ukkikki.travelPlan.application.command.CreateTravelPlanCommand;
-import com.dancing_orangutan.ukkikki.travelPlan.application.command.JoinTravelPlanCommand;
-import com.dancing_orangutan.ukkikki.travelPlan.application.command.UpdateTravelPlanStatusCommand;
-import com.dancing_orangutan.ukkikki.travelPlan.application.command.UpdateCloseTimeCommand;
-import com.dancing_orangutan.ukkikki.travelPlan.application.command.WriteCommentCommand;
+import com.dancing_orangutan.ukkikki.travelPlan.application.command.*;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchSuggestedTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.request.CreateTravelPlanRequest;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.request.JoinTravelPlanRequest;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.request.UpdateTravelPlanStatusRequest;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.request.UpdateCloseTimeRequest;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.request.WriteCommentRequest;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.request.*;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.CreateTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.application.TravelPlanService;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.FetchSuggestedTravelPlanResponse;
@@ -131,5 +124,24 @@ public class TravelPlanController {
 		command.validate();
 		travelPlanService.updateCloseTime(command);
 		return ApiUtils.success("마감일시가 성공적으로 등록되었습니다.");
+	}
+
+	@PutMapping("/{travelPlanId}/companion")
+	public ApiUtils.ApiResponse<String> updateHost(@RequestBody UpdateHostRequest request
+			, @PathVariable(name = "travelPlanId") Integer travelPlanId
+			, @AuthenticationPrincipal MemberUserDetails memberUserDetails) {
+
+		UpdateHostCommand command = UpdateHostCommand.builder()
+				.travelPlanId(travelPlanId)
+				.memberId(memberUserDetails.getMemberId())
+				.childCount(request.childCount())
+				.infantCount(request.infantCount())
+				.adultCount(request.adultCount())
+				.build();
+
+		command.validate();
+
+		travelPlanService.updateHost(command);
+		return ApiUtils.success("인원이 성공적으로 변경되었습니다.");
 	}
 }
