@@ -1,12 +1,13 @@
 package com.dancing_orangutan.ukkikki.member.domain.member;
 
 import lombok.Builder;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+@Getter
 public class Member {
 
-    private Integer memberId;
     private String email;
     private String password;
     private String name;
@@ -14,8 +15,7 @@ public class Member {
     private String provider;
 
     @Builder
-    public Member(Integer memberId, String email, String password, String name, String profileImageUrl, String provider) {
-        this.memberId = memberId;
+    public Member(String email, String password, String name, String profileImageUrl, String provider) {
         this.email = email;
         this.password = password;
         this.name = name;
