@@ -4,20 +4,27 @@ package com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
-
 @Getter
 public class TravelPlan {
 
 	private final TravelPlanInfo travelPlanInfo;
 	private final Host host;
-	private final List<Integer> keywords;
+
 
 	@Builder()
-	public TravelPlan(final TravelPlanInfo travelPlanInfo, final Host host, final List<Integer> keywords) {
+	public TravelPlan(final TravelPlanInfo travelPlanInfo, final Host host) {
 		this.travelPlanInfo = travelPlanInfo;
 		this.host = host;
-		this.keywords = keywords;
+	}
+
+	public int calPeopleCount() {
+		return host.adultCount() + host.childCount() + host.infantCount();
+	}
+
+	public void validateCreatedAndCloseTime() {
+		if (travelPlanInfo.createTime().isBefore(travelPlanInfo.closeTime())) {
+			throw new IllegalArgumentException("마감 일시는 생성 일시보다 이전일 수 없습니다.");
+		}
 	}
 }
 

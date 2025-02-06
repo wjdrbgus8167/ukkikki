@@ -2,7 +2,7 @@ package com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan;
 
 import com.dancing_orangutan.ukkikki.entity.info.CityEntity;
 import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
-import com.dancing_orangutan.ukkikki.place.domain.PlaceEntity;
+import com.dancing_orangutan.ukkikki.place.domain.place.PlaceEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.MessageEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
@@ -136,4 +136,15 @@ public class TravelPlanEntity {
 		this.memberTravelPlans.add(memberTravelPlan);
 	}
 
+	public void updateStatus(PlanningStatus planningStatus) {
+		this.planningStatus = planningStatus;
+	}
+
+	public void updateComment(String hostComment) {
+		this.hostComment = hostComment;
+	}
+
+	public void updateCloseTime(LocalDateTime closeTime) {
+		this.closeTime = closeTime;
+	}
 }

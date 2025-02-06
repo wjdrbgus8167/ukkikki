@@ -1,8 +1,8 @@
 package com.dancing_orangutan.ukkikki.place.mapper;
 
-import com.dancing_orangutan.ukkikki.place.domain.PlaceEntity;
-import com.dancing_orangutan.ukkikki.place.domain.PlaceTag;
-import com.dancing_orangutan.ukkikki.place.domain.PlaceTagEntity;
+import com.dancing_orangutan.ukkikki.place.domain.place.PlaceEntity;
+import com.dancing_orangutan.ukkikki.place.domain.placeTag.PlaceTag;
+import com.dancing_orangutan.ukkikki.place.domain.placeTag.PlaceTagEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 
 public class PlaceTagMapper {

@@ -1,16 +1,14 @@
 package com.dancing_orangutan.ukkikki.place.application;
 
-import com.dancing_orangutan.ukkikki.place.application.command.CreatePlaceCommand;
-import com.dancing_orangutan.ukkikki.place.application.command.CreatePlaceTagCommand;
-import com.dancing_orangutan.ukkikki.place.application.command.DeletePlaceTagCommand;
-import com.dancing_orangutan.ukkikki.place.domain.Place;
-import com.dancing_orangutan.ukkikki.place.domain.PlaceEntity;
-import com.dancing_orangutan.ukkikki.place.domain.PlaceTag;
-import com.dancing_orangutan.ukkikki.place.domain.PlaceTagEntity;
-import com.dancing_orangutan.ukkikki.place.infrastructure.MemberTravelPlanFinder;
-import com.dancing_orangutan.ukkikki.place.infrastructure.PlaceRepository;
-import com.dancing_orangutan.ukkikki.place.infrastructure.PlaceTagRepository;
-import com.dancing_orangutan.ukkikki.place.infrastructure.TravelPlanFinder;
+import com.dancing_orangutan.ukkikki.place.application.command.*;
+import com.dancing_orangutan.ukkikki.place.domain.like.Like;
+import com.dancing_orangutan.ukkikki.place.domain.like.LikeEntity;
+import com.dancing_orangutan.ukkikki.place.domain.place.Place;
+import com.dancing_orangutan.ukkikki.place.domain.place.PlaceEntity;
+import com.dancing_orangutan.ukkikki.place.domain.placeTag.PlaceTag;
+import com.dancing_orangutan.ukkikki.place.domain.placeTag.PlaceTagEntity;
+import com.dancing_orangutan.ukkikki.place.infrastructure.*;
+import com.dancing_orangutan.ukkikki.place.mapper.PlaceLikeMapper;
 import com.dancing_orangutan.ukkikki.place.mapper.PlaceMapper;
 import com.dancing_orangutan.ukkikki.place.mapper.PlaceTagMapper;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
@@ -28,6 +26,7 @@ public class PlaceServiceImpl implements PlaceService {
 
     private final PlaceRepository placeRepository;
     private final PlaceTagRepository placeTagRepository;
+    private final PlaceLikeRepository placeLikeRepository;
     private final TravelPlanFinder travelPlanFinder;
     private final MemberTravelPlanFinder memberTravelPlanFinder;
     private static final Logger logger = LoggerFactory.getLogger(PlaceServiceImpl.class);
@@ -101,5 +100,46 @@ public class PlaceServiceImpl implements PlaceService {
 
         // PlaceTag delete
         placeTagRepository.delete(placeTagEntity);
+    }
+
+    @Override
+    public void createPlaceLike(CreatePlaceLikeCommand command) {
+
+        // Like 도메인 객체 생성
+        Like like = Like.builder()
+                .creatorId(command.getMemberId())
+                .placeId(command.getPlaceId())
+                .travelPlanId(command.getTravelPlanId())
+                .build();
+
+        // 비즈니스 로직 수행
+        MemberTravelPlanEntity memberTravelPlanEntity = memberTravelPlanFinder
+                .findMemberTravelPlanById(like.getTravelPlanId(), like.getCreatorId());
+        like.setLikeCount(memberTravelPlanEntity);
+
+        // 도메인 객체 Like 영속성 객체 LikeEntity로 매핑
+        LikeEntity likeEntity = PlaceLikeMapper.mapToEntity(like);
+
+        // PlaceLike save
+        placeLikeRepository.save(likeEntity);
+    }
+
+    @Override
+    public void deletePlaceLike(DeletePlaceLikeCommand command) {
+
+        // Like 도메인 객체 생성
+        Like like = Like.builder()
+                .creatorId(command.getMemberId())
+                .placeId(command.getPlaceId())
+                .travelPlanId(command.getTravelPlanId())
+                .build();
+
+        // 비즈니스 로직 수행
+
+        // 도메인 객체 Like 영속성 객체 LikeEntity로 매핑
+        LikeEntity likeEntity = PlaceLikeMapper.mapToEntity(like);
+
+        // PlaceLike delete
+        placeLikeRepository.delete(likeEntity);
     }
 }
