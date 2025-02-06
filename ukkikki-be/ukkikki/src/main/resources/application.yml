@@ -55,6 +55,14 @@ spring:
       host: ${REDIS_HOST:localhost}
       port: 6379
 
+    aws:
+      s3:
+        bucket-name: ${AWS_S3_BUCKET_NAME}
+      region: ap-northeast-2
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+
+
 logging:
   level:
     root: info
