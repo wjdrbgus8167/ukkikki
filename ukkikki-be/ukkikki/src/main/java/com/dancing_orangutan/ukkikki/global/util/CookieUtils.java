@@ -1,7 +1,11 @@
 package com.dancing_orangutan.ukkikki.global.util;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import java.util.Arrays;
+import java.util.Optional;
 
 public class CookieUtils {
 
@@ -36,5 +40,33 @@ public class CookieUtils {
      */
     public static void removeCookie(HttpServletResponse response, String name) {
         addCookie(response, name, null, 0);
+    }
+
+
+    /**
+     * 헤더에서 액세스 토큰 추출
+     */
+    public static Optional<String> getAccessToken(HttpServletRequest request) {
+        if (request.getCookies() == null) {
+            return Optional.empty();
+        }
+        return Arrays.stream(request.getCookies())
+                .filter(cookie -> "access_token".equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .findFirst();
+    }
+
+
+    /***
+     * 쿠키에서 리프레시 토큰 추출
+     */
+    public static Optional<String> getRefreshToken(HttpServletRequest request) {
+        if (request.getCookies() == null) {
+            return Optional.empty();
+        }
+        return Arrays.stream(request.getCookies())
+                .filter(cookie -> "refresh_token".equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .findFirst();
     }
 }

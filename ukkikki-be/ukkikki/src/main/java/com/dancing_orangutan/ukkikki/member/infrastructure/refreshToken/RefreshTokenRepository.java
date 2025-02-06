@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface RefreshTokenRepository extends CrudRepository<RefreshTokenEntity, Long> {
 
-    Optional<RefreshTokenEntity> findByRefreshToken(String refreshToken);
+    Optional<RefreshTokenEntity> findByEmail(String email);
 }

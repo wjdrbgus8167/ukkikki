@@ -3,11 +3,9 @@ package com.dancing_orangutan.ukkikki.member.ui;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.global.util.CookieUtils;
 import com.dancing_orangutan.ukkikki.member.application.AuthService;
-import com.dancing_orangutan.ukkikki.member.application.command.CompanyLoginCommand;
-import com.dancing_orangutan.ukkikki.member.application.command.CompanyRegisterCommand;
-import com.dancing_orangutan.ukkikki.member.application.command.MemberLoginCommand;
-import com.dancing_orangutan.ukkikki.member.application.command.MemberRegisterCommand;
+import com.dancing_orangutan.ukkikki.member.application.command.*;
 import com.dancing_orangutan.ukkikki.member.ui.request.*;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -105,6 +103,20 @@ public class AuthController {
 
         return ResponseEntity.ok(
                 ApiUtils.success("로그인이 완료되었습니다.")
+        );
+    }
+
+    @PostMapping("/token/refresh")
+    public ResponseEntity<ApiUtils.ApiResponse<?>> refreshAccessToken(
+            HttpServletRequest request)
+    {
+        RefreshAccessTokenCommand command = RefreshAccessTokenCommand.builder()
+                .refreshToken(CookieUtils.getRefreshToken(request))
+                .build();
+
+        authService.refreshAccessToken(command);
+        return ResponseEntity.ok(
+                ApiUtils.success("토큰이 재발급 되었습니다.")
         );
     }
 

@@ -2,14 +2,12 @@ package com.dancing_orangutan.ukkikki.member.application;
 
 import com.dancing_orangutan.ukkikki.global.error.ApiException;
 import com.dancing_orangutan.ukkikki.global.error.ErrorCode;
-import com.dancing_orangutan.ukkikki.member.application.command.CompanyLoginCommand;
-import com.dancing_orangutan.ukkikki.member.application.command.CompanyRegisterCommand;
-import com.dancing_orangutan.ukkikki.member.application.command.MemberLoginCommand;
-import com.dancing_orangutan.ukkikki.member.application.command.MemberRegisterCommand;
+import com.dancing_orangutan.ukkikki.member.application.command.*;
 import com.dancing_orangutan.ukkikki.member.domain.company.CompanyEntity;
 import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
 import com.dancing_orangutan.ukkikki.global.jwt.JwtTokenProvider;
 import com.dancing_orangutan.ukkikki.member.domain.refreshToken.RefreshTokenEntity;
+import com.dancing_orangutan.ukkikki.member.infrastructure.refreshToken.RefreshTokenFinder;
 import com.dancing_orangutan.ukkikki.member.infrastructure.refreshToken.RefreshTokenRepository;
 import com.dancing_orangutan.ukkikki.member.ui.*;
 import com.dancing_orangutan.ukkikki.member.infrastructure.company.CompanyRepository;
@@ -29,6 +27,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenFinder refreshTokenFinder;
 
     /**
      * 일반 사용자 회원가입
@@ -125,6 +124,25 @@ public class AuthService {
                         .expiration(jwtTokenProvider.getRefreshExpiration())
                         .build()
         );
+    }
+
+    /**
+     * access token 재발급
+     */
+    public String refreshAccessToken(RefreshAccessTokenCommand command) {
+        String refreshToken = command.getRefreshToken().orElseThrow(
+                (() -> new ApiException(ErrorCode.MISSING_REFRESH_TOKEN))
+        );
+
+        String email = jwtTokenProvider.getEmail(refreshToken);
+        int userId = jwtTokenProvider.getUserId(refreshToken);
+        RefreshTokenEntity refreshTokenEntity = refreshTokenFinder.findByEmail(email);
+
+        if(!refreshTokenEntity.getRefreshToken().equals(refreshToken) || !refreshTokenEntity.getUserId().equals(userId)){
+            throw new ApiException(ErrorCode.INVALID_TOKEN);
+        }
+
+        return jwtTokenProvider.createAccessToken(userId, email);
     }
 
 }
