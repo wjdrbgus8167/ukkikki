@@ -1,5 +1,6 @@
 package com.dancing_orangutan.ukkikki.global.util;
 
+import com.dancing_orangutan.ukkikki.global.error.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
@@ -15,5 +16,9 @@ public class JsonResponseUtils {
         response.setContentType("application/json; charset=UTF-8");
         response.getWriter().write(objectMapper.writeValueAsString(responseData));
         response.getWriter().flush();
+    }
+
+    public static void sendJsonErrorResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
+        sendJsonResponse(response, errorCode.getStatus(), ApiUtils.error(errorCode));
     }
 }

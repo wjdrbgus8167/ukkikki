@@ -1,5 +1,6 @@
 package com.dancing_orangutan.ukkikki.global.util;
 
+import com.dancing_orangutan.ukkikki.global.error.ErrorCode;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -24,12 +25,12 @@ public class ApiUtils {
 	}
 
 	// 메시지로 인한 오류 API 응답 생성
-	public static ApiResponse<?> error(String code, String message, HttpStatus status) {
+	public static ApiResponse<?> error(ErrorCode errorCode) {
 		return new ApiResponse<>(
-				status.value(),
+				errorCode.getStatus().value(),
 				FAILED,
 				null,
-				new ApiError(code, message)
+				new ApiError(errorCode)
 		);
 	}
 
@@ -56,9 +57,9 @@ public class ApiUtils {
 		private final String code;
 		private final String message;
 
-		ApiError(String code, String message) {
-			this.code = code;
-			this.message = message;
+		ApiError(ErrorCode errorCode) {
+			this.code = errorCode.getCode();
+			this.message = errorCode.getMessage();
 		}
 
 		ApiError(String code, Throwable throwable) {
