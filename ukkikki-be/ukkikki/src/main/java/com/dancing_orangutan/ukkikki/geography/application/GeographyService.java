@@ -34,9 +34,8 @@ public class GeographyService {
         return countryMapper.domainsToResponses(geographyRepository.getCountries(domain));
     }
 
-    //TODO
     public List<FetchCitiesResponse> getCities(FetchCitiesQuery query) {
-        City domain =
+        City domain = cityMapper.queryToDomain(query);
+        return cityMapper.domainsToResponses(geographyRepository.getCities(domain));
     }
-
 }
