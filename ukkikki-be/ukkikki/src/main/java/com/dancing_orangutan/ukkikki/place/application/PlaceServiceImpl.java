@@ -142,4 +142,10 @@ public class PlaceServiceImpl implements PlaceService {
         // PlaceLike delete
         placeLikeRepository.delete(likeEntity);
     }
+
+    @Override
+    public void updatePlaceLike(UpdatePlaceLikeCommand command) {
+
+        //
+    }
 }
