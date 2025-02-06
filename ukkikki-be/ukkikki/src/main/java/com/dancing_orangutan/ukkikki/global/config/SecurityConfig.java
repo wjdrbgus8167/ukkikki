@@ -89,7 +89,7 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/auth/logout")
-                        .logoutSuccessHandler(customLogoutSuccessHandler)  // 커스텀 핸들러 설정
+                        .logoutSuccessHandler(customLogoutSuccessHandler)
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
