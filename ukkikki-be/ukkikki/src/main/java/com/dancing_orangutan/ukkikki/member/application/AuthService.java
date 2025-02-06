@@ -109,4 +109,18 @@ public class AuthService {
         return new AuthTokens(accessToken, refreshToken);
     }
 
+
+    /**
+     *  refresh token 저장
+     */
+    public void saveRefreshToken(String email, String refreshToken) {
+        refreshTokenRepository.save(
+                RefreshTokenEntity.builder()
+                        .email(email)
+                        .refreshToken(refreshToken)
+                        .expiration(jwtTokenProvider.getRefreshExpiration())
+                        .build()
+        );
+    }
+
 }
