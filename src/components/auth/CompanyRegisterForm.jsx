@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // ✅ React Router v6 이상에서 사용
 import { publicRequest } from '../../hooks/requestMethod';
 import axios from 'axios';
 
 const CompanyRegisterForm = () => {
+  const navigate = useNavigate(); // ✅ 네비게이트 사용
+
   const [step, setStep] = useState(1); // 현재 단계 (1 or 2)
   const [formData, setFormData] = useState({
     email: '',
@@ -11,12 +14,11 @@ const CompanyRegisterForm = () => {
     confirmPassword: '',
     companyName: '',
     businessRegistrationNumber: '',
-    companyPhone: '',
+    companyPhone: '', // ❗ 혹은 phoneNumber 이름으로 사용할 때는 맞춰주세요
   });
   const [errorMessage, setErrorMessage] = useState('');
   const [businessCheckResult, setBusinessCheckResult] = useState(null);
   const [isChecking, setIsChecking] = useState(false); // 사업자번호 조회 중 여부
-  const [isScriptLoaded, setIsScriptLoaded] = useState(false); // ✅ 스크립트 로딩 상태
 
   const apiKey = import.meta.env.VITE_APP_ODCLOUD_API_KEY; // 환경 변수에서 API 키 가져오기
 
@@ -81,12 +83,11 @@ const CompanyRegisterForm = () => {
     setStep(1);
   };
 
-  // ✅ 사업자등록번호 검사 로직 수정
+  // ✅ 사업자등록번호 검사 로직
   const verifyBusinessNumber = async (businessRegistrationNumber) => {
     setIsChecking(true);
 
     const apiUrl = `https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey=${apiKey}`;
-
     const requestData = {
       b_no: [businessRegistrationNumber],
     };
@@ -98,8 +99,6 @@ const CompanyRegisterForm = () => {
           Accept: 'application/json',
         },
       });
-
-      console.log('📌 API 응답:', response.data);
 
       if (
         !response.data ||
@@ -136,36 +135,38 @@ const CompanyRegisterForm = () => {
     }
   };
 
-  //회원가입 요청
+  // 회원가입 요청
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // 유효성 검사
     if (
       !formData.companyName ||
       !formData.businessRegistrationNumber ||
-      !formData.companyPhone
+      !formData.phoneNumber
     ) {
       setErrorMessage('모든 필드를 입력해주세요.');
       return;
     }
-    // ❌ 사업자번호가 유효하지 않으면 가입 불가
     if (!businessCheckResult?.valid) {
       setErrorMessage('유효한 사업자등록번호를 입력해주세요.');
       return;
     }
 
     const requestBody = {
-      companyName: formData.companyName,
-      ceoName: formData.ceoName,
-      businessRegistrationNumber: formData.businessRegistrationNumber,
       email: formData.email,
       password: formData.password,
+      ceoName: formData.ceoName,
+      companyName: formData.companyName,
+      businessRegistrationNumber: formData.businessRegistrationNumber,
       phoneNumber: formData.phoneNumber,
+      profileImageUrl: '',
     };
 
     try {
-      await publicRequest.post('/api/v1/auth/companies/register', requestBody);
+      await publicRequest.post('/auth/companies/register', requestBody);
       alert('기업 회원가입 성공!');
+      navigate('/login'); // ✅ 회원가입 성공 시 /login으로 이동
     } catch (error) {
       setErrorMessage(error.response?.data?.message || '회원가입 실패');
     }
@@ -280,9 +281,9 @@ const CompanyRegisterForm = () => {
           <div className="mb-4">
             <input
               type="text"
-              name="companyPhone"
+              name="phoneNumber"
               placeholder="회사 전화번호"
-              value={formData.companyPhone}
+              value={formData.phoneNumber}
               onChange={handleChange}
               className="w-full px-3 py-4 border rounded"
               required

@@ -1,25 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import logo from '../../assets/logo.png'; // 로고 이미지
-import defaultProfile from '../../assets/profile.png'; // 기본 프로필 이미지
+import { getAuthCookie, removeAuthCookie } from '../../utils/cookie'; // ✅ 수정된 쿠키 함수 가져오기
+import logo from '../../assets/logo.png';
+import defaultProfile from '../../assets/profile.png';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [token, setToken] = useState(null); // ✅ 로그인 여부 상태
   const navigate = useNavigate();
 
+  // ✅ 로그인 여부 확인
   useEffect(() => {
-    // ✅ 로그인한 사용자 정보 가져오기
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    setUser(storedUser);
+    const authToken = getAuthCookie(); // ✅ 수정된 쿠키 함수 사용
+    setToken(authToken);
   }, []);
 
+  // ✅ 로그아웃 핸들러
   const handleLogout = () => {
-    // ✅ 로그아웃 시 로컬 스토리지에서 토큰 삭제
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('user');
-    setUser(null);
+    removeAuthCookie(); // ✅ 쿠키 삭제
+    setToken(null); // ✅ 상태 업데이트
     navigate('/');
   };
 
@@ -32,7 +32,7 @@ const Header = () => {
 
       {/* 오른쪽 메뉴 */}
       <nav className="hidden md:flex space-x-6 mr-10">
-        {!user ? (
+        {!token ? (
           <>
             <Link
               to="/about"
@@ -49,19 +49,17 @@ const Header = () => {
           </>
         ) : (
           <div className="relative">
-            {/* ✅ 프로필 클릭 시 드롭다운 메뉴 */}
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="flex items-center space-x-2 focus:outline-none"
             >
               <img
-                src={user.profile_image_url || defaultProfile}
+                src={defaultProfile}
                 alt="프로필"
                 className="w-10 h-10 rounded-full border border-gray-300"
               />
             </button>
 
-            {/* ✅ 드롭다운 메뉴 */}
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg">
                 <Link
@@ -91,10 +89,9 @@ const Header = () => {
           ☰
         </button>
 
-        {/* 드롭다운 메뉴 */}
         {menuOpen && (
-          <div className="absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-md">
-            {!user ? (
+          <div className="absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-md z-50">
+            {!token ? (
               <>
                 <Link
                   to="/about"
@@ -111,11 +108,6 @@ const Header = () => {
               </>
             ) : (
               <div className="px-4 py-2">
-                <img
-                  src={user.profile_image_url || defaultProfile}
-                  alt="Profile"
-                  className="w-10 h-10 rounded-full object-cover mb-2"
-                />
                 <Link
                   to="/mypage"
                   className="block px-4 py-2 text-gray-600 hover:text-blue-500 hover:bg-gray-100 transition duration-300"
