@@ -43,9 +43,10 @@ public class InquiryEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumns({
-			@JoinColumn(name = "travel_plan_id"),
-			@JoinColumn(name = "member_id")
+			@JoinColumn(name = "member_id"),
+			@JoinColumn(name = "travel_plan_id")
 	})
+
 	private MemberTravelPlanEntity memberTravelPlan;
 
 	@Builder

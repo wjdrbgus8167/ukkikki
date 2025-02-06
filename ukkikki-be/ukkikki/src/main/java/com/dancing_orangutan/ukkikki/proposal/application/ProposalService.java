@@ -1,17 +1,18 @@
 package com.dancing_orangutan.ukkikki.proposal.application;
 
-
 import com.dancing_orangutan.ukkikki.proposal.application.command.CreateInquiryCommand;
 import com.dancing_orangutan.ukkikki.proposal.application.command.CreateProposalCommand;
 import com.dancing_orangutan.ukkikki.proposal.domain.Inquiry.Inquiry;
+import com.dancing_orangutan.ukkikki.proposal.domain.Inquiry.InquiryEntity;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
+import com.dancing_orangutan.ukkikki.proposal.infrastructure.inquiry.InquiryFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.inquiry.InquiryRepository;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.memberTravelPlan.MemberTravelPlanFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.proposal.ProposalFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.proposal.ProposalRepository;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.schedule.ScheduleFinder;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.CreateInquiryResponse;
-import com.dancing_orangutan.ukkikki.proposal.ui.response.CreateProposalResponse;
+import com.dancing_orangutan.ukkikki.proposal.ui.response.InquiryListResponse;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.ProposalDetailResponse;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.ScheduleResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+
 public class ProposalService {
 
     private final ProposalRepository proposalRepository;
@@ -34,6 +36,7 @@ public class ProposalService {
     private final MemberTravelPlanFinder memberTravelPlanFinder;
     private final ProposalFinder proposalFinder;
     private final InquiryRepository inquiryRepository;
+    private final InquiryFinder inquiryFinder;
 
     // 제안서 작성
    public Proposal createProposal(CreateProposalCommand command){
@@ -61,7 +64,6 @@ public class ProposalService {
                .travelPlanId(command.getTravelPlanId())
                .build();
 
-
        return proposalRepository.save(domain);
    }
 
@@ -81,13 +83,12 @@ public class ProposalService {
         return new ProposalDetailResponse(proposal,schedules);
     }
 
-    @Transactional
+    //제안서 문의
     public CreateInquiryResponse createInquiry(CreateInquiryCommand command) {
 
-        // 사용자가 여행 계획에 참가하고 있는지 확인
+       // 사용자가 여행 계획에 참가하고 있는지 확인
         boolean isJoining = memberTravelPlanFinder.isJoiningTravelPlan(
                 command.getMemberId(), command.getTravelPlanId());
-
 
         if (!isJoining) {
             throw new IllegalArgumentException("회원이 여행 계획에 속하지 않습니다.");
@@ -96,7 +97,6 @@ public class ProposalService {
         MemberTravelPlanEntity memberTravelPlan = memberTravelPlanFinder
                 .findByTravelPlanIdAndMemberId(command.getTravelPlanId(), command.getMemberId());
 
-
         // ProposalEntity 조회
         Proposal proposal = proposalFinder.getProposalDomain(command.getProposalId());
 
@@ -104,21 +104,34 @@ public class ProposalService {
             throw new IllegalArgumentException("제안서를 찾을 수 없습니다.");
         }
 
-
         Inquiry inquiry = Inquiry.builder()
                 .title(command.getTitle())
                 .content(command.getContent())
                 .createTIme(LocalDateTime.now())
                 .proposalId(proposal.getProposalId())
-                .memberId(memberTravelPlan.getMemberTravelPlanId().getMemberId())
-                .travelPlanId(memberTravelPlan.getMemberTravelPlanId().getTravelPlanId())
+                .memberId(memberTravelPlan.getMember().getMemberId())
+                .travelPlanId(memberTravelPlan.getTravelPlan().getTravelPlanId())
                 .build();
 
-
         Inquiry savedInquiry = inquiryRepository.save(inquiry);
-
 
         return CreateInquiryResponse.from(savedInquiry);
     }
 
+    // 제안서 문의 목록 조회
+    public List<InquiryListResponse> getInquiryList(Integer proposalId) {
+
+        // Proposal 존재 여부 확인
+        if (proposalRepository.findById(proposalId)==null) {
+            throw new IllegalArgumentException("해당 proposalId에 대한 제안서를 찾을 수 없습니다: " + proposalId);
+        }
+
+        // InquiryFinder를 사용하여 문의 조회
+        List<InquiryEntity> inquiries = inquiryFinder.findByProposalId(proposalId);
+
+        // InquiryEntity → InquiryResponse 변환 후 반환
+        return inquiries.stream()
+                .map(InquiryListResponse::from)
+                .collect(Collectors.toList());
+    }
 }

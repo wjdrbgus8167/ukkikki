@@ -1,7 +1,5 @@
 package com.dancing_orangutan.ukkikki.proposal.ui;
 
-
-
 import com.dancing_orangutan.ukkikki.global.security.CompanyUserDetails;
 import com.dancing_orangutan.ukkikki.global.security.MemberUserDetails;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
@@ -12,18 +10,22 @@ import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
 import com.dancing_orangutan.ukkikki.proposal.ui.request.CreateInquiryRequest;
 import com.dancing_orangutan.ukkikki.proposal.ui.request.CreateProposalRequest;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.CreateInquiryResponse;
+import com.dancing_orangutan.ukkikki.proposal.ui.response.InquiryListResponse;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.ProposalDetailResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
+@Slf4j
 @RequestMapping("/travel-plans/{travelPlanId}/proposals")
 
 public class ProposalController {
-
 
     private final ProposalService proposalService;
 
@@ -37,7 +39,9 @@ public class ProposalController {
         if (request == null || request.getProposalRequest() == null) {
             throw new IllegalArgumentException("Request body or proposalRequest is missing!");
         }
+
         CreateProposalCommand command = request.toCommand(travelPlanId, companyUserDetails.getCompanyId());
+
         return ApiUtils.success(proposalService.createProposal(command));
     }
 
@@ -61,7 +65,16 @@ public class ProposalController {
 
         CreateInquiryCommand command = request.requestToDomain(proposalId,travelPlanId,memberUserDetails.getMemberId());
 
-
         return ApiUtils.success(proposalService.createInquiry(command));
+    }
+
+    // 제안서 문의 목록 조회
+    @GetMapping("/{proposalId}/inquiries")
+    public ApiUtils.ApiResponse<List<InquiryListResponse>> getInquiryList(
+            @PathVariable Integer proposalId) {
+
+        List<InquiryListResponse> inquiries = proposalService.getInquiryList(proposalId);
+
+        return ApiUtils.success(inquiries);
     }
 }

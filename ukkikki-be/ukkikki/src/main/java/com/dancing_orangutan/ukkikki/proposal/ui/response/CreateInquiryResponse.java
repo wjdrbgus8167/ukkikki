@@ -16,16 +16,20 @@ public class CreateInquiryResponse {
     private final LocalDateTime completedTime;
 
     public CreateInquiryResponse(Inquiry inquiry) {
+
         this.inquiryId = inquiry.getInquiryId();
         this.title = inquiry.getTitle();
         this.content = inquiry.getContent();
         this.answer = inquiry.getAnswer();
         this.createTime = inquiry.getCreateTIme();
         this.completedTime = inquiry.getCompletedTIme();
+
     }
 
     public static CreateInquiryResponse from(Inquiry inquiry) {
+
         return new CreateInquiryResponse(inquiry);
+
     }
 
 }
