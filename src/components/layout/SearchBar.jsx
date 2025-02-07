@@ -7,7 +7,6 @@ import axios from 'axios';
 import KoreaAirportSelector from '../../services/airport/KoreaAirportSelector';
 import WorldAirportSelector from '../../services/airport/WorldAirportSelector';
 import CreateRoomModal from '../mainpage/CreateRoomModal';
-import { useCookies } from 'react-cookie';
 import { publicRequest } from '../../hooks/requestMethod';
 const SearchBar = () => {
   const [startDate, setStartDate] = useState(null);
@@ -16,14 +15,12 @@ const SearchBar = () => {
   const [arrivalAirport, setArrivalAirport] = useState('');
   const [searchType, setSearchType] = useState('findRoom'); // ✅ 방 찾기 / 방 만들기 선택 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const [cookies] = useCookies(['accessToken']); // ✅ 컴포넌트 내부에서 useCookies 사용
   const navigate = useNavigate();
-  const isAuthenticated = !!cookies.accessToken; // ✅ accessToken 존재 여부 확인
 
   const API_KEY = import.meta.env.VITE_APP_AIRPORT_API_KEY;
   const API_BASE_URL = '/api/flight/getIflightScheduleList'; // 프록시 사용
 
+  //--------------------------------------------------------------------------------
   // ✅ 방 찾기 버튼 클릭 시 검색 조건을 API에 전달 후 SearchRoom 페이지로 이동
   const handleFindRoom = async () => {
     if (!startDate || !endDate || !departureAirport || !arrivalAirport) {
@@ -52,14 +49,9 @@ const SearchBar = () => {
     }
   };
 
+  //--------------------------------------------------------------------------------
   // ✅ 방 만들기 버튼 클릭 시 로그인 여부 확인 후 동작
   const handleCreateRoom = async () => {
-    if (!isAuthenticated) {
-      alert('로그인이 필요합니다.');
-      navigate('/login'); // ✅ 로그인 페이지로 이동
-      return;
-    }
-
     if (!startDate || !endDate || !departureAirport || !arrivalAirport) {
       alert('출발일, 돌아오는 날, 출발 공항, 도착 공항을 모두 선택해주세요.');
       return;

@@ -14,6 +14,5 @@ export default defineConfig({
           path.replace(/^\/api\/flight/, '/service/rest/FlightScheduleList'),
       },
     },
-    host: 'fe.i12c204.p.ssafy.io',
   },
 });
