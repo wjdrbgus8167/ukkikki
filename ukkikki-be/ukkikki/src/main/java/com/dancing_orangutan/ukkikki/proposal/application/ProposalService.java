@@ -2,15 +2,19 @@ package com.dancing_orangutan.ukkikki.proposal.application;
 
 import com.dancing_orangutan.ukkikki.proposal.application.command.CreateInquiryCommand;
 import com.dancing_orangutan.ukkikki.proposal.application.command.CreateProposalCommand;
+import com.dancing_orangutan.ukkikki.proposal.application.command.CreateScheduleCommand;
 import com.dancing_orangutan.ukkikki.proposal.domain.Inquiry.Inquiry;
 import com.dancing_orangutan.ukkikki.proposal.domain.Inquiry.InquiryEntity;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
+import com.dancing_orangutan.ukkikki.proposal.domain.schedule.Schedule;
+import com.dancing_orangutan.ukkikki.proposal.domain.schedule.ScheduleEntity;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.inquiry.InquiryFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.inquiry.InquiryRepository;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.memberTravelPlan.MemberTravelPlanFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.proposal.ProposalFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.proposal.ProposalRepository;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.schedule.ScheduleFinder;
+import com.dancing_orangutan.ukkikki.proposal.infrastructure.schedule.ScheduleRepository;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.*;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +38,7 @@ public class ProposalService {
     private final ProposalFinder proposalFinder;
     private final InquiryRepository inquiryRepository;
     private final InquiryFinder inquiryFinder;
+    private final ScheduleRepository scheduleRepository;
 
     // 제안서 작성
    public Proposal createProposal(CreateProposalCommand command){
@@ -168,5 +173,31 @@ public class ProposalService {
                 .collect(Collectors.toList());
 
         return new CompanyProposalDetailResponse(proposal, schedules);
+    }
+
+    // 제안서 내 일정 등록
+    public Schedule createSchedule(CreateScheduleCommand command) {
+
+       // 일정 등록 전 겹치는 일정이 있는지 확인
+        List<ScheduleEntity> overlappingSchedules = scheduleRepository
+                .checkOverlapSchedule(
+                        command.getProposalId(),
+                        command.getEndDate(),
+                        command.getStartDate()
+                );
+
+        if (!overlappingSchedules.isEmpty()) {
+            throw new IllegalArgumentException("해당 시간대에는 이미 일정이 등록되어 있습니다.");
+        }
+
+        Schedule schedule = Schedule.builder()
+                .scheduleName(command.getScheduleName())
+                .startTime(command.getStartDate())
+                .endTime(command.getEndDate())
+                .imageUrl(command.getImageUrl())
+                .proposalId(command.getProposalId())
+                .build();
+
+       return scheduleRepository.save(schedule);
     }
 }
