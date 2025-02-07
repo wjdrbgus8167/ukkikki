@@ -1,10 +1,10 @@
 package com.dancing_orangutan.ukkikki.global.security;
 
 import com.dancing_orangutan.ukkikki.global.jwt.JwtTokenProvider;
+import com.dancing_orangutan.ukkikki.global.util.CookieUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +15,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -29,7 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
-            getAccessToken(request).ifPresent(accessToken -> {
+            CookieUtils.getAccessToken(request).ifPresent(accessToken -> {
                 // access token이 유효한 경우 인증
                 String email = jwtTokenProvider.getEmail(accessToken);
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
@@ -49,32 +47,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     }
 
-
-    /**
-     * 헤더에서 액세스 토큰 추출
-     */
-    public Optional<String> getAccessToken(HttpServletRequest request) {
-        if (request.getCookies() == null) {
-            return Optional.empty();
-        }
-        return Arrays.stream(request.getCookies())
-                .filter(cookie -> "access_token".equals(cookie.getName()))
-                .map(Cookie::getValue)
-                .findFirst();
-    }
-
-    /***
-     * 쿠키에서 리프레시 토큰 추출
-     */
-    private Optional<String> getRefreshToken(HttpServletRequest request) {
-        if (request.getCookies() == null) {
-            return Optional.empty();
-        }
-        return Arrays.stream(request.getCookies())
-                .filter(cookie -> "refresh_token".equals(cookie.getName()))
-                .map(Cookie::getValue)
-                .findFirst();
-    }
 
 }
 

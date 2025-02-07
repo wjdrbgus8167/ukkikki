@@ -1,7 +1,7 @@
 package com.dancing_orangutan.ukkikki.proposal.domain.proposal;
 
 import com.dancing_orangutan.ukkikki.entity.info.Airport;
-import com.dancing_orangutan.ukkikki.member.domain.CompanyEntity;
+import com.dancing_orangutan.ukkikki.member.domain.company.CompanyEntity;
 import com.dancing_orangutan.ukkikki.proposal.constant.ProposalStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import jakarta.persistence.*;

@@ -1,5 +1,7 @@
 package com.dancing_orangutan.ukkikki.global.jwt;
 
+import com.dancing_orangutan.ukkikki.global.error.ApiException;
+import com.dancing_orangutan.ukkikki.global.error.ErrorCode;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -69,12 +71,29 @@ public class JwtTokenProvider implements InitializingBean {
      * 토큰의 Claims 파싱
      */
     private Claims getClaims(String token) {
+        try{
+            return Jwts.parser()
+                    .setSigningKey(signingKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        }catch (SecurityException | MalformedJwtException e) {
+            throw new ApiException(ErrorCode.INVALID_TOKEN_SIGNATURE);
+        } catch (ExpiredJwtException e) {
+            throw new ApiException(ErrorCode.EXPIRED_TOKEN);
+        } catch (UnsupportedJwtException e) {
+            throw new ApiException(ErrorCode.UNSUPPORTED_TOKEN);
+        } catch (IllegalArgumentException e) {
+            throw new ApiException(ErrorCode.INVALID_TOKEN_FORMAT);
+        }
 
-        return Jwts.parser()
-                .setSigningKey(signingKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+    }
+
+    /**
+     *  리프레시 토큰 유효시간 반환
+     */
+    public long getRefreshExpiration() {
+        return jwtProperties.getRefreshExpiration();
     }
 
 }

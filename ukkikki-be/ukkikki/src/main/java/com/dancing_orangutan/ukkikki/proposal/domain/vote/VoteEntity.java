@@ -1,7 +1,7 @@
 package com.dancing_orangutan.ukkikki.proposal.domain.vote;
 
 import com.dancing_orangutan.ukkikki.proposal.domain.voteSurvey.VoteSurveyEntity;
-import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
+import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.ProposalEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

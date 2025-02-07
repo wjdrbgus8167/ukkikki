@@ -2,12 +2,18 @@ package com.dancing_orangutan.ukkikki.member.application;
 
 import com.dancing_orangutan.ukkikki.global.error.ApiException;
 import com.dancing_orangutan.ukkikki.global.error.ErrorCode;
-import com.dancing_orangutan.ukkikki.member.domain.CompanyEntity;
-import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
+import com.dancing_orangutan.ukkikki.member.application.command.*;
+import com.dancing_orangutan.ukkikki.member.domain.company.CompanyEntity;
+import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
 import com.dancing_orangutan.ukkikki.global.jwt.JwtTokenProvider;
+import com.dancing_orangutan.ukkikki.member.domain.refreshToken.RefreshToken;
+import com.dancing_orangutan.ukkikki.member.domain.refreshToken.RefreshTokenEntity;
+import com.dancing_orangutan.ukkikki.member.infrastructure.refreshToken.RefreshTokenFinder;
+import com.dancing_orangutan.ukkikki.member.infrastructure.refreshToken.RefreshTokenRepository;
+import com.dancing_orangutan.ukkikki.member.mapper.RefreshTokenMapper;
 import com.dancing_orangutan.ukkikki.member.ui.*;
-import com.dancing_orangutan.ukkikki.member.infrastructure.CompanyRepository;
-import com.dancing_orangutan.ukkikki.member.infrastructure.MemberRepository;
+import com.dancing_orangutan.ukkikki.member.infrastructure.company.CompanyRepository;
+import com.dancing_orangutan.ukkikki.member.infrastructure.member.MemberRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,79 +28,129 @@ public class AuthService {
     private final CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenFinder refreshTokenFinder;
 
     /**
      * 일반 사용자 회원가입
      */
     @Transactional
-    public void memberRegister(MemberRegisterRequest request){
+    public void memberRegister(MemberRegisterCommand command){
         // 이메일 중복 체크
-        if(memberRepository.findByEmail(request.email()).isPresent() || companyRepository.findByEmail(request.email()).isPresent()){
+        if(memberRepository.findByEmail(command.getEmail()).isPresent() || companyRepository.findByEmail(command.getEmail()).isPresent()){
             throw new ApiException(ErrorCode.EMAIL_ALREADY_IN_USE);
         }
 
         memberRepository.save(MemberEntity.builder()
-                .email(request.email())
-                .password(passwordEncoder.encode(request.password()))
-                .name(request.name())
-                .profileImageUrl(request.profileImageUrl())
+                .email(command.getEmail())
+                .password(passwordEncoder.encode(command.getPassword()))
+                .name(command.getName())
+                .profileImageUrl(command.getProfileImageUrl())
                 .provider("")
                 .build()
         );
     }
 
     /**
-     *  일반 사용자 로그인 - access token(body 응답), refresh token(쿠키 전송) 발급
+     *  일반 사용자 로그인 - access token(쿠키), refresh token(쿠키) 발급
      */
-    public AuthTokens memberLogin(MemberLoginRequest request) {
-        MemberEntity member = memberRepository.findByEmail(request.email())
+    public AuthTokens memberLogin(MemberLoginCommand command) {
+        MemberEntity memberEntity = memberRepository.findByEmail(command.getEmail())
                 .orElseThrow(() -> new ApiException(ErrorCode.MEMBER_NOT_FOUND));
 
-        if (!passwordEncoder.matches(request.password(), member.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
+        if (!passwordEncoder.matches(command.getPassword(), memberEntity.getPassword())) {
+            throw new ApiException(ErrorCode.INVALID_PASSWORD);
         }
 
+        String accessToken = jwtTokenProvider.createAccessToken(memberEntity.getMemberId(), memberEntity.getEmail());
+        String refreshToken = jwtTokenProvider.createRefreshToken(memberEntity.getMemberId(), memberEntity.getEmail());
+        saveRefreshToken(RefreshToken.builder()
+                .email(memberEntity.getEmail())
+                .userId(memberEntity.getMemberId())
+                .refreshToken(refreshToken)
+                .expiration(jwtTokenProvider.getRefreshExpiration())
+                .build()
+        );
+
         return AuthTokens.builder()
-                        .accessToken(jwtTokenProvider.createAccessToken(member.getMemberId(), member.getEmail()))
-                        .refreshToken(jwtTokenProvider.createRefreshToken(member.getMemberId(), member.getEmail()))
-                        .build();
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
     /**
      * 여행사 회원가입
      */
     @Transactional
-    public void companyRegister(CompanyRegisterRequest request) {
+    public void companyRegister(CompanyRegisterCommand command) {
         // 이메일 중복 체크
-        if(memberRepository.findByEmail(request.email()).isPresent() || companyRepository.findByEmail(request.email()).isPresent()){
+        if(memberRepository.findByEmail(command.getEmail()).isPresent() || companyRepository.findByEmail(command.getEmail()).isPresent()){
             throw new ApiException(ErrorCode.EMAIL_ALREADY_IN_USE);
         }
 
         companyRepository.save(CompanyEntity.builder()
-                .email(request.email())
-                .password(passwordEncoder.encode(request.password()))
-                .ceoName(request.ceoName())
-                .companyName(request.companyName())
-                .businessRegistrationNumber(request.businessRegistrationNumber())
-                .phoneNumber(request.phoneNumber())
-                .profileImageUrl(request.profileImageUrl())
+                .email(command.getEmail())
+                .password(passwordEncoder.encode(command.getPassword()))
+                .ceoName(command.getCeoName())
+                .companyName(command.getCompanyName())
+                .businessRegistrationNumber(command.getBusinessRegistrationNumber())
+                .phoneNumber(command.getPhoneNumber())
+                .profileImageUrl(command.getProfileImageUrl())
                 .build()
         );
     }
     /**
      * 여행사 로그인
      */
-    public AuthTokens companyLogin(CompanyLoginRequest request) {
-        CompanyEntity companyEntity = companyRepository.findByEmail(request.email())
-                .orElseThrow(() -> new IllegalArgumentException("해당 이메일로 등록된 회사가 없습니다."));
+    public AuthTokens companyLogin(CompanyLoginCommand command) {
+        CompanyEntity companyEntity = companyRepository.findByEmail(command.getEmail())
+                .orElseThrow(() -> new ApiException(ErrorCode.COMPANY_NOT_FOUND));
 
-        if (!passwordEncoder.matches(request.password(), companyEntity.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        if (!passwordEncoder.matches(command.getPassword(), companyEntity.getPassword())) {
+            throw new ApiException(ErrorCode.INVALID_PASSWORD);
         }
 
         String accessToken = jwtTokenProvider.createAccessToken(companyEntity.getCompanyId(), companyEntity.getEmail());
         String refreshToken = jwtTokenProvider.createRefreshToken(companyEntity.getCompanyId(), companyEntity.getEmail());
+        saveRefreshToken(RefreshToken.builder()
+                .email(companyEntity.getEmail())
+                .userId(companyEntity.getCompanyId())
+                .refreshToken(refreshToken)
+                .expiration(jwtTokenProvider.getRefreshExpiration())
+                .build()
+        );
 
-        return new AuthTokens(accessToken, refreshToken);
+        return AuthTokens.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
+
+
+    /**
+     *  refresh token 저장
+     */
+    public void saveRefreshToken(RefreshToken refreshToken) {
+        refreshTokenRepository.save(RefreshTokenMapper.mapToEntity(refreshToken));
+    }
+
+    /**
+     * access token 재발급
+     */
+    public String refreshAccessToken(RefreshAccessTokenCommand command) {
+        String refreshToken = command.getRefreshToken().orElseThrow(
+                (() -> new ApiException(ErrorCode.MISSING_REFRESH_TOKEN))
+        );
+
+        String email = jwtTokenProvider.getEmail(refreshToken);
+        int userId = jwtTokenProvider.getUserId(refreshToken);
+        RefreshTokenEntity refreshTokenEntity = refreshTokenFinder.findByEmail(email);
+
+        if(!refreshTokenEntity.getRefreshToken().equals(refreshToken) || !refreshTokenEntity.getUserId().equals(userId)){
+            throw new ApiException(ErrorCode.INVALID_TOKEN);
+        }
+
+        return jwtTokenProvider.createAccessToken(userId, email);
+    }
+
 }

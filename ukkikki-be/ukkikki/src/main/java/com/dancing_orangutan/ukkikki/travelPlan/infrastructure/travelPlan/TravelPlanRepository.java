@@ -1,8 +1,8 @@
 package com.dancing_orangutan.ukkikki.travelPlan.infrastructure.travelPlan;
 
 import com.dancing_orangutan.ukkikki.entity.info.CityEntity;
-import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
-import com.dancing_orangutan.ukkikki.member.infrastructure.MemberFinder;
+import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
+import com.dancing_orangutan.ukkikki.member.infrastructure.member.MemberFinder;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.keyword.KeywordEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.*;

@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.place.domain.like;
 
-import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
+import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
 import com.dancing_orangutan.ukkikki.place.domain.place.PlaceEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
