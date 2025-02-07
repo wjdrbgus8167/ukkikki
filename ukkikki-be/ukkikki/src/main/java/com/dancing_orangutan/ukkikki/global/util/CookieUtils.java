@@ -16,7 +16,7 @@ public class CookieUtils {
                 .secure(false)
                 .path("/")
                 .maxAge(maxAge)
-                .sameSite("None")
+//                .sameSite("None")
                 .domain("i12c204.p.ssafy.io")
                 .build();
 
