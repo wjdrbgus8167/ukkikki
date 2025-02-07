@@ -3,14 +3,16 @@
 import React, { useEffect, useState } from "react";
 import ListCard from "../common/ListCard";
 import { fetchAgencyProposals } from "../../apis/agency";
+import Cookies from "js-cookie";
 
-const jwtToken = '내 토큰'
 
 const AgencyProposals = () => {
 
    
   const [proposals, setProposal ] = useState([]);
   const [error, setError] = useState(null);
+
+  const jwtToken = Cookies.get('jwtToken');
 
   useEffect(() => {
     const getAgencyProposals = async() => {
