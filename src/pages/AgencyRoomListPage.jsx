@@ -5,11 +5,12 @@ import Footer from "../components/layout/Footer";
 import UserProposals from "../components/agencyPlanList/UserProposals";
 import AgencyProposals from "../components/agencyPlanList/AgencyProposals";
 import { TravelPlanProvider } from "../contexts/travelPlanContext";
-
+import Cookies from "js-cookie"
 
 const AgencyRoomList = () => {
 
-  const jwtToken = "내 토큰 설정"
+  const jwtToken = Cookies.get('jwtToken');
+  console.log(jwtToken)
   const [activeTab, setActiveTab] = useState(null);
 
   return(

@@ -12,8 +12,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) =>
           path.replace(/^\/api\/flight/, '/service/rest/FlightScheduleList'),
+        rewrite: (path) =>
+          path.replace(/^\/api\/flight/, '/service/rest/FlightScheduleList'),
       },
     },
-    host: 'fe.i12c204.p.ssafy.io',
+
+    // host: 'fe.i12c204.p.ssafy.io',
   },
 });
