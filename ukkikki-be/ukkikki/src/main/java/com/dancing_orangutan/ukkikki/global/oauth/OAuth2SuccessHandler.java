@@ -32,6 +32,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         CookieUtils.addRefreshTokenCookie(response, refreshToken);
         CookieUtils.addAccessTokenCookie(response, accessToken);
 
-        response.sendRedirect("http://localhost:5173/oauth/success");
+        response.sendRedirect("http://fe.i12c204.p.ssafy.io:5173/");
     }
 }
