@@ -14,4 +14,5 @@ public interface JpaProposalRepository extends JpaRepository<ProposalEntity,Inte
 
     Optional<ProposalEntity> findByProposalIdAndCompany_CompanyId(Integer proposalId, Integer companyId);
 
+    ProposalEntity findByProposalId(Integer proposalId);
 }
