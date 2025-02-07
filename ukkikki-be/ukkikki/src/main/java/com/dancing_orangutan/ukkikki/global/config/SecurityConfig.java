@@ -24,6 +24,7 @@ import org.springframework.web.filter.CorsFilter;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final AppConfig appConfig;
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -49,7 +50,7 @@ public class SecurityConfig {
 
     @Bean
     public OAuth2SuccessHandler oAuth2SuccessHandler() {
-        return new OAuth2SuccessHandler(jwtTokenProvider, memberRepository);
+        return new OAuth2SuccessHandler(jwtTokenProvider, memberRepository, appConfig);
     }
 
     @Bean

@@ -69,9 +69,15 @@ spring:
 logging:
   level:
     root: info
+    org.springframework.data.redis: INFO
+    io.lettuce.core: INFO
+
 
 jwt:
   secret_key: nD/99zQMrX/fypNsi0J2IG+h46ePk0hddF3uCwRQITw=
   access_expiration: 3600000
   refresh_expiration: 604800000
+
+app:
+  domain: ${REDIS_HOST:localhost}
 

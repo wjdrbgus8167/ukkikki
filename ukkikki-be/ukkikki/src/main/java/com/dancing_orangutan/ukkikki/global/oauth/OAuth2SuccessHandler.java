@@ -1,5 +1,6 @@
 package com.dancing_orangutan.ukkikki.global.oauth;
 
+import com.dancing_orangutan.ukkikki.global.config.AppConfig;
 import com.dancing_orangutan.ukkikki.global.jwt.JwtTokenProvider;
 import com.dancing_orangutan.ukkikki.global.util.CookieUtils;
 import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
@@ -18,6 +19,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
+    private final AppConfig appConfig;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -32,6 +34,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         CookieUtils.addRefreshTokenCookie(response, refreshToken);
         CookieUtils.addAccessTokenCookie(response, accessToken);
 
-        response.sendRedirect("http://i12c204.p.ssafy.io/");
+        response.sendRedirect("http://"+appConfig.getDomain());
     }
 }
