@@ -10,9 +10,9 @@ export default defineConfig({
       '/api/flight': {
         target: 'http://openapi.airport.co.kr', // API의 base URL
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/flight/, '/service/rest/FlightScheduleList'),
+        rewrite: (path) =>
+          path.replace(/^\/api\/flight/, '/service/rest/FlightScheduleList'),
       },
     },
-
   },
 });
