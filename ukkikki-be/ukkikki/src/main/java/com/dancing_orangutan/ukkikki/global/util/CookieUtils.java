@@ -17,7 +17,7 @@ public class CookieUtils {
                 .path("/")
                 .maxAge(maxAge)
                 .sameSite("None")
-                .domain(".i12c204.p.ssafy.io")
+                .domain(".localhost")
                 .build();
 
         response.addHeader("Set-Cookie", cookie.toString());
