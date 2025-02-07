@@ -11,7 +11,7 @@ import java.util.Collections;
 @AllArgsConstructor
 public class MemberUserDetails implements UserDetails {
 
-    private final MemberEntity member;
+    private final MemberEntity memberEntity;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -20,16 +20,23 @@ public class MemberUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return member.getPassword();
+        return memberEntity.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return member.getEmail();
+        return memberEntity.getEmail();
     }
 
     public Integer getMemberId() {
-        return member.getMemberId();
+        return memberEntity.getMemberId();
     }
+
+    public String getEmail() { return memberEntity.getEmail();}
+
+    public String getName() { return memberEntity.getName(); }
+
+    public String getProfileImageUrl() { return memberEntity.getProfileImageUrl(); }
+
 }
 
