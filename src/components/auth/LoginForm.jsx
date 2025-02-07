@@ -1,13 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { setAuthCookie } from '../../utils/cookie'; // ✅ 수정된 쿠키 유틸 가져오기
 import { publicRequest } from '../../hooks/requestMethod';
+import { useCookies } from 'react-cookie';
 
 const LoginForm = ({ isCompany }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
+  const [cookies] = useCookies(['accesstoken', 'refreshtoken']);
+
+  // 쿠키 값이 변경되었을 때 콘솔에 출력 (선택 사항)
+  useEffect(() => {
+    if (cookies.accesstoken || cookies.refreshtoken) {
+      console.log(
+        '쿠키에서 가져온 토큰:',
+        cookies.accesstoken,
+        cookies.refreshtoken,
+      );
+    }
+  }, [cookies]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
