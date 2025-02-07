@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.geography.mapper;
 
-import com.dancing_orangutan.ukkikki.entity.info.CityEntity;
+import com.dancing_orangutan.ukkikki.geography.domain.CityEntity;
 import com.dancing_orangutan.ukkikki.geography.application.query.FetchCitiesQuery;
 import com.dancing_orangutan.ukkikki.geography.domain.City;
 import com.dancing_orangutan.ukkikki.geography.ui.response.FetchCitiesResponse;

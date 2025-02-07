@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.proposal.infrastructure.proposal;
 
-import com.dancing_orangutan.ukkikki.entity.info.Airport;
+import com.dancing_orangutan.ukkikki.geography.domain.AirportEntity;
 import com.dancing_orangutan.ukkikki.member.domain.company.CompanyEntity;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.ProposalEntity;
@@ -27,8 +27,8 @@ public class ProposalRepository  {
 
     public Proposal save(final Proposal proposalDomain) {
 
-        Airport departureAirport = airportFinder.getReferenceById(proposalDomain.getDepartureAirportCode());
-        Airport arrivalAirport = airportFinder.getReferenceById(proposalDomain.getArrivalAirportCode());
+        AirportEntity departureAirport = airportFinder.getReferenceById(proposalDomain.getDepartureAirportCode());
+        AirportEntity arrivalAirport = airportFinder.getReferenceById(proposalDomain.getArrivalAirportCode());
         CompanyEntity company = companyFinder.getReferenceById(proposalDomain.getCompanyId());
         TravelPlanEntity travelPlan = travelPlanFinder.getReferenceById(proposalDomain.getTravelPlanId());
 

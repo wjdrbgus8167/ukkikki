@@ -1,6 +1,7 @@
 package com.dancing_orangutan.ukkikki.travelPlan.infrastructure.city;
 
-import com.dancing_orangutan.ukkikki.entity.info.CityEntity;
+import com.dancing_orangutan.ukkikki.geography.domain.CityEntity;
+import com.dancing_orangutan.ukkikki.geography.infrastructure.JpaCityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
