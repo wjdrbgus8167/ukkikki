@@ -57,3 +57,12 @@
 .max-h-96.overflow-y-auto::-webkit-scrollbar {
   display: none;
 }
+
+@font-face {
+  font-family: '여기어때 잘난체';
+  font-weight: normal;
+  font-style: normal;
+  src: url('/fonts/JalnanGothic.otf') format('opentype'),
+       url('/fonts/JalnanGothicTTF.ttf') format('truetype');
+  font-display: swap; /* 폰트가 로드될 때까지 대체 폰트를 표시하는 설정 */
+}

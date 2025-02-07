@@ -1,4 +1,4 @@
-// 여행사 여행행 관련 API
+// 여행사 여행 관련 API
 import { publicRequest } from '../hooks/requestMethod';
 
 
@@ -8,6 +8,7 @@ export const fetchUserProposals = async(jwtToken) => {
   try {
     const response = await publicRequest.get('/travel-plans/list',{
       headers: {
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${jwtToken}`,
       }, 
     });
