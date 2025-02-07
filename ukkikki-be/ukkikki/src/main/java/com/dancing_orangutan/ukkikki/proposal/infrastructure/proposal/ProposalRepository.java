@@ -79,4 +79,12 @@ public class ProposalRepository  {
         }
 
     }
+
+    public Proposal findByProposalIdAndCompany_CompanyId(Integer proposalId,Integer companyId) {
+
+        ProposalEntity entity = jpaProposalRepository.findByProposalIdAndCompany_CompanyId(proposalId,companyId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 제안서를 찾을 수 없습니다."));
+
+        return proposalMapper.entityToDomain(entity);
+    }
 }
