@@ -1,12 +1,14 @@
 // 상세 내용 
 
 import React, { useState } from "react";
-import KoreaAirportSelector from "../../services/airport/KoreaAirportSelector";
 import CurrencyInput from "react-currency-input-field";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ko } from "date-fns/locale";
 import { format } from "date-fns";
+import { DetailFormContainer,TravelWrapper, TravelTitle,FlexWrapper,InputWrapper} from "./style/DetailFormStyle";
+
+
 
 const DetailForm = () => {
 
@@ -65,75 +67,68 @@ const DetailForm = () => {
 
 
     return (
-        <div className="detail-form-container">
+        <DetailFormContainer>
             <h1 className="detail-form-title
-            font-['Pretendard'] font-extrabold text-[80px] text-center pt-5
+            text-[80px] text-center pt-3
             ">여행 상세 내용</h1>
-            <hr className="my-3 border-t-[3.5px] border-gray-300 w-[800px] mx-auto"/>
+            <hr className="custom-hr"/>
 
+            <div className="content-container">
+                
             <form action="">
                 {/* 여행 시작일 */}
-                <div className="m-4">
-                    <p>여행일정</p>
-                    <div className="flex space-x-40 mb-4">
-                        <div className="mb-4 text-center border-[3px] border-gray-200 rounded-lg">
-                            <label 
-                            htmlFor="startDate"
-                            className="startDate border-"
-                            >
-                                여행시작일
-                            </label>
-                            <br />
-                            <DatePicker 
-                            id="startDate"
-                            selected={getDateValue("startDate")}
-                            onChange={handleDateChange("startDate")}
-                            dateFormat="yyyy/MM/dd"
-                            minDate={new Date()}
-                            locale={ko}
-                            className="startdate-input text-center "
-                            placeholderText="yyyy/MM/dd"
+                <div className="flex items-center mb-4 space-x-10">
+                    <TravelTitle>여행 일정</TravelTitle>
+                    <FlexWrapper>                                   
+                        <InputWrapper>
+                            <label htmlFor="startDate" className="startDate text-a">시작일</label>
+                            <DatePicker
+                                id="startDate"
+                                selected={getDateValue("startDate")}
+                                onChange={handleDateChange("startDate")}
+                                dateFormat="yyyy/MM/dd"
+                                minDate={new Date()}
+                                locale={ko}
+                                className="startdate-input text-center"
+                                placeholderText="yyyy/MM/dd"
                             />
-                        </div>
-                        {/* 여행 종료일 */}
-                        <div className="mb-4 text-center border-[3px] border-gray-200 rounded-lg">
-                            <label 
-                            htmlFor="endDate"
-                            className="end-date"
-                            >
-                                여행 종료일
-                            </label>
-                            <br />
-                            <DatePicker 
-                            id="endDate"
-                            selected={getDateValue("endDate")}
-                            onChange={handleDateChange("endDate")}
-                            dateFormat="yyyy/MM/dd"
-                            minDate={new Date()}
-                            locale={ko}
-                            className="enddate-input text-center"
-                            placeholderText="yyyy/MM/dd"
+                        </InputWrapper>
+
+                        <InputWrapper>
+                            <label htmlFor="endDate" className="end-date">종료일</label>
+                            <DatePicker
+                                id="endDate"
+                                selected={getDateValue("endDate")}
+                                onChange={handleDateChange("endDate")}
+                                dateFormat="yyyy/MM/dd"
+                                minDate={new Date()}
+                                locale={ko}
+                                className="enddate-input text-center"
+                                placeholderText="yyyy/MM/dd"
                             />
-                        </div>
-                    </div>
+                        </InputWrapper>
+                    </FlexWrapper>
                 </div>
                 
                 
                 {/* 항공사 */}
                 <div className="">
-                    <label htmlFor="airLine"
-                    className="">항공사</label>
+                <TravelWrapper>
+                    <TravelTitle htmlFor="airLine">항공사</TravelTitle>
                     <input 
                     id='airLine'
                     name='airLine'
                     type="text" 
                     value={proposal.airLine}
                     onChange={handleChange}
-                    className="airline-input border-gray-300"
+                    className="airline-input border border-gray-300"
                     />
+                </TravelWrapper>
+
                 </div>
 
-                <div className=" m-4">
+                <div className=" flex items-center mb-4 space-x-10">
+                    <TravelTitle>항공 일정</TravelTitle>
                     <div className="flex space-x-40 mb-4">
                         <div className="text-center border-[3px] border-gray-200 rounded-lg">
                             {/* 출발일 탑승 일시 */}
@@ -218,9 +213,7 @@ const DetailForm = () => {
                 
                 {/* 예약금 */}
                 <div>
-                    <label 
-                    className="title text-xl font-bold"
-                    htmlFor="deposit">예약금</label>
+                    <TravelTitle htmlFor="deposit">예약금</TravelTitle>
                     <CurrencyInput 
                         id="deposit"
                         name="deposit"
@@ -236,9 +229,7 @@ const DetailForm = () => {
                 </div>
                 {/* 최소 인원 */}
                 <div>
-                    <label 
-                    className="title text-xl font-bold"
-                    htmlFor="minPeople">최소 인원</label>
+                    <TravelTitle htmlFor="minPeople">최소인원</TravelTitle>
                     <input 
                     id="minPeople"
                     name="minPeople"
@@ -252,9 +243,7 @@ const DetailForm = () => {
                 </div>
                 {/* 가이드 유무 */}
                 <div>
-                    <label 
-                    className="title text-xl font-bold"
-                    htmlFor="guideIncluded">가이드 여부</label>
+                    <TravelTitle htmlFor="guideIncluded">가이드 여부</TravelTitle>
                     <input 
                     id="guideIncluded"
                     name="guideIncluded"
@@ -271,9 +260,7 @@ const DetailForm = () => {
                 </div>  
                     {/* 여행자보험 포함 여부 */}
                 <div>
-                    <label 
-                    className="title text-xl font-bold"
-                    htmlFor="insuranceIncluded">여행자 보험 포함 여부</label>
+                    <TravelTitle htmlFor="insuranceIncluded">여행자 보험 포함 여부</TravelTitle>
                     <input 
                     id="insuranceIncluded"
                     name="guideIncluded"
@@ -289,9 +276,7 @@ const DetailForm = () => {
                 </div>
                 {/* 상품소개 */}
                 <div>
-                    <label 
-                    className="title text-xl font-bold"
-                    htmlFor="productIntroduction">상품소개</label>
+                    <TravelTitle htmlFor="producintrodution">상품 소개</TravelTitle>
                     <br />
                     <input 
                     id="productIntroduction"
@@ -304,9 +289,7 @@ const DetailForm = () => {
                 </div>
                     {/* 취소/환불정책 */}
                 <div>
-                    <label 
-                    className="title text-xl font-bold"
-                    htmlFor="refundPolicy">취소/환불정책</label>
+                    <TravelTitle htmlFor="refundPolicy">취소/ 환불정책</TravelTitle>
                     <br />
                     <input 
                     id="refundPolicy"
@@ -318,8 +301,9 @@ const DetailForm = () => {
                     />
                 </div>
             </form>
-
-        </div>
+            </div>
+        
+        </DetailFormContainer>
     );
 };
 export default DetailForm;

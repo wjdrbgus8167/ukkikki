@@ -15,6 +15,9 @@ const UserProposals = () => {
   if (proposals.length === 0) {
     return <div>여행 제안서가 없습니다</div>
   } 
+  if (proposals.length > 0) {
+    return <div>{proposals}</div>
+  }
 
   return(
     <div className="flex flex-col gap-6">
