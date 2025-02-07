@@ -1,7 +1,8 @@
+// LoginForm.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { setAuthCookie } from '../../utils/cookie'; // ✅ 수정된 쿠키 유틸 가져오기
 import { publicRequest } from '../../hooks/requestMethod';
+import useAuthStore from '../../stores/authStore';
 
 const LoginForm = ({ isCompany }) => {
   const [email, setEmail] = useState('');
@@ -19,11 +20,11 @@ const LoginForm = ({ isCompany }) => {
       });
 
       if (response.status === 200) {
-        const token = response.data.token; // ✅ 백엔드에서 받은 토큰
-        setAuthCookie(token); // ✅ 쿠키에 토큰 저장
+        // 로그인 성공 시 인증 플래그를 true로 설정
+        useAuthStore.getState().setUser(true); // isAuthenticated가 true로 설정됩니다.
 
-        console.log('로그인 성공, 저장된 토큰:', token);
-        navigate('/'); // ✅ 로그인 성공 후 이동
+        console.log('로그인 성공');
+        navigate('/');
       } else {
         setErrorMessage('로그인 실패');
       }
@@ -36,9 +37,8 @@ const LoginForm = ({ isCompany }) => {
   return (
     <form onSubmit={handleLogin}>
       {errorMessage && (
-        <p className="text-red-500 text-sm mb-4">{errorMessage}</p>
+        <p className="mb-4 text-sm text-red-500">{errorMessage}</p>
       )}
-
       <div className="mb-4">
         <input
           type="email"
@@ -49,7 +49,6 @@ const LoginForm = ({ isCompany }) => {
           required
         />
       </div>
-
       <div className="mb-4">
         <input
           type="password"
@@ -60,10 +59,9 @@ const LoginForm = ({ isCompany }) => {
           required
         />
       </div>
-
       <button
         type="submit"
-        className="w-full bg-brown text-white py-3 rounded-xl"
+        className="w-full py-3 text-white bg-brown rounded-xl"
       >
         {isCompany ? '기업 로그인' : '로그인'}
       </button>

@@ -1,7 +1,5 @@
 export const setAuthCookie = (token) => {
-  document.cookie = `token=${encodeURIComponent(
-    token,
-  )}; path=/; secure; sameSite=None`;
+  document.cookie = `token=${encodeURIComponent(token)}; path=/; secure=None;`;
 };
 
 // ✅ 쿠키 가져오기
