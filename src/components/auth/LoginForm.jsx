@@ -1,9 +1,9 @@
-// src/components/auth/LoginForm.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { setAuthCookie } from '../../utils/cookie'; // ✅ 수정된 쿠키 유틸 가져오기
 import { publicRequest } from '../../hooks/requestMethod';
 
-const LoginForm = ({ isCompany, onLogin }) => {
+const LoginForm = ({ isCompany }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -12,38 +12,23 @@ const LoginForm = ({ isCompany, onLogin }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    // 기업/개인에 따라 API 경로 분기
-    const endpoint = isCompany
-      ? '/api/v1/auth/companies/login'
-      : '/api/v1/auth/members/login';
-
     try {
-      // ★ 쿠키에 토큰이 담겨 오므로 withCredentials 필요
-      const response = await publicRequest.post(endpoint, {
+      const response = await publicRequest.post('/auth/members/login', {
         email,
         password,
       });
 
-      // 가정: 서버 응답 형태 { status: 201, message: "Success", data: { user: {...} } }
-      const { status, message, data } = response.data;
+      if (response.status === 200) {
+        const token = response.data.token; // ✅ 백엔드에서 받은 토큰
+        setAuthCookie(token); // ✅ 쿠키에 토큰 저장
 
-      if (status === 200) {
-        console.log('response.data', response.data);
-        console.log('data.member', data.member);
-        // 백엔드에서 쿠키(엑세스토큰, 리프레시토큰)가 Set-Cookie로 내려옴
-        // 브라우저는 자동 저장 (withCredentials: true 설정 시)
-
-        // 사용자 정보를 상위 컴포넌트로 전달
-        onLogin(data.user);
-
-        // 메인 페이지로 이동
-        navigate('/');
+        console.log('로그인 성공, 저장된 토큰:', token);
+        navigate('/'); // ✅ 로그인 성공 후 이동
       } else {
-        // 로그인 실패 케이스
-        setErrorMessage(message || '로그인 실패');
+        setErrorMessage('로그인 실패');
       }
     } catch (error) {
-      console.error('로그인 실패:', error.response?.data);
+      console.error('로그인 실패:', error);
       setErrorMessage(error.response?.data?.message || '로그인 실패');
     }
   };

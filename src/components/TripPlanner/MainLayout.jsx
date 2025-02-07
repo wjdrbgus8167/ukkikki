@@ -3,7 +3,9 @@ import DateSidebar from './DateSidebar';
 import PlaceSelection from './PlaceSelection';
 import PlaceSelectionResult from './PlaceSelectionResult';
 import MapDisplay from './MapDisplay';
+import DetailForm from './DetailForm';
 import { LoadScript } from '@react-google-maps/api';
+
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
 const MainLayout = ({ travelPlan }) => {
@@ -27,11 +29,15 @@ const MainLayout = ({ travelPlan }) => {
 
   const [travelDays, setTravelDays] = useState(initialTravelDays);
   const [selectedDayId, setSelectedDayId] = useState(travelDays[0]?.id || 1);
+  const [showDetailFrom, setShowDetailFrom] = useState(false);
 
+  //날짜 선택 시 호출
   const handleDaySelect = (dayId) => {
     setSelectedDayId(dayId);
+    setShowDetailFrom(false);
   };
 
+  //장소 선택 시 해당 날짜에 장소 추가
   const handleAddPlace = (place) => {
     setTravelDays((prevDays) =>
       prevDays.map((day) =>
@@ -44,6 +50,8 @@ const MainLayout = ({ travelPlan }) => {
       ),
     );
   };
+
+  //선택한 장소 추가 및 삭제
   const handleTogglePlace = (place) => {
     console.log('handleTogglePlace 실행됨:', place); // ✅ 디버깅
     if (!place.latitude || !place.longitude) {
@@ -65,6 +73,11 @@ const MainLayout = ({ travelPlan }) => {
     );
   };
   const selectedDay = travelDays.find((day) => day.id === selectedDayId);
+  
+  //DetilForm 표시 토글 함수
+  const onToggleDetailForm = () => {
+    setShowDetailFrom((prev) => !prev);
+  };
 
   return (
     <div className="flex w-full h-screen">
@@ -74,40 +87,50 @@ const MainLayout = ({ travelPlan }) => {
           travelDays={travelDays}
           selectedDayId={selectedDayId}
           onDaySelect={handleDaySelect}
+          onToggleDetailForm={onToggleDetailForm}
         />
       </div>
+      
+      {showDetailFrom ? (
+        <div className='flex-grow h-full'>
+          <DetailForm />
+        </div>
+      ) : (
+        <>
+          <LoadScript
+          googleMapsApiKey={apiKey} // 본인의 API 키
+          libraries={['places']} // ★ Autocomplete에 필요한 'places' 라이브러리 명시
+        >
+          {/* 장소 선택 (비율 3) */}
+          <div className="border-r ">
+            <PlaceSelection
+              destinationCity={destinationCity}
+              travelStart={travelStart}
+              travelEnd={travelEnd}
+              placeList={placeList}
+              onTogglePlace={handleTogglePlace} // ✅ 함수 전달
+              selectedPlaces={selectedDay?.selectedPlaces || []}
+            />
+          </div>
+        </LoadScript>
 
-      <LoadScript
-        googleMapsApiKey={apiKey} // 본인의 API 키
-        libraries={['places']} // ★ Autocomplete에 필요한 'places' 라이브러리 명시
-      >
-        {/* 장소 선택 (비율 3) */}
-        <div className="border-r ">
-          <PlaceSelection
+        {/* 선택한 장소 결과 (비율 3) */}
+        <div className="border-r">
+          <PlaceSelectionResult
+            selectedDay={selectedDay ?? { selectedPlaces: [] }}
+          />{' '}
+        </div>
+
+        {/* 지도 컴포넌트 (비율 3) */}
+        <div className="flex-grow h-full">
+          <MapDisplay
             destinationCity={destinationCity}
-            travelStart={travelStart}
-            travelEnd={travelEnd}
-            placeList={placeList}
-            onTogglePlace={handleTogglePlace} // ✅ 함수 전달
             selectedPlaces={selectedDay?.selectedPlaces || []}
           />
         </div>
-      </LoadScript>
+        </>
+      )}
 
-      {/* 선택한 장소 결과 (비율 3) */}
-      <div className="border-r">
-        <PlaceSelectionResult
-          selectedDay={selectedDay ?? { selectedPlaces: [] }}
-        />{' '}
-      </div>
-
-      {/* 지도 컴포넌트 (비율 3) */}
-      <div className="flex-grow h-full">
-        <MapDisplay
-          destinationCity={destinationCity}
-          selectedPlaces={selectedDay?.selectedPlaces || []}
-        />
-      </div>
     </div>
   );
 };

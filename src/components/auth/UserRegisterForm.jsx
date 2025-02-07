@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { publicRequest } from '../../hooks/requestMethod';
+import { useNavigate } from 'react-router-dom'; // ✅ React Router v6 이상에서 사용
 
 const UserRegisterForm = () => {
+  const navigate = useNavigate(); // ✅ 네비게이트 사용
+
   const [formData, setFormData] = useState({
     email: '',
     name: '',
@@ -43,13 +46,14 @@ const UserRegisterForm = () => {
     }
 
     try {
-      await publicRequest.post('/api/v1/auth/members/register', {
+      await publicRequest.post('/auth/members/register', {
         email: formData.email,
         name: formData.name,
         password: formData.password,
-        profileImageUrl: 'https://source.unsplash.com/random',
+        profileImageUrl: '',
       });
       alert('회원가입 성공!');
+      navigate('/login');
     } catch (error) {
       setErrorMessage(error.response?.data?.message || '회원가입 실패');
     }

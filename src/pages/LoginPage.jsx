@@ -1,10 +1,10 @@
-// src/pages/LoginPage.jsx
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import HeroText from '../components/common/SloganText';
 import LoginForm from '../components/auth/LoginForm';
+import useAuthStore from '../stores/authStore';
 
 import kakaoLogo from '../assets/icon.png';
 import googleLogo from '../assets/google.png';
@@ -12,30 +12,23 @@ import logo from '../assets/logo.png';
 import bgImage from '../assets/login-bg.png';
 
 const LoginPage = () => {
-  const [user, setUser] = useState(null);
-  const [isCompanyLogin, setIsCompanyLogin] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // 만약 localStorage에 user 정보가 있다면 복원
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
-  const handleLogin = (userData) => {
-    // user 정보를 localStorage 등에 저장 (원하는 대로)
-    setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
-    navigate('/'); // 메인 페이지로 이동
-  };
+  const { user, logout } = useAuthStore(); // Zustand 스토어에서 user, logout 불러오기
 
   const handleLogout = () => {
-    // 로그아웃 시 user 제거
-    localStorage.removeItem('user');
-    setUser(null);
+    logout(); // Zustand 로그아웃 호출
     navigate('/login');
+  };
+
+  // 카카오 및 구글 로그인 핸들러는 그대로 사용
+  const handleKakaoLogin = () => {
+    window.location.href =
+      'http://i12c204.p.ssafy.io:8080/api/v1/oauth2/authorization/kakao';
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href =
+      'http://i12c204.p.ssafy.io:8080/api/v1/oauth2/authorization/google';
   };
 
   return (
@@ -52,11 +45,14 @@ const LoginPage = () => {
             <img src={logo} className="mx-auto my-6 w-48 h-auto" alt="로고" />
 
             {/* 로그인 폼 */}
-            <LoginForm isCompany={isCompanyLogin} onLogin={handleLogin} />
+            <LoginForm isCompany={false} />
 
-            {!isCompanyLogin && (
+            {!user && (
               <div className="mt-6 space-y-4">
-                <button className="w-full bg-white text-black py-3 rounded-xl border border-gray-200 transition flex items-center relative">
+                <button
+                  className="w-full bg-white text-black py-3 rounded-xl border border-gray-200 transition flex items-center relative"
+                  onClick={handleGoogleLogin}
+                >
                   <img
                     src={googleLogo}
                     alt="Google"
@@ -66,7 +62,10 @@ const LoginPage = () => {
                     구글 계정으로 로그인하기
                   </span>
                 </button>
-                <button className="w-full bg-yellow text-brown py-3 rounded-xl transition flex items-center relative">
+                <button
+                  className="w-full bg-yellow text-brown py-3 rounded-xl transition flex items-center relative"
+                  onClick={handleKakaoLogin}
+                >
                   <img
                     src={kakaoLogo}
                     alt="Kakao"
@@ -80,25 +79,25 @@ const LoginPage = () => {
             )}
 
             <div className="mt-6 flex items-center justify-center space-x-4">
-              {isCompanyLogin ? (
-                <Link
-                  to="/signup?type=company"
+              {user ? (
+                <button
+                  onClick={handleLogout}
                   className="text-blue-500 hover:underline"
                 >
-                  기업으로 회원가입하기
-                </Link>
+                  로그아웃
+                </button>
               ) : (
                 <>
                   <Link to="/signup" className="text-gray-600 hover:underline">
                     이메일로 회원가입
                   </Link>
                   <span className="text-gray-400">|</span>
-                  <button
-                    onClick={() => setIsCompanyLogin(true)}
+                  <Link
+                    to="/signup?type=company"
                     className="text-blue-500 hover:underline"
                   >
-                    기업이신가요? 바로가기
-                  </button>
+                    기업으로 회원가입하기
+                  </Link>
                 </>
               )}
             </div>
