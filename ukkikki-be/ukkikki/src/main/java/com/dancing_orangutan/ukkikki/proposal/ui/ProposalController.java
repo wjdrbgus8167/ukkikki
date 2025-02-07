@@ -6,9 +6,12 @@ import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.proposal.application.ProposalService;
 import com.dancing_orangutan.ukkikki.proposal.application.command.CreateInquiryCommand;
 import com.dancing_orangutan.ukkikki.proposal.application.command.CreateProposalCommand;
+import com.dancing_orangutan.ukkikki.proposal.application.command.CreateScheduleCommand;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
+import com.dancing_orangutan.ukkikki.proposal.domain.schedule.Schedule;
 import com.dancing_orangutan.ukkikki.proposal.ui.request.CreateInquiryRequest;
 import com.dancing_orangutan.ukkikki.proposal.ui.request.CreateProposalRequest;
+import com.dancing_orangutan.ukkikki.proposal.ui.request.CreateScheduleRequest;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.CreateInquiryResponse;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.InquiryListResponse;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.ProposalDetailResponse;
@@ -76,5 +79,18 @@ public class ProposalController {
         List<InquiryListResponse> inquiries = proposalService.getInquiryList(proposalId);
 
         return ApiUtils.success(inquiries);
+    }
+
+    // 일정등록
+    @PostMapping("/{proposalId}/schedules")
+    public ApiUtils.ApiResponse<Schedule> createSchedule(
+        @PathVariable Integer proposalId,
+        @AuthenticationPrincipal CompanyUserDetails companyUserDetails,
+        @Validated @RequestBody CreateScheduleRequest request
+    ){
+
+        CreateScheduleCommand command = request.requestToDomain(proposalId);
+
+        return ApiUtils.success(proposalService.createSchedule(command));
     }
 }
