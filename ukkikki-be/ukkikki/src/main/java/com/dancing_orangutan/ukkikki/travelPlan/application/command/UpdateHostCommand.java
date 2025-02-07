@@ -2,7 +2,8 @@ package com.dancing_orangutan.ukkikki.travelPlan.application.command;
 
 import lombok.Builder;
 
-public record UpdateHostCommand(Integer travelPlanId,Integer memberId, int adultCount, int childCount, int infantCount) {
+public record UpdateHostCommand(Integer travelPlanId,Integer memberId,
+                                int adultCount, int childCount, int infantCount) {
 
     @Builder
     public UpdateHostCommand{
