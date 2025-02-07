@@ -3,6 +3,7 @@ import Footer from '../components/layout/Footer';
 import Header from '../components/layout/Header';
 import KakaoPayTest from '../services/KakaoPayTest';
 import AgencyList from '../components/vote/AgencyList';
+import CustomCalendar from '../utils/CustomCalendar';
 
 const UserVotePage = () => {
   const [agencies, setAgencies] = useState([
@@ -49,6 +50,9 @@ const UserVotePage = () => {
           <h2 className="text-lg font-semibold mb-2">예약금 결제</h2>
           <KakaoPayTest />
         </div>
+      </div>
+      <div>
+        <CustomCalendar />
       </div>
 
       <Footer />
