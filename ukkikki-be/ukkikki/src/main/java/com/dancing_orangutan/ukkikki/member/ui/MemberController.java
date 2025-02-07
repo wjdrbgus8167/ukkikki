@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/member")
+@RequestMapping("/members")
 public class MemberController {
     private final MemberService memberService;
 
@@ -31,5 +31,9 @@ public class MemberController {
                 )
         );
     }
+
+    // 프로필 이미지 수정
+
+
 
 }
