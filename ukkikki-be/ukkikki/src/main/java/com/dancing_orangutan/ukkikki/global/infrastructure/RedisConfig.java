@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.global.config;
+package com.dancing_orangutan.ukkikki.global.infrastructure;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;

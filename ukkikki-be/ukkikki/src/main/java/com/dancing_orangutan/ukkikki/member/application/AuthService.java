@@ -6,9 +6,11 @@ import com.dancing_orangutan.ukkikki.member.application.command.*;
 import com.dancing_orangutan.ukkikki.member.domain.company.CompanyEntity;
 import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
 import com.dancing_orangutan.ukkikki.global.jwt.JwtTokenProvider;
+import com.dancing_orangutan.ukkikki.member.domain.refreshToken.RefreshToken;
 import com.dancing_orangutan.ukkikki.member.domain.refreshToken.RefreshTokenEntity;
 import com.dancing_orangutan.ukkikki.member.infrastructure.refreshToken.RefreshTokenFinder;
 import com.dancing_orangutan.ukkikki.member.infrastructure.refreshToken.RefreshTokenRepository;
+import com.dancing_orangutan.ukkikki.member.mapper.RefreshTokenMapper;
 import com.dancing_orangutan.ukkikki.member.ui.*;
 import com.dancing_orangutan.ukkikki.member.infrastructure.company.CompanyRepository;
 import com.dancing_orangutan.ukkikki.member.infrastructure.member.MemberRepository;
@@ -53,16 +55,22 @@ public class AuthService {
      *  일반 사용자 로그인 - access token(쿠키), refresh token(쿠키) 발급
      */
     public AuthTokens memberLogin(MemberLoginCommand command) {
-        MemberEntity member = memberRepository.findByEmail(command.getEmail())
+        MemberEntity memberEntity = memberRepository.findByEmail(command.getEmail())
                 .orElseThrow(() -> new ApiException(ErrorCode.MEMBER_NOT_FOUND));
 
-        if (!passwordEncoder.matches(command.getPassword(), member.getPassword())) {
+        if (!passwordEncoder.matches(command.getPassword(), memberEntity.getPassword())) {
             throw new ApiException(ErrorCode.INVALID_PASSWORD);
         }
 
-        String accessToken = jwtTokenProvider.createAccessToken(member.getMemberId(), member.getEmail());
-        String refreshToken = jwtTokenProvider.createRefreshToken(member.getMemberId(), member.getEmail());
-        saveRefreshToken(member.getEmail(), refreshToken);
+        String accessToken = jwtTokenProvider.createAccessToken(memberEntity.getMemberId(), memberEntity.getEmail());
+        String refreshToken = jwtTokenProvider.createRefreshToken(memberEntity.getMemberId(), memberEntity.getEmail());
+        saveRefreshToken(RefreshToken.builder()
+                .email(memberEntity.getEmail())
+                .userId(memberEntity.getMemberId())
+                .refreshToken(refreshToken)
+                .expiration(jwtTokenProvider.getRefreshExpiration())
+                .build()
+        );
 
         return AuthTokens.builder()
                 .accessToken(accessToken)
@@ -104,7 +112,13 @@ public class AuthService {
 
         String accessToken = jwtTokenProvider.createAccessToken(companyEntity.getCompanyId(), companyEntity.getEmail());
         String refreshToken = jwtTokenProvider.createRefreshToken(companyEntity.getCompanyId(), companyEntity.getEmail());
-        saveRefreshToken(companyEntity.getEmail(), refreshToken);
+        saveRefreshToken(RefreshToken.builder()
+                .email(companyEntity.getEmail())
+                .userId(companyEntity.getCompanyId())
+                .refreshToken(refreshToken)
+                .expiration(jwtTokenProvider.getRefreshExpiration())
+                .build()
+        );
 
         return AuthTokens.builder()
                 .accessToken(accessToken)
@@ -116,14 +130,8 @@ public class AuthService {
     /**
      *  refresh token 저장
      */
-    public void saveRefreshToken(String email, String refreshToken) {
-        refreshTokenRepository.save(
-                RefreshTokenEntity.builder()
-                        .email(email)
-                        .refreshToken(refreshToken)
-                        .expiration(jwtTokenProvider.getRefreshExpiration())
-                        .build()
-        );
+    public void saveRefreshToken(RefreshToken refreshToken) {
+        refreshTokenRepository.save(RefreshTokenMapper.mapToEntity(refreshToken));
     }
 
     /**
