@@ -7,6 +7,7 @@ public class CookieUtils {
 
     public static void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
         Cookie cookie = new Cookie(name, value);
+        cookie.setDomain(".i12c204.p.ssafy.io");
         cookie.setHttpOnly(true);
         cookie.setSecure(false); // https 배포시 true로 변경
         cookie.setPath("/");
