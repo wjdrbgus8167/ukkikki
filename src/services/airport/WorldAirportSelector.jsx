@@ -16,9 +16,16 @@ const WorldAirportSelector = ({ selectedAirport, onChange }) => {
     const fetchContinents = async () => {
       try {
         const response = await publicRequest.get('/geography/continents');
-        setContinents(response.data);
+        const data = response.data.data;
+        if (Array.isArray(data)) {
+          setContinents(data);
+        } else {
+          console.error('Unexpected data format for continents:', data);
+          setContinents([]);
+        }
       } catch (error) {
         console.error('대륙 데이터를 불러오는 중 오류 발생:', error);
+        setContinents([]);
       }
     };
     fetchContinents();
@@ -32,9 +39,19 @@ const WorldAirportSelector = ({ selectedAirport, onChange }) => {
           const response = await publicRequest.get(
             `/geography/continents/${selectedContinent}/countries`,
           );
-          setCountries(response.data);
+          const data = response.data.data;
+          if (Array.isArray(data)) {
+            setCountries(data);
+          } else {
+            console.error(
+              'Unexpected data format for countries:',
+              response.data,
+            );
+            setCountries([]);
+          }
         } catch (error) {
           console.error('나라 데이터를 불러오는 중 오류 발생:', error);
+          setCountries([]);
         }
       };
       fetchCountries();
@@ -51,11 +68,18 @@ const WorldAirportSelector = ({ selectedAirport, onChange }) => {
       const fetchCities = async () => {
         try {
           const response = await publicRequest.get(
-            `/categories/continents/${selectedContinent}/countries/${selectedCountry}/cities`,
+            `/geography/continents/${selectedContinent}/countries/${selectedCountry}/cities`,
           );
-          setCities(response.data);
+          const data = response.data.data;
+          if (Array.isArray(data)) {
+            setCities(data);
+          } else {
+            console.error('Unexpected data format for cities:', response.data);
+            setCities([]);
+          }
         } catch (error) {
           console.error('도시 데이터를 불러오는 중 오류 발생:', error);
+          setCities([]);
         }
       };
       fetchCities();
@@ -63,13 +87,13 @@ const WorldAirportSelector = ({ selectedAirport, onChange }) => {
       setCities([]);
       setAirports([]);
     }
-  }, [selectedCountry]);
+  }, [selectedCountry, selectedContinent]);
 
   // 선택된 도시에 따라 공항 데이터 필터링
   useEffect(() => {
     if (selectedCity) {
       const filteredAirports =
-        cities.find((city) => city.city_id === selectedCity)?.airports || [];
+        cities.find((city) => city.cityId === selectedCity)?.airports || [];
       setAirports(filteredAirports);
     } else {
       setAirports([]);
@@ -104,32 +128,39 @@ const WorldAirportSelector = ({ selectedAirport, onChange }) => {
         className="w-full px-4 py-2 bg-transparent border text-white placeholder-white border-white rounded-md focus:outline-none focus:ring-2 focus:bg-dark-green"
       >
         <option value="">도착 공항 선택</option>
-        {continents.map((continent) => (
-          <option
-            key={continent.continent_id}
-            value={`continent-${continent.continent_id}`}
-          >
-            {continent.continent_name}
-          </option>
-        ))}
-        {countries.map((country) => (
-          <option
-            key={country.country_id}
-            value={`country-${country.country_id}`}
-          >
-            ─ {country.country_name}
-          </option>
-        ))}
-        {cities.map((city) => (
-          <option key={city.city_id} value={`city-${city.city_id}`}>
-            ─ ─ {city.city_name}
-          </option>
-        ))}
-        {airports.map((airport) => (
-          <option key={airport.airport_code} value={airport.airport_code}>
-            ─ ─ ─ {airport.airport_name}
-          </option>
-        ))}
+        {Array.isArray(continents) &&
+          continents.map((continent) => (
+            <option
+              key={`continent-${continent.continentId}`}
+              value={`continent-${continent.continentId}`}
+            >
+              {continent.name}
+            </option>
+          ))}
+        {Array.isArray(countries) &&
+          countries.map((country) => (
+            <option
+              key={`country-${country.countryId}`}
+              value={`country-${country.countryId}`}
+            >
+              ─ {country.name}
+            </option>
+          ))}
+        {Array.isArray(cities) &&
+          cities.map((city) => (
+            <option key={`city-${city.cityId}`} value={`city-${city.cityId}`}>
+              ─ ─ {city.name}
+            </option>
+          ))}
+        {Array.isArray(airports) &&
+          airports.map((airport) => (
+            <option
+              key={`airport-${airport.airport_code}`}
+              value={airport.airport_code}
+            >
+              ─ ─ ─ {airport.airport_name}
+            </option>
+          ))}
       </select>
     </div>
   );
