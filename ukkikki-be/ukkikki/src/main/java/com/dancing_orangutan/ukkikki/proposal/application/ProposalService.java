@@ -11,11 +11,7 @@ import com.dancing_orangutan.ukkikki.proposal.infrastructure.memberTravelPlan.Me
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.proposal.ProposalFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.proposal.ProposalRepository;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.schedule.ScheduleFinder;
-import com.dancing_orangutan.ukkikki.proposal.ui.response.CreateInquiryResponse;
-import com.dancing_orangutan.ukkikki.proposal.ui.response.InquiryListResponse;
-import com.dancing_orangutan.ukkikki.proposal.ui.response.ProposalDetailResponse;
-import com.dancing_orangutan.ukkikki.proposal.ui.response.ScheduleResponse;
-import com.dancing_orangutan.ukkikki.proposal.ui.response.CompanyProposalListResponse;
+import com.dancing_orangutan.ukkikki.proposal.ui.response.*;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -136,7 +132,7 @@ public class ProposalService {
                 .collect(Collectors.toList());
     }
 
-    //여행사 입장 제안서 목록 조회
+    //여행사 본인 제안서 목록 조회
     public List<CompanyProposalListResponse> getCompanyProposalList(Integer companyId) {
 
         List<CompanyProposalListResponse> proposals = proposalRepository.findByCompanyId(companyId).stream()
@@ -156,5 +152,21 @@ public class ProposalService {
                 .collect(Collectors.toList());
 
         return proposals;
+    }
+
+    //여행사 본인 제안서 상세 조회
+    public CompanyProposalDetailResponse getCompanyProposalDetail(Integer proposalId,Integer companyId) {
+
+        Proposal proposal = proposalRepository.findByProposalIdAndCompany_CompanyId(proposalId, companyId);
+
+        List<ScheduleResponse> schedules = scheduleFinder.findSchedulesByProposalId(proposal.getProposalId()).stream()
+                .map(schedule -> new ScheduleResponse(
+                        schedule.getScheduleName(),
+                        schedule.getStartTime(),
+                        schedule.getEndTime(),
+                        schedule.getImageUrl()))
+                .collect(Collectors.toList());
+
+        return new CompanyProposalDetailResponse(proposal, schedules);
     }
 }
