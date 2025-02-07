@@ -29,18 +29,18 @@ public class S3Service {
     /**
      * S3에 파일 업로드
      */
-    public String uploadFile(MultipartFile file) {
+    public String uploadFile(MultipartFile file, S3FolderName folderName) throws ApiException {
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-
+        String fullFileName = folderName.getFullPath(fileName);
         try {
             s3Client.putObject(
                     PutObjectRequest.builder()
                             .bucket(bucketName)
-                            .key(fileName)
+                            .key(fullFileName)
                             .build(),
                     RequestBody.fromInputStream(file.getInputStream(), file.getSize())
             );
-            return fileName;
+            return fullFileName;
         } catch (S3Exception | IOException e) {
             throw new ApiException(ErrorCode.S3_UPLOAD_ERROR);
         }
