@@ -3,6 +3,7 @@ package com.dancing_orangutan.ukkikki.global.util;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseCookie;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -10,28 +11,18 @@ import java.util.Optional;
 public class CookieUtils {
 
     public static void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
-        Cookie cookie = new Cookie(name, value);
-        cookie.setDomain("fe.i12c204.p.ssafy.io");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false); // https 배포시 true로 변경
-        cookie.setPath("/");
-        cookie.setMaxAge(maxAge);
-        cookie.setAttribute("SameSite", "None");
+        ResponseCookie cookie = ResponseCookie.from(name, value)
+                .httpOnly(false)
+                .secure(false)
+                .path("/")
+                .maxAge(maxAge)
+                .sameSite("None")
+                .domain(".i12c204.p.ssafy.io")
+                .build();
 
-        response.addCookie(cookie);
-        addSubCookie(response, "sub_"+name, value, maxAge);
+        response.addHeader("Set-Cookie", cookie.toString());
     }
 
-    public static void addSubCookie(HttpServletResponse response, String name, String value, int maxAge) {
-        Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(false);
-        cookie.setSecure(false); // https 배포시 true로 변경
-        cookie.setPath("/");
-        cookie.setMaxAge(maxAge);
-        cookie.setAttribute("SameSite", "None");
-
-        response.addCookie(cookie);
-    }
 
     /**
      * Refresh Token 쿠키 생성
