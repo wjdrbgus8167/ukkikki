@@ -24,6 +24,7 @@ spring:
         show_sql: true
         format_sql: true
         use_sql_comments: true
+    defer-datasource-initialization: true
 
   security:
     oauth2:
@@ -64,7 +65,10 @@ spring:
         static: ap-northeast-2
       s3:
         bucket: ${AWS_S3_BUCKET_NAME}
-
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:data.sql
 
 logging:
   level:
