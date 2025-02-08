@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 public class Schedule {
@@ -24,4 +25,13 @@ public class Schedule {
         this.imageUrl = imageUrl;
         this.proposalId = proposalId;
     }
+
+    // 겹치는 일정 확인
+    public static boolean hasOverlappingSchedules(List<Schedule> schedules, LocalDateTime newStart, LocalDateTime newEnd) {
+
+        return schedules.stream().anyMatch(existingSchedule ->
+                !(existingSchedule.getEndTime().isBefore(newStart) || existingSchedule.getStartTime().isAfter(newEnd))
+        );
+    }
+
 }
