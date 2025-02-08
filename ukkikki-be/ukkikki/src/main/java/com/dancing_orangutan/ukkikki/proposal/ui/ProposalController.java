@@ -7,6 +7,7 @@ import com.dancing_orangutan.ukkikki.proposal.application.ProposalService;
 import com.dancing_orangutan.ukkikki.proposal.application.command.CreateInquiryCommand;
 import com.dancing_orangutan.ukkikki.proposal.application.command.CreateProposalCommand;
 import com.dancing_orangutan.ukkikki.proposal.application.command.CreateScheduleCommand;
+import com.dancing_orangutan.ukkikki.proposal.application.command.DeleteScheduleCommand;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
 import com.dancing_orangutan.ukkikki.proposal.domain.schedule.Schedule;
 import com.dancing_orangutan.ukkikki.proposal.ui.request.CreateInquiryRequest;
@@ -17,7 +18,9 @@ import com.dancing_orangutan.ukkikki.proposal.ui.response.InquiryListResponse;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.ProposalDetailResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -92,5 +95,27 @@ public class ProposalController {
         CreateScheduleCommand command = request.requestToDomain(proposalId);
 
         return ApiUtils.success(proposalService.createSchedule(command));
+    }
+
+    // 일정 삭제
+    @DeleteMapping("/{proposalId}/schedules/{scheduleId}")
+    public ApiUtils.ApiResponse<?> deleteSchedule(
+            @PathVariable Integer proposalId,
+            @PathVariable Integer scheduleId
+    ){
+
+        DeleteScheduleCommand command  = DeleteScheduleCommand.builder()
+                .proposalId(proposalId)
+                .scheduleId(scheduleId)
+                .build();
+
+        try{
+            proposalService.deleteSchedule(command);
+
+            return ApiUtils.success("일정 삭제완료.");
+        }catch (Exception e){
+
+            return ApiUtils.error("일정 삭제 실패", e, HttpStatus.BAD_REQUEST);
+        }
     }
 }
