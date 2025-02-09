@@ -44,4 +44,11 @@ public class ScheduleEntity {
         this.imageUrl = imageUrl;
         this.proposal = proposal;
     }
+
+    public void updateSchedule(String scheduleName, LocalDateTime startTime, LocalDateTime endTime,String imageUrl) {
+        this.scheduleName = (scheduleName != null) ? scheduleName : this.scheduleName;
+        this.startTime = (startTime != null) ? startTime : this.startTime;
+        this.endTime = (endTime != null) ? endTime : this.endTime;
+        this.imageUrl = (imageUrl != null) ? imageUrl : this.imageUrl;
+    }
 }
