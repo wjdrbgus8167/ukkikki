@@ -16,7 +16,12 @@ export default defineConfig({
           path.replace(/^\/api\/flight/, '/service/rest/FlightScheduleList'),
       },
     },
+<<<<<<< HEAD
 
     host: 'fe.i12c204.p.ssafy.io',
+=======
+    // host: 'fe.i12c204.p.ssafy.io',
+
+>>>>>>> fd4c0d372ed1c96133be5653b990b92506a7dce0
   },
 });
