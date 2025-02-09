@@ -1,19 +1,28 @@
-// src/components/Header.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../../stores/authStore';
+import { publicRequest } from '../../hooks/requestMethod';
 import logo from '../../assets/logo.png';
 import defaultProfile from '../../assets/profile.png';
 
 const Header = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { isAuthenticated, logout } = useAuthStore();
+  const { user, setUser } = useAuthStore();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      await publicRequest.post('/auth/logout', {}, {});
+
+      // 상태 초기화 및 쿠키 삭제
+      localStorage.removeItem('accessToken');
+      setUser(null);
+
+      // 페이지 리로드하여 로그인 상태 동기화
+      window.location.reload();
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
+    }
   };
 
   return (
@@ -22,17 +31,17 @@ const Header = () => {
         <img src={logo} alt="Logo" className="object-contain w-32 h-32 ml-10" />
       </Link>
       <nav className="hidden mr-10 space-x-6 md:flex">
-        {!isAuthenticated ? (
+        {!user ? (
           <>
             <Link
               to="/about"
-              className="text-gray-600 transition duration-300 hover:text-blue-500"
+              className="text-gray-600 transition hover:text-blue-500"
             >
               서비스 소개
             </Link>
             <Link
               to="/login"
-              className="text-gray-600 transition duration-300 hover:text-blue-500"
+              className="text-gray-600 transition hover:text-blue-500"
             >
               회원가입 | 로그인
             </Link>
@@ -48,7 +57,6 @@ const Header = () => {
                 alt="프로필"
                 className="w-10 h-10 border border-gray-300 rounded-full"
               />
-              <span>로그인됨</span>
             </button>
             {isDropdownOpen && (
               <div className="absolute right-0 w-40 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg">
@@ -69,7 +77,6 @@ const Header = () => {
           </div>
         )}
       </nav>
-      {/* 모바일 메뉴 생략 */}
     </header>
   );
 };

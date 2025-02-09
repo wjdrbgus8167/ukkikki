@@ -25,7 +25,15 @@ const getThemeColor = (theme) => {
 
 const CardList = ({ cards }) => {
   const [imageUrls, setImageUrls] = useState({});
-
+  if (!Array.isArray(cards)) {
+    console.error('🚨 오류: cards가 배열이 아닙니다.', cards);
+    return (
+      <p className="text-center text-red-500">
+        여행방 데이터를 불러오는 중 오류가 발생했습니다. <br />
+        잠시 후 다시 시도해 주세요.
+      </p>
+    );
+  }
   // ➁ useRoomModal 훅 사용
   const {
     isModalOpen,
@@ -66,11 +74,11 @@ const CardList = ({ cards }) => {
   return (
     <>
       {/* 카드 리스트 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+      <div className="grid grid-cols-1 gap-6 p-6 md:grid-cols-2 lg:grid-cols-3">
         {cards.map((card, index) => (
           <div
             key={index}
-            className="bg-white rounded-md shadow-lg p-6 border border-gray-200 flex flex-col justify-between h-full"
+            className="flex flex-col justify-between h-full p-6 bg-white border border-gray-200 rounded-md shadow-lg"
           >
             <div className="relative">
               <span
@@ -89,17 +97,17 @@ const CardList = ({ cards }) => {
               <img
                 src={imageUrls[card.country] || '/default-image.jpg'}
                 alt={card.country}
-                className="w-full h-64 object-cover rounded-lg shadow-md mt-4"
+                className="object-cover w-full h-64 mt-4 rounded-lg shadow-md"
               />
             </div>
 
-            <div className="flex flex-col mt-4 space-y-4 flex-grow">
+            <div className="flex flex-col flex-grow mt-4 space-y-4">
               {/* 방 제목 */}
-              <h3 className="font-bold text-xl truncate">{card.title}</h3>
+              <h3 className="text-xl font-bold truncate">{card.title}</h3>
 
               {/* 모집 진행률 바 */}
-              <div className="flex flex-col space-y-2 mt-4">
-                <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
+              <div className="flex flex-col mt-4 space-y-2">
+                <div className="w-full h-4 overflow-hidden bg-gray-200 rounded-full">
                   <div
                     className="h-full bg-yellow"
                     style={{
@@ -107,7 +115,7 @@ const CardList = ({ cards }) => {
                     }}
                   />
                 </div>
-                <div className="flex justify-between items-center text-sm font-medium text-gray-600">
+                <div className="flex items-center justify-between text-sm font-medium text-gray-600">
                   <span>현재 인원: {card.people}명</span>
                   <span>최소 모집인원: {card.min_people}명</span>
                 </div>
@@ -136,7 +144,7 @@ const CardList = ({ cards }) => {
 
             {/* 버튼: 자세히 보기 => 모달 열기 */}
             <button
-              className="mt-4 bg-brown text-white px-4 py-2 rounded-md hover:bg-yellow hover:text-brown hover:font-bold"
+              className="px-4 py-2 mt-4 text-white rounded-md bg-brown hover:bg-yellow hover:text-brown hover:font-bold"
               onClick={() => openModal(card)} // ➂ 사용
             >
               자세히 보기
