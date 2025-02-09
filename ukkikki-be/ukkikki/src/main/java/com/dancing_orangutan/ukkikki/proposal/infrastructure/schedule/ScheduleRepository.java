@@ -38,8 +38,4 @@ public class ScheduleRepository {
                 .build();
     }
 
-    public List<ScheduleEntity> checkOverlapSchedule(Integer proposalId, LocalDateTime startTime, LocalDateTime endTime){
-
-        return jpaScheduleRepository.findByProposal_ProposalIdAndStartTimeLessThanAndEndTimeGreaterThan(proposalId,endTime,startTime);
-    }
 }
