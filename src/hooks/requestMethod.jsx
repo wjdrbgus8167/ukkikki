@@ -7,5 +7,5 @@ export const publicRequest = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, //axios에서 쿠키를 사용하려면 withCredentials: true로 설정
+  withCredentials: true,
 });

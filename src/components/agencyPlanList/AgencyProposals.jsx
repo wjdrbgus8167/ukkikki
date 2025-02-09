@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import ListCard from "../common/ListCard";
-import { fetchAgencyProposals } from "../../apis/agency";
+import { AgencyProposalslist } from "../../apis/agency";
 
 
 const AgencyProposals = () => {
@@ -16,7 +16,8 @@ const AgencyProposals = () => {
         setError(null);
         
         try{
-            const data = await fetchAgencyProposals();
+            const data = await AgencyProposalslist();
+            console.log("API 응답 데이터:", data);
             setProposals(data);
         } catch(error) {
             setError('제안서를 불러오는 데 실패했습니다.');
@@ -26,15 +27,15 @@ const AgencyProposals = () => {
 
     getAgencyProposals();
   
-    });
+    },[]);
 
     return(
         <div className="flex flex-wrap">
-            {proposals && proposals.length > 0 ? (
+            {proposals ? (
                 proposals.map((proposal) => (
                     <ListCard 
                         key = {proposal.proposalId}
-                        trip_name = {proposal.travelPlanName}
+                        trip_name = {proposal.deposit}
                     />
                 ))
             ) : (

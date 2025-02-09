@@ -3,7 +3,7 @@ import { UserProposalslist } from "../apis/agency";
 
 const TravelPlanContext = createContext();
 
-export const TravelPlanProvider = ({children, jwtToken}) => {
+export const TravelPlanProvider = ({children}) => {
 
   const [proposals, setProposals] = useState([]);
   const [error, setError] = useState(null);
