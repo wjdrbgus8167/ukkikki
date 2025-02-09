@@ -15,7 +15,9 @@ const WorldAirportSelector = ({ selectedAirport, onChange }) => {
   useEffect(() => {
     const fetchContinents = async () => {
       try {
-        const response = await publicRequest.get('/geography/continents');
+        const response = await publicRequest.get(
+          '/api/v1/geography/continents',
+        );
         const data = response.data.data;
         if (Array.isArray(data)) {
           setContinents(data);
@@ -37,7 +39,7 @@ const WorldAirportSelector = ({ selectedAirport, onChange }) => {
       const fetchCountries = async () => {
         try {
           const response = await publicRequest.get(
-            `/geography/continents/${selectedContinent}/countries`,
+            `/api/v1/geography/continents/${selectedContinent}/countries`,
           );
           const data = response.data.data;
           if (Array.isArray(data)) {
@@ -68,7 +70,7 @@ const WorldAirportSelector = ({ selectedAirport, onChange }) => {
       const fetchCities = async () => {
         try {
           const response = await publicRequest.get(
-            `/geography/continents/${selectedContinent}/countries/${selectedCountry}/cities`,
+            `/api/v1/geography/continents/${selectedContinent}/countries/${selectedCountry}/cities`,
           );
           const data = response.data.data;
           if (Array.isArray(data)) {
@@ -99,7 +101,7 @@ const WorldAirportSelector = ({ selectedAirport, onChange }) => {
 
       try {
         const response = await publicRequest.get(
-          `/geography/continents/${selectedContinent}/countries/${selectedCountry}/cities/${selectedCity}`,
+          `/api/v1/geography/continents/${selectedContinent}/countries/${selectedCountry}/cities/${selectedCity}`,
         );
 
         console.log('📌 전체 API 응답:', response); // ✅ 응답 확인
