@@ -4,15 +4,13 @@ import com.dancing_orangutan.ukkikki.global.security.CompanyUserDetails;
 import com.dancing_orangutan.ukkikki.global.security.MemberUserDetails;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.proposal.application.ProposalService;
-import com.dancing_orangutan.ukkikki.proposal.application.command.CreateInquiryCommand;
-import com.dancing_orangutan.ukkikki.proposal.application.command.CreateProposalCommand;
-import com.dancing_orangutan.ukkikki.proposal.application.command.CreateScheduleCommand;
-import com.dancing_orangutan.ukkikki.proposal.application.command.DeleteScheduleCommand;
+import com.dancing_orangutan.ukkikki.proposal.application.command.*;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
 import com.dancing_orangutan.ukkikki.proposal.domain.schedule.Schedule;
 import com.dancing_orangutan.ukkikki.proposal.ui.request.CreateInquiryRequest;
 import com.dancing_orangutan.ukkikki.proposal.ui.request.CreateProposalRequest;
 import com.dancing_orangutan.ukkikki.proposal.ui.request.CreateScheduleRequest;
+import com.dancing_orangutan.ukkikki.proposal.ui.request.UpdateScheduleRequest;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.CreateInquiryResponse;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.InquiryListResponse;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.ProposalDetailResponse;
@@ -118,4 +116,20 @@ public class ProposalController {
             return ApiUtils.error("일정 삭제 실패", e, HttpStatus.BAD_REQUEST);
         }
     }
+
+    //일정 수정
+    @PutMapping("/{proposalId}/schedules/{scheduleId}")
+    public ApiUtils.ApiResponse<?> updateSchedule(
+            @PathVariable Integer proposalId,
+            @PathVariable Integer scheduleId,
+            @Validated @RequestBody UpdateScheduleRequest request
+    ){
+
+       UpdateScheduleCommand command = request.requestToDomain(proposalId,scheduleId);
+
+       proposalService.updateSchedule(command);
+
+       return ApiUtils.success("일정이 변경되었습니다");
+    }
+
 }

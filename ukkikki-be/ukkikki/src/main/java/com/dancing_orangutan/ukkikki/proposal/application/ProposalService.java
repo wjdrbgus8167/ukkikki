@@ -1,10 +1,7 @@
 package com.dancing_orangutan.ukkikki.proposal.application;
 
 import com.dancing_orangutan.ukkikki.place.domain.placeTag.PlaceTagEntity;
-import com.dancing_orangutan.ukkikki.proposal.application.command.CreateInquiryCommand;
-import com.dancing_orangutan.ukkikki.proposal.application.command.CreateProposalCommand;
-import com.dancing_orangutan.ukkikki.proposal.application.command.CreateScheduleCommand;
-import com.dancing_orangutan.ukkikki.proposal.application.command.DeleteScheduleCommand;
+import com.dancing_orangutan.ukkikki.proposal.application.command.*;
 import com.dancing_orangutan.ukkikki.proposal.domain.Inquiry.Inquiry;
 import com.dancing_orangutan.ukkikki.proposal.domain.Inquiry.InquiryEntity;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
@@ -193,7 +190,6 @@ public class ProposalService {
                 .map(scheduleMapper::entityToDomain)
                 .collect(Collectors.toList());
 
-        // 새로운 Schedule 도메인 객체 생성
         if (Schedule.hasOverlappingSchedules(existingSchedules,command.getStartDate(), command.getEndDate())) {
             throw new IllegalArgumentException("새로운 일정이 기존 일정과 겹칩니다.");
         }
@@ -220,5 +216,28 @@ public class ProposalService {
 
         jpaScheduleRepository.delete(scheduleEntity);
 
+    }
+
+    //일정 수정
+    public void updateSchedule(UpdateScheduleCommand command) {
+
+        Optional<ScheduleEntity> optionalScheduleEntity = jpaScheduleRepository.findById(command.getScheduleId());
+
+        ScheduleEntity scheduleEntity = optionalScheduleEntity
+                .orElseThrow(() -> new EntityNotFoundException("해당 일정을 찾을 수 없습니다."));
+
+        List<Schedule> existingSchedules = scheduleFinder.findSchedulesByProposalId(command.getProposalId()).stream()
+                .filter(s -> !s.getScheduleId().equals(scheduleEntity.getScheduleId()))
+                .map(scheduleMapper::entityToDomain)
+                .collect(Collectors.toList());
+
+        if (Schedule.hasOverlappingSchedules(existingSchedules,command.getStartDate(), command.getEndDate())) {
+            throw new IllegalArgumentException("해당 시간대에는 이미 일정이 등록되어 있습니다.");
+        }
+
+        // 새 일정 추가 후 저장
+        scheduleEntity.updateSchedule(command.getScheduleName(), command.getStartDate(), command.getEndDate(), command.getImageUrl());
+
+        jpaScheduleRepository.save(scheduleEntity);
     }
 }
