@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import HeroText from '../components/common/SloganText';
 import LoginForm from '../components/auth/LoginForm';
 import useAuthStore from '../stores/authStore';
+import { publicRequest } from '../hooks/requestMethod';
 
 import kakaoLogo from '../assets/icon.png';
 import googleLogo from '../assets/google.png';
@@ -15,29 +16,27 @@ const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuthStore(); // Zustand 스토어에서 user, logout 불러오기
+  const { user, setUser } = useAuthStore();
+  const [isCompany, setIsCompany] = useState(false);
 
-  const [isCompany, setIsCompany] = useState(false); // 일반 유저 로그인 기본값
+  // ✅ OAuth 로그인 후 리디렉션된 경우 처리
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
 
-  const handleLogout = () => {
-    logout(); // Zustand 로그아웃 호출
-    navigate('/login');
-  };
-
-  const handleKakaoLogin = () => {
-    window.location.href = `${baseUrl}oauth2/authorization/kakao`;
-  };
-
-  const handleGoogleLogin = () => {
-    window.location.href = `${baseUrl}oauth2/authorization/google`;
-  };
+    if (token) {
+      setUser({ token });
+      localStorage.setItem('accessToken', token);
+      navigate('/');
+    }
+  }, [navigate, setUser]);
 
   return (
     <div
       className="flex flex-col min-h-screen"
       style={{ backgroundImage: `url(${bgImage})`, backgroundSize: 'cover' }}
     >
-      <Header user={user} onLogout={handleLogout} />
+      <Header />
       <main className="flex flex-col items-center flex-1 py-10 md:flex-row md:px-28">
         <HeroText textColor="text-brown" />
 
@@ -82,7 +81,9 @@ const LoginPage = () => {
               <div className="mt-6 space-y-4">
                 <button
                   className="relative flex items-center w-full py-3 text-black transition bg-white border border-gray-200 rounded-xl"
-                  onClick={handleGoogleLogin}
+                  onClick={() =>
+                    (window.location.href = `${baseUrl}oauth2/authorization/google`)
+                  }
                 >
                   <img
                     src={googleLogo}
@@ -95,7 +96,9 @@ const LoginPage = () => {
                 </button>
                 <button
                   className="relative flex items-center w-full py-3 transition bg-yellow text-brown rounded-xl"
-                  onClick={handleKakaoLogin}
+                  onClick={() =>
+                    (window.location.href = `${baseUrl}oauth2/authorization/kakao`)
+                  }
                 >
                   <img
                     src={kakaoLogo}
@@ -108,30 +111,6 @@ const LoginPage = () => {
                 </button>
               </div>
             )}
-
-            <div className="flex items-center justify-center mt-6 space-x-4">
-              {user ? (
-                <button
-                  onClick={handleLogout}
-                  className="text-blue-500 hover:underline"
-                >
-                  로그아웃
-                </button>
-              ) : (
-                <>
-                  <Link to="/signup" className="text-gray-600 hover:underline">
-                    이메일로 회원가입
-                  </Link>
-                  <span className="text-gray-400">|</span>
-                  <Link
-                    to="/signup?type=company"
-                    className="text-blue-500 hover:underline"
-                  >
-                    기업으로 회원가입하기
-                  </Link>
-                </>
-              )}
-            </div>
           </div>
         </div>
       </main>
