@@ -2,34 +2,26 @@
 import { publicRequest } from '../hooks/requestMethod';
 
 
-//여행 계획 제출 목록 조회
+//여행 계획 제출 목록 조회(유저 제안)
 
-export const fetchUserProposals = async(jwtToken) => {
+export const UserProposalslist = async() => {
   try {
-    const response = await publicRequest.get('/travel-plans/list',{
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${jwtToken}`,
-      }, 
-    });
-    return response.data;
+    const response = await publicRequest.get('/travel-plans/list');
+    return response.data.data;
 
   } catch(error) {
-    console.log(`Error: `, error)
+    console.log(`Error: `, error.message)
     throw error;
   };
 };
 
 // 제안서 목록 조회
 
-export const fetchAgencyProposals = async(jwtToken) => {
+export const fetchAgencyProposals = async() => {
   try{
-    const response = await publicRequest.get('/proposals',{
-      headers: {
-        Authorization: `Bearer ${jwtToken}`,
-      },
-    });
+    const response = await publicRequest.get('/proposals');
     return response.data.proposals;
+
   } catch(error) {
     console.log('Error', error)
   };

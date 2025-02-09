@@ -5,10 +5,11 @@ import ProposalContent from '../components/agencyDetail/ProposalContent.jsx'
 import PlaceList from "../components/agencyDetail/PlaceList.jsx";
 import { ProposalDetailProvider } from "../contexts/ProposalDetailContext.jsx";
 import UserLocationMap from "../components/agencyDetail/UserLocationMap.jsx";
-const ProposalDetail = ({jwtToken, travelPlanId}) => {
+
+const ProposalDetail = (travelPlanId) => {
 
     return(
-      <ProposalDetailProvider jwtToken={jwtToken} travelPlanId={travelPlanId}>
+      <ProposalDetailProvider travelPlanId={travelPlanId}>
         <div>
             <Header />
              <div className=" p-10">

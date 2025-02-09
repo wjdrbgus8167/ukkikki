@@ -4,14 +4,14 @@ import { AgencyProposalDetail } from "../apis/agency";
 
 const ProposalDetailContext = createContext();
 
-export const ProposalDetailProvider = ({children, jwtToken, travelPlanId}) => {
+export const ProposalDetailProvider = ({children, travelPlanId}) => {
   const [proposals, setProposals ] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     const fetchProposalData = async() => {
       try {
-        const data = await AgencyProposalDetail(jwtToken, travelPlanId);
+        const data = await AgencyProposalDetail(travelPlanId);
         setProposals(data);
 
         if (data.users) {
@@ -22,10 +22,10 @@ export const ProposalDetailProvider = ({children, jwtToken, travelPlanId}) => {
         console.log('error:', error);
       }
     };
-    if (jwtToken && travelPlanId) {
+    if (travelPlanId) {
       fetchProposalData();
     }
-  },[jwtToken,travelPlanId]);
+  },[travelPlanId]);
 
   return (
     <ProposalDetailContext.Provider value={{proposals,totalCount}}>
