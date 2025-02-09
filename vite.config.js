@@ -17,6 +17,6 @@ export default defineConfig({
       },
     },
 
-    // host: 'fe.i12c204.p.ssafy.io',
+    host: 'fe.i12c204.p.ssafy.io',
   },
 });

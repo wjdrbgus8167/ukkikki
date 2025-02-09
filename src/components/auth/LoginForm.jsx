@@ -1,4 +1,3 @@
-// LoginForm.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { publicRequest } from '../../hooks/requestMethod';
@@ -14,14 +13,19 @@ const LoginForm = ({ isCompany }) => {
     e.preventDefault();
 
     try {
-      const response = await publicRequest.post('/auth/members/login', {
+      // isCompany에 따라 로그인 API 경로 변경
+      const loginEndpoint = isCompany
+        ? '/auth/companies/login' // 기업 로그인 API
+        : '/auth/members/login'; // 일반 사용자 로그인 API
+
+      const response = await publicRequest.post(loginEndpoint, {
         email,
         password,
       });
 
       if (response.status === 200) {
-        // 로그인 성공 시 인증 플래그를 true로 설정
-        useAuthStore.getState().setUser(true); // isAuthenticated가 true로 설정됩니다.
+        // 로그인 성공 시 인증 상태 업데이트
+        useAuthStore.getState().setUser(true);
 
         console.log('로그인 성공');
         navigate('/');

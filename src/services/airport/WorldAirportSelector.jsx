@@ -91,14 +91,48 @@ const WorldAirportSelector = ({ selectedAirport, onChange }) => {
 
   // 선택된 도시에 따라 공항 데이터 필터링
   useEffect(() => {
-    if (selectedCity) {
-      const filteredAirports =
-        cities.find((city) => city.cityId === selectedCity)?.airports || [];
-      setAirports(filteredAirports);
-    } else {
-      setAirports([]);
-    }
-  }, [selectedCity, cities]);
+    const fetchAirports = async () => {
+      if (!selectedCity) {
+        setAirports([]); // ✅ 도시가 선택되지 않으면 공항 목록 초기화
+        return;
+      }
+
+      try {
+        const response = await publicRequest.get(
+          `/geography/continents/${selectedContinent}/countries/${selectedCountry}/cities/${selectedCity}`,
+        );
+
+        console.log('📌 전체 API 응답:', response); // ✅ 응답 확인
+        console.log('📌 응답 데이터:', response.data); // ✅ 응답 데이터 확인
+
+        // ✅ 응답 데이터에서 `data`가 존재하고 배열인지 확인 후 `setAirports` 설정
+        const data =
+          response.data && Array.isArray(response.data.data)
+            ? response.data.data
+            : [];
+
+        if (data.length > 0) {
+          setAirports(data);
+          console.log('✅ 공항 데이터 로드 완료:', data);
+        } else {
+          console.error(
+            '🚨 Unexpected data format for airports:',
+            response.data,
+          );
+          setAirports([]);
+        }
+      } catch (error) {
+        console.error('🚨 공항 데이터를 불러오는 중 오류 발생:', error);
+        console.error(
+          '📌 서버 응답:',
+          error.response ? error.response.data : '응답 없음',
+        );
+        setAirports([]);
+      }
+    };
+
+    fetchAirports();
+  }, [selectedCity, selectedContinent, selectedCountry]);
 
   return (
     <div className="w-full">
@@ -107,8 +141,12 @@ const WorldAirportSelector = ({ selectedAirport, onChange }) => {
       </label>
       <select
         value={selectedAirport}
-        onChange={(e) => {
-          const value = e.target.value;
+        onChange={(event) => {
+          const rawValue = event?.target?.value ?? ''; // ✅ `undefined` 방지
+          if (!rawValue) return;
+
+          const value = rawValue.replace(/^[-\s]+/, ''); // ✅ 앞쪽 `---` 제거
+
           if (value.startsWith('continent-')) {
             setSelectedContinent(value.replace('continent-', ''));
             setSelectedCountry('');
@@ -122,10 +160,22 @@ const WorldAirportSelector = ({ selectedAirport, onChange }) => {
             setSelectedCity(value.replace('city-', ''));
             setAirports([]);
           } else {
-            onChange(value);
+            // ✅ 선택한 공항 정보 가져오기
+            const selectedAirportData = airports.find(
+              (airport) => airport.airportCode === value,
+            );
+
+            console.log('🚀 선택된 공항 데이터:', selectedAirportData);
+
+            if (typeof onChange === 'function') {
+              // ✅ 부모에게 `airportCode` 전달 (이전: `airportId`)
+              onChange(
+                selectedAirportData ? selectedAirportData.airportCode : value,
+              );
+            }
           }
         }}
-        className="w-full px-4 py-2 bg-transparent border text-white placeholder-white border-white rounded-md focus:outline-none focus:ring-2 focus:bg-dark-green"
+        className="w-full px-4 py-2 text-white placeholder-white bg-transparent border border-white rounded-md focus:outline-none focus:ring-2 focus:bg-dark-green"
       >
         <option value="">도착 공항 선택</option>
         {Array.isArray(continents) &&
@@ -155,10 +205,10 @@ const WorldAirportSelector = ({ selectedAirport, onChange }) => {
         {Array.isArray(airports) &&
           airports.map((airport) => (
             <option
-              key={`airport-${airport.airport_code}`}
-              value={airport.airport_code}
+              key={`airport-${airport.airportCode || 'unknown'}`} // ✅ 키가 `undefined` 방지
+              value={airport.airportCode ?? ''} // ✅ `undefined` 방지
             >
-              ─ ─ ─ {airport.airport_name}
+              {airport.name}
             </option>
           ))}
       </select>
