@@ -1,6 +1,5 @@
 package com.dancing_orangutan.ukkikki.travelPlan.ui;
 
-import com.dancing_orangutan.ukkikki.event.eventPublisher.SpringEventPublisher;
 import com.dancing_orangutan.ukkikki.global.security.MemberUserDetails;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.*;
@@ -13,10 +12,12 @@ import com.dancing_orangutan.ukkikki.travelPlan.application.TravelPlanService;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.FetchSuggestedTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.JoinTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.SearchTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.response.FetchAllTravelPlansResponse;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.*;
@@ -143,5 +144,10 @@ public class TravelPlanController {
 
 		travelPlanService.updateHost(command);
 		return ApiUtils.success("인원이 성공적으로 변경되었습니다.");
+	}
+
+	@GetMapping
+	public ApiUtils.ApiResponse<FetchAllTravelPlansResponse> getAllTravelPlans(Pageable pageable) {
+		return  ApiUtils.success(travelPlanService.getAllTravelPlans(pageable));
 	}
 }

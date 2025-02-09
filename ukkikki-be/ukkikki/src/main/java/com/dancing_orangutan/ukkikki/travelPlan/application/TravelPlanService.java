@@ -8,6 +8,7 @@ import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchSuggested
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.Host;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlan;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanInfo;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.memberTravelPlan.MemberTravelPlanFinder;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.memberTravelPlan.MemberTravelPlanModifier;
@@ -18,9 +19,12 @@ import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.travelPlan.Travel
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.FetchSuggestedTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.JoinTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.SearchTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.response.FetchAllTravelPlansResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -224,5 +228,10 @@ public class TravelPlanService {
 				.memberId(domain.getHost().memberId())
 				.travelPlanId(domain.getTravelPlanInfo().travelPlanId())
 				.build());
+	}
+
+	public FetchAllTravelPlansResponse getAllTravelPlans(Pageable pageable) {
+		Page<TravelPlanEntity> entityPage = travelPlanRepository.getAllTravelPlans(pageable);
+		return FetchAllTravelPlansResponse.toResponse(entityPage);
 	}
 }
