@@ -1,17 +1,18 @@
+// src/stores/authStore.js
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 const useAuthStore = create(
   persist(
     (set) => ({
-      user: null,
-      setUser: (user) => set({ user }),
-      logout: () => set({ user: null }),
-      // 필요한 경우 login, register 등의 액션도 추가
+      user: null, // 로그인된 사용자 정보 (예: { id, name, ... })
+      isAuthenticated: false, // 로그인 여부를 boolean으로 관리
+      setUser: (user) => set({ user, isAuthenticated: Boolean(user) }),
+      logout: () => set({ user: null, isAuthenticated: false }),
     }),
     {
-      name: 'auth', // 로컬 스토리지에 저장될 key 이름
-      // 선택적으로 직렬화/역직렬화 옵션을 설정할 수 있음
+      name: 'auth-store', // 로컬 스토리지에 저장될 key 이름
+      // getStorage: () => localStorage, // 기본값이 localStorage입니다.
     },
   ),
 );

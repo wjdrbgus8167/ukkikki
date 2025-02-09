@@ -6,7 +6,8 @@ import { ko } from 'date-fns/locale';
 import axios from 'axios';
 import KoreaAirportSelector from '../../services/airport/KoreaAirportSelector';
 import WorldAirportSelector from '../../services/airport/WorldAirportSelector';
-import CreateRoomModal from '../mainpage/CreateRoomModal';
+import CreateRoomModal from './CreateRoomModal';
+import { useCookies } from 'react-cookie';
 import { publicRequest } from '../../hooks/requestMethod';
 const SearchBar = () => {
   const [startDate, setStartDate] = useState(null);
@@ -15,24 +16,32 @@ const SearchBar = () => {
   const [arrivalAirport, setArrivalAirport] = useState('');
   const [searchType, setSearchType] = useState('findRoom'); // ✅ 방 찾기 / 방 만들기 선택 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [cookies] = useCookies(['accessToken']); // ✅ 컴포넌트 내부에서 useCookies 사용
   const navigate = useNavigate();
+  const isAuthenticated = !!cookies.accessToken; // ✅ accessToken 존재 여부 확인
 
   const API_KEY = import.meta.env.VITE_APP_AIRPORT_API_KEY;
   const API_BASE_URL = '/api/flight/getIflightScheduleList'; // 프록시 사용
 
-  //--------------------------------------------------------------------------------
   // ✅ 방 찾기 버튼 클릭 시 검색 조건을 API에 전달 후 SearchRoom 페이지로 이동
   const handleFindRoom = async () => {
     if (!startDate || !endDate || !departureAirport || !arrivalAirport) {
       alert('출발일, 돌아오는 날, 출발 공항, 도착 공항을 모두 선택해주세요.');
       return;
     }
+
+    if (departureAirport === arrivalAirport) {
+      alert('출발지와 도착지는 달라야 합니다.');
+      return;
+    }
+
     const endpoint = '/travel-plans/search';
 
     try {
       const response = await publicRequest.get(endpoint, {
         params: {
-          startDate: startDate.toISOString().split('T')[0],
+          startDate: startDate.toISOString().split('T')[0], // 날짜 포맷 확인
           endDate: endDate.toISOString().split('T')[0],
           departureCityId: departureAirport,
           arrivalCityId: arrivalAirport,
@@ -41,17 +50,29 @@ const SearchBar = () => {
 
       if (response.status === 200) {
         console.log('🔍 검색 결과:', response.data);
-        navigate('/search-room', { state: { rooms: response.data } }); // ✅ 결과 전달
+        navigate('/search-room', { state: { rooms: response.data } });
       }
     } catch (error) {
+      console.log('🔍 요청 URL:', endpoint);
+      console.log('📌 요청 파라미터:', {
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
+        departureCityId: departureAirport,
+        arrivalCityId: arrivalAirport,
+      });
       console.error('🚨 방 찾기 실패:', error);
       alert('🚨 방 찾기 중 오류가 발생했습니다.');
     }
   };
 
-  //--------------------------------------------------------------------------------
   // ✅ 방 만들기 버튼 클릭 시 로그인 여부 확인 후 동작
   const handleCreateRoom = async () => {
+    if (!isAuthenticated) {
+      alert('로그인이 필요합니다.');
+      navigate('/login'); // ✅ 로그인 페이지로 이동
+      return;
+    }
+
     if (!startDate || !endDate || !departureAirport || !arrivalAirport) {
       alert('출발일, 돌아오는 날, 출발 공항, 도착 공항을 모두 선택해주세요.');
       return;
@@ -99,10 +120,10 @@ const SearchBar = () => {
 
   return (
     <div className="flex justify-center mt-10">
-      <div className="bg-white bg-opacity-30 p-6 rounded-md shadow-lg w-full max-w-3xl backdrop-blur-md">
+      <div className="w-full max-w-3xl p-6 bg-white rounded-md shadow-lg bg-opacity-30 backdrop-blur-md">
         <form className="space-y-6">
           {/* ✅ 방 찾기 vs 방 만들기 선택 스위치 */}
-          <div className="relative flex justify-between items-center border-gray-300 pb-2">
+          <div className="relative flex items-center justify-between pb-2 border-gray-300">
             <button
               type="button"
               className={`flex-1 text-center py-2 rounded-md ${
@@ -126,7 +147,7 @@ const SearchBar = () => {
               방 만들기
             </button>
             <div
-              className="absolute bottom-0 h-1 w-1/2 bg-dark-green transition-transform duration-300"
+              className="absolute bottom-0 w-1/2 h-1 transition-transform duration-300 bg-dark-green"
               style={{
                 transform:
                   searchType === 'findRoom'
@@ -148,7 +169,7 @@ const SearchBar = () => {
                 minDate={new Date()}
                 dateFormat="yyyy/MM/dd"
                 locale={ko}
-                className="w-full px-4 py-2 border bg-transparent border-white rounded-md text-white placeholder-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 text-white placeholder-white bg-transparent border border-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholderText="언제 떠나시나요?"
               />
             </div>
@@ -162,7 +183,7 @@ const SearchBar = () => {
                 minDate={startDate || new Date()}
                 dateFormat="yyyy/MM/dd"
                 locale={ko}
-                className="w-full px-4 py-2 border bg-transparent border-white rounded-md text-white placeholder-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 text-white placeholder-white bg-transparent border border-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholderText="언제 돌아오시나요?"
               />
             </div>
@@ -176,7 +197,13 @@ const SearchBar = () => {
             />
             <WorldAirportSelector
               selectedAirport={arrivalAirport}
-              onChange={(e) => setArrivalAirport(e.target.value)}
+              onChange={(selectedValue) => {
+                console.log(
+                  '✅ 부모 컴포넌트에서 받은 도착 공항 코드:',
+                  selectedValue,
+                );
+                setArrivalAirport(selectedValue);
+              }}
             />
           </div>
 
@@ -186,7 +213,7 @@ const SearchBar = () => {
               <button
                 type="button"
                 onClick={handleFindRoom}
-                className="w-full bg-dark-green text-white px-8 py-3 rounded-md font-semibold"
+                className="w-full px-8 py-3 font-semibold text-white rounded-md bg-dark-green"
               >
                 검색하기
               </button>
@@ -194,7 +221,7 @@ const SearchBar = () => {
               <button
                 type="button"
                 onClick={handleCreateRoom}
-                className="w-full bg-dark-green text-white px-8 py-3 rounded-md font-semibold"
+                className="w-full px-8 py-3 font-semibold text-white rounded-md bg-dark-green"
               >
                 방 만들기
               </button>
