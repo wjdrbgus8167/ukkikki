@@ -27,43 +27,75 @@ const LikeList = ({ wishlists }) => {
     setExpandedIndex(expandedIndex === index ? null : index);
   };
 
+  const handleLikeButtonClick = async (place) => {
+    if (!place || !selectedCard || !selectedCard.id) {
+      console.error('🚨 장소 정보 또는 여행방 ID가 없습니다.');
+      return;
+    }
+
+    const travelPlanId = selectedCard.id;
+    const placeId = place.id;
+
+    try {
+      await axios.post(
+        `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
+      );
+
+      // ✅ 좋아요 개수 업데이트
+      setFavorites((prev) =>
+        prev.map((fav) =>
+          fav.id === placeId ? { ...fav, likes: fav.likes + 1 } : fav,
+        ),
+      );
+
+      console.log('✅ 좋아요 증가 성공:', place);
+    } catch (error) {
+      console.error('🚨 좋아요 증가 실패:', error);
+      alert('🚨 좋아요를 추가하는 중 오류가 발생했습니다.');
+    }
+  };
+
   return (
     <div className="space-y-4">
-      {sortedWishlists.map((item, index) => {
-        const rank = index + 1; // 순위 계산
-        return (
-          <div
-            key={index}
-            className="bg-gray-100 rounded-lg shadow-md p-4 cursor-pointer transition-all duration-300 hover:bg-gray-200"
-            onClick={() => handleItemClick(index)}
-          >
-            {/* 리스트 항목 제목과 좋아요 */}
-            <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-2">
-                {/* 순위 표시 */}
-                <span className={`text-lg ${getRankStyle(rank)}`}>{rank}위</span>
-                <h3 className="text-lg font-semibold text-gray-700">{item.name}</h3>
-              </div>
-              <span className="text-sm text-gray-500">❤️ {item.likes}</span>
+      {sortedWishlists.map((item, index) => (
+        <div
+          key={index}
+          className="p-4 transition-all duration-300 bg-gray-100 rounded-lg shadow-md cursor-pointer hover:bg-gray-200"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <span className={`text-lg ${getRankStyle(index + 1)}`}>
+                {index + 1}위
+              </span>
+              <h3 className="text-lg font-semibold text-gray-700">
+                {item.name}
+              </h3>
             </div>
 
-            {/* 상세 정보 펼치기 */}
-            {expandedIndex === index && (
-              <div className="mt-2 text-gray-600 transition-all duration-300 overflow-hidden">
-                <p>
-                  <strong>주소:</strong> {item.address}
-                </p>
-                <p>
-                  <strong>위도:</strong> {item.latitude}
-                </p>
-                <p>
-                  <strong>경도:</strong> {item.longitude}
-                </p>
-              </div>
-            )}
+            {/* 좋아요 버튼 */}
+            <button
+              className="px-2 py-1 text-sm text-red-500 bg-gray-200 rounded-md"
+              onClick={() => handleLikeButtonClick(item)}
+            >
+              ❤️ {item.likes}
+            </button>
           </div>
-        );
-      })}
+
+          {expandedIndex === index && (
+            <div className="mt-2 text-gray-600">
+              <p>
+                <strong>주소:</strong> {item.address}
+              </p>
+              <p>
+                <strong>위도:</strong> {item.latitude}
+              </p>
+              <p>
+                <strong>경도:</strong> {item.longitude}
+              </p>
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 };

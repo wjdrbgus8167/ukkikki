@@ -30,12 +30,18 @@ const SearchBar = () => {
       alert('출발일, 돌아오는 날, 출발 공항, 도착 공항을 모두 선택해주세요.');
       return;
     }
+
+    if (departureAirport === arrivalAirport) {
+      alert('출발지와 도착지는 달라야 합니다.');
+      return;
+    }
+
     const endpoint = '/travel-plans/search';
 
     try {
       const response = await publicRequest.get(endpoint, {
         params: {
-          startDate: startDate.toISOString().split('T')[0],
+          startDate: startDate.toISOString().split('T')[0], // 날짜 포맷 확인
           endDate: endDate.toISOString().split('T')[0],
           departureCityId: departureAirport,
           arrivalCityId: arrivalAirport,
@@ -44,9 +50,16 @@ const SearchBar = () => {
 
       if (response.status === 200) {
         console.log('🔍 검색 결과:', response.data);
-        navigate('/search-room', { state: { rooms: response.data } }); // ✅ 결과 전달
+        navigate('/search-room', { state: { rooms: response.data } });
       }
     } catch (error) {
+      console.log('🔍 요청 URL:', endpoint);
+      console.log('📌 요청 파라미터:', {
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
+        departureCityId: departureAirport,
+        arrivalCityId: arrivalAirport,
+      });
       console.error('🚨 방 찾기 실패:', error);
       alert('🚨 방 찾기 중 오류가 발생했습니다.');
     }
@@ -184,7 +197,13 @@ const SearchBar = () => {
             />
             <WorldAirportSelector
               selectedAirport={arrivalAirport}
-              onChange={(e) => setArrivalAirport(e.target.value)}
+              onChange={(selectedValue) => {
+                console.log(
+                  '✅ 부모 컴포넌트에서 받은 도착 공항 코드:',
+                  selectedValue,
+                );
+                setArrivalAirport(selectedValue);
+              }}
             />
           </div>
 

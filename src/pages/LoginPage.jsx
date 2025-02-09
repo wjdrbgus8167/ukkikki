@@ -1,75 +1,109 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import HeroText from '../components/common/SloganText';
 import LoginForm from '../components/auth/LoginForm';
 import useAuthStore from '../stores/authStore';
+import { publicRequest } from '../hooks/requestMethod';
 
 import kakaoLogo from '../assets/icon.png';
 import googleLogo from '../assets/google.png';
 import logo from '../assets/logo.png';
 import bgImage from '../assets/login-bg.png';
 
+const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
+
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuthStore(); // Zustand 스토어에서 user, logout 불러오기
+  const { user, setUser } = useAuthStore();
+  const [isCompany, setIsCompany] = useState(false);
 
-  const handleLogout = () => {
-    logout(); // Zustand 로그아웃 호출
-    navigate('/login');
-  };
+  // ✅ OAuth 로그인 후 리디렉션된 경우 처리
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
 
-  // 카카오 및 구글 로그인 핸들러는 그대로 사용
-  const handleKakaoLogin = () => {
-    window.location.href =
-      'http://i12c204.p.ssafy.io:8080/api/v1/oauth2/authorization/kakao';
-  };
-
-  const handleGoogleLogin = () => {
-    window.location.href =
-      'http://i12c204.p.ssafy.io:8080/api/v1/oauth2/authorization/google';
-  };
+    if (token) {
+      setUser({ token });
+      localStorage.setItem('accessToken', token);
+      navigate('/');
+    }
+  }, [navigate, setUser]);
 
   return (
     <div
       className="flex flex-col min-h-screen"
       style={{ backgroundImage: `url(${bgImage})`, backgroundSize: 'cover' }}
     >
-      <Header user={user} onLogout={handleLogout} />
-      <main className="flex flex-1 flex-col md:flex-row items-center md:px-28 py-10">
+      <Header />
+      <main className="flex flex-col items-center flex-1 py-10 md:flex-row md:px-28">
         <HeroText textColor="text-brown" />
 
-        <div className="w-full md:w-1/2 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
-            <img src={logo} className="mx-auto my-6 w-48 h-auto" alt="로고" />
+        <div className="flex items-center justify-center w-full md:w-1/2">
+          <div className="w-full max-w-md p-6 bg-white shadow-lg rounded-xl">
+            <img src={logo} className="w-48 h-auto mx-auto my-6" alt="로고" />
 
-            {/* 로그인 폼 */}
-            <LoginForm isCompany={false} />
+            {/* ✅ 일반 유저 / 여행사 스위치 버튼 추가 ✅ */}
+            <div className="flex items-center justify-center mb-6">
+              <span
+                className={`text-sm font-semibold transition-colors ${
+                  !isCompany ? 'text-brown' : 'text-gray-400'
+                }`}
+              >
+                일반 유저
+              </span>
+              <div
+                className={`relative w-14 h-7 mx-4 bg-gray-300 rounded-full cursor-pointer transition-all ${
+                  isCompany ? 'bg-brown' : 'bg-gray-300'
+                }`}
+                onClick={() => setIsCompany(!isCompany)}
+              >
+                <div
+                  className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow-md transition-transform ${
+                    isCompany ? 'translate-x-7' : 'translate-x-0'
+                  }`}
+                ></div>
+              </div>
+              <span
+                className={`text-sm font-semibold transition-colors ${
+                  isCompany ? 'text-brown' : 'text-gray-400'
+                }`}
+              >
+                여행사
+              </span>
+            </div>
+
+            {/* ✅ `isCompany` 값 전달하여 로그인 폼 변경 ✅ */}
+            <LoginForm isCompany={isCompany} />
 
             {!user && (
               <div className="mt-6 space-y-4">
                 <button
-                  className="w-full bg-white text-black py-3 rounded-xl border border-gray-200 transition flex items-center relative"
-                  onClick={handleGoogleLogin}
+                  className="relative flex items-center w-full py-3 text-black transition bg-white border border-gray-200 rounded-xl"
+                  onClick={() =>
+                    (window.location.href = `${baseUrl}oauth2/authorization/google`)
+                  }
                 >
                   <img
                     src={googleLogo}
                     alt="Google"
-                    className="absolute left-4 w-5 h-5"
+                    className="absolute w-5 h-5 left-4"
                   />
                   <span className="flex-1 text-center">
                     구글 계정으로 로그인하기
                   </span>
                 </button>
                 <button
-                  className="w-full bg-yellow text-brown py-3 rounded-xl transition flex items-center relative"
-                  onClick={handleKakaoLogin}
+                  className="relative flex items-center w-full py-3 transition bg-yellow text-brown rounded-xl"
+                  onClick={() =>
+                    (window.location.href = `${baseUrl}oauth2/authorization/kakao`)
+                  }
                 >
                   <img
                     src={kakaoLogo}
                     alt="Kakao"
-                    className="absolute left-4 w-6 h-6"
+                    className="absolute w-6 h-6 left-4"
                   />
                   <span className="flex-1 text-center">
                     카카오 계정으로 로그인하기
@@ -77,30 +111,6 @@ const LoginPage = () => {
                 </button>
               </div>
             )}
-
-            <div className="mt-6 flex items-center justify-center space-x-4">
-              {user ? (
-                <button
-                  onClick={handleLogout}
-                  className="text-blue-500 hover:underline"
-                >
-                  로그아웃
-                </button>
-              ) : (
-                <>
-                  <Link to="/signup" className="text-gray-600 hover:underline">
-                    이메일로 회원가입
-                  </Link>
-                  <span className="text-gray-400">|</span>
-                  <Link
-                    to="/signup?type=company"
-                    className="text-blue-500 hover:underline"
-                  >
-                    기업으로 회원가입하기
-                  </Link>
-                </>
-              )}
-            </div>
           </div>
         </div>
       </main>

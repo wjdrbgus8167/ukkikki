@@ -46,6 +46,9 @@ const MapSearchBar = ({ onPlaceSelected }) => {
 
     // 만약 찜이 아니라면 → 부모로 새 장소 전달
     if (!isBookmarked) {
+      handleLikePlace(searchedPlace); // ✅ API 요청 (찜하기)
+      setIsBookmarked(!isBookmarked);
+
       onPlaceSelected(searchedPlace);
     } else {
       // 여기서 "찜 취소" 시, 부모 쪽에서 제거 로직을 원하면
@@ -74,12 +77,7 @@ const MapSearchBar = ({ onPlaceSelected }) => {
             "
           />
           {/* 오른쪽 끝에 돋보기 아이콘 */}
-          <div
-            className="
-              absolute right-3 top-1/2 -translate-y-1/2
-              pointer-events-none text-xl text-gray-500
-            "
-          >
+          <div className="absolute text-xl text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2">
             🔍
           </div>
         </div>
@@ -130,17 +128,7 @@ const MapSearchBar = ({ onPlaceSelected }) => {
           {/* "찜하기" / "찜 취소" 버튼 */}
           <button
             onClick={handleToggleBookmark}
-            className="
-              mt-2
-              h-9
-              px-3
-              rounded
-              border-none
-              bg-orange-400
-              text-white
-              cursor-pointer
-              self-end
-            "
+            className="self-end px-3 mt-2 text-white bg-orange-400 border-none rounded cursor-pointer h-9"
           >
             {isBookmarked ? '찜 취소' : '찜하기'}
           </button>

@@ -53,10 +53,11 @@ const SearchRoom = () => {
   //   },
   // ];
   const location = useLocation();
-  const rooms = location.state?.rooms || []; // ✅ 전달된 검색 결과 가져오기
+  console.log('🔍 location.state:', location.state); // ✅ 추가
+  const rooms = location.state?.rooms || []; // ✅ API에서 전달된 여행방 데이터
+  console.log('✅ rooms 데이터 확인:', rooms); // ✅ 추가
 
-  const [filteredRooms, setFilteredRooms] = useState(cards);
-
+  const [filteredRooms, setFilteredRooms] = useState(rooms); // ✅ 초기값을 API 데이터로 설정
   const handleFilter = (themes, states) => {
     let filtered = cards;
 
