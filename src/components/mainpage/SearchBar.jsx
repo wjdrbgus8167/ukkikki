@@ -4,8 +4,8 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { ko } from 'date-fns/locale';
 import axios from 'axios';
-import KoreaAirportSelector from '../../services/airport/KoreaAirportSelector';
-import WorldAirportSelector from '../../services/airport/WorldAirportSelector';
+import KoreaAirportModal from '../../services/airport/KoreaAirportSelector';
+import WorldAirportModal from '../../services/airport/WorldAirportSelector';
 import CreateRoomModal from './CreateRoomModal';
 import { useCookies } from 'react-cookie';
 import { publicRequest } from '../../hooks/requestMethod';
@@ -16,38 +16,48 @@ const SearchBar = () => {
   const [arrivalAirport, setArrivalAirport] = useState('');
   const [searchType, setSearchType] = useState('findRoom'); // ✅ 방 찾기 / 방 만들기 선택 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const [cookies] = useCookies(['accessToken']); // ✅ 컴포넌트 내부에서 useCookies 사용
+  const [arrivalCityId, setArrivalCityId] = useState('');
+  const [departureCityId, setDepartureCityId] = useState('');
+  const [isKoreaModalOpen, setIsKoreaModalOpen] = useState(false);
+  const [isWorldModalOpen, setIsWorldModalOpen] = useState(false);
   const navigate = useNavigate();
-  const isAuthenticated = !!cookies.accessToken; // ✅ accessToken 존재 여부 확인
 
   const API_KEY = import.meta.env.VITE_APP_AIRPORT_API_KEY;
   const API_BASE_URL = '/api/flight/getIflightScheduleList'; // 프록시 사용
 
+  // ✅ 날짜 포맷 변환 함수
+  const formatDate = (date) => {
+    if (!date) return ''; // ✅ 날짜가 없을 경우 빈 문자열 반환
+    return date.toISOString().split('T')[0]; // ✅ yyyy-MM-dd 형식으로 변환
+  };
   // ✅ 방 찾기 버튼 클릭 시 검색 조건을 API에 전달 후 SearchRoom 페이지로 이동
   const handleFindRoom = async () => {
-    if (!startDate || !endDate || !departureAirport || !arrivalAirport) {
-      alert('출발일, 돌아오는 날, 출발 공항, 도착 공항을 모두 선택해주세요.');
+    // 🚀 최종 값 확인 (여기서 값이 `""`라면 문제가 있음)
+    console.log('🚀 최종 출발 도시 ID:', departureCityId);
+    console.log('🚀 최종 도착 도시 ID:', arrivalCityId);
+    console.log('🚀 최종 출발일:', startDate);
+    console.log('🚀 최종 도착일:', endDate);
+    if (!startDate || !endDate || !departureCityId || !arrivalCityId) {
+      alert('출발일, 돌아오는 날, 출발 도시, 도착 도시를 모두 선택해주세요.');
       return;
     }
 
-    if (departureAirport === arrivalAirport) {
+    if (departureCityId === arrivalCityId) {
       alert('출발지와 도착지는 달라야 합니다.');
       return;
     }
 
-    const endpoint = '/travel-plans/search';
+    const endpoint = '/api/v1/travel-plans/search';
 
     try {
       const response = await publicRequest.get(endpoint, {
         params: {
-          startDate: startDate.toISOString().split('T')[0], // 날짜 포맷 확인
-          endDate: endDate.toISOString().split('T')[0],
-          departureCityId: departureAirport,
-          arrivalCityId: arrivalAirport,
+          startDate: formatDate(startDate),
+          endDate: formatDate(endDate),
+          departureCityId, // ✅ 변경된 부분 (departureAirport → departureCityId)
+          arrivalCityId, // ✅ 변경된 부분 (arrivalAirport → arrivalCityId)
         },
       });
-
       if (response.status === 200) {
         console.log('🔍 검색 결과:', response.data);
         navigate('/search-room', { state: { rooms: response.data } });
@@ -57,23 +67,22 @@ const SearchBar = () => {
       console.log('📌 요청 파라미터:', {
         startDate: startDate.toISOString().split('T')[0],
         endDate: endDate.toISOString().split('T')[0],
-        departureCityId: departureAirport,
-        arrivalCityId: arrivalAirport,
+        departureCityId,
+        arrivalCityId,
       });
       console.error('🚨 방 찾기 실패:', error);
       alert('🚨 방 찾기 중 오류가 발생했습니다.');
     }
   };
 
+  //----------------------------------------------
   // ✅ 방 만들기 버튼 클릭 시 로그인 여부 확인 후 동작
   const handleCreateRoom = async () => {
-    if (!isAuthenticated) {
-      alert('로그인이 필요합니다.');
-      navigate('/login'); // ✅ 로그인 페이지로 이동
-      return;
-    }
-
-    if (!startDate || !endDate || !departureAirport || !arrivalAirport) {
+    console.log('🚀 최종 출발 도시 ID:', departureCityId);
+    console.log('🚀 최종 도착 도시 ID:', arrivalCityId);
+    console.log('🚀 최종 출발일:', startDate);
+    console.log('🚀 최종 도착일:', endDate);
+    if (!startDate || !endDate || !arrivalCityId || !departureCityId) {
       alert('출발일, 돌아오는 날, 출발 공항, 도착 공항을 모두 선택해주세요.');
       return;
     }
@@ -190,23 +199,88 @@ const SearchBar = () => {
           </div>
 
           {/* ✅ 출발/도착 공항 선택 */}
-          <div className="flex space-x-4">
+          {/* <div className="flex space-x-4">
             <KoreaAirportSelector
               selectedAirport={departureAirport}
-              onChange={(e) => setDepartureAirport(e.target.value)}
+              onChange={(selectedCityId) => {
+                console.log('✅ 부모에서 받은 출발 cityId:', selectedCityId);
+                setDepartureCityId(selectedCityId); // ✅ 출발 도시 ID 설정
+              }}
             />
-            <WorldAirportSelector
+
+            <WorldAirportModal
               selectedAirport={arrivalAirport}
-              onChange={(selectedValue) => {
-                console.log(
-                  '✅ 부모 컴포넌트에서 받은 도착 공항 코드:',
-                  selectedValue,
-                );
-                setArrivalAirport(selectedValue);
+              onChange={(cityId) => {
+                console.log('✅ 부모에서 받은 도착 cityId:', cityId);
+                setArrivalCityId(cityId); // ✅ 도착 도시 ID 설정
+              }}
+            />
+          </div> */}
+
+          <div className="w-full max-w-3xl rounded-md">
+            <div className="space-y-6">
+              {/* 출발지 선택 */}
+              <div>
+                <label className="block mb-2 text-sm font-medium text-white">
+                  출발지
+                </label>
+                <div
+                  onClick={() => setIsKoreaModalOpen(true)}
+                  className="w-full px-4 py-2 text-white bg-transparent border border-white rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-gray-300"
+                >
+                  {departureCityId
+                    ? `출발지: ${departureCityId} (${departureAirport})`
+                    : '출발지 선택'}
+                </div>
+              </div>
+
+              {/* 도착지 선택 */}
+              <div>
+                <label className="block mb-2 text-sm font-medium text-white">
+                  도착지
+                </label>
+                <div
+                  onClick={() => setIsWorldModalOpen(true)}
+                  className="w-full px-4 py-2 text-white bg-transparent border border-white rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-gray-300"
+                >
+                  {arrivalCityId
+                    ? `도착지: ${arrivalCityId} (${arrivalAirport})`
+                    : '도착지 선택'}
+                </div>
+              </div>
+            </div>
+
+            {/* 출발지 모달 */}
+            <KoreaAirportModal
+              isOpen={isKoreaModalOpen}
+              onClose={() => setIsKoreaModalOpen(false)}
+              onSelect={(cityId, airportName) => {
+                setDepartureCityId(cityId);
+                setDepartureAirport(airportName);
+                setIsKoreaModalOpen(false);
+              }}
+            />
+
+            {/* 도착지 모달 */}
+            <WorldAirportModal
+              isOpen={isWorldModalOpen}
+              onClose={() => setIsWorldModalOpen(false)}
+              onSelect={(cityId, airportName) => {
+                if (!cityId) {
+                  console.error(
+                    '🚨 도착지 cityId가 없음! 전달된 값:',
+                    cityId,
+                    airportName,
+                  );
+                  return;
+                }
+                console.log('✅ 부모에서 받은 도착 cityId:', cityId);
+                setArrivalCityId(cityId);
+                setArrivalAirport(airportName);
+                setIsWorldModalOpen(false);
               }}
             />
           </div>
-
           {/* ✅ 검색하기 / 방 만들기 버튼 */}
           <div className="text-center">
             {searchType === 'findRoom' ? (

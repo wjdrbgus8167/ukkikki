@@ -25,12 +25,12 @@ const getThemeColor = (theme) => {
 
 const CardList = ({ cards }) => {
   const [imageUrls, setImageUrls] = useState({});
-  if (!Array.isArray(cards)) {
-    console.error('🚨 오류: cards가 배열이 아닙니다.', cards);
+
+  if (!Array.isArray(cards) || cards.length === 0) {
     return (
-      <p className="text-center text-red-500">
-        여행방 데이터를 불러오는 중 오류가 발생했습니다. <br />
-        잠시 후 다시 시도해 주세요.
+      <p className="text-center text-gray-500">
+        검색 결과가 없습니다. <br />
+        다른 조건으로 검색해보세요.
       </p>
     );
   }
