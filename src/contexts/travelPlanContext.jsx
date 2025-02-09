@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import { fetchUserProposals } from "../apis/agency";
+import { UserProposalslist } from "../apis/agency";
 
 const TravelPlanContext = createContext();
 
@@ -14,18 +14,17 @@ export const TravelPlanProvider = ({children, jwtToken}) => {
       setError(null);
 
       try{
-        const data = await fetchUserProposals(jwtToken);
-        setProposals(data);
+        const data = await UserProposalslist();
+        console.log("API 응답 데이터:", data);
+        setProposals(data.travelPlans);
       } catch(error) {
         setError('사용자 제안 목록을 불러오는 데 실패했습니다.');
         console.error(error);
       } 
     };
 
-    if(jwtToken) {
       getUserProposals();
-    }
-  }, [jwtToken])
+  },[]);
 
 
   return (

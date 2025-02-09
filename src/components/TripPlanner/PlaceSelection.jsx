@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Autocomplete, useJsApiLoader } from '@react-google-maps/api';
+import { Info, TabButton, SearchSection,Places } from './style/PlaceSelectionStyle';
 
 const libraries = ['places'];
 
@@ -127,36 +128,41 @@ const PlaceSelection = ({
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-2">{destinationCity}</h1>
-      <h3 className="text-lg mb-4">
-        {travelStart} ~ {travelEnd}
-      </h3>
-
-      {/* 탭 스위치 버튼 */}
-      <div className="flex mb-4">
+      <Info>
+        <h1> {destinationCity}</h1>
+        <h3>
+          {travelStart} ~ {travelEnd}
+        </h3>
+      </Info>
+  
+      <div>
+        {/* 탭 스위치 버튼 */}
+      
+      <TabButton>
         <button
-          onClick={() => setIsSearchMode(false)}
-          className={`flex-1 py-2 font-semibold ${
-            !isSearchMode
-              ? 'text-blue-500 border-b-2 border-blue-500'
-              : 'text-gray-500'
-          }`}
-        >
-          여행 장소 목록
-        </button>
-        <button
-          onClick={() => setIsSearchMode(true)}
-          className={`flex-1 py-2 font-semibold ${
-            isSearchMode
-              ? 'text-blue-500 border-b-2 border-blue-500'
-              : 'text-gray-500'
-          }`}
-        >
-          새로운 장소 검색
-        </button>
-      </div>
+            onClick={() => setIsSearchMode(false)}
+            className={`flex-1 py-2 font-semibold ${
+              !isSearchMode
+                ? 'text-blue-500 border-b-2 border-blue-500'
+                : 'text-gray-500'
+            }`}
+          >
+            여행 장소 목록
+          </button>
+          <button
+            onClick={() => setIsSearchMode(true)}
+            className={`flex-1 py-2 font-semibold ${
+              isSearchMode
+                ? 'text-blue-500 border-b-2 border-blue-500'
+                : 'text-gray-500'
+            }`}
+          >
+            새로운 장소 검색
+          </button>
+      </TabButton>
 
-      {/* "여행 장소 목록" 탭 */}
+      <Places>
+        {/* "여행 장소 목록" 탭 */}
       {!isSearchMode && (
         <>
           <h2 className="text-xl font-bold mb-4">여행 장소 목록</h2>
@@ -168,13 +174,13 @@ const PlaceSelection = ({
                   key={place.id}
                   className="flex justify-between items-center mb-2"
                 >
-                  <div className="flex items-start">
+                  <div className="flex items-center">
                     {/* 사진이 있으면 표시 */}
                     {place.photoUrl ? (
                       <img
                         src={place.photoUrl}
                         alt={place.name}
-                        className="w-20 h-20 object-cover mr-4"
+                        className="w-20 h-20 object-cover aspect-square mr-4"
                       />
                     ) : (
                       <div className="w-20 h-20 bg-gray-200 flex items-center justify-center mr-4">
@@ -216,32 +222,25 @@ const PlaceSelection = ({
       {/* "새로운 장소 검색" 탭 */}
       {isSearchMode && (
         <>
-          <h2 className="text-xl font-bold mb-4">장소 검색</h2>
+          <SearchSection>
+          <h2>장소 검색</h2>
           {isLoaded ? (
-            <Autocomplete
-              onLoad={(autocomplete) =>
-                (autocompleteRef.current = autocomplete)
-              }
-              onPlaceChanged={onPlaceChanged}
-            >
-              <input
-                type="text"
-                placeholder="장소 검색"
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-              />
+            <Autocomplete onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)} onPlaceChanged={onPlaceChanged}>
+              <input type="text" placeholder="장소 검색" />
             </Autocomplete>
           ) : (
             <p>지도 로딩중...</p>
           )}
+        </SearchSection>
 
           {/* 검색한 장소 표시 */}
           {searchedPlace && (
-            <div className="mt-4 p-3 border rounded-lg shadow flex items-start">
+            <div className="mt-4 p-3 border rounded-lg shadow flex items-center">
               {searchedPlace.photoUrl ? (
                 <img
                   src={searchedPlace.photoUrl}
                   alt={searchedPlace.name}
-                  className="w-24 h-24 object-cover mr-4"
+                  className="w-24 h-24 object-cover aspect-square mr-4"
                 />
               ) : (
                 <div className="w-24 h-24 bg-gray-200 flex items-center justify-center mr-4">
@@ -268,6 +267,10 @@ const PlaceSelection = ({
           )}
         </>
       )}
+      </Places>
+      </div>
+
+      
     </div>
   );
 };
