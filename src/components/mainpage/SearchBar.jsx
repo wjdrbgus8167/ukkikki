@@ -219,41 +219,38 @@ const SearchBar = () => {
 
           <div className="w-full max-w-3xl rounded-md">
             <div className="space-y-6">
-              {/* ✅ 출발/도착 공항 선택 */}
-              <div className="flex flex-col space-y-4">
-                {/* ✅ 출발지 선택 */}
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-white">
-                    출발지
-                  </label>
-                  <div
-                    onClick={() => setIsKoreaModalOpen(true)}
-                    className="w-full px-4 py-2 text-white bg-transparent border border-white rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-gray-300"
-                  >
-                    {departureCityId
-                      ? `출발지: ${departureCityId} (${departureAirport})`
-                      : '출발지 선택'}
-                  </div>
+              {/* 출발지 선택 */}
+              <div>
+                <label className="block mb-2 text-sm font-medium text-white">
+                  출발지
+                </label>
+                <div
+                  onClick={() => setIsKoreaModalOpen(true)}
+                  className="w-full px-4 py-2 text-white bg-transparent border border-white rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-gray-300"
+                >
+                  {departureCityId
+                    ? `출발지: ${departureCityId} (${departureAirport})`
+                    : '출발지 선택'}
                 </div>
+              </div>
 
-                {/* ✅ 도착지 선택 */}
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-white">
-                    도착지
-                  </label>
-                  <div
-                    onClick={() => setIsWorldModalOpen(true)}
-                    className="w-full px-4 py-2 text-white bg-transparent border border-white rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-gray-300"
-                  >
-                    {arrivalCityId
-                      ? `도착지: ${arrivalCityId} (${arrivalAirport})`
-                      : '도착지 선택'}
-                  </div>
+              {/* 도착지 선택 */}
+              <div>
+                <label className="block mb-2 text-sm font-medium text-white">
+                  도착지
+                </label>
+                <div
+                  onClick={() => setIsWorldModalOpen(true)}
+                  className="w-full px-4 py-2 text-white bg-transparent border border-white rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-gray-300"
+                >
+                  {arrivalCityId
+                    ? `도착지: ${arrivalCityId} (${arrivalAirport})`
+                    : '도착지 선택'}
                 </div>
               </div>
             </div>
 
-            {/* ✅ 출발지 모달 */}
+            {/* 출발지 모달 */}
             <KoreaAirportModal
               isOpen={isKoreaModalOpen}
               onClose={() => setIsKoreaModalOpen(false)}
@@ -264,14 +261,14 @@ const SearchBar = () => {
               }}
             />
 
-            {/* ✅ 도착지 모달 */}
+            {/* 도착지 모달 */}
             <WorldAirportModal
               isOpen={isWorldModalOpen}
               onClose={() => setIsWorldModalOpen(false)}
               onSelect={(cityId, airportName) => {
                 if (!cityId) {
                   console.error(
-                    '🚨 도착지 cityId가 없음! onSelect에서 전달된 값:',
+                    '🚨 도착지 cityId가 없음! 전달된 값:',
                     cityId,
                     airportName,
                   );
@@ -284,7 +281,6 @@ const SearchBar = () => {
               }}
             />
           </div>
-
           {/* ✅ 검색하기 / 방 만들기 버튼 */}
           <div className="text-center">
             {searchType === 'findRoom' ? (
