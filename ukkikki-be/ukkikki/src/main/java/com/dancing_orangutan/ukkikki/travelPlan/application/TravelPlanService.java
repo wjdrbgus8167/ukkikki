@@ -2,14 +2,16 @@ package com.dancing_orangutan.ukkikki.travelPlan.application;
 
 
 import com.dancing_orangutan.ukkikki.event.eventPublisher.SpringEventPublisher;
-import com.dancing_orangutan.ukkikki.event.travelPlanEvent.UpdatedHostEvent;
+import com.dancing_orangutan.ukkikki.event.travelPlanEvent.HostUpdatedEvent;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.*;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchSuggestedTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.keyword.KeywordEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.Host;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlan;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanInfo;
+import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.keyword.JpaKeywordRepository;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.memberTravelPlan.MemberTravelPlanFinder;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.memberTravelPlan.MemberTravelPlanModifier;
 import com.dancing_orangutan.ukkikki.travelPlan.mapper.TravelPlanMapper;
@@ -18,6 +20,8 @@ import com.dancing_orangutan.ukkikki.travelPlan.ui.response.*;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.travelPlan.TravelPlanRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,6 +37,7 @@ public class TravelPlanService {
 	private final MemberTravelPlanFinder memberTravelPlanFinder;
 	private final MemberTravelPlanModifier memberTravelPlanModifier;
 	private final SpringEventPublisher springEventPublisher;
+	private final JpaKeywordRepository jpaKeywordRepository;
 
 	@Transactional
 	public CreateTravelPlanResponse createTravelPlan(CreateTravelPlanCommand command) {
@@ -216,7 +221,7 @@ public class TravelPlanService {
 
 		travelPlanRepository.updateHost(domain);
 
-		springEventPublisher.publish(UpdatedHostEvent.builder()
+		springEventPublisher.publish(HostUpdatedEvent.builder()
 				.adultCount(domain.getHost().adultCount())
 				.childCount(domain.getHost().childCount())
 				.infantCount(domain.getHost().infantCount())
@@ -229,4 +234,17 @@ public class TravelPlanService {
 		TravelPlanEntity travelPlanEntity = travelPlanRepository.fetchTravelPlan(travelPlanId);
 		return FetchSuggestedTravelPlanDetailsResponse.toResponse(travelPlanEntity);
 	}
+
+    public GetKeywordsResponse getKeywords() {
+		List<KeywordEntity> keywordEntityList = jpaKeywordRepository.findAll();
+
+		return GetKeywordsResponse.builder()
+				.keywords(keywordEntityList.stream()
+						.map(entity -> GetKeywordsResponse.KeywordResponse.builder()
+								.id(entity.getKeywordId())
+								.name(entity.getName())
+								.build())
+						.collect(Collectors.toList()))
+				.build();
+    }
 }

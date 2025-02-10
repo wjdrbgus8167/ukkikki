@@ -7,11 +7,15 @@ import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchSuggested
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.request.*;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.response.CreateTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.response.*;
 import com.dancing_orangutan.ukkikki.travelPlan.application.TravelPlanService;
+<<<<<<< ukkikki-be/ukkikki/src/main/java/com/dancing_orangutan/ukkikki/travelPlan/ui/TravelPlanController.java
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.FetchSuggestedTravelPlansResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.JoinTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.SearchTravelPlanResponse;
+=======
+
+>>>>>>> ukkikki-be/ukkikki/src/main/java/com/dancing_orangutan/ukkikki/travelPlan/ui/TravelPlanController.java
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -148,4 +152,12 @@ public class TravelPlanController {
 	public ApiUtils.ApiResponse<Object> getTravelPlanDetails(@PathVariable(name = "travelPlanId") Integer travelPlanId) {
 		return ApiUtils.success(travelPlanService.fetchTravelPlanDetails(travelPlanId));
 	}
+
+	@GetMapping("/keywords")
+	public ApiUtils.ApiResponse<GetKeywordsResponse> getKeywords() {
+		GetKeywordsResponse response = travelPlanService.getKeywords();
+		return ApiUtils.success(response);
+	}
+
+
 }

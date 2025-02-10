@@ -37,7 +37,6 @@ public class PlaceController {
         // CreatePlaceCommand 생성 로깅
         log.debug("CreatePlaceCommand 생성됨 - {}", command);
 
-
         try {
             // PlaceService 호출 로깅
             log.info("PlaceService의 createPlace 호출 - {}", command);
