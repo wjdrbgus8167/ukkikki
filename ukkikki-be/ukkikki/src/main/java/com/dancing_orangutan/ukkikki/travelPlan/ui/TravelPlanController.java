@@ -1,6 +1,5 @@
 package com.dancing_orangutan.ukkikki.travelPlan.ui;
 
-import com.dancing_orangutan.ukkikki.event.eventPublisher.SpringEventPublisher;
 import com.dancing_orangutan.ukkikki.global.security.MemberUserDetails;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.*;
@@ -8,11 +7,9 @@ import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchSuggested
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.request.*;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.response.CreateTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.response.*;
 import com.dancing_orangutan.ukkikki.travelPlan.application.TravelPlanService;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.response.FetchSuggestedTravelPlanResponse;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.response.JoinTravelPlanResponse;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.response.SearchTravelPlanResponse;
+
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -144,4 +141,12 @@ public class TravelPlanController {
 		travelPlanService.updateHost(command);
 		return ApiUtils.success("인원이 성공적으로 변경되었습니다.");
 	}
+
+	@GetMapping("/keywords")
+	public ApiUtils.ApiResponse<GetKeywordsResponse> getKeywords() {
+		GetKeywordsResponse response = travelPlanService.getKeywords();
+		return ApiUtils.success(response);
+	}
+
+
 }
