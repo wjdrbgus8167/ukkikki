@@ -36,7 +36,9 @@ public class MemberUserDetails implements UserDetails {
 
     public String getName() { return memberEntity.getName(); }
 
-    public String getProfileImageUrl() { return memberEntity.getProfileImageUrl(); }
+    public String getProfileImageUrl() {
+        return memberEntity.getProfileImageUrl().equals("") ? "https://ukkikki-bucket.s3.ap-northeast-2.amazonaws.com/profile/ukkikki" + ((memberEntity.getMemberId() % 6) + 1) + ".png" : memberEntity.getProfileImageUrl();
+    }
 
 }
 
