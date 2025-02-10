@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
@@ -7,8 +7,7 @@ import InteractiveSection from '../components/userroom/InteractiveSection';
 
 const UserRoom = () => {
   const location = useLocation();
-  const selectedCard = location.state?.selectedCard; // ✅ 전달된 여행방 데이터
-  const travelPlanId = selectedCard?.id; // 여행방 ID
+  const selectedCard = location.state?.selectedCard; // 전달된 여행방 데이터
 
   if (!selectedCard) {
     return (
@@ -26,8 +25,7 @@ const UserRoom = () => {
     <div>
       <Header />
       <DashBoard selectedCard={selectedCard} />
-      <InteractiveSection selectedCard={selectedCard} />{' '}
-      {/* ✅ selectedCard 통째로 전달 */}
+      <InteractiveSection selectedCard={selectedCard} />
       <Footer />
     </div>
   );
