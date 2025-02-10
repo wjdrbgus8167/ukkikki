@@ -53,20 +53,18 @@ const TravelPackageCarousel = () => {
   };
   const handleViewDetails = async () => {
     try {
-      const response = await publicRequest.get('/travel-plans', {
-        headers: {
-          Accept: 'application/json', // ✅ JSON 응답을 기대함
-        },
-      });
-
-      if (!response.data || !Array.isArray(response.data)) {
+      const response = await publicRequest.get('/api/v1/travel-plans');
+      console.log('response', response);
+      if (!response.data || !Array.isArray(response.data.data.travelPlans)) {
         throw new Error('🚨 API 응답이 올바르지 않습니다.');
       }
 
-      console.log('✅ 여행방 데이터:', response.data);
+      console.log('✅ 여행방 데이터:', response.data.data.travelPlans);
 
       // ✅ API 응답 데이터를 `state`로 전달하면서 `search-room`으로 이동
-      navigate('/search-room', { state: { rooms: response.data } });
+      navigate('/search-room', {
+        state: { rooms: response.data.data.travelPlans },
+      });
     } catch (error) {
       console.error('🚨 여행방 전체 조회 실패:', error);
       alert('🚨 여행방 데이터를 불러오는 중 오류가 발생했습니다.');

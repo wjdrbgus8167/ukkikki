@@ -9,21 +9,22 @@ const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { user, setUser } = useAuthStore();
   const navigate = useNavigate();
-
+  const { isAuthenticated, logout } = useAuthStore();
   const handleLogout = async () => {
     try {
-      await publicRequest.post('api/v1/auth/logout');
+      // ✅ 백엔드로 로그아웃 요청 (쿠키 삭제)
+      const response = await publicRequest.post('/api/v1/auth/logout');
 
-      // Zustand persist 미들웨어에서 제공하는 clearStorage()를 호출하여 localStorage의 persisted state 삭제
-      useAuthStore.persist.clearStorage();
+      if (response.status === 200) {
+        console.log('✅ 로그아웃 성공:', response.data);
+        useAuthStore.getState().setUser(false);
 
-      // 상태 초기화
-      setUser(null);
-
-      // 페이지 리로드하여 로그인 상태 동기화
-      window.location.reload();
+        logout();
+        // ✅ 페이지 새로고침 없이 상태 업데이트 반영
+        navigate('/');
+      }
     } catch (error) {
-      console.error('로그아웃 실패:', error);
+      console.error('🚨 로그아웃 실패:', error);
     }
   };
 
