@@ -5,7 +5,6 @@ import Footer from '../components/layout/Footer';
 import HeroText from '../components/common/SloganText';
 import LoginForm from '../components/auth/LoginForm';
 import useAuthStore from '../stores/authStore';
-import { publicRequest } from '../hooks/requestMethod';
 
 import kakaoLogo from '../assets/icon.png';
 import googleLogo from '../assets/google.png';
