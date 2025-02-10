@@ -11,125 +11,146 @@ import java.util.List;
 import java.util.Objects;
 
 
-public record JoinTravelPlanResponse(List<Member> members, TravelPlan travelPlan, List<Message> messages) {
+public record JoinTravelPlanResponse(List<Member> members, TravelPlan travelPlan,
+									 List<Message> messages) {
 
 
-    private record Member(String name, boolean hostYn, int totalPeopleCount) {
-        @Builder
-        public Member {
+	private record Member(String name, boolean hostYn, int totalPeopleCount) {
 
-        }
-    }
+		@Builder
+		public Member {
 
-    private record TravelPlan(Integer travelPlanId, String name, City arrivalCity, City departureCity,
-                              LocalDate startDate, LocalDate endDate,
-                              int currentParticipants, List<Keyword> keywords, List<Place> places) {
-        @Builder
-        public TravelPlan {
-        }
-    }
+		}
+	}
 
-    private record City(Integer cityId, String name) {
-        @Builder
-        public City {
-        }
-    }
+	private record TravelPlan(Integer travelPlanId, String name, City arrivalCity,
+							  City departureCity,
+							  LocalDate startDate, LocalDate endDate, int minPeople, int maxPeople,
+							  int currentParticipants, List<Keyword> keywords, List<Place> places) {
 
-    private record Keyword(Integer keywordId, String name) {
-        @Builder
-        public Keyword {
-        }
-    }
+		@Builder
+		public TravelPlan {
+		}
+	}
 
-    private record Place(Integer placeId, String name, List<PlaceTag> tags, Integer likeCount, double latitude,
-                         double longitude, boolean likeYn) {
-        @Builder
-        public Place {
-        }
-    }
+	private record City(Integer cityId, String name) {
 
-    private record PlaceTag(Integer placeTagId, String name) {
+		@Builder
+		public City {
+		}
+	}
 
-        @Builder
-        public PlaceTag {
-        }
-    }
+	private record Keyword(Integer keywordId, String name) {
 
-    private record Message(String content, LocalDateTime createdAt) {
+		@Builder
+		public Keyword {
+		}
+	}
 
-        @Builder
-        public Message {
+	private record Place(Integer placeId, String name, List<PlaceTag> tags, Integer likeCount,
+						 double latitude,
+						 double longitude, boolean likeYn) {
 
-        }
-    }
+		@Builder
+		public Place {
+		}
+	}
 
-    @Builder
-    public JoinTravelPlanResponse {
+	private record PlaceTag(Integer placeTagId, String name) {
 
-    }
+		@Builder
+		public PlaceTag {
+		}
+	}
+
+	private record Message(String content, LocalDateTime createdAt) {
+
+		@Builder
+		public Message {
+
+		}
+	}
+
+	@Builder
+	public JoinTravelPlanResponse {
+
+	}
 
 
-    public static JoinTravelPlanResponse toResponse(final TravelPlanEntity entity, final Integer memberId) {
-        return JoinTravelPlanResponse.builder()
-                .travelPlan(
-                        TravelPlan.builder()
-                                .travelPlanId(entity.getTravelPlanId())
-                                .name(entity.getName())
-                                .arrivalCity(
-                                        City.builder()
-                                                .cityId(entity.getArrivalCity().getCityId())
-                                                .name(entity.getArrivalCity().getName())
-                                                .build()
-                                )
-                                .departureCity(
-                                        City.builder()
-                                                .cityId(entity.getDepartureCity().getCityId())
-                                                .name(entity.getDepartureCity().getName())
-                                                .build()
-                                )
-                                .startDate(entity.getStartDate())
-                                .endDate(entity.getEndDate())
-                                .currentParticipants(entity.getMemberTravelPlans().stream().mapToInt(
-                                        memberTravelPlanEntity -> memberTravelPlanEntity.getAdultCount() + memberTravelPlanEntity.getChildCount() + memberTravelPlanEntity.getInfantCount()
-                                ).sum())
-                                .keywords(
-                                        entity.getTravelPlanKeywords().stream()
-                                                .map(k -> Keyword.builder()
-                                                        .keywordId(k.getKeyword().getKeywordId())
-                                                        .name(k.getTravelPlan().getName())
-                                                        .build())
-                                                .toList()
-                                )
-                                .places(
-                                        entity.getPlaces().stream()
-                                                .map(p -> Place.builder()
-                                                        .placeId(p.getPlaceId())
-                                                        .name(p.getName())
-                                                        .tags(p.getPlaceTags().stream()
-                                                                .map(tag -> PlaceTag.builder()
-                                                                        .placeTagId(tag.getPlaceTagId())
-                                                                        .name(tag.getPlaceTagName())
-                                                                        .build())
-                                                                .toList())
-                                                        .likeCount(p.getLikes().stream()
-                                                                .mapToInt(LikeEntity::getLikesCnt)
-                                                                .sum())
-                                                        .latitude(p.getLatitude())
-                                                        .longitude(p.getLongitude())
-                                                        .likeYn(p.getLikes().stream()
-                                                                .anyMatch(like -> Objects.equals(like.getMember().getMemberId(), memberId)))
-                                                        .build())
-                                                .toList()
-                                )
-                                .build()
-                ).members(entity.getMemberTravelPlans().stream().map(
-                        memberTravelPlan -> Member.builder()
-                                .name(memberTravelPlan.getMember().getName())
-                                .hostYn(memberTravelPlan.isHostYn())
-                                .totalPeopleCount(memberTravelPlan.getAdultCount()+memberTravelPlan.getInfantCount()+memberTravelPlan.getChildCount())
-                                .build()
+	public static JoinTravelPlanResponse toResponse(final TravelPlanEntity entity,
+			final Integer memberId) {
+		return JoinTravelPlanResponse.builder()
+				.travelPlan(
+						TravelPlan.builder()
+								.travelPlanId(entity.getTravelPlanId())
+								.name(entity.getName())
+								.arrivalCity(
+										City.builder()
+												.cityId(entity.getArrivalCity().getCityId())
+												.name(entity.getArrivalCity().getName())
+												.build()
+								)
+								.departureCity(
+										City.builder()
+												.cityId(entity.getDepartureCity().getCityId())
+												.name(entity.getDepartureCity().getName())
+												.build()
+								)
+								.startDate(entity.getStartDate())
+								.endDate(entity.getEndDate())
+								.currentParticipants(
+										entity.getMemberTravelPlans().stream().mapToInt(
+												memberTravelPlanEntity ->
+														memberTravelPlanEntity.getAdultCount()
+																+ memberTravelPlanEntity.getChildCount()
+																+ memberTravelPlanEntity.getInfantCount()
+										).sum())
+								.minPeople(entity.getMinPeople())
+								.maxPeople(entity.getMaxPeople())
+								.keywords(
+										entity.getTravelPlanKeywords().stream()
+												.map(k -> Keyword.builder()
+														.keywordId(k.getKeyword().getKeywordId())
+														.name(k.getTravelPlan().getName())
+														.build())
+												.toList()
+								)
+								.places(
+										entity.getPlaces().stream()
+												.map(p -> Place.builder()
+														.placeId(p.getPlaceId())
+														.name(p.getName())
+														.tags(p.getPlaceTags().stream()
+																.map(tag -> PlaceTag.builder()
+																		.placeTagId(
+																				tag.getPlaceTagId())
+																		.name(tag.getPlaceTagName())
+																		.build())
+																.toList())
+														.likeCount(p.getLikes().stream()
+																.mapToInt(LikeEntity::getLikesCnt)
+																.sum())
+														.latitude(p.getLatitude())
+														.longitude(p.getLongitude())
+														.likeYn(p.getLikes().stream()
+																.anyMatch(like -> Objects.equals(
+																		like.getMember()
+																				.getMemberId(),
+																		memberId)))
+														.build())
+												.toList()
+								)
+								.build()
+				).members(entity.getMemberTravelPlans().stream().map(
+						memberTravelPlan -> Member.builder()
+								.name(memberTravelPlan.getMember().getName())
+								.hostYn(memberTravelPlan.isHostYn())
+								.totalPeopleCount(memberTravelPlan.getAdultCount()
+										+ memberTravelPlan.getInfantCount()
+										+ memberTravelPlan.getChildCount())
+								.build()
 
-                ).toList())
-                .build();
-    }
+				).toList())
+				.build();
+	}
 }
