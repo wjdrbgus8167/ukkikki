@@ -33,7 +33,7 @@ public class TravelPlanRepository {
 
 	private final MemberFinder memberFinder;
 
-	public TravelPlan save(final TravelPlan travelPlanDomain) {
+	public TravelPlanEntity save(final TravelPlan travelPlanDomain) {
 
 		CityEntity arrivalCity = cityFinder.getReferenceById(
 				travelPlanDomain.getTravelPlanInfo().arrivalCityId());
@@ -69,24 +69,7 @@ public class TravelPlanRepository {
 				travelPlanDomain.getHost().adultCount(), travelPlanDomain.getHost().childCount(),
 				travelPlanDomain.getHost().infantCount(), true);
 
-		TravelPlanEntity entity = jpaTravelPlanRepository.save(travelPlanEntity);
-
-		return TravelPlan.builder()
-				.travelPlanInfo(TravelPlanInfo.builder()
-						.name(entity.getName())
-						.departureCityId(entity.getDepartureCity().getCityId())
-						.maxPeople(entity.getMaxPeople())
-						.minPeople(entity.getMinPeople())
-						.arrivalCityId(entity.getArrivalCity().getCityId())
-						.planningStatus(entity.getPlanningStatus())
-						.startDate(entity.getStartDate())
-						.endDate(entity.getEndDate())
-						.keywords(entity.getTravelPlanKeywords()
-								.stream()
-								.map(travelPlanKeywordEntity -> travelPlanKeywordEntity.getKeyword().getKeywordId())
-								.toList())
-						.build())
-				.build();
+		return jpaTravelPlanRepository.save(travelPlanEntity);
 	}
 
 	public void joinTravelPlan(final TravelPlan travelPlanDomain) {
