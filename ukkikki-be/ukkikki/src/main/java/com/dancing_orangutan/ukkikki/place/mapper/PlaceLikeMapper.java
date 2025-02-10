@@ -15,4 +15,12 @@ public class PlaceLikeMapper {
                 .likeId(likeId)
                 .build();
     }
+
+    public static Like mapToDomain(LikeEntity likeEntity) {
+        return Like.builder()
+                .placeId(likeEntity.getLikeId().getPlaceId())
+                .creatorId(likeEntity.getLikeId().getMemberId())
+                .likeCount(likeEntity.getLikesCnt())
+                .build();
+    }
 }
