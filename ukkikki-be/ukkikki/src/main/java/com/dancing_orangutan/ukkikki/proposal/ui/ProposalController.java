@@ -7,10 +7,9 @@ import com.dancing_orangutan.ukkikki.proposal.application.ProposalService;
 import com.dancing_orangutan.ukkikki.proposal.application.command.*;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
 import com.dancing_orangutan.ukkikki.proposal.domain.schedule.Schedule;
-import com.dancing_orangutan.ukkikki.proposal.ui.request.CreateInquiryRequest;
-import com.dancing_orangutan.ukkikki.proposal.ui.request.CreateProposalRequest;
-import com.dancing_orangutan.ukkikki.proposal.ui.request.CreateScheduleRequest;
-import com.dancing_orangutan.ukkikki.proposal.ui.request.UpdateScheduleRequest;
+import com.dancing_orangutan.ukkikki.proposal.domain.traveler.Traveler;
+import com.dancing_orangutan.ukkikki.proposal.domain.traveler.TravelerEntity;
+import com.dancing_orangutan.ukkikki.proposal.ui.request.*;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.CreateInquiryResponse;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.InquiryListResponse;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.ProposalDetailResponse;
@@ -23,6 +22,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -132,4 +132,22 @@ public class ProposalController {
        return ApiUtils.success("일정이 변경되었습니다");
     }
 
+    // 확정 제안서에 관한 여행자 등록
+    @PostMapping("/{proposalId}/travelers")
+    public ApiUtils.ApiResponse<List<Traveler>> createTravelers(
+            @PathVariable Integer travelPlanId,
+            @PathVariable Integer proposalId,
+            @AuthenticationPrincipal MemberUserDetails memberUserDetails,
+            @Validated @RequestBody List<CreateTravelerRequest> requests) {
+
+        // 요청된 모든 여행자 정보를 CreateTravelerCommand로 변환
+        List<CreateTravelerCommand> command = requests.stream()
+                .map(request -> request.toCommand(travelPlanId, proposalId, memberUserDetails.getMemberId()))
+                .collect(Collectors.toList());
+
+        // 여러 여행자 등록
+        List<Traveler> travelers = proposalService.createTravelers(command);
+
+        return ApiUtils.success(travelers);
+    }
 }

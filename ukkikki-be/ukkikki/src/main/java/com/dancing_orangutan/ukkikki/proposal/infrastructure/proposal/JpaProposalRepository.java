@@ -1,5 +1,6 @@
 package com.dancing_orangutan.ukkikki.proposal.infrastructure.proposal;
 
+import com.dancing_orangutan.ukkikki.proposal.constant.ProposalStatus;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.ProposalEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,4 +16,8 @@ public interface JpaProposalRepository extends JpaRepository<ProposalEntity,Inte
     Optional<ProposalEntity> findByProposalIdAndCompany_CompanyId(Integer proposalId, Integer companyId);
 
     ProposalEntity findByProposalId(Integer proposalId);
+
+    Optional<ProposalEntity> findByProposalIdAndTravelPlan_TravelPlanIdAndProposalStatus(
+            Integer proposalId, Integer travelPlanId, ProposalStatus proposalStatus
+    );
 }
