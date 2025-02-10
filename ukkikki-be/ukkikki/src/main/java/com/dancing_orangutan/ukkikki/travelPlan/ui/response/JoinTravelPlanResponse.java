@@ -14,7 +14,7 @@ import java.util.Objects;
 public record JoinTravelPlanResponse(List<Member> members, TravelPlan travelPlan, List<Message> messages) {
 
 
-    private record Member(String name, String content, boolean hostYn, int totalPeopleCount) {
+    private record Member(String name, boolean hostYn, int totalPeopleCount) {
         @Builder
         public Member {
 
@@ -72,7 +72,7 @@ public record JoinTravelPlanResponse(List<Member> members, TravelPlan travelPlan
     public static JoinTravelPlanResponse toResponse(final TravelPlanEntity entity, final Integer memberId) {
         return JoinTravelPlanResponse.builder()
                 .travelPlan(
-                        JoinTravelPlanResponse.TravelPlan.builder()
+                        TravelPlan.builder()
                                 .travelPlanId(entity.getTravelPlanId())
                                 .name(entity.getName())
                                 .arrivalCity(
@@ -122,7 +122,14 @@ public record JoinTravelPlanResponse(List<Member> members, TravelPlan travelPlan
                                                 .toList()
                                 )
                                 .build()
-                )
+                ).members(entity.getMemberTravelPlans().stream().map(
+                        memberTravelPlan -> Member.builder()
+                                .name(memberTravelPlan.getMember().getName())
+                                .hostYn(memberTravelPlan.isHostYn())
+                                .totalPeopleCount(memberTravelPlan.getAdultCount()+memberTravelPlan.getInfantCount()+memberTravelPlan.getChildCount())
+                                .build()
+
+                ).toList())
                 .build();
     }
 }
