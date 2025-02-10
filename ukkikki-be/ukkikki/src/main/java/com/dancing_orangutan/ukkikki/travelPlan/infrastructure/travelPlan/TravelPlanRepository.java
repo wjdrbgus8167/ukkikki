@@ -83,11 +83,9 @@ public class TravelPlanRepository {
 				false);
 	}
 
-	public TravelPlanRead findAllByTravelPlanId(final Integer travelPlanId,
-			final Integer memberId) {
-		TravelPlanEntity travelPlanEntity = jpaTravelPlanRepository.findAllByTravelPlanId(
-				travelPlanId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 여행 계획입니다."));
-		return TravelPlanRead.fromEntity(travelPlanEntity, memberId);
+	public TravelPlanEntity findAllByTravelPlanId(final Integer travelPlanId) {
+        return jpaTravelPlanRepository.findAllByTravelPlanId(
+                travelPlanId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 여행 계획입니다."));
 	}
 
 	public List<TravelPlan> searchTravelPlan(final TravelPlan travelPlanDomain) {

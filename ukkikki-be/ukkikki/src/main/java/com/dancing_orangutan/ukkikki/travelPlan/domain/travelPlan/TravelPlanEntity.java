@@ -160,4 +160,5 @@ public class TravelPlanEntity {
 				.findFirst()
 				.orElseThrow(() -> new IllegalArgumentException("해당 멤버는 여행 계획에 포함되지 않습니다."));
 	}
+
 }

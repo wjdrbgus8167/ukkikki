@@ -7,14 +7,10 @@ import com.dancing_orangutan.ukkikki.travelPlan.application.command.*;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchSuggestedTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.keyword.KeywordEntity;
-import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.Host;
-import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlan;
-import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
-import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanInfo;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.*;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.keyword.JpaKeywordRepository;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.memberTravelPlan.MemberTravelPlanFinder;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.memberTravelPlan.MemberTravelPlanModifier;
-import com.dancing_orangutan.ukkikki.travelPlan.mapper.TravelPlanMapper;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.request.KeywordUi;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.*;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.travelPlan.TravelPlanRepository;
@@ -37,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class TravelPlanService {
 
 	private final TravelPlanRepository travelPlanRepository;
-	private final TravelPlanMapper travelPlanMapper;
 	private final MemberTravelPlanFinder memberTravelPlanFinder;
 	private final MemberTravelPlanModifier memberTravelPlanModifier;
 	private final SpringEventPublisher springEventPublisher;
@@ -96,10 +91,8 @@ public class TravelPlanService {
 			travelPlanRepository.joinTravelPlan(domain);
 		}
 
-		// 여행 계획 ID와 관련된 모든 데이터 조회
-		return travelPlanMapper.toJoinTravelResponse(
-				travelPlanRepository.findAllByTravelPlanId(command.getTravelPlanId(),
-						command.getMemberId()));
+		TravelPlanEntity entity = travelPlanRepository.findAllByTravelPlanId(command.getTravelPlanId());
+		return JoinTravelPlanResponse.toResponse(entity,command.getMemberId());
 	}
 
 	public SearchTravelPlanResponse searchTravelPlan(SearchTravelPlanQuery query) {
