@@ -1,4 +1,4 @@
-package com.dancing_orangutan.ukkikki.entity.info;
+package com.dancing_orangutan.ukkikki.geography.domain;
 
 import com.dancing_orangutan.ukkikki.geography.domain.CountryEntity;
 import jakarta.persistence.Column;

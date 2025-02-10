@@ -1,8 +1,10 @@
 package com.dancing_orangutan.ukkikki.geography.ui;
 
 import com.dancing_orangutan.ukkikki.geography.application.GeographyService;
+import com.dancing_orangutan.ukkikki.geography.application.query.FetchAirportsQuery;
 import com.dancing_orangutan.ukkikki.geography.application.query.FetchCitiesQuery;
 import com.dancing_orangutan.ukkikki.geography.application.query.FetchCountriesQuery;
+import com.dancing_orangutan.ukkikki.geography.ui.response.FetchAirportsResponse;
 import com.dancing_orangutan.ukkikki.geography.ui.response.FetchCitiesResponse;
 import com.dancing_orangutan.ukkikki.geography.ui.response.FetchContinentsResponse;
 import com.dancing_orangutan.ukkikki.geography.ui.response.FetchCountriesResponse;
@@ -44,5 +46,17 @@ public class GeographyController {
                 .continentId(continentId)
                 .build();
         return ApiUtils.success(geographyService.getCities(query));
+    }
+
+    @GetMapping("/continents/{continentId}/countries/{countryId}/cities/{cityId}")
+    public ApiUtils.ApiResponse<List<FetchAirportsResponse>> getAirports(
+            @PathVariable(name = "continentId") Integer continentId,
+            @PathVariable(name = "countryId") Integer countryId,
+            @PathVariable(name = "cityId") Integer cityId
+    ) {
+        FetchAirportsQuery query = FetchAirportsQuery.builder()
+                .cityId(cityId)
+                .build();
+        return ApiUtils.success(geographyService.getAirports(query));
     }
 }

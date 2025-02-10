@@ -2,13 +2,14 @@ package com.dancing_orangutan.ukkikki.travelPlan.application;
 
 
 import com.dancing_orangutan.ukkikki.event.eventPublisher.SpringEventPublisher;
-import com.dancing_orangutan.ukkikki.event.travelPlanEvent.UpdatedHostEvent;
+import com.dancing_orangutan.ukkikki.event.travelPlanEvent.HostUpdatedEvent;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.*;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchSuggestedTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.keyword.KeywordEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.Host;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlan;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanInfo;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.keyword.JpaKeywordRepository;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.memberTravelPlan.MemberTravelPlanFinder;
@@ -131,7 +132,7 @@ public class TravelPlanService {
 		);
 	}
 
-	public FetchSuggestedTravelPlanResponse fetchSuggestedTravelPlans(
+	public FetchSuggestedTravelPlansResponse fetchSuggestedTravelPlans(
 			FetchSuggestedTravelPlanQuery query) {
 		TravelPlan domain = TravelPlan.builder()
 				.travelPlanInfo(
@@ -140,11 +141,11 @@ public class TravelPlanService {
 								.build()
 				).build();
 
-		List<TravelPlan> travelPlans = travelPlanRepository.fetchTravelPlan(domain);
+		List<TravelPlan> travelPlans = travelPlanRepository.fetchTravelPlans(domain);
 
-		return new FetchSuggestedTravelPlanResponse(
+		return new FetchSuggestedTravelPlansResponse(
 				travelPlans.stream()
-						.map(travelPlan -> new FetchSuggestedTravelPlanResponse.FetchSuggestedTravelPlanInfo(
+						.map(travelPlan -> new FetchSuggestedTravelPlansResponse.FetchSuggestedTravelPlanInfo(
 								travelPlan.getTravelPlanInfo().travelPlanId(),
 								travelPlan.getTravelPlanInfo().name(),
 								travelPlan.getTravelPlanInfo().departureCityId(),
@@ -220,13 +221,18 @@ public class TravelPlanService {
 
 		travelPlanRepository.updateHost(domain);
 
-		springEventPublisher.publish(UpdatedHostEvent.builder()
+		springEventPublisher.publish(HostUpdatedEvent.builder()
 				.adultCount(domain.getHost().adultCount())
 				.childCount(domain.getHost().childCount())
 				.infantCount(domain.getHost().infantCount())
 				.memberId(domain.getHost().memberId())
 				.travelPlanId(domain.getTravelPlanInfo().travelPlanId())
 				.build());
+	}
+
+	public FetchSuggestedTravelPlanDetailsResponse fetchTravelPlanDetails(Integer travelPlanId) {
+		TravelPlanEntity travelPlanEntity = travelPlanRepository.fetchTravelPlan(travelPlanId);
+		return FetchSuggestedTravelPlanDetailsResponse.toResponse(travelPlanEntity);
 	}
 
     public GetKeywordsResponse getKeywords() {
@@ -241,5 +247,4 @@ public class TravelPlanService {
 						.collect(Collectors.toList()))
 				.build();
     }
-
 }

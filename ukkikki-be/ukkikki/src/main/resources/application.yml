@@ -17,13 +17,14 @@ spring:
   jpa:
     generate-ddl: 'true'
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         show_sql: true
         format_sql: true
         use_sql_comments: true
+    defer-datasource-initialization: true
 
   security:
     oauth2:
@@ -53,7 +54,7 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
+      host: ${REDIS_HOST}
       port: 6379
   cloud:
     aws:
@@ -64,7 +65,10 @@ spring:
         static: ap-northeast-2
       s3:
         bucket: ${AWS_S3_BUCKET_NAME}
-
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:data.sql
 
 logging:
   level:
@@ -78,5 +82,5 @@ jwt:
   refresh_expiration: 604800000
 
 app:
-  domain: ${REDIS_HOST:localhost}
+  domain: ${REDIS_HOST}
 

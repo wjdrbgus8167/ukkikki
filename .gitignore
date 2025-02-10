@@ -35,3 +35,17 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# QueryDSL 자동 생성 파일 무시
+**/generated/
+**/build/generated/
+**/out/production/generated/
+**/querydsl/
+
+# MapStruct 자동 생성 파일 무시
+**/build/generated/sources/annotationProcessor/
+**/out/production/classes/generated/
+**/generated-sources/
+**/generated-mappers/
+ukkikki-be/ukkikki/src/main/generated/
+
