@@ -5,21 +5,23 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 public class Like {
 
     private Integer creatorId;
     private Integer placeId;
     private Integer travelPlanId;
-    private int likeCount;
+    private int likeCount = 0;
 
     @Builder
     public Like(Integer creatorId, Integer placeId,
-                Integer travelPlanId) {
+                Integer travelPlanId, int likeCount) {
         this.creatorId = creatorId;
         this.placeId = placeId;
         this.travelPlanId = travelPlanId;
-        this.likeCount = 0;
+        this.likeCount = likeCount;
     }
 
     /**
@@ -36,4 +38,17 @@ public class Like {
         totalCount += memberTravelPlanEntity.getInfantCount();
         this.likeCount = totalCount;
     }
+
+    /**
+     * Checks whether a specific member has already liked a specific place.
+     *
+     * @param creatorId The ID of the member.
+     * @param placeId   The ID of the place.
+     * @return true if the member has already liked the place, false otherwise.
+     */
+    public static boolean hasDuplicateLike(Integer creatorId, Integer placeId, List<Like> existingLikes) {
+        return existingLikes.stream()
+                .anyMatch(like -> like.getCreatorId().equals(creatorId) && like.getPlaceId().equals(placeId));
+    }
+
 }

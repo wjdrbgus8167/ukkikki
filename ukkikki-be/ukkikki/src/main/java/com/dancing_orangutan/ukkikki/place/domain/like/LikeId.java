@@ -5,11 +5,13 @@ import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Embeddable
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class LikeId implements Serializable {
 
 	@Column
