@@ -24,8 +24,10 @@ const UserRoom = () => {
   return (
     <div>
       <Header />
-      <DashBoard selectedCard={selectedCard} />
-      <InteractiveSection selectedCard={selectedCard} />
+      <div className="container px-4 py-8 mx-auto">
+        <DashBoard selectedCard={selectedCard} />
+        <InteractiveSection selectedCard={selectedCard} />
+      </div>
       <Footer />
     </div>
   );

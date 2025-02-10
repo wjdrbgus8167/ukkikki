@@ -40,11 +40,13 @@ const TravelPackageCarousel = () => {
     speed: 500,
     slidesToShow: 3,
     slidesToScroll: 1,
+    autoplay: true, // 자동 재생 활성화
+    autoplaySpeed: 3000, // 3초 간격
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
     responsive: [
       {
-        breakpoint: 768, // 태블릿 이하에서는 1개씩만 표시
+        breakpoint: 768,
         settings: {
           slidesToShow: 1,
         },
