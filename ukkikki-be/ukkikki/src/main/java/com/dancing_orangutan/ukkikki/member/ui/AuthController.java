@@ -8,8 +8,8 @@ import com.dancing_orangutan.ukkikki.member.ui.request.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 @RequiredArgsConstructor
 @RestController
@@ -23,7 +23,7 @@ public class AuthController {
      */
     @PostMapping("/members/register")
 
-    public ResponseEntity<ApiUtils.ApiResponse> memberRegister(@RequestBody MemberRegisterRequest request){
+    public ApiUtils.ApiResponse<?> memberRegister(@RequestBody MemberRegisterRequest request){
 
         MemberRegisterCommand command = MemberRegisterCommand.builder()
                 .name(request.getName())
@@ -34,19 +34,19 @@ public class AuthController {
 
         authService.memberRegister(command);
 
-        return ResponseEntity.ok(
-                ApiUtils.success("회원가입이 완료되었습니다.")
-        );
+        return ApiUtils.success("회원가입이 완료되었습니다.");
+
     }
 
     /**
      *  일반 사용자 이메일 로그인
      */
     @PostMapping("/members/login")
-    public ResponseEntity<ApiUtils.ApiResponse> memberLogin(
+    public ApiUtils.ApiResponse<?> memberLogin(
             @RequestBody MemberLoginRequest request,
             HttpServletResponse response
     ) {
+
         MemberLoginCommand command = MemberLoginCommand.builder()
                 .email(request.getEmail())
                 .password(request.getPassword())
@@ -56,16 +56,15 @@ public class AuthController {
         CookieUtils.addAccessTokenCookie(response, tokens.accessToken());
         CookieUtils.addRefreshTokenCookie(response, tokens.refreshToken());
 
-        return ResponseEntity.ok(
-                ApiUtils.success("로그인이 완료되었습니다.")
-        );
+        return ApiUtils.success("로그인이 완료되었습니다.");
+
     }
 
     /**
      * 여행사 회원가입
      */
     @PostMapping("/companies/register")
-    public ResponseEntity<ApiUtils.ApiResponse<?>> companyRegister(@RequestBody CompanyRegisterRequest request) {
+    public ApiUtils.ApiResponse<?> companyRegister(@RequestBody CompanyRegisterRequest request) {
 
         CompanyRegisterCommand command = CompanyRegisterCommand.builder()
                 .email(request.getEmail())
@@ -79,16 +78,14 @@ public class AuthController {
 
         authService.companyRegister(command);
 
-        return ResponseEntity.ok(
-                ApiUtils.success("회원가입이 완료되었습니다.")
-        );
+        return ApiUtils.success("회원가입이 완료되었습니다.");
     }
 
     /**
      * 여행사 로그인
      */
     @PostMapping("/companies/login")
-    public ResponseEntity<ApiUtils.ApiResponse<?>> companyLogin(
+    public ApiUtils.ApiResponse<?> companyLogin(
             @RequestBody CompanyLoginRequest request,
             HttpServletResponse response
     ) {
@@ -101,23 +98,21 @@ public class AuthController {
         CookieUtils.addAccessTokenCookie(response, tokens.accessToken());
         CookieUtils.addRefreshTokenCookie(response, tokens.refreshToken());
 
-        return ResponseEntity.ok(
-                ApiUtils.success("로그인이 완료되었습니다.")
-        );
+        return ApiUtils.success("로그인이 완료되었습니다.");
     }
 
     @PostMapping("/token/refresh")
-    public ResponseEntity<ApiUtils.ApiResponse<?>> refreshAccessToken(
-            HttpServletRequest request)
+    public ApiUtils.ApiResponse<?> refreshAccessToken(
+            HttpServletRequest request,
+            HttpServletResponse response
+    )
     {
         RefreshAccessTokenCommand command = RefreshAccessTokenCommand.builder()
                 .refreshToken(CookieUtils.getRefreshToken(request))
                 .build();
 
-        authService.refreshAccessToken(command);
-        return ResponseEntity.ok(
-                ApiUtils.success("토큰이 재발급 되었습니다.")
-        );
+        CookieUtils.addAccessTokenCookie(response, authService.refreshAccessToken(command));
+        return ApiUtils.success("토큰이 재발급 되었습니다.");
     }
 
 }

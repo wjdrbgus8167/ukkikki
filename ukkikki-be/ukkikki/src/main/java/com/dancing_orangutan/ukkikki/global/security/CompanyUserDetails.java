@@ -32,4 +32,11 @@ public class CompanyUserDetails implements UserDetails {
     public Integer getCompanyId() {
         return companyEntity.getCompanyId();
     }
+
+    public String getEmail() {return companyEntity.getEmail();}
+    public String getCeoName() {return companyEntity.getCeoName();}
+    public String getCompanyName() {return companyEntity.getCompanyName();}
+    public String getBusinessRegistrationNumber() {return companyEntity.getBusinessRegistrationNumber();}
+    public String getPhoneNumber() {return companyEntity.getPhoneNumber();}
+    public String getProfileImageUrl() {return companyEntity.getProfileImageUrl().equals("")? "https://ukkikki-bucket.s3.ap-northeast-2.amazonaws.com/profile/%EC%97%AC%ED%96%89%EC%82%AC.png":companyEntity.getProfileImageUrl();}
 }
