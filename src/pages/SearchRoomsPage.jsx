@@ -10,21 +10,18 @@ const SearchRoom = () => {
   const navigate = useNavigate(); // 여기서 navigate를 선언합니다.
 
   console.log('🔍 location.state:', location.state); // ✅ 추가
-  const rooms = location.state?.rooms?.travelPlans || [];
 
-  // 만약 아래 navigate 호출이 필요한 경우 (주의: 컴포넌트 렌더링 중 호출하면 무한 루프 등 부작용 발생 가능)
-  // navigate('/search-room', {
-  //   state: { travelPlan: response.data.data.travelPlan },
-  // });
+  // 수정: travelPlans 프로퍼티 없이 바로 rooms 배열 사용
+  const rooms = location.state.rooms.travelPlans || [];
 
   // 🚀 디버깅 로그
   console.log('✅ rooms 데이터 확인:', rooms);
-  console.log('✅ travelPlans 데이터:', location.state?.rooms?.travelPlans);
-  console.log('✅ rooms 데이터 확인:', rooms); // ✅ 추가
 
-  const [filteredRooms, setFilteredRooms] = useState(rooms); // ✅ 초기값을 API 데이터로 설정
+  // 필터링 결과를 관리하는 상태 (초기값을 rooms 배열로 설정)
+  const [filteredRooms, setFilteredRooms] = useState(rooms);
+
   const handleFilter = (themes, states) => {
-    let filtered = rooms; // cards 대신 rooms로 변경
+    let filtered = rooms; // 원본 데이터인 rooms를 사용
 
     if (!themes.includes('전체보기')) {
       filtered = filtered.filter((room) =>
@@ -44,7 +41,8 @@ const SearchRoom = () => {
       <Header />
       <div className="flex flex-1">
         <Sidebar onFilter={handleFilter} />
-        <CardList cards={rooms} />
+        {/* 필터링된 결과 사용 */}
+        <CardList cards={filteredRooms} />
       </div>
       <Footer />
     </div>

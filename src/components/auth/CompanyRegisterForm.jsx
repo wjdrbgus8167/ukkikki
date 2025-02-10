@@ -14,7 +14,7 @@ const CompanyRegisterForm = () => {
     confirmPassword: '',
     companyName: '',
     businessRegistrationNumber: '',
-    companyPhone: '', // ❗ 혹은 phoneNumber 이름으로 사용할 때는 맞춰주세요
+    companyPhone: '',
   });
   const [errorMessage, setErrorMessage] = useState('');
   const [businessCheckResult, setBusinessCheckResult] = useState(null);

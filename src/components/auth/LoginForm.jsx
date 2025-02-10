@@ -16,7 +16,7 @@ const LoginForm = ({ isCompany }) => {
       // isCompany에 따라 로그인 API 경로 변경
       const loginEndpoint = isCompany
         ? 'api/v1/auth/companies/login' // 기업 로그인 API
-        : 'api/v1/auth/members/login'; // 일반 사용자 로그인 API
+        : '/api/v1/auth/members/login'; // 일반 사용자 로그인 API
 
       const response = await publicRequest.post(loginEndpoint, {
         email,
