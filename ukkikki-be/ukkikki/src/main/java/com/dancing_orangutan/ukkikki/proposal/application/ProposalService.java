@@ -268,7 +268,8 @@ public class ProposalService {
     public CreateVoteSurveyResponse createVoteSurvey(CreateVoteSurveyCommand command) {
 
         // 여행 계획(travelPlanId) 존재 여부 확인
-        MemberTravelPlanEntity memberTravelPlan = memberTravelPlanFinder.findByTravelPlanIdAndMemberId(command.getMemberId(),command.getTravelPlanId());
+        MemberTravelPlanEntity memberTravelPlan = memberTravelPlanFinder
+                .findByTravelPlanIdAndMemberId(command.getTravelPlanId(), command.getMemberId());
 
         if(memberTravelPlan==null){
             throw new EntityNotFoundException("해당 일정을 찾을 수 없습니다.");
@@ -276,7 +277,7 @@ public class ProposalService {
 
         // memberId가 해당 여행 계획의 호스트인지 확인
         if (!memberTravelPlan.isHostYn()) {
-            throw new IllegalArgumentException("투표를 시작할 권한이 없습니다.");
+            throw new IllegalArgumentException("투표를 시작할 권한이 없습니다 방장만 투표를 시작할 수 있습니다.");
         }
 
         // 투표 설문 생성 (현재 시간 기준 +72시간 설정)
@@ -292,7 +293,7 @@ public class ProposalService {
         return CreateVoteSurveyResponse.builder()
                 .surveyStartTime(voteSurvey.getSurveyStartTime())
                 .surveyEndTime(voteSurvey.getSurveyEndTime())
-                .travelPlanId(voteSurvey.getTravelPlanId())
+                .travelPlanId(memberTravelPlan.getTravelPlan().getTravelPlanId())
                 .build();
 
     }

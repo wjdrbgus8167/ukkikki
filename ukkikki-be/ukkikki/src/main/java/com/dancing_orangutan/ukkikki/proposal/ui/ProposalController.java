@@ -22,6 +22,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -138,15 +139,19 @@ public class ProposalController {
     public ApiUtils.ApiResponse<CreateVoteSurveyResponse> voteSurvey(
             @PathVariable Integer travelPlanId,
             @PathVariable Integer proposalId,
-            @AuthenticationPrincipal MemberUserDetails memberUserDetails,
-            @Validated @RequestBody CreateVoteSurveyRequest request
+            @AuthenticationPrincipal MemberUserDetails memberUserDetails
     ){
+        CreateVoteSurveyCommand command =CreateVoteSurveyCommand.builder()
+                .surveyStartTime(LocalDateTime.now())
+                .surveyEndTime(LocalDateTime.now().plusHours(72))
+                .travelPlanId(travelPlanId)
+                .proposalId(proposalId)
+                .memberId(memberUserDetails.getMemberId())
+                .build();
 
-        CreateVoteSurveyCommand command = request.toCommand(travelPlanId,proposalId,memberUserDetails.getMemberId());
+        CreateVoteSurveyResponse response = proposalService.createVoteSurvey(command);
 
-        CreateVoteSurveyResponse reponse = proposalService.createVoteSurvey(command);
-
-        return ApiUtils.success(reponse);
+        return ApiUtils.success(response);
     }
     // 확정 제안서에 관한 여행자 등록
     @PostMapping("/{proposalId}/travelers")
