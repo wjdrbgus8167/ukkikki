@@ -5,13 +5,14 @@ import { AgencyProposalDetail } from "../apis/agency";
 const ProposalDetailContext = createContext();
 
 export const ProposalDetailProvider = ({children, travelPlanId}) => {
-  const [proposals, setProposals ] = useState([]);
+  const [proposal, setProposals ] = useState(null);
   const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     const fetchProposalData = async() => {
       try {
         const data = await AgencyProposalDetail(travelPlanId);
+        console.log('context:',data.data)
         setProposals(data);
 
         if (data.users) {
@@ -28,7 +29,7 @@ export const ProposalDetailProvider = ({children, travelPlanId}) => {
   },[travelPlanId]);
 
   return (
-    <ProposalDetailContext.Provider value={{proposals,totalCount}}>
+    <ProposalDetailContext.Provider value={{proposal,totalCount}}>
       {children}
     </ProposalDetailContext.Provider>
   );
