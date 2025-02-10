@@ -22,7 +22,6 @@ const KoreaAirportModal = ({ isOpen, onClose, onSelect }) => {
 
   useEffect(() => {
     if (!selectedCity) return;
-
     const fetchAirports = async () => {
       try {
         const response = await publicRequest.get(
@@ -40,7 +39,7 @@ const KoreaAirportModal = ({ isOpen, onClose, onSelect }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="p-6 bg-white rounded-md w-96">
+      <div className="relative p-6 bg-white rounded-md w-96">
         <h2 className="mb-4 text-xl font-bold">출발지 선택</h2>
         <button
           onClick={onClose}
@@ -48,7 +47,6 @@ const KoreaAirportModal = ({ isOpen, onClose, onSelect }) => {
         >
           ❌
         </button>
-
         {/* 도시 선택 */}
         {!selectedCity ? (
           <div className="grid grid-cols-2 gap-2">
@@ -68,7 +66,10 @@ const KoreaAirportModal = ({ isOpen, onClose, onSelect }) => {
             {airports.map((airport) => (
               <button
                 key={airport.airportCode}
-                onClick={() => onSelect(selectedCity, airport.name)}
+                onClick={() =>
+                  // 추가: airport.airportCode도 함께 전달
+                  onSelect(selectedCity, airport.name, airport.airportCode)
+                }
                 className="p-2 bg-gray-200 rounded-md"
               >
                 {airport.name}

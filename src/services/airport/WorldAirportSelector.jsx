@@ -63,7 +63,7 @@ const WorldAirportModal = ({ isOpen, onClose, onSelect }) => {
         const response = await publicRequest.get(
           `/api/v1/geography/continents/${selectedContinent}/countries/${selectedCountry}/cities/${selectedCity}`,
         );
-        // 매핑: 응답 데이터의 각 공항 객체에 selectedCity를 cityId로 추가
+        // 각 공항 객체에 selectedCity를 cityId로 추가 (원하는 경우)
         const airportsData = (response.data.data || []).map((airport) => ({
           ...airport,
           cityId: selectedCity,
@@ -91,8 +91,8 @@ const WorldAirportModal = ({ isOpen, onClose, onSelect }) => {
       console.error('🚨 선택된 공항의 cityId가 없음:', airport);
       return;
     }
-    // 버튼 클릭 시 기본 동작 방지를 위해 type="button"을 사용한 경우 새로고침이 발생하지 않음
-    onSelect(airport.cityId, airport.name);
+    // onSelect에 airport.cityId, airport.name, airport.airportCode 전달
+    onSelect(airport.cityId, airport.name, airport.airportCode);
     onClose();
   };
 
@@ -100,10 +100,10 @@ const WorldAirportModal = ({ isOpen, onClose, onSelect }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="p-6 bg-white rounded-md w-96">
+      <div className="relative p-6 bg-white rounded-md w-96">
         <h2 className="mb-4 text-xl font-bold">도착지 선택</h2>
         <button
-          type="button" // type="button" 추가하여 submit 방지
+          type="button"
           onClick={onClose}
           className="absolute text-gray-500 top-3 right-3"
         >
@@ -200,7 +200,7 @@ const WorldAirportModal = ({ isOpen, onClose, onSelect }) => {
             <div className="grid grid-cols-2 gap-2">
               {airports.map((airport) => (
                 <button
-                  type="button" // 추가: submit 방지
+                  type="button"
                   key={airport.airportCode}
                   onClick={() => handleSelectAirport(airport)}
                   className="p-2 bg-gray-200 rounded-md"

@@ -19,7 +19,7 @@ const LoginPage = () => {
   const { user, setUser } = useAuthStore();
   const [isCompany, setIsCompany] = useState(false);
 
-  // ✅ OAuth 로그인 후 리디렉션된 경우 처리
+  // OAuth 로그인 후 리디렉션된 경우 처리
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
@@ -44,7 +44,7 @@ const LoginPage = () => {
           <div className="w-full max-w-md p-6 bg-white shadow-lg rounded-xl">
             <img src={logo} className="w-48 h-auto mx-auto my-6" alt="로고" />
 
-            {/* ✅ 일반 유저 / 여행사 스위치 버튼 추가 ✅ */}
+            {/* 일반 유저 / 여행사 스위치 버튼 */}
             <div className="flex items-center justify-center mb-6">
               <span
                 className={`text-sm font-semibold transition-colors ${
@@ -74,7 +74,7 @@ const LoginPage = () => {
               </span>
             </div>
 
-            {/* ✅ `isCompany` 값 전달하여 로그인 폼 변경 ✅ */}
+            {/* 로그인 폼 */}
             <LoginForm isCompany={isCompany} />
 
             {!user && (
@@ -109,6 +109,19 @@ const LoginPage = () => {
                     카카오 계정으로 로그인하기
                   </span>
                 </button>
+                {/* 카카오 로그인 버튼 밑에 회원가입 링크 추가 */}
+                <div className="flex items-center justify-center mt-4 space-x-2">
+                  <Link to="/signup" className="text-gray-600 hover:underline">
+                    이메일로 회원가입
+                  </Link>
+                  <span className="text-gray-400">|</span>
+                  <Link
+                    to="/signup?type=company"
+                    className="text-blue-500 hover:underline"
+                  >
+                    기업으로 회원가입하기
+                  </Link>
+                </div>
               </div>
             )}
           </div>

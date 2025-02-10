@@ -12,10 +12,12 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
-      await publicRequest.post('/auth/logout', {}, {});
+      await publicRequest.post('api/v1/auth/logout');
 
-      // 상태 초기화 및 쿠키 삭제
-      localStorage.removeItem('accessToken');
+      // Zustand persist 미들웨어에서 제공하는 clearStorage()를 호출하여 localStorage의 persisted state 삭제
+      useAuthStore.persist.clearStorage();
+
+      // 상태 초기화
       setUser(null);
 
       // 페이지 리로드하여 로그인 상태 동기화
