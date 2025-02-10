@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import useRoomModal from './useRoomModal'; // ➀ 커스텀 훅 import
 import RoomModal from './RoomModal';
+import logo from '../../assets/loading-spinner.png';
+import { useNavigate } from 'react-router-dom'; // ✅ 메인페이지 이동을 위한 useNavigate 추가
 
 const apiKey = import.meta.env.VITE_APP_UNSPLASH_API_KEY;
 const statusMap = {
@@ -30,13 +32,30 @@ const getThemeColor = (theme) => {
 
 const CardList = ({ cards }) => {
   const [imageUrls, setImageUrls] = useState({});
+  const navigate = useNavigate(); // ✅ 메인페이지 이동을 위한 훅 사용
 
   if (!Array.isArray(cards) || cards.length === 0) {
     return (
-      <p className="text-center text-gray-500">
-        검색 결과가 없습니다. <br />
-        다른 조건으로 검색해보세요.
-      </p>
+      <div className="flex flex-col items-center justify-center w-full h-full mt-16 space-y-4">
+        {/* 바나나 로고 */}
+        <img
+          src={logo} // ✅ 바나나 로고 경로 수정 필요
+          alt="바나나 로고"
+          className="w-16 h-16"
+        />
+        {/* 검색 결과가 없다는 메시지 */}
+        <p className="text-center text-gray-500">
+          검색 결과가 없습니다. <br />
+          다른 조건으로 검색해보세요.
+        </p>
+        {/* 메인페이지로 가기 버튼 */}
+        <button
+          onClick={() => navigate('/')} // ✅ 메인페이지로 이동
+          className="px-4 py-2 mt-4 text-white rounded-md bg-brown hover:bg-yellow hover:text-brown hover:font-bold"
+        >
+          메인페이지로 가기
+        </button>
+      </div>
     );
   }
 
@@ -133,7 +152,7 @@ const CardList = ({ cards }) => {
               </div>
 
               {/* 여행 날짜 */}
-              <p className="text-gray-600">
+              <p className="text-black">
                 <strong>여행 날짜:</strong> {card.startDate} ~ {card.endDate}
               </p>
 
@@ -144,9 +163,11 @@ const CardList = ({ cards }) => {
                   card.keywords.map((keyword, idx) => (
                     <span
                       key={idx}
-                      className="px-3 py-1 text-sm font-semibold text-white bg-gray-500 rounded-full"
+                      className={`px-3 py-1 text-sm font-semibold rounded-full ${getThemeColor(
+                        keyword.name,
+                      )}`}
                     >
-                      {keyword.keywordId}
+                      {keyword.name}
                     </span>
                   ))
                 ) : (

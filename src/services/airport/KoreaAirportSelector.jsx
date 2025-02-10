@@ -38,47 +38,58 @@ const KoreaAirportModal = ({ isOpen, onClose, onSelect }) => {
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 flex items-center justify-center bg-opacity-50 bg-dark-green"
-      onClick={onClose} // 바깥 영역 클릭 시 모달 닫기
-    >
-      <div className="relative p-6 bg-white rounded-md w-96">
-        <h2 className="mb-4 text-xl font-bold">출발지 선택</h2>
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 animate-fadeIn">
+      <div className="relative p-8 transition-all duration-300 transform scale-100 bg-white shadow-2xl rounded-xl w-96">
+        <h2 className="mb-6 text-2xl font-bold text-center text-gray-800">
+          출발지 선택
+        </h2>
         <button
+          type="button"
           onClick={onClose}
-          className="absolute text-gray-500 top-3 right-3"
+          className="absolute text-gray-500 top-3 right-3 hover:text-gray-700 focus:outline-none"
         >
           ❌
         </button>
-        {/* 도시 선택 */}
+
+        {/* 1단계: 도시 선택 */}
         {!selectedCity ? (
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-4">
             {cities.map((city) => (
               <button
                 key={city.cityId}
                 onClick={() => setSelectedCity(city.cityId)}
-                className="p-2 bg-gray-200 rounded-md"
+                className="p-3 transition-colors bg-gray-200 rounded-lg hover:bg-gray-300"
               >
                 {city.name}
               </button>
             ))}
           </div>
         ) : (
-          // 공항 선택
-          <div className="grid grid-cols-2 gap-2">
-            {airports.map((airport) => (
-              <button
-                key={airport.airportCode}
-                onClick={() =>
-                  // 추가: airport.airportCode도 함께 전달
-                  onSelect(selectedCity, airport.name, airport.airportCode)
-                }
-                className="p-2 bg-gray-200 rounded-md"
-              >
-                {airport.name}
-              </button>
-            ))}
-          </div>
+          <>
+            {/* 2단계: 공항 선택 */}
+            <button
+              type="button"
+              onClick={() => setSelectedCity('')}
+              className="mb-4 text-blue-500 hover:underline"
+            >
+              ⬅️ 뒤로
+            </button>
+            <div className="grid grid-cols-2 gap-4">
+              {airports.map((airport) => (
+                <button
+                  type="button"
+                  key={airport.airportCode}
+                  onClick={() => {
+                    onSelect(selectedCity, airport.name, airport.airportCode);
+                    onClose();
+                  }}
+                  className="p-3 transition-colors bg-gray-200 rounded-lg hover:bg-gray-300"
+                >
+                  {airport.name}
+                </button>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

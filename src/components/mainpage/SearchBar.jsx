@@ -7,7 +7,6 @@ import axios from 'axios';
 import KoreaAirportModal from '../../services/airport/KoreaAirportSelector';
 import WorldAirportModal from '../../services/airport/WorldAirportSelector';
 import CreateRoomModal from './CreateRoomModal';
-import { useCookies } from 'react-cookie';
 import { publicRequest } from '../../hooks/requestMethod';
 const SearchBar = () => {
   const [startDate, setStartDate] = useState(null);
@@ -20,6 +19,9 @@ const SearchBar = () => {
   const [departureCityId, setDepartureCityId] = useState('');
   const [isKoreaModalOpen, setIsKoreaModalOpen] = useState(false);
   const [isWorldModalOpen, setIsWorldModalOpen] = useState(false);
+  const [arrivalCityName, setArrivalCityName] = useState('');
+  const [departureCityName, setDepartureCityName] = useState('');
+
   const navigate = useNavigate();
 
   const API_KEY = import.meta.env.VITE_APP_AIRPORT_API_KEY;
@@ -221,10 +223,10 @@ const SearchBar = () => {
           </div>
 
           <div className="w-full max-w-3xl rounded-md">
-            <div className="space-y-6">
+            <div className="flex space-x-4 ">
               {/* 출발지 선택 */}
-              <div>
-                <label className="block mb-2 text-sm font-medium text-white">
+              <div className="w-1/2">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
                   출발지
                 </label>
                 <div
@@ -232,14 +234,14 @@ const SearchBar = () => {
                   className="w-full px-4 py-2 text-white bg-transparent border border-white rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-gray-300"
                 >
                   {departureCityId
-                    ? `출발지: ${departureCityId} (${departureAirport})`
+                    ? `출발지: ${departureCityName} (${departureAirport})`
                     : '출발지 선택'}
                 </div>
               </div>
 
               {/* 도착지 선택 */}
-              <div>
-                <label className="block mb-2 text-sm font-medium text-white">
+              <div className="w-1/2">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
                   도착지
                 </label>
                 <div
@@ -247,7 +249,7 @@ const SearchBar = () => {
                   className="w-full px-4 py-2 text-white bg-transparent border border-white rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-gray-300"
                 >
                   {arrivalCityId
-                    ? `도착지: ${arrivalCityId} (${arrivalAirport})`
+                    ? `도착지: ${arrivalCityName} (${arrivalAirport})`
                     : '도착지 선택'}
                 </div>
               </div>
@@ -259,9 +261,10 @@ const SearchBar = () => {
               onClose={() => setIsKoreaModalOpen(false)}
               onSelect={(cityId, airportName, airportCode) => {
                 setDepartureCityId(cityId);
-                // 여기서는 airportCode를 실제 API 호출에 사용하도록 저장합니다.
-                setDepartureAirport(airportCode);
+                // 공항 이름을 전달받아 state에 저장 (화면에 표시하거나 API 호출 시 활용)
+                setDepartureCityName(airportName);
                 setIsKoreaModalOpen(false);
+                setDepartureAirport(airportCode);
               }}
             />
 
@@ -283,6 +286,7 @@ const SearchBar = () => {
                 // airportCode를 저장하여 API 호출에 사용합니다.
                 setArrivalAirport(airportCode);
                 setIsWorldModalOpen(false);
+                setArrivalCityName(airportName);
               }}
             />
           </div>

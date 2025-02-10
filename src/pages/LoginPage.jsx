@@ -81,7 +81,7 @@ const LoginPage = () => {
                 <button
                   className="relative flex items-center w-full py-3 text-black transition bg-white border border-gray-200 rounded-xl"
                   onClick={() =>
-                    (window.location.href = `${baseUrl}oauth2/authorization/google`)
+                    (window.location.href = `${baseUrl}api/v1/oauth2/authorization/google`)
                   }
                 >
                   <img
@@ -96,7 +96,7 @@ const LoginPage = () => {
                 <button
                   className="relative flex items-center w-full py-3 transition bg-yellow text-brown rounded-xl"
                   onClick={() =>
-                    (window.location.href = `${baseUrl}oauth2/authorization/kakao`)
+                    (window.location.href = `${baseUrl}api/v1/oauth2/authorization/kakao`)
                   }
                 >
                   <img
