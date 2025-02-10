@@ -61,4 +61,8 @@ public class CompanyEntity {
         this.phoneNumber = phoneNumber;
         this.profileImageUrl = profileImageUrl;
     }
+
+    public void updateProfileImage(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
 }
