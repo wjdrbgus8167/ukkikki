@@ -11,6 +11,7 @@ import com.dancing_orangutan.ukkikki.proposal.domain.traveler.Traveler;
 import com.dancing_orangutan.ukkikki.proposal.domain.traveler.TravelerEntity;
 import com.dancing_orangutan.ukkikki.proposal.ui.request.*;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.CreateInquiryResponse;
+import com.dancing_orangutan.ukkikki.proposal.ui.response.CreateVoteSurveyResponse;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.InquiryListResponse;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.ProposalDetailResponse;
 import lombok.RequiredArgsConstructor;
@@ -132,6 +133,21 @@ public class ProposalController {
        return ApiUtils.success("일정이 변경되었습니다");
     }
 
+    // 투표 시작하기
+    @PostMapping("/{proposalId}/vote-survey")
+    public ApiUtils.ApiResponse<CreateVoteSurveyResponse> voteSurvey(
+            @PathVariable Integer travelPlanId,
+            @PathVariable Integer proposalId,
+            @AuthenticationPrincipal MemberUserDetails memberUserDetails,
+            @Validated @RequestBody CreateVoteSurveyRequest request
+    ){
+
+        CreateVoteSurveyCommand command = request.toCommand(travelPlanId,proposalId,memberUserDetails.getMemberId());
+
+        CreateVoteSurveyResponse reponse = proposalService.createVoteSurvey(command);
+
+        return ApiUtils.success(reponse);
+    }
     // 확정 제안서에 관한 여행자 등록
     @PostMapping("/{proposalId}/travelers")
     public ApiUtils.ApiResponse<List<Traveler>> createTravelers(
