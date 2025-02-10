@@ -60,7 +60,9 @@ const SearchBar = () => {
       });
       if (response.status === 200) {
         console.log('🔍 검색 결과:', response.data);
-        navigate('/search-room', { state: { rooms: response.data } });
+        navigate('/search-room', {
+          state: { rooms: response.data.data },
+        });
       }
     } catch (error) {
       console.log('🔍 요청 URL:', endpoint);
@@ -82,6 +84,7 @@ const SearchBar = () => {
     console.log('🚀 최종 도착 도시 ID:', arrivalCityId);
     console.log('🚀 최종 출발일:', startDate);
     console.log('🚀 최종 도착일:', endDate);
+
     if (!startDate || !endDate || !arrivalCityId || !departureCityId) {
       alert('출발일, 돌아오는 날, 출발 공항, 도착 공항을 모두 선택해주세요.');
       return;
@@ -90,31 +93,50 @@ const SearchBar = () => {
     const depDate = startDate.toISOString().split('T')[0].replace(/-/g, '');
     const arrDate = endDate.toISOString().split('T')[0].replace(/-/g, '');
 
+    // 디버깅: 요청 파라미터 출력
+    const departureParams = {
+      serviceKey: API_KEY,
+      schDate: depDate,
+      schDeptCityCode: departureAirport,
+      schArrvCityCode: arrivalAirport,
+      pageNo: 1,
+    };
+    const returnParams = {
+      serviceKey: API_KEY,
+      schDate: arrDate,
+      schDeptCityCode: arrivalAirport,
+      schArrvCityCode: departureAirport,
+      pageNo: 1,
+    };
+
+    console.log('🛫 출발 항공편 요청 파라미터:', departureParams);
+    console.log('🛬 도착 항공편 요청 파라미터:', returnParams);
+
     try {
       const departureResponse = await axios.get(API_BASE_URL, {
-        params: {
-          serviceKey: API_KEY,
-          schDate: depDate,
-          schDeptCityCode: departureAirport,
-          schArrvCityCode: arrivalAirport,
-          pageNo: 1,
-        },
+        params: departureParams,
       });
-
       const returnResponse = await axios.get(API_BASE_URL, {
-        params: {
-          serviceKey: API_KEY,
-          schDate: arrDate,
-          schDeptCityCode: arrivalAirport,
-          schArrvCityCode: departureAirport,
-          pageNo: 1,
-        },
+        params: returnParams,
       });
 
-      const departureFlights =
+      // 디버깅: 전체 응답 객체 출력
+      console.log('✈️ 출발 항공편 전체 응답:', departureResponse.data);
+      console.log('✈️ 도착 항공편 전체 응답:', returnResponse.data);
+
+      // 항공편 데이터 추출 (항공편 데이터가 단일 객체로 반환될 수도 있으므로 배열 처리)
+      let departureFlights =
         departureResponse.data.response?.body?.items?.item || [];
-      const returnFlights =
-        returnResponse.data.response?.body?.items?.item || [];
+      if (departureFlights && !Array.isArray(departureFlights)) {
+        departureFlights = [departureFlights];
+      }
+      let returnFlights = returnResponse.data.response?.body?.items?.item || [];
+      if (returnFlights && !Array.isArray(returnFlights)) {
+        returnFlights = [returnFlights];
+      }
+
+      console.log('🛫 출발 항공편 데이터:', departureFlights);
+      console.log('🛬 도착 항공편 데이터:', returnFlights);
 
       if (departureFlights.length > 0 && returnFlights.length > 0) {
         setIsModalOpen(true);
@@ -198,25 +220,6 @@ const SearchBar = () => {
             </div>
           </div>
 
-          {/* ✅ 출발/도착 공항 선택 */}
-          {/* <div className="flex space-x-4">
-            <KoreaAirportSelector
-              selectedAirport={departureAirport}
-              onChange={(selectedCityId) => {
-                console.log('✅ 부모에서 받은 출발 cityId:', selectedCityId);
-                setDepartureCityId(selectedCityId); // ✅ 출발 도시 ID 설정
-              }}
-            />
-
-            <WorldAirportModal
-              selectedAirport={arrivalAirport}
-              onChange={(cityId) => {
-                console.log('✅ 부모에서 받은 도착 cityId:', cityId);
-                setArrivalCityId(cityId); // ✅ 도착 도시 ID 설정
-              }}
-            />
-          </div> */}
-
           <div className="w-full max-w-3xl rounded-md">
             <div className="space-y-6">
               {/* 출발지 선택 */}
@@ -254,9 +257,10 @@ const SearchBar = () => {
             <KoreaAirportModal
               isOpen={isKoreaModalOpen}
               onClose={() => setIsKoreaModalOpen(false)}
-              onSelect={(cityId, airportName) => {
+              onSelect={(cityId, airportName, airportCode) => {
                 setDepartureCityId(cityId);
-                setDepartureAirport(airportName);
+                // 여기서는 airportCode를 실제 API 호출에 사용하도록 저장합니다.
+                setDepartureAirport(airportCode);
                 setIsKoreaModalOpen(false);
               }}
             />
@@ -265,7 +269,7 @@ const SearchBar = () => {
             <WorldAirportModal
               isOpen={isWorldModalOpen}
               onClose={() => setIsWorldModalOpen(false)}
-              onSelect={(cityId, airportName) => {
+              onSelect={(cityId, airportName, airportCode) => {
                 if (!cityId) {
                   console.error(
                     '🚨 도착지 cityId가 없음! 전달된 값:',
@@ -276,7 +280,8 @@ const SearchBar = () => {
                 }
                 console.log('✅ 부모에서 받은 도착 cityId:', cityId);
                 setArrivalCityId(cityId);
-                setArrivalAirport(airportName);
+                // airportCode를 저장하여 API 호출에 사용합니다.
+                setArrivalAirport(airportCode);
                 setIsWorldModalOpen(false);
               }}
             />
@@ -309,6 +314,12 @@ const SearchBar = () => {
         <CreateRoomModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
+          travelData={{
+            departureCityId,
+            arrivalCityId,
+            startDate: formatDate(startDate), // "yyyy-MM-dd" 형식
+            endDate: formatDate(endDate),
+          }}
         />
       )}
     </div>

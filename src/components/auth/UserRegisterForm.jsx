@@ -46,7 +46,7 @@ const UserRegisterForm = () => {
     }
 
     try {
-      await publicRequest.post('/auth/members/register', {
+      await publicRequest.post('/api/v1/auth/members/register', {
         email: formData.email,
         name: formData.name,
         password: formData.password,
@@ -60,13 +60,13 @@ const UserRegisterForm = () => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto bg-white p-6 rounded-lg">
-      <h1 className="text-3xl text-brown font-bold text-center mb-6">
+    <div className="w-full max-w-md p-6 mx-auto bg-white rounded-lg">
+      <h1 className="mb-6 text-3xl font-bold text-center text-brown">
         이메일로 회원가입
       </h1>
 
       {errorMessage && (
-        <p className="text-red-500 text-sm mb-4 text-center">{errorMessage}</p>
+        <p className="mb-4 text-sm text-center text-red-500">{errorMessage}</p>
       )}
 
       <form onSubmit={handleSubmit}>
@@ -120,7 +120,7 @@ const UserRegisterForm = () => {
 
         <button
           type="submit"
-          className="w-full mt-6 bg-brown text-white py-3 rounded-lg"
+          className="w-full py-3 mt-6 text-white rounded-lg bg-brown"
         >
           회원가입
         </button>
