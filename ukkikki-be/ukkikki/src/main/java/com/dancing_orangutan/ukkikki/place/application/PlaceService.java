@@ -13,4 +13,6 @@ public interface PlaceService {
     void createPlaceLike(CreatePlaceLikeCommand command);
 
     void deletePlaceLike(DeletePlaceLikeCommand command);
+
+    void updatePlaceLike(UpdatePlaceLikeCommand command);
 }

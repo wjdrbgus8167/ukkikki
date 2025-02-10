@@ -158,7 +158,7 @@ public class TravelPlanRepository {
 	}
 
 	//TODO : 반복되는 코드 매퍼로 분리해야함
-	public List<TravelPlan> fetchTravelPlan(final TravelPlan travelPlanDomain) {
+	public List<TravelPlan> fetchTravelPlans(final TravelPlan travelPlanDomain) {
 		List<TravelPlanEntity> travelPlanEntities = queryDslTravelPlanRepository.fetchSuggestedTravelPlan(travelPlanDomain.getTravelPlanInfo().planningStatus());
 
 		return travelPlanEntities.stream()
@@ -237,5 +237,9 @@ public class TravelPlanRepository {
 
 	public Page<TravelPlanEntity> getAllTravelPlans(Pageable pageable) {
 		return jpaTravelPlanRepository.findByPlanningStatusNot(PlanningStatus.CONFIRMED,pageable);
+	}
+
+	public TravelPlanEntity fetchTravelPlan(Integer travelPlanId) {
+		return jpaTravelPlanRepository.findAllByTravelPlanId(travelPlanId).orElseThrow(() -> new IllegalArgumentException("존재 하지않는 여행계획입니다."));
 	}
 }

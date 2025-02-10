@@ -15,17 +15,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberTravelPlanId implements Serializable {
 
-	@Column
-	@EqualsAndHashCode.Include
-	private Integer travelPlanId;
-
 	@EqualsAndHashCode.Include
 	@Column
 	private Integer memberId;
 
+	@Column
+	@EqualsAndHashCode.Include
+	private Integer travelPlanId;
+
 	@Builder
-	public MemberTravelPlanId(Integer travelPlanId, Integer memberId) {
-		this.travelPlanId = travelPlanId;
+	public MemberTravelPlanId(Integer memberId, Integer travelPlanId) {
 		this.memberId = memberId;
+		this.travelPlanId = travelPlanId;
 	}
 }
