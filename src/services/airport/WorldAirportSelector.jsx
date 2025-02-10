@@ -99,7 +99,10 @@ const WorldAirportModal = ({ isOpen, onClose, onSelect }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div
+      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+      onClick={onClose}
+    >
       <div className="relative p-6 bg-white rounded-md w-96">
         <h2 className="mb-4 text-xl font-bold">도착지 선택</h2>
         <button
