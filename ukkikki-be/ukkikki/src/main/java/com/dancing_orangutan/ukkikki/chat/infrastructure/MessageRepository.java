@@ -20,6 +20,8 @@ public class MessageRepository {
 		MessageEntity save = repository.save(entity);
 
 		return Message.builder()
+				.travelPlanId(entity.getTravelPlanId())
+				.memberId(entity.getMemberId())
 				.content(save.getContent())
 				.build();
 	}
