@@ -1,5 +1,7 @@
 package com.dancing_orangutan.ukkikki.place.application;
 
+import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
+import com.dancing_orangutan.ukkikki.member.infrastructure.MemberFinder;
 import com.dancing_orangutan.ukkikki.place.application.command.*;
 import com.dancing_orangutan.ukkikki.place.domain.like.Like;
 import com.dancing_orangutan.ukkikki.place.domain.like.LikeEntity;
@@ -13,6 +15,7 @@ import com.dancing_orangutan.ukkikki.place.mapper.PlaceMapper;
 import com.dancing_orangutan.ukkikki.place.mapper.PlaceTagMapper;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +33,7 @@ public class PlaceServiceImpl implements PlaceService {
     private final TravelPlanFinder travelPlanFinder;
     private final MemberTravelPlanFinder memberTravelPlanFinder;
     private static final Logger logger = LoggerFactory.getLogger(PlaceServiceImpl.class);
+    private final MemberFinder memberFinder;
 
     @Override
     public void createPlace(CreatePlaceCommand command) {
@@ -46,8 +50,10 @@ public class PlaceServiceImpl implements PlaceService {
                 travelPlanFinder.findByTravelPlanId(command.getTravelPlanId());
 
         if(travelPlanEntity.isEmpty()) {
-            logger.error("TravelPlanEntity not found for id: {}", command.getTravelPlanId());
-            throw new IllegalArgumentException("No TravelPlanEntity found for id: " + command.getTravelPlanId());
+            logger.error("TravelPlanEntity not found for id: {}",
+                    command.getTravelPlanId());
+            throw new IllegalArgumentException("No TravelPlanEntity found for id: "
+                    + command.getTravelPlanId());
         } else {
             PlaceEntity placeEntity = PlaceMapper.mapToEntity(place, travelPlanEntity.get());
             placeRepository.save(placeEntity);
@@ -87,10 +93,12 @@ public class PlaceServiceImpl implements PlaceService {
     public void deletePlaceTag(DeletePlaceTagCommand command) {
 
         // PlaceTag 영속성 객체 불러오기
-        Optional<PlaceTagEntity> optionalPlaceTagEntity = placeTagRepository.findById(command.getPlaceTagId());
+        Optional<PlaceTagEntity> optionalPlaceTagEntity = placeTagRepository
+                .findById(command.getPlaceTagId());
         PlaceTagEntity placeTagEntity = optionalPlaceTagEntity.orElseThrow(() -> {
             logger.error("PlaceTagEntity not found for id: {}", command.getPlaceTagId());
-            return new IllegalArgumentException("No PlaceTagEntity found for id: " + command.getPlaceTagId());
+            return new IllegalArgumentException("No PlaceTagEntity found for id: "
+                    + command.getPlaceTagId());
         });
 
         // 영속성 객체 도메인 객체로 매핑
@@ -119,6 +127,10 @@ public class PlaceServiceImpl implements PlaceService {
 
         // 도메인 객체 Like 영속성 객체 LikeEntity로 매핑
         LikeEntity likeEntity = PlaceLikeMapper.mapToEntity(like);
+        MemberEntity memberEntity = memberFinder.findById(like.getCreatorId());
+        likeEntity.setMember(memberEntity);
+        PlaceEntity placeEntity = placeRepository.findById(like.getPlaceId()).get();
+        likeEntity.setPlace(placeEntity);
 
         // PlaceLike save
         placeLikeRepository.save(likeEntity);
@@ -144,8 +156,35 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
+    @Transactional
     public void updatePlaceLike(UpdatePlaceLikeCommand command) {
 
-        //
+        // 여행 계획 조회
+        Optional<TravelPlanEntity> travelPlanEntity =
+                travelPlanFinder.findByTravelPlanId(command.getTravelPlanId());
+        if (travelPlanEntity.isEmpty()) {
+            throw new IllegalArgumentException("해당 TravelPlan이 존재하지 않습니다. ID: "
+                    + command.getTravelPlanId());
+        }
+
+        // 해당 여행 계획에 해당 하는 장소 조회 후 좋아요 업데이트
+        travelPlanEntity.get().getPlaces().forEach(
+                placeEntity -> {
+                    placeEntity.getLikes().forEach(
+                            likeEntity -> {
+                                if(likeEntity.getMember().getMemberId().equals(command.getMemberId())) {
+                                    // 좋아요 수 업데이트
+                                    int newLikeCount =
+                                            command.getAdultCount()
+                                            + command.getChildCount()
+                                            + command.getInfantCount();
+                                    likeEntity.updateLikeCnt(newLikeCount);
+                                    placeLikeRepository.save(likeEntity);
+                                }
+                            }
+                    );
+                }
+        );
+
     }
 }
