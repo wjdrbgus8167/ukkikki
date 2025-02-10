@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 
 import lombok.*;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "places")
@@ -37,8 +38,8 @@ public class PlaceEntity {
 	private TravelPlanEntity travelPlan;
 
 	@OneToMany(mappedBy = "placeEntity", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<PlaceTagEntity> placeTags;
+	private Set<PlaceTagEntity> placeTags;
 
 	@OneToMany(mappedBy = "placeEntity", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<LikeEntity> likes;
+	private Set<LikeEntity> likes;
 }

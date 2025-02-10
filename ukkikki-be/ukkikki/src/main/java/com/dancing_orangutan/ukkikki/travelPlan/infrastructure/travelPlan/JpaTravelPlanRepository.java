@@ -11,13 +11,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public interface JpaTravelPlanRepository extends JpaRepository<TravelPlanEntity,Integer> {
-
 	@EntityGraph(attributePaths = {
 			"departureCity",
 			"arrivalCity",
 			"travelPlanKeywords.keyword",
 			"memberTravelPlans.member",
-			"places.placeTags"
+			"places.placeTags",
+			"places.likes"
 	})
 	Optional<TravelPlanEntity> findAllByTravelPlanId(Integer travelPlanId);
 
