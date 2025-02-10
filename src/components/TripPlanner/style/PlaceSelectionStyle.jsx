@@ -23,13 +23,13 @@ export const Info = styled.div`
 
 export const TabButton = styled.div`
   display: flex;
-  margin-bottom: 16px; /* 버튼과 아래 콘텐츠 사이의 간격 */
+  margin-bottom: 14px; /* 버튼과 아래 콘텐츠 사이의 간격 */
   justify-content: space-evenly; /* 버튼 간격 균일하게 정렬 */
-
+  
 
   button {
     flex: 1; /* 버튼의 동일한 너비 */
-    padding: 8px 16px; /* 버튼 내부 여백 */
+    padding: 8px 2px; /* 버튼 내부 여백 */
     font-size: 16px; /* 텍스트 크기 */
     font-weight: 600; /* 텍스트 두께 */
     cursor: pointer; /* 포인터 커서 */
@@ -37,7 +37,7 @@ export const TabButton = styled.div`
     border-bottom: 2px solid transparent; /* 기본 상태에서 투명 */
     transition: all 0.2s ease; /* 클릭 시 애니메이션 */
     text-align: center; /* 텍스트 가운데 정렬 */
-    min-width: 180px; /* 버튼의 최소 너비 지정 */
+    min-width: 10px; /* 버튼의 최소 너비 지정 */
     white-space: nowrap; /* 텍스트 줄 바꿈 방지 */
 
     &.active {
@@ -65,8 +65,8 @@ export const SearchSection = styled.div`
     margin-top:10px;
 
   }
-`
+`;
 
 export const Places = styled.div`
  margin: 10px;
-`
+`;

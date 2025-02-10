@@ -1,3 +1,4 @@
+// MainLayout.jsx
 import React, { useState } from 'react';
 import DateSidebar from './DateSidebar';
 import PlaceSelection from './PlaceSelection';
@@ -5,7 +6,8 @@ import PlaceSelectionResult from './PlaceSelectionResult';
 import MapDisplay from './MapDisplay';
 import DetailForm from './DetailForm';
 import { LoadScript } from '@react-google-maps/api';
-import { StyledLoadScript, StyledPlaceSelectionResult } from './style/MainLayoutStyle'; // 스타일드 컴포넌트 import
+import { StyledLoadScript, StyledPlaceSelectionResult } from './style/MainLayoutStyle';
+import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
@@ -19,9 +21,7 @@ const MainLayout = ({ travelPlan }) => {
     return Array.from({ length: diffDays }, (_, i) => ({
       id: i + 1,
       label: `${i + 1}일차`,
-      date: new Date(start.getTime() + i * 86400000)
-        .toISOString()
-        .split('T')[0],
+      date: new Date(start.getTime() + i * 86400000).toISOString().split('T')[0],
       selectedPlaces: [],
     }));
   };
@@ -31,7 +31,7 @@ const MainLayout = ({ travelPlan }) => {
   const [travelDays, setTravelDays] = useState(initialTravelDays);
   const [selectedDayId, setSelectedDayId] = useState(travelDays[0]?.id || 1);
   const [showDetailFrom, setShowDetailFrom] = useState(false);
-  const [isResultVisible, setIsResultVisible] = useState(true); // PlaceSelectionResult 접기/펼치기 상태
+  const [isPanelCollapsed, setIsPanelCollapsed] = useState(false);
 
   const handleDaySelect = (dayId) => {
     setSelectedDayId(dayId);
@@ -42,22 +42,17 @@ const MainLayout = ({ travelPlan }) => {
     setTravelDays((prevDays) =>
       prevDays.map((day) =>
         day.id === selectedDayId
-          ? {
-              ...day,
-              selectedPlaces: [...new Set([...day.selectedPlaces, place])],
-            }
+          ? { ...day, selectedPlaces: [...new Set([...day.selectedPlaces, place])] }
           : day
       )
     );
   };
 
   const handleTogglePlace = (place) => {
-    console.log('handleTogglePlace 실행됨:', place);
     if (!place.latitude || !place.longitude) {
-      console.error('🚨 경도 또는 위도가 없습니다!', place);
+      console.error('경도 또는 위도가 없습니다!', place);
       return;
     }
-
     setTravelDays((prevDays) =>
       prevDays.map((day) =>
         day.id === selectedDayId
@@ -95,41 +90,34 @@ const MainLayout = ({ travelPlan }) => {
         </div>
       ) : (
         <>
-          <StyledLoadScript>
-            <LoadScript
-              googleMapsApiKey={apiKey}
-              libraries={['places']}
-            >
-              <div>
-                <PlaceSelection
-                  destinationCity={destinationCity}
-                  travelStart={travelStart}
-                  travelEnd={travelEnd}
-                  placeList={placeList}
-                  onTogglePlace={handleTogglePlace}
-                  selectedPlaces={selectedDay?.selectedPlaces || []}
-                />
-              </div>
-            </LoadScript>
-          </StyledLoadScript>
+          <LoadScript googleMapsApiKey={apiKey} libraries={['places']}>
+            <StyledLoadScript>
+              <PlaceSelection
+                destinationCity={destinationCity}
+                travelStart={travelStart}
+                travelEnd={travelEnd}
+                placeList={placeList}
+                onTogglePlace={handleTogglePlace}
+                selectedPlaces={selectedDay?.selectedPlaces || []}
+              />
+            </StyledLoadScript>
+          </LoadScript>
 
-          {/* 접기/펼치기 버튼 */}
-          <div className="flex items-center justify-center">
-            <button
-              onClick={() => setIsResultVisible((prev) => !prev)}
-              className="p-2 m-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 transition"
-            >
-              {isResultVisible ? '결과 접기' : '결과 보기'}
-            </button>
-          </div>
-
-          {isResultVisible && (
-            <StyledPlaceSelectionResult>
+          {/* PlaceSelectionResult와 토글 버튼을 flex 컨테이너로 나란히 배치 */}
+          <div className="flex items-center">
+            <StyledPlaceSelectionResult isCollapsed={isPanelCollapsed}>
               <PlaceSelectionResult
                 selectedDay={selectedDay ?? { selectedPlaces: [] }}
+                isCollapsed={isPanelCollapsed}
               />
             </StyledPlaceSelectionResult>
-          )}
+            <button
+              onClick={() => setIsPanelCollapsed(!isPanelCollapsed)}
+              className="ml-2 bg-white border rounded-full shadow p-2"
+            >
+              {isPanelCollapsed ? <AiOutlineRight size={20} /> : <AiOutlineLeft size={20} />}
+            </button>
+          </div>
 
           <div className="flex-grow h-full">
             <MapDisplay
