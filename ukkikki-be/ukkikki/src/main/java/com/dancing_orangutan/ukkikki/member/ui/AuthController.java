@@ -108,13 +108,15 @@ public class AuthController {
 
     @PostMapping("/token/refresh")
     public ResponseEntity<ApiUtils.ApiResponse<?>> refreshAccessToken(
-            HttpServletRequest request)
+            HttpServletRequest request,
+            HttpServletResponse response
+    )
     {
         RefreshAccessTokenCommand command = RefreshAccessTokenCommand.builder()
                 .refreshToken(CookieUtils.getRefreshToken(request))
                 .build();
 
-        authService.refreshAccessToken(command);
+        CookieUtils.addAccessTokenCookie(response, authService.refreshAccessToken(command));
         return ResponseEntity.ok(
                 ApiUtils.success("토큰이 재발급 되었습니다.")
         );
