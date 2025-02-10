@@ -37,10 +37,11 @@ public class S3Service {
                     PutObjectRequest.builder()
                             .bucket(bucketName)
                             .key(fullFileName)
+                            .contentType(file.getContentType())
                             .build(),
                     RequestBody.fromInputStream(file.getInputStream(), file.getSize())
             );
-            return fullFileName;
+            return getFileUrl(fullFileName);
         } catch (S3Exception | IOException e) {
             throw new ApiException(ErrorCode.S3_UPLOAD_ERROR);
         }
