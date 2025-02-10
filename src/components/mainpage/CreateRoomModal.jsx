@@ -1,22 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { publicRequest } from '../../hooks/requestMethod';
-
-const themes = [
-  '골프',
-  '관광+휴양',
-  '휴양',
-  '관광',
-  '럭셔리',
-  '식도락',
-  '축구',
-  '현지문화체험',
-  '해양스포츠',
-  '온천',
-  'SNS핫플',
-  '성지순례',
-  '기차여행',
-];
+import { useNavigate } from 'react-router-dom';
 
 const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
   // travelData: { departureCityId, arrivalCityId, startDate, endDate }
@@ -25,12 +10,13 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
     title: '',
     minPeople: '',
     maxPeople: '',
-    selectedThemes: [], // 사용자가 선택한 테마 (이름 배열)
+    selectedKeywords: [], // 선택된 키워드 객체 배열 (예: { id: 1 })
     adults: 0,
     teens: 0,
     kids: 0,
   });
-  const [keywordList, setKeywordList] = useState([]); // 전체 테마 키워드 목록
+  const [keywordList, setKeywordList] = useState([]); // 전체 키워드 목록
+  const navigate = useNavigate();
 
   // 모달 마운트 시 전체 키워드 조회
   useEffect(() => {
@@ -39,8 +25,8 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
         const response = await publicRequest.get(
           '/api/v1/travel-plans/keywords',
         );
-        // API 응답에 전체 키워드가 response.data.data 안에 있다고 가정
-        setKeywordList(response.data.data || []);
+        // 응답 구조에 맞춰서, 키워드 배열을 response.data.data.keywords에서 추출
+        setKeywordList(response.data.data.keywords || []);
       } catch (error) {
         console.error('키워드 조회 실패:', error);
       }
@@ -49,7 +35,7 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
     fetchKeywords();
   }, []);
 
-  // 1단계 입력 핸들러 (방 제목, 최소/최대 인원, 테마 선택)
+  // 1단계 입력 핸들러 (방 제목, 최소/최대 인원)
   const handleChange = (e) => {
     setRoomData({ ...roomData, [e.target.name]: e.target.value });
   };
@@ -72,23 +58,32 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
   const handleCountChange = (type, value) => {
     setRoomData((prev) => ({
       ...prev,
-      [type]: Math.max(0, prev[type] + value), // 0 이하로 내려가지 않도록 제한
+      [type]: Math.max(0, prev[type] + value),
     }));
   };
 
   // 총 인원 계산
   const totalPeople = roomData.adults + roomData.teens + roomData.kids;
 
-  // 테마 선택 (여러 개 선택 가능)
-  const handleThemeToggle = (theme) => {
+  // 키워드 선택 토글 (API에서 불러온 keyword 객체 사용, 키 이름은 id)
+  const handleKeywordToggle = (keyword) => {
     setRoomData((prev) => {
-      const isSelected = prev.selectedThemes.includes(theme);
-      return {
-        ...prev,
-        selectedThemes: isSelected
-          ? prev.selectedThemes.filter((t) => t !== theme)
-          : [...prev.selectedThemes, theme],
-      };
+      const exists = prev.selectedKeywords.find(
+        (item) => item.id === keyword.id,
+      );
+      if (exists) {
+        return {
+          ...prev,
+          selectedKeywords: prev.selectedKeywords.filter(
+            (item) => item.id !== keyword.id,
+          ),
+        };
+      } else {
+        return {
+          ...prev,
+          selectedKeywords: [...prev.selectedKeywords, { id: keyword.id }],
+        };
+      }
     });
   };
 
@@ -99,7 +94,7 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
       title: '',
       minPeople: '',
       maxPeople: '',
-      selectedThemes: [],
+      selectedKeywords: [],
       adults: 0,
       teens: 0,
       kids: 0,
@@ -107,28 +102,29 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
     onClose();
   };
 
-  // 방 만들기 완료 시: 선택된 테마를 keywordList에서 찾아 keywordId를 추출한 후 API 요청 전송
+  // 방 만들기 완료 시: 선택된 키워드를 요청 바디에 포함하여 API 호출 후, 생성된 방으로 이동
   const handleRoomCreation = async () => {
-    // 선택한 테마 이름(roomData.selectedThemes)을 keywordList에서 찾아 { keywordId: ... } 형태로 변환
-    const selectedKeywordObjects = roomData.selectedThemes
-      .map((theme) => {
-        // 예를 들어, 백엔드에서 키워드 객체는 { keywordId, name, ... } 형태라고 가정
-        const keywordObj = keywordList.find((item) => item.name === theme);
-        return keywordObj ? { keywordId: keywordObj.keywordId } : null;
-      })
-      .filter((item) => item !== null);
+    // 변환: 선택된 키워드 배열을 백엔드가 기대하는 형식으로 변환 (예: { keywordId: 1 })
+    const keywordsPayload = roomData.selectedKeywords.map((item) => ({
+      keywordId: item.id,
+    }));
 
     const requestBody = {
       travelPlan: {
         departureCityId: travelData.departureCityId,
         arrivalCityId: travelData.arrivalCityId,
         name: roomData.title,
-        startDate: travelData.startDate, // yyyy-MM-dd 형식이어야 함
+        startDate: travelData.startDate, // "yyyy-MM-dd" 형식이어야 함
         endDate: travelData.endDate,
-        keywords: selectedKeywordObjects,
+        keywords: keywordsPayload,
         minPeople: parseInt(roomData.minPeople, 10),
         maxPeople: parseInt(roomData.maxPeople, 10),
         planningStatus: 'IN_PROGRESS',
+      },
+      host: {
+        adultCount: roomData.adults,
+        childCount: roomData.teens,
+        infantCount: roomData.kids,
       },
     };
 
@@ -139,7 +135,11 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
       );
       console.log('여행 플랜 생성 성공:', response.data);
       alert('여행 플랜이 성공적으로 생성되었습니다.');
-      handleModalClose();
+
+      // API 응답 구조에 따라 생성된 방 정보 추출 (예: response.data.data.travelPlan)
+      const createdRoom = response.data.data.travelPlan;
+      // 방 생성 후 /user-room으로 이동하면서 생성된 방 데이터를 state에 담아 전달
+      navigate('/user-room', { state: { selectedCard: createdRoom } });
     } catch (error) {
       console.error('여행 플랜 생성 실패:', error);
       alert('여행 플랜 생성 중 오류가 발생했습니다.');
@@ -154,7 +154,7 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={handleModalClose} // 바깥 클릭 시 모달 닫기
+          onClick={handleModalClose}
         />
         <motion.div
           className="relative z-10 w-full max-w-lg p-6 bg-white shadow-lg rounded-xl"
@@ -175,7 +175,8 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
               ✕
             </button>
           </div>
-          {/* 1단계: 방 제목, 최소/최대 인원, 테마 선택 */}
+
+          {/* 1단계: 방 제목, 최소/최대 인원, 키워드 선택 */}
           {step === 1 && (
             <div>
               <div className="mb-5">
@@ -234,22 +235,31 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
                   />
                 </div>
               </div>
+              {/* 키워드 선택 영역 */}
               <div className="mb-5">
-                <label className="block text-sm font-medium">테마 선택</label>
+                <label className="block text-sm font-medium">
+                  여행 테마 선택
+                </label>
                 <div className="grid grid-cols-3 gap-3">
-                  {themes.map((theme) => (
-                    <button
-                      key={theme}
-                      onClick={() => handleThemeToggle(theme)}
-                      className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
-                        roomData.selectedThemes.includes(theme)
-                          ? 'bg-dark-green text-white'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
-                    >
-                      {theme}
-                    </button>
-                  ))}
+                  {keywordList && keywordList.length > 0 ? (
+                    keywordList.map((keyword) => (
+                      <button
+                        key={keyword.id}
+                        onClick={() => handleKeywordToggle(keyword)}
+                        className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
+                          roomData.selectedKeywords.some(
+                            (item) => item.id === keyword.id,
+                          )
+                            ? 'bg-dark-green text-white'
+                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
+                      >
+                        {keyword.name}
+                      </button>
+                    ))
+                  ) : (
+                    <p className="text-gray-500">키워드를 불러오는 중...</p>
+                  )}
                 </div>
               </div>
               <button
@@ -260,6 +270,7 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
               </button>
             </div>
           )}
+
           {/* 2단계: 인원 조절 */}
           {step === 2 && (
             <div>
