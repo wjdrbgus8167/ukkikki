@@ -59,4 +59,8 @@ public class MemberEntity {
         this.profileImageUrl = profileImageUrl;
         this.provider = provider;
     }
+
+    public void updateProfileImage(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
 }

@@ -3,8 +3,6 @@ package com.dancing_orangutan.ukkikki.member.domain.member;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
-
 @Getter
 public class Member {
 
