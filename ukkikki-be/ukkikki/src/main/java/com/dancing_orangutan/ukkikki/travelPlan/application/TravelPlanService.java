@@ -18,7 +18,6 @@ import com.dancing_orangutan.ukkikki.travelPlan.mapper.TravelPlanMapper;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.request.KeywordUi;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.*;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.travelPlan.TravelPlanRepository;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.response.FetchSuggestedTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.JoinTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.SearchTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.FetchAllTravelPlansResponse;
