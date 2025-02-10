@@ -5,7 +5,7 @@ const ListCard = ({ imageSrc, trip_name, dataRange, location, min_people, max_pe
   const navigate = useNavigate(); // useNavigate 훅 사용
 
   const onhandleDetail = () => {
-    navigate(`/agencydetail/${proposal.travelPlanId}`); // travelPlanId를 URL에 추가
+    navigate(`/agency-detail/${proposal.travelPlanId}`); // travelPlanId를 URL에 추가
   };
 
   return (
