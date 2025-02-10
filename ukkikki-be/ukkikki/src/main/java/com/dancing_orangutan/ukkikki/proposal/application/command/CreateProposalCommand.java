@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class CreateProposalCommand {
     private Integer travelPlanId;
     private Integer companyId;
+    private String name;
     private LocalDate startDate;
     private LocalDate endDate;
     private String airline;

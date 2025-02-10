@@ -13,6 +13,7 @@ public class CompanyProposalDetailResponse {
 
     private Integer proposalId;
     private Integer companyId;
+    private String name;
     private LocalDate startDate;
     private LocalDate endDate;
     private String airLine;
@@ -35,6 +36,7 @@ public class CompanyProposalDetailResponse {
 
         this.proposalId = proposal.getProposalId();
         this.companyId = proposal.getCompanyId();
+        this.name = proposal.getName();
         this.startDate = proposal.getStartDate();
         this.endDate = proposal.getEndDate();
         this.airLine = proposal.getAirline();

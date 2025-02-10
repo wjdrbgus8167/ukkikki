@@ -18,6 +18,7 @@ public class CreateProposalRequest {
     @Getter
     @NoArgsConstructor
     public static class ProposalRequest{
+        private String name;
         private LocalDate startDate;
         private LocalDate endDate;
         private String airline;
@@ -36,10 +37,11 @@ public class CreateProposalRequest {
         private ProposalStatus proposalStatus;
 
         @Builder
-        public ProposalRequest(LocalDate startDate,LocalDate endDate, String airline, String departureAirportCode
+        public ProposalRequest(String name, LocalDate startDate,LocalDate endDate, String airline, String departureAirportCode
         ,String arrivalAirportCode,LocalDateTime startDateBoardingTime,LocalDateTime startDateArrivalTime,LocalDateTime endDateBoardingTime
         ,LocalDateTime endDateArrivalTime,int deposit,int minPeople,boolean guideIncluded,String productIntroduction
         ,String refundPolicy,boolean insuranceIncluded,ProposalStatus proposalStatus){
+            this.name = name;
             this.startDate = startDate;
             this.endDate = endDate;
             this.airline = airline;
@@ -66,6 +68,7 @@ public class CreateProposalRequest {
     }
     public CreateProposalCommand toCommand(Integer travelPlanId,Integer companyId){
         return CreateProposalCommand.builder()
+                .name(this.proposalRequest.getName())
                 .startDate(proposalRequest.getStartDate())
                 .endDate(proposalRequest.getEndDate())
                 .airline(proposalRequest.getAirline())
