@@ -1,5 +1,6 @@
 package com.dancing_orangutan.ukkikki.travelPlan.ui.response;
 
+import com.dancing_orangutan.ukkikki.place.domain.like.LikeEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import lombok.Builder;
@@ -10,29 +11,42 @@ import java.util.List;
 public record FetchSuggestedTravelPlanDetailsResponse(TravelPlan travelPlan) {
 
     @Builder
-    public FetchSuggestedTravelPlanDetailsResponse {}
-
-    public record TravelPlan(String name, City arrivalCity, City departureCity,
-                             LocalDate startDate, LocalDate endDate,
-                             int currentParticipants, List<Keyword> keywords, List<Place> places) {
-        @Builder
-        public TravelPlan {}
+    public FetchSuggestedTravelPlanDetailsResponse {
     }
 
-    public record City(Integer cityId, String name) {
+    private record TravelPlan(String name, City arrivalCity, City departureCity,
+                              LocalDate startDate, LocalDate endDate,
+                              int currentParticipants, List<Keyword> keywords, List<Place> places) {
         @Builder
-        public City {}
+        public TravelPlan {
+        }
     }
 
-    public record Keyword(Integer keywordId, String name) {
+    private record City(Integer cityId, String name) {
         @Builder
-        public Keyword {}
+        public City {
+        }
     }
 
-    public record Place(Integer placeId, String name) {
+    private record Keyword(Integer keywordId, String name) {
         @Builder
-        public Place {}
+        public Keyword {
+        }
     }
+
+    private record Place(Integer placeId, String name, List<PlaceTag> tags, Integer likeCount) {
+        @Builder
+        public Place {
+        }
+    }
+
+    private record PlaceTag(Integer placeTagId, String name) {
+
+        @Builder
+        public PlaceTag {
+        }
+    }
+
 
     public static FetchSuggestedTravelPlanDetailsResponse toResponse(final TravelPlanEntity entity) {
         return FetchSuggestedTravelPlanDetailsResponse.builder()
@@ -54,7 +68,7 @@ public record FetchSuggestedTravelPlanDetailsResponse(TravelPlan travelPlan) {
                                 .startDate(entity.getStartDate())
                                 .endDate(entity.getEndDate())
                                 .currentParticipants(entity.getMemberTravelPlans().stream().mapToInt(
-                                        memberTravelPlanEntity-> memberTravelPlanEntity.getAdultCount() + memberTravelPlanEntity.getChildCount() + memberTravelPlanEntity.getInfantCount()
+                                        memberTravelPlanEntity -> memberTravelPlanEntity.getAdultCount() + memberTravelPlanEntity.getChildCount() + memberTravelPlanEntity.getInfantCount()
                                 ).sum())
                                 .keywords(
                                         entity.getTravelPlanKeywords().stream()
@@ -69,6 +83,15 @@ public record FetchSuggestedTravelPlanDetailsResponse(TravelPlan travelPlan) {
                                                 .map(p -> Place.builder()
                                                         .placeId(p.getPlaceId())
                                                         .name(p.getName())
+                                                        .tags(p.getPlaceTags().stream()
+                                                                .map(tag -> PlaceTag.builder()
+                                                                        .placeTagId(tag.getPlaceTagId())
+                                                                        .name(tag.getPlaceTagName())
+                                                                        .build())
+                                                                .toList())
+                                                        .likeCount(p.getLikes().stream()
+                                                                .mapToInt(LikeEntity::getLikesCnt)
+                                                                .sum())
                                                         .build())
                                                 .toList()
                                 )

@@ -161,5 +161,4 @@ public class TravelPlanController {
 		GetKeywordsResponse response = travelPlanService.getKeywords();
 		return ApiUtils.success(response);
 	}
-
 }
