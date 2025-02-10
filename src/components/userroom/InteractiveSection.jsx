@@ -9,7 +9,7 @@ const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
 const InteractiveSection = ({ selectedCard }) => {
   const travelPlanId = selectedCard.id; // 여행방 ID
-  const city = selectedCard.country || '기본 도시'; // 선택된 도시
+  const city = selectedCard.arrivalCity.name || '기본 도시'; // 선택된 도시
 
   const [isLikeList, setIsLikeList] = useState(true);
 

@@ -1,19 +1,14 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import img from '../../assets/package_sample.png';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { publicRequest } from '../../hooks/requestMethod';
-const packages = [
-  { id: 1, title: '파리 로맨틱 투어', image: img },
-  { id: 2, title: '뉴욕 시티 브레이크', image: img },
-  { id: 3, title: '도쿄 문화 탐방', image: img },
-  { id: 4, title: '발리 휴양 여행', image: img },
-];
 
-// 화살표 커스터마이징 컴포넌트 (카드 바깥 배치)
+const apiKey = import.meta.env.VITE_APP_UNSPLASH_API_KEY;
+
+// 화살표 커스터마이징 컴포넌트
 const PrevArrow = ({ onClick }) => (
   <button
     className="absolute left-[-30px] top-1/2 transform -translate-y-1/2 z-10 bg-brown text-white p-3 rounded-full shadow-lg focus:outline-none"
@@ -31,8 +26,93 @@ const NextArrow = ({ onClick }) => (
     &#9654;
   </button>
 );
+
 const TravelPackageCarousel = () => {
-  const navigate = useNavigate(); // ✅ useNavigate 훅 사용
+  const navigate = useNavigate();
+  const [travelPlans, setTravelPlans] = useState([]);
+  const [imageUrls, setImageUrls] = useState({});
+
+  // ✅ 여행지 이미지 가져오기 (axios 사용)
+  useEffect(() => {
+    const fetchImages = async () => {
+      console.log('📌 [디버깅] 이미지 요청 시작');
+
+      const imageRequests = travelPlans.map(async (plan) => {
+        const cityName = plan.arrivalCity?.name;
+        console.log(`🔎 [도시] 검색 대상: ${cityName}`);
+
+        if (!cityName) {
+          console.warn(`⚠️ [경고] 도착 도시 정보 없음 -> ${plan}`);
+          return null;
+        }
+
+        if (imageUrls[cityName]) {
+          console.log(`✅ [스킵] 이미 불러온 이미지: ${cityName}`);
+          return null;
+        }
+
+        try {
+          console.log(`🚀 [API 요청] Unsplash에서 이미지 요청: ${cityName}`);
+          const response = await axios.get(
+            `https://api.unsplash.com/photos/random`,
+            {
+              params: {
+                query: cityName,
+                client_id: apiKey,
+              },
+            },
+          );
+
+          console.log(
+            `🎉 [응답] Unsplash 이미지 URL: ${response.data?.urls?.regular}`,
+          );
+
+          return {
+            [cityName]:
+              response.data?.urls?.regular || 'https://via.placeholder.com/400',
+          };
+        } catch (error) {
+          console.error(`🚨 [에러] ${cityName} 이미지 불러오기 실패:`, error);
+          return { [cityName]: 'https://via.placeholder.com/400' }; // 기본 이미지
+        }
+      });
+
+      const results = await Promise.all(imageRequests);
+      console.log('🔄 [결과] 모든 요청 완료:', results);
+
+      const newImageUrls = results.reduce((acc, result) => {
+        return result ? { ...acc, ...result } : acc;
+      }, {});
+
+      console.log('🌟 [최종 상태 업데이트] 새로운 이미지 목록:', newImageUrls);
+
+      if (Object.keys(newImageUrls).length > 0) {
+        setImageUrls((prev) => {
+          console.log('📌 [이전 상태] 기존 이미지 목록:', prev);
+          return { ...prev, ...newImageUrls };
+        });
+      }
+    };
+
+    if (travelPlans.length > 0) fetchImages();
+  }, [travelPlans, apiKey]);
+
+  // ✅ API 호출하여 여행방 데이터를 가져오기
+  useEffect(() => {
+    const fetchTravelPlans = async () => {
+      try {
+        const response = await publicRequest.get('/api/v1/travel-plans');
+        if (response.status === 200 && response.data?.data?.travelPlans) {
+          setTravelPlans(response.data.data.travelPlans);
+        } else {
+          console.error('🚨 여행방 데이터 형식 오류:', response.data);
+        }
+      } catch (error) {
+        console.error('🚨 여행방 전체 조회 실패:', error);
+      }
+    };
+    fetchTravelPlans();
+  }, []);
 
   const settings = {
     dots: true,
@@ -40,8 +120,8 @@ const TravelPackageCarousel = () => {
     speed: 500,
     slidesToShow: 3,
     slidesToScroll: 1,
-    autoplay: true, // 자동 재생 활성화
-    autoplaySpeed: 3000, // 3초 간격
+    autoplay: true,
+    autoplaySpeed: 3000,
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
     responsive: [
@@ -53,17 +133,14 @@ const TravelPackageCarousel = () => {
       },
     ],
   };
+
   const handleViewDetails = async () => {
     try {
       const response = await publicRequest.get('/api/v1/travel-plans');
-      console.log('response', response);
       if (!response.data || !Array.isArray(response.data.data.travelPlans)) {
         throw new Error('🚨 API 응답이 올바르지 않습니다.');
       }
 
-      console.log('✅ 여행방 데이터:', response.data.data.travelPlans);
-
-      // ✅ API 응답 데이터를 `state`로 전달하면서 `search-room`으로 이동
       navigate('/search-room', {
         state: { rooms: response.data.data.travelPlans },
       });
@@ -75,7 +152,7 @@ const TravelPackageCarousel = () => {
 
   return (
     <div className="relative w-full">
-      {/* ✅ 배경 레이어 (opacity 적용) */}
+      {/* ✅ 배경 레이어 */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#D9D9D9] via-[#C5C3B1] to-[#412B2B] opacity-50"></div>
 
       {/* ✅ 컨텐츠 영역 */}
@@ -87,8 +164,8 @@ const TravelPackageCarousel = () => {
             <br /> 우랑이를 모집합니다
           </h2>
           <button
-            className="px-6 py-3 mt-6 text-lg font-semibold text-white rounded-full shadow-md bg-brown "
-            onClick={handleViewDetails} // ✅ API 호출 후 이동
+            className="px-6 py-3 mt-6 text-lg font-semibold text-white rounded-full shadow-md bg-brown"
+            onClick={handleViewDetails}
           >
             자세히 알아보기 →
           </button>
@@ -97,22 +174,32 @@ const TravelPackageCarousel = () => {
         {/* 오른쪽 캐러셀 */}
         <div className="w-full mt-10 md:w-2/3 md:mt-0">
           <Slider {...settings}>
-            {packages.map((pkg) => (
-              <div key={pkg.id} className="p-4">
-                <div className="overflow-hidden bg-white rounded-lg shadow-lg">
-                  <img
-                    src={pkg.image}
-                    alt={pkg.title}
-                    className="object-cover w-full h-48"
-                  />
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-800">
-                      {pkg.title}
-                    </h3>
+            {travelPlans.map((plan) => {
+              const cityName = plan.arrivalCity?.name;
+              const imageUrl =
+                imageUrls[cityName] || 'https://via.placeholder.com/400';
+
+              return (
+                <div key={plan.travelPlanId} className="p-4">
+                  <div className="overflow-hidden bg-white rounded-lg shadow-lg">
+                    {/* ✅ Unsplash에서 가져온 이미지 사용 */}
+                    <img
+                      src={imageUrl}
+                      alt={plan.name}
+                      className="object-cover w-full h-48"
+                    />
+                    <div className="p-4">
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        {plan.name}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        {plan.departureCity?.name} → {plan.arrivalCity?.name}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </Slider>
         </div>
       </div>

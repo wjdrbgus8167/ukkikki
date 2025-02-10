@@ -63,7 +63,6 @@ const WorldAirportModal = ({ isOpen, onClose, onSelect }) => {
         const response = await publicRequest.get(
           `/api/v1/geography/continents/${selectedContinent}/countries/${selectedCountry}/cities/${selectedCity}`,
         );
-        // 각 공항 객체에 selectedCity를 cityId로 추가 (원하는 경우)
         const airportsData = (response.data.data || []).map((airport) => ({
           ...airport,
           cityId: selectedCity,
@@ -91,7 +90,6 @@ const WorldAirportModal = ({ isOpen, onClose, onSelect }) => {
       console.error('🚨 선택된 공항의 cityId가 없음:', airport);
       return;
     }
-    // onSelect에 airport.cityId, airport.name, airport.airportCode 전달
     onSelect(airport.cityId, airport.name, airport.airportCode);
     onClose();
   };
@@ -99,24 +97,25 @@ const WorldAirportModal = ({ isOpen, onClose, onSelect }) => {
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-      onClick={onClose}
-    >
-      <div className="relative p-6 bg-white rounded-md w-96">
-        <h2 className="mb-4 text-xl font-bold">도착지 선택</h2>
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 animate-fadeIn">
+      <div className="p-8 transition-all duration-300 transform scale-100 bg-white shadow-2xl rounded-xl w-96">
+        <h2 className="mb-6 text-2xl font-bold text-center text-gray-800">
+          도착지 선택
+        </h2>
         <button
           type="button"
           onClick={onClose}
-          className="absolute text-gray-500 top-3 right-3"
+          className="absolute text-gray-500 top-3 right-3 hover:text-gray-700 focus:outline-none"
         >
           ❌
         </button>
 
         {step === 1 && (
           <>
-            <h3 className="mb-2 text-lg font-semibold">대륙 선택</h3>
-            <div className="grid grid-cols-2 gap-2">
+            <h3 className="mb-4 text-lg font-semibold text-gray-700">
+              대륙 선택
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
               {continents.map((continent) => (
                 <button
                   type="button"
@@ -125,7 +124,7 @@ const WorldAirportModal = ({ isOpen, onClose, onSelect }) => {
                     setSelectedContinent(continent.continentId);
                     setStep(2);
                   }}
-                  className="p-2 bg-gray-200 rounded-md"
+                  className="p-3 transition-colors bg-gray-200 rounded-lg hover:bg-gray-300"
                 >
                   {continent.name}
                 </button>
@@ -136,15 +135,17 @@ const WorldAirportModal = ({ isOpen, onClose, onSelect }) => {
 
         {step === 2 && (
           <>
-            <h3 className="mb-2 text-lg font-semibold">나라 선택</h3>
+            <h3 className="mb-4 text-lg font-semibold text-gray-700">
+              나라 선택
+            </h3>
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="mb-2 text-blue-500"
+              className="mb-4 text-blue-500 hover:underline"
             >
               ⬅️ 뒤로
             </button>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-4">
               {countries.map((country) => (
                 <button
                   type="button"
@@ -153,7 +154,7 @@ const WorldAirportModal = ({ isOpen, onClose, onSelect }) => {
                     setSelectedCountry(country.countryId);
                     setStep(3);
                   }}
-                  className="p-2 bg-gray-200 rounded-md"
+                  className="p-3 transition-colors bg-gray-200 rounded-lg hover:bg-gray-300"
                 >
                   {country.name}
                 </button>
@@ -164,15 +165,17 @@ const WorldAirportModal = ({ isOpen, onClose, onSelect }) => {
 
         {step === 3 && (
           <>
-            <h3 className="mb-2 text-lg font-semibold">도시 선택</h3>
+            <h3 className="mb-4 text-lg font-semibold text-gray-700">
+              도시 선택
+            </h3>
             <button
               type="button"
               onClick={() => setStep(2)}
-              className="mb-2 text-blue-500"
+              className="mb-4 text-blue-500 hover:underline"
             >
               ⬅️ 뒤로
             </button>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-4">
               {cities.map((city) => (
                 <button
                   type="button"
@@ -181,7 +184,7 @@ const WorldAirportModal = ({ isOpen, onClose, onSelect }) => {
                     setSelectedCity(city.cityId);
                     setStep(4);
                   }}
-                  className="p-2 bg-gray-200 rounded-md"
+                  className="p-3 transition-colors bg-gray-200 rounded-lg hover:bg-gray-300"
                 >
                   {city.name}
                 </button>
@@ -192,21 +195,23 @@ const WorldAirportModal = ({ isOpen, onClose, onSelect }) => {
 
         {step === 4 && (
           <>
-            <h3 className="mb-2 text-lg font-semibold">공항 선택</h3>
+            <h3 className="mb-4 text-lg font-semibold text-gray-700">
+              공항 선택
+            </h3>
             <button
               type="button"
               onClick={() => setStep(3)}
-              className="mb-2 text-blue-500"
+              className="mb-4 text-blue-500 hover:underline"
             >
               ⬅️ 뒤로
             </button>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-4">
               {airports.map((airport) => (
                 <button
                   type="button"
                   key={airport.airportCode}
                   onClick={() => handleSelectAirport(airport)}
-                  className="p-2 bg-gray-200 rounded-md"
+                  className="p-3 transition-colors bg-gray-200 rounded-lg hover:bg-gray-300"
                 >
                   {airport.name}
                 </button>

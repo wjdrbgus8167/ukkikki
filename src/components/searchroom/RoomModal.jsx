@@ -65,8 +65,10 @@ function RoomModal({
         requestBody,
       );
       console.log('✅ 여행방 입장 성공:', response.data);
-      // 생성된 방 정보를 담아 /user-room으로 이동
-      navigate('/user-room', { state: { selectedCard: response.data } });
+      console.log('📌 넘겨지는 selectedCard:', response.data.data.travelPlan); // 생성된 방 정보를 담아 /user-room으로 이동
+      navigate('/user-room', {
+        state: { selectedCard: response.data.data.travelPlan },
+      });
     } catch (error) {
       console.error('🚨 여행방 입장 실패:', error);
       alert('🚨 여행방 입장 중 오류가 발생했습니다.');
@@ -102,10 +104,10 @@ function RoomModal({
               <strong>방 이름:</strong> {selectedCard.name}
             </p>
             <p className="mb-2">
-              <strong>출발 도시 ID:</strong> {selectedCard.departureCityId}
+              <strong>출발 도시 :</strong> {selectedCard.departureCity.name}
             </p>
             <p className="mb-2">
-              <strong>도착 도시 ID:</strong> {selectedCard.arrivalCityId}
+              <strong>도착 도시 :</strong> {selectedCard.arrivalCity.name}
             </p>
             <p className="mb-2">
               <strong>여행 날짜:</strong> {selectedCard.startDate} ~{' '}
