@@ -152,7 +152,7 @@ public class TravelPlanController {
 	}
 
 	@GetMapping("/{travelPlanId}")
-	public ApiUtils.ApiResponse<Object> getTravelPlanDetails(@PathVariable(name = "travelPlanId") Integer travelPlanId) {
+	public ApiUtils.ApiResponse<FetchSuggestedTravelPlanDetailsResponse> getTravelPlanDetails(@PathVariable(name = "travelPlanId") Integer travelPlanId) {
 		return ApiUtils.success(travelPlanService.fetchTravelPlanDetails(travelPlanId));
 	}
 
