@@ -107,26 +107,8 @@ public class TravelPlanService {
 								.keywords(query.keywords())
 								.build())
 				.build();
-		List<TravelPlan> travelPlans = travelPlanRepository.searchTravelPlan(domain);
 
-		return new SearchTravelPlanResponse(
-				travelPlans.stream()
-						.map(travelPlan -> new SearchTravelPlanResponse.SearchTravelPlanInfo(
-								travelPlan.getTravelPlanInfo().travelPlanId(),
-								travelPlan.getTravelPlanInfo().name(),
-								travelPlan.getTravelPlanInfo().departureCityId(),
-								travelPlan.getTravelPlanInfo().arrivalCityId(),
-								travelPlan.getTravelPlanInfo().startDate(),
-								travelPlan.getTravelPlanInfo().endDate(),
-								travelPlan.calPeopleCount(),
-								travelPlan.getTravelPlanInfo().maxPeople(),
-								travelPlan.getTravelPlanInfo().planningStatus(),
-								travelPlan.getTravelPlanInfo().keywords().stream()
-										.map(KeywordUi::new)
-										.toList()
-						))
-						.toList()
-		);
+		return SearchTravelPlanResponse.toResponse(travelPlanRepository.searchTravelPlan(domain));
 	}
 
 	public FetchSuggestedTravelPlansResponse fetchSuggestedTravelPlans(

@@ -88,8 +88,8 @@ public class TravelPlanRepository {
                 travelPlanId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 여행 계획입니다."));
 	}
 
-	public List<TravelPlan> searchTravelPlan(final TravelPlan travelPlanDomain) {
-		List<TravelPlanEntity> travelPlanEntities = queryDslTravelPlanRepository.searchTravelPlan(
+	public List<TravelPlanEntity> searchTravelPlan(final TravelPlan travelPlanDomain) {
+		return queryDslTravelPlanRepository.searchTravelPlan(
 				travelPlanDomain.getTravelPlanInfo().startDate(),
 				travelPlanDomain.getTravelPlanInfo().endDate(),
 				travelPlanDomain.getTravelPlanInfo().departureCityId(),
@@ -97,45 +97,6 @@ public class TravelPlanRepository {
 				travelPlanDomain.getTravelPlanInfo().planningStatus(),
 				travelPlanDomain.getTravelPlanInfo().keywords()
 		);
-
-		return travelPlanEntities.stream()
-				.map(entity -> TravelPlan.builder()
-						.travelPlanInfo(
-								TravelPlanInfo.builder()
-										.travelPlanId(entity.getTravelPlanId())
-										.name(entity.getName())
-										.startDate(entity.getStartDate())
-										.endDate(entity.getEndDate())
-										.departureCityId(entity.getDepartureCity().getCityId())
-										.arrivalCityId(entity.getArrivalCity().getCityId())
-										.planningStatus(entity.getPlanningStatus())
-										.maxPeople(entity.getMaxPeople())
-										.keywords(
-												entity.getTravelPlanKeywords().stream()
-														.map(keywordEntity -> keywordEntity.getKeyword().getKeywordId())
-														.toList()
-										)
-										.build()
-						)
-						.host(
-								Host.builder()
-										.adultCount(entity.getMemberTravelPlans().
-												stream()
-												.mapToInt(MemberTravelPlanEntity::getAdultCount)
-												.sum()
-										).childCount(entity.getMemberTravelPlans().
-												stream()
-												.mapToInt(MemberTravelPlanEntity::getChildCount)
-												.sum())
-										.infantCount(entity.getMemberTravelPlans().
-												stream()
-												.mapToInt(MemberTravelPlanEntity::getInfantCount)
-												.sum())
-										.build()
-						)
-						.build()
-				)
-				.toList();
 	}
 
 	//TODO : 반복되는 코드 매퍼로 분리해야함

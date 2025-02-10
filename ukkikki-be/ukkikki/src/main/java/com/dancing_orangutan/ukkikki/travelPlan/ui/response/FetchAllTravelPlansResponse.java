@@ -12,70 +12,79 @@ import lombok.Builder;
 import org.springframework.data.domain.Page;
 
 public record FetchAllTravelPlansResponse(
-        List<TravelPlan> travelPlans,
-        int totalPages,
-        long totalElements,
-        int pageNumber,
-        int pageSize
+		List<TravelPlan> travelPlans,
+		int totalPages,
+		long totalElements,
+		int pageNumber,
+		int pageSize
 ) {
 
-    @Builder
-    public FetchAllTravelPlansResponse {
+	@Builder
+	public FetchAllTravelPlansResponse {
 
-    }
+	}
 
-    private record TravelPlan(Integer travelPlanId, String name, City arrivalCity, City departureCity,
-                              LocalDate startDate, LocalDate endDate, PlanningStatus planningStatus,
-                              int currentParticipants, List<Keyword> keywords) {
-        @Builder
-        private TravelPlan {
-        }
-    }
+	private record TravelPlan(Integer travelPlanId, String name, City arrivalCity,
+							  City departureCity,
+							  LocalDate startDate, LocalDate endDate, PlanningStatus planningStatus,
+							  int currentParticipants, List<Keyword> keywords) {
 
-    private record City(Integer cityId, String name) {
-        @Builder
-        private City {
-        }
-    }
+		@Builder
+		private TravelPlan {
+		}
+	}
 
-    private record Keyword(Integer keywordId, String name) {
-        @Builder
-        private Keyword {
-        }
-    }
+	private record City(Integer cityId, String name) {
+
+		@Builder
+		private City {
+		}
+	}
+
+	private record Keyword(Integer keywordId, String name) {
+
+		@Builder
+		private Keyword {
+		}
+	}
 
 
-    public static FetchAllTravelPlansResponse toResponse(Page<TravelPlanEntity> page) {
-        List<TravelPlan> travelPlans = page.getContent().stream()
-                .map(entity -> TravelPlan.builder()
-                        .travelPlanId(entity.getTravelPlanId())
-                        .arrivalCity(City.builder()
-                                .cityId(entity.getArrivalCity().getCityId())
-                                .name(entity.getArrivalCity().getName()) // 오타 수정
-                                .build())
-                        .departureCity(City.builder()
-                                .cityId(entity.getDepartureCity().getCityId())
-                                .name(entity.getDepartureCity().getName())
-                                .build())
-                        .name(entity.getName())
-                        .startDate(entity.getStartDate())
-                        .endDate(entity.getEndDate())
-                        .planningStatus(entity.getPlanningStatus())
-                        .keywords(entity.getTravelPlanKeywords().stream()
-                                .map(keyword -> Keyword.builder()
-                                        .keywordId(keyword.getKeyword().getKeywordId())
-                                        .name(keyword.getKeyword().getName())
-                                        .build())
-                                .collect(toList()))
-                        .build())
-                .toList();
+	public static FetchAllTravelPlansResponse toResponse(Page<TravelPlanEntity> page) {
+		List<TravelPlan> travelPlans = page.getContent().stream()
+				.map(entity -> TravelPlan.builder()
+						.travelPlanId(entity.getTravelPlanId())
+						.arrivalCity(City.builder()
+								.cityId(entity.getArrivalCity().getCityId())
+								.name(entity.getArrivalCity().getName()) // 오타 수정
+								.build())
+						.departureCity(City.builder()
+								.cityId(entity.getDepartureCity().getCityId())
+								.name(entity.getDepartureCity().getName())
+								.build())
+						.name(entity.getName())
+						.startDate(entity.getStartDate())
+						.endDate(entity.getEndDate())
+						.planningStatus(entity.getPlanningStatus())
+						.currentParticipants(entity.getMemberTravelPlans().stream().mapToInt(
+								memberTravelPlanEntity -> memberTravelPlanEntity.getAdultCount()
+										+ memberTravelPlanEntity.getChildCount()
+										+ memberTravelPlanEntity.getInfantCount()
+						).sum())
+						.keywords(entity.getTravelPlanKeywords().stream()
+								.map(keyword -> Keyword.builder()
+										.keywordId(keyword.getKeyword().getKeywordId())
+										.name(keyword.getKeyword().getName())
+										.build())
+								.collect(toList()))
+						.build())
+				.toList();
 
-        return new FetchAllTravelPlansResponse(
-                travelPlans,
-                page.getTotalPages(),
-                page.getTotalElements(),
-                page.getNumber(),
-                page.getSize()
-        );
-    }
+		return new FetchAllTravelPlansResponse(
+				travelPlans,
+				page.getTotalPages(),
+				page.getTotalElements(),
+				page.getNumber(),
+				page.getSize()
+		);
+	}
 }
