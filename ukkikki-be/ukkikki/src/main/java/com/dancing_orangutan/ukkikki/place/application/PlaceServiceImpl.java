@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -110,6 +111,7 @@ public class PlaceServiceImpl implements PlaceService {
         placeTagRepository.delete(placeTagEntity);
     }
 
+    @Transactional
     @Override
     public void createPlaceLike(CreatePlaceLikeCommand command) {
 
@@ -121,6 +123,18 @@ public class PlaceServiceImpl implements PlaceService {
                 .build();
 
         // 비즈니스 로직 수행
+        // 기존 좋아요 조회
+        List<LikeEntity> existingLikeEntities = placeLikeRepository.findByLikeId_PlaceId(command.getPlaceId());
+        List<Like> existingLikes = existingLikeEntities.stream()
+                .map(PlaceLikeMapper::mapToDomain)
+                .toList();
+
+        // 중복 체크
+        if (Like.hasDuplicateLike(like.getCreatorId(), like.getPlaceId(), existingLikes)) {
+            throw new IllegalStateException("중복 좋아요: 해당 사용자가 이미 이 장소를 좋아요 했습니다.");
+        }
+
+        // 여행 계획 내 동행자 수를 가져와 좋아요 수 세팅
         MemberTravelPlanEntity memberTravelPlanEntity = memberTravelPlanFinder
                 .findMemberTravelPlanById(like.getTravelPlanId(), like.getCreatorId());
         like.setLikeCount(memberTravelPlanEntity);
