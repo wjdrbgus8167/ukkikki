@@ -56,6 +56,10 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: 6379
+
+    mongodb:
+      uri: mongodb://${MONGO_HOST}:${MONGO_PORT}/${MONGO_DATABASE}
+
   cloud:
     aws:
       credentials:
