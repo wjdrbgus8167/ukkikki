@@ -8,16 +8,15 @@ import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchSuggested
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.Host;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlan;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanInfo;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.memberTravelPlan.MemberTravelPlanFinder;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.memberTravelPlan.MemberTravelPlanModifier;
 import com.dancing_orangutan.ukkikki.travelPlan.mapper.TravelPlanMapper;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.request.KeywordUi;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.response.CreateTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.response.*;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.travelPlan.TravelPlanRepository;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.response.FetchSuggestedTravelPlanResponse;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.response.JoinTravelPlanResponse;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.response.SearchTravelPlanResponse;
+
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -128,7 +127,7 @@ public class TravelPlanService {
 		);
 	}
 
-	public FetchSuggestedTravelPlanResponse fetchSuggestedTravelPlans(
+	public FetchSuggestedTravelPlansResponse fetchSuggestedTravelPlans(
 			FetchSuggestedTravelPlanQuery query) {
 		TravelPlan domain = TravelPlan.builder()
 				.travelPlanInfo(
@@ -137,11 +136,11 @@ public class TravelPlanService {
 								.build()
 				).build();
 
-		List<TravelPlan> travelPlans = travelPlanRepository.fetchTravelPlan(domain);
+		List<TravelPlan> travelPlans = travelPlanRepository.fetchTravelPlans(domain);
 
-		return new FetchSuggestedTravelPlanResponse(
+		return new FetchSuggestedTravelPlansResponse(
 				travelPlans.stream()
-						.map(travelPlan -> new FetchSuggestedTravelPlanResponse.FetchSuggestedTravelPlanInfo(
+						.map(travelPlan -> new FetchSuggestedTravelPlansResponse.FetchSuggestedTravelPlanInfo(
 								travelPlan.getTravelPlanInfo().travelPlanId(),
 								travelPlan.getTravelPlanInfo().name(),
 								travelPlan.getTravelPlanInfo().departureCityId(),
@@ -224,5 +223,10 @@ public class TravelPlanService {
 				.memberId(domain.getHost().memberId())
 				.travelPlanId(domain.getTravelPlanInfo().travelPlanId())
 				.build());
+	}
+
+	public FetchSuggestedTravelPlanDetailsResponse fetchTravelPlanDetails(Integer travelPlanId) {
+		TravelPlanEntity travelPlanEntity = travelPlanRepository.fetchTravelPlan(travelPlanId);
+		return FetchSuggestedTravelPlanDetailsResponse.toResponse(travelPlanEntity);
 	}
 }
