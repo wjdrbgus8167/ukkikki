@@ -1,7 +1,7 @@
 package com.dancing_orangutan.ukkikki.place.application;
 
-import com.dancing_orangutan.ukkikki.member.domain.MemberEntity;
-import com.dancing_orangutan.ukkikki.member.infrastructure.MemberFinder;
+import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
+import com.dancing_orangutan.ukkikki.member.infrastructure.member.MemberFinder;
 import com.dancing_orangutan.ukkikki.place.application.command.*;
 import com.dancing_orangutan.ukkikki.place.domain.like.Like;
 import com.dancing_orangutan.ukkikki.place.domain.like.LikeEntity;
