@@ -164,7 +164,7 @@ const CompanyRegisterForm = () => {
     };
 
     try {
-      await publicRequest.post('/auth/companies/register', requestBody);
+      await publicRequest.post('api/v1/auth/companies/register', requestBody);
       alert('기업 회원가입 성공!');
       navigate('/login'); // ✅ 회원가입 성공 시 /login으로 이동
     } catch (error) {
@@ -173,13 +173,13 @@ const CompanyRegisterForm = () => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto bg-white p-6 rounded-lg ">
-      <h1 className="text-3xl text-brown font-bold text-center mb-6">
+    <div className="w-full max-w-md p-6 mx-auto bg-white rounded-lg ">
+      <h1 className="mb-6 text-3xl font-bold text-center text-brown">
         기업회원 회원가입
       </h1>
 
       {errorMessage && (
-        <p className="text-red-500 text-sm mb-4">{errorMessage}</p>
+        <p className="mb-4 text-sm text-red-500">{errorMessage}</p>
       )}
 
       {step === 1 ? (
@@ -236,7 +236,7 @@ const CompanyRegisterForm = () => {
           <button
             type="button"
             onClick={handleNextStep}
-            className="w-full bg-brown text-white py-3 rounded-lg mt-4"
+            className="w-full py-3 mt-4 text-white rounded-lg bg-brown"
           >
             다음
           </button>
@@ -266,7 +266,7 @@ const CompanyRegisterForm = () => {
               className="w-full px-3 py-4 border rounded focus:ring focus:ring-yellow-400"
               required
             />
-            {isChecking && <p className="text-gray-500 text-sm">조회 중...</p>}
+            {isChecking && <p className="text-sm text-gray-500">조회 중...</p>}
             {businessCheckResult && (
               <p
                 className={`text-sm ${
@@ -294,14 +294,14 @@ const CompanyRegisterForm = () => {
             <button
               type="button"
               onClick={handlePreviousStep}
-              className="bg-gray-400 text-white px-4 py-2 rounded"
+              className="px-4 py-2 text-white bg-gray-400 rounded"
             >
               이전
             </button>
 
             <button
               type="submit"
-              className="bg-brown text-white px-4 py-2 rounded hover:bg-yellow hover:text-brown hover:font-semibold"
+              className="px-4 py-2 text-white rounded bg-brown hover:bg-yellow hover:text-brown hover:font-semibold"
               disabled={!businessCheckResult?.valid} // ❌ 유효하지 않으면 버튼 비활성화
             >
               회원가입 완료
