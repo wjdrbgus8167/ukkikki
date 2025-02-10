@@ -22,4 +22,8 @@ public class MemberFinder {
 		return memberRepository.findById(memberId)
 				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 멤버 ID입니다.")).getName();
 	}
+
+	public MemberEntity findById(Integer memberId) {
+		return memberRepository.findById(memberId).orElse(null);
+	}
 }

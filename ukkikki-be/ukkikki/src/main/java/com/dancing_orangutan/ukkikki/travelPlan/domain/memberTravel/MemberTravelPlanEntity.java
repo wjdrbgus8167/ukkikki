@@ -57,14 +57,14 @@ public class MemberTravelPlanEntity {
 	private LocalDateTime exitTime;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@MapsId("travelPlanId")
-	@JoinColumn(name = "travel_plan_id")
-	private TravelPlanEntity travelPlan;
-
-	@ManyToOne(fetch = FetchType.LAZY)
 	@MapsId("memberId")
 	@JoinColumn(name = "member_id")
 	private MemberEntity member;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@MapsId("travelPlanId")
+	@JoinColumn(name = "travel_plan_id")
+	private TravelPlanEntity travelPlan;
 
 	@Builder
 	public MemberTravelPlanEntity(MemberTravelPlanId memberTravelPlanId,
