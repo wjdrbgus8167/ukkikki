@@ -12,7 +12,7 @@ const SearchRoom = () => {
   console.log('🔍 location.state:', location.state); // ✅ 추가
 
   // 수정: travelPlans 프로퍼티 없이 바로 rooms 배열 사용
-  const rooms = location.state?.rooms || [];
+  const rooms = location.state.rooms.travelPlans || [];
 
   // 🚀 디버깅 로그
   console.log('✅ rooms 데이터 확인:', rooms);

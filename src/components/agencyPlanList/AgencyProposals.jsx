@@ -35,7 +35,8 @@ const AgencyProposals = () => {
                 proposals.map((proposal) => (
                     <ListCard 
                         key = {proposal.proposalId}
-                        trip_name = {proposal.deposit}
+                        trip_name = {proposal.proposalState}
+
                     />
                 ))
             ) : (

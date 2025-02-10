@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; // React Router 사용
 import { publicRequest } from '../../hooks/requestMethod';
+
 const ProgressBar = ({ step, totalSteps }) => {
   const progress = (step / totalSteps) * 100;
 
@@ -39,19 +40,19 @@ function RoomModal({
 
   // 오버레이 클릭 핸들러
   const handleOverlayClick = (e) => {
-    // 만약 클릭 대상이 overlay(div) 자신이라면 모달 닫기
     if (e.target === e.currentTarget) {
       onClose();
     }
   };
-  // 입장하기 버튼 클릭 시 UserRoom으로 라우팅
+
+  // 입장하기 버튼 클릭 시 UserRoom으로 이동
   const handleEnterRoom = async () => {
-    if (!selectedCard || !selectedCard.id) {
+    if (!selectedCard || !selectedCard.travelPlanId) {
       alert('🚨 여행방 정보를 찾을 수 없습니다.');
       return;
     }
 
-    const travelPlanId = selectedCard.id; // ✅ 선택된 여행방의 ID
+    const travelPlanId = selectedCard.travelPlanId; // API 응답에 따른 ID 필드
     const requestBody = {
       adultCount: people.adult,
       childCount: people.child,
@@ -60,52 +61,56 @@ function RoomModal({
 
     try {
       const response = await publicRequest.post(
-        `/travel-plans/${travelPlanId}`,
+        `/api/v1/travel-plans/${travelPlanId}`,
         requestBody,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
       );
-
       console.log('✅ 여행방 입장 성공:', response.data);
-
-      // ✅ UserRoom 페이지로 이동하면서 상태 전달
+      // 생성된 방 정보를 담아 /user-room으로 이동
       navigate('/user-room', { state: { selectedCard: response.data } });
     } catch (error) {
       console.error('🚨 여행방 입장 실패:', error);
       alert('🚨 여행방 입장 중 오류가 발생했습니다.');
     }
   };
+
   return (
-    // 클릭 이벤트를 배경(오버레이) div에 등록
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
       onClick={handleOverlayClick}
     >
-      {/* 자식 컨테이너에서 이벤트 버블링 막기 */}
       <div
         className="w-full max-w-lg p-6 bg-white shadow-lg rounded-xl"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* 모달 헤더 */}
+        <div className="flex items-center justify-between pb-2 mb-5 border-b-2">
+          <h1 className="pb-2 text-xl font-semibold border-gray-300">
+            {step === 1 ? '방 정보 확인' : '인원 입력'}
+          </h1>
+          <button
+            onClick={onClose}
+            className="text-xl text-gray-500 hover:text-gray-700"
+          >
+            ✕
+          </button>
+        </div>
+
         {/* 1단계: 방 정보 확인 */}
         {step === 1 && selectedCard && (
           <div>
-            <h2 className="pb-2 mb-4 text-xl font-bold border-b-2">
-              방 정보 확인
-            </h2>
             <p className="mb-2">
-              <strong>방 이름:</strong> {selectedCard.title}
+              <strong>방 이름:</strong> {selectedCard.name}
             </p>
             <p className="mb-2">
-              <strong>나라:</strong> {selectedCard.country}
+              <strong>출발 도시 ID:</strong> {selectedCard.departureCityId}
             </p>
             <p className="mb-2">
-              <strong>여행 날짜:</strong> {selectedCard.date}
+              <strong>도착 도시 ID:</strong> {selectedCard.arrivalCityId}
             </p>
-
-            {/* 진행바 + 버튼 영역 */}
+            <p className="mb-2">
+              <strong>여행 날짜:</strong> {selectedCard.startDate} ~{' '}
+              {selectedCard.endDate}
+            </p>
             <div className="mt-6">
               <ProgressBar step={step} totalSteps={totalSteps} />
               <div className="flex justify-between space-x-2">
@@ -129,9 +134,6 @@ function RoomModal({
         {/* 2단계: 인원 입력 */}
         {step === 2 && (
           <div>
-            <h2 className="pb-2 mb-4 text-xl font-bold border-b-2">
-              인원 입력
-            </h2>
             <div className="space-y-4">
               {['adult', 'child', 'infant'].map((type) => (
                 <div key={type} className="flex items-center justify-between">
@@ -155,12 +157,7 @@ function RoomModal({
                       onChange={(e) =>
                         handlePeopleChange(type, Number(e.target.value))
                       }
-                      className="
-                        w-20 p-2 border border-gray-300 rounded-md text-center
-                        [appearance:textfield]
-                        [&::-webkit-outer-spin-button]:appearance-none
-                        [&::-webkit-inner-spin-button]:appearance-none
-                      "
+                      className="w-20 p-2 text-center border border-gray-300 rounded-md"
                       min={0}
                     />
                     <button
@@ -173,7 +170,6 @@ function RoomModal({
                 </div>
               ))}
             </div>
-
             <div className="mt-6">
               <ProgressBar step={step} totalSteps={totalSteps} />
               <div className="flex justify-between">
