@@ -65,8 +65,8 @@ public class TravelPlanService {
 						.build())
 				.build();
 
-		TravelPlan savedTravelPlan = travelPlanRepository.save(domain);
-		return CreateTravelPlanResponse.toResponse(savedTravelPlan);
+
+		return CreateTravelPlanResponse.toResponse(travelPlanRepository.save(domain));
 	}
 
 	@Transactional
