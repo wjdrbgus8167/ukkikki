@@ -127,7 +127,7 @@ const PlaceSelection = ({
   };
 
   return (
-    <div className="p-4">
+    <div className="">
       <Info>
         <h1> {destinationCity}</h1>
         <h3>
@@ -138,28 +138,21 @@ const PlaceSelection = ({
       <div>
         {/* 탭 스위치 버튼 */}
       
-      <TabButton>
-        <button
+        <TabButton>
+          <button
             onClick={() => setIsSearchMode(false)}
-            className={`flex-1 py-2 font-semibold ${
-              !isSearchMode
-                ? 'text-blue-500 border-b-2 border-blue-500'
-                : 'text-gray-500'
-            }`}
+            className={!isSearchMode ? "active" : "inactive"}
           >
             여행 장소 목록
           </button>
           <button
             onClick={() => setIsSearchMode(true)}
-            className={`flex-1 py-2 font-semibold ${
-              isSearchMode
-                ? 'text-blue-500 border-b-2 border-blue-500'
-                : 'text-gray-500'
-            }`}
+            className={isSearchMode ? "active" : "inactive"}
           >
             새로운 장소 검색
           </button>
-      </TabButton>
+        </TabButton>
+
 
       <Places>
         {/* "여행 장소 목록" 탭 */}
@@ -226,7 +219,7 @@ const PlaceSelection = ({
           <h2>장소 검색</h2>
           {isLoaded ? (
             <Autocomplete onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)} onPlaceChanged={onPlaceChanged}>
-              <input type="text" placeholder="장소 검색" />
+              <input type="text" placeholder="장소를 입력해주세요" />
             </Autocomplete>
           ) : (
             <p>지도 로딩중...</p>
