@@ -3,6 +3,7 @@ package com.dancing_orangutan.ukkikki.travelPlan.infrastructure.travelPlan;
 import com.dancing_orangutan.ukkikki.geography.domain.CityEntity;
 import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
 import com.dancing_orangutan.ukkikki.member.infrastructure.member.MemberFinder;
+import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.keyword.KeywordEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.*;
@@ -13,6 +14,8 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
@@ -230,6 +233,10 @@ public class TravelPlanRepository {
 				domain.getTravelPlanInfo().travelPlanId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 여행 계획입니다."));
 
 		travelPlanEntity.updateHostInfo(domain.getHost().memberId(), domain.getHost().adultCount(), domain.getHost().childCount(), domain.getHost().infantCount());
+	}
+
+	public Page<TravelPlanEntity> getAllTravelPlans(Pageable pageable) {
+		return jpaTravelPlanRepository.findByPlanningStatusNot(PlanningStatus.CONFIRMED,pageable);
 	}
 
 	public TravelPlanEntity fetchTravelPlan(Integer travelPlanId) {

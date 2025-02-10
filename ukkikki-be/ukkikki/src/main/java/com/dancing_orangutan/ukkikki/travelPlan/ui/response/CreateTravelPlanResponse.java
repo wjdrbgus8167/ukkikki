@@ -5,7 +5,6 @@ import com.dancing_orangutan.ukkikki.travelPlan.ui.request.KeywordUi;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.request.TravelPlanInfoUi;
 
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 public record CreateTravelPlanResponse(TravelPlanInfoUi travelPlan) {
@@ -14,25 +13,21 @@ public record CreateTravelPlanResponse(TravelPlanInfoUi travelPlan) {
 		if (travelPlan == null) {
 			return null;
 		}
-		TravelPlanInfoUi travelPlanInfoUi = new TravelPlanInfoUi(
-				travelPlan.getTravelPlanInfo().name(),
-				travelPlan.getTravelPlanInfo().departureCityId(),
-				travelPlan.getTravelPlanInfo().arrivalCityId(),
-				travelPlan.getTravelPlanInfo().startDate(),
-				travelPlan.getTravelPlanInfo().endDate(),
-				travelPlan.getTravelPlanInfo().minPeople(),
-				travelPlan.getTravelPlanInfo().maxPeople(),
-				travelPlan.getTravelPlanInfo().planningStatus(),
-				mapKeywords(travelPlan.getTravelPlanInfo().keywords())
-		);
+
+		TravelPlanInfoUi travelPlanInfoUi = TravelPlanInfoUi.builder()
+				.name(travelPlan.getTravelPlanInfo().name())
+				.departureCityId(travelPlan.getTravelPlanInfo().departureCityId())
+				.arrivalCityId(travelPlan.getTravelPlanInfo().arrivalCityId())
+				.startDate(travelPlan.getTravelPlanInfo().startDate())
+				.endDate(travelPlan.getTravelPlanInfo().endDate())
+				.maxPeople(travelPlan.getTravelPlanInfo().maxPeople())
+				.minPeople(travelPlan.getTravelPlanInfo().minPeople())
+				.planningStatus(travelPlan.getTravelPlanInfo().planningStatus())
+				.keywords(travelPlan.getTravelPlanInfo().keywords().stream().map(KeywordUi::new)
+						.collect(Collectors.toList()))
+				.build();
 
 		return new CreateTravelPlanResponse(travelPlanInfoUi);
 	}
 
-	private static List<KeywordUi> mapKeywords(List<Integer> keywordIds) {
-		if (keywordIds == null) {
-			return null;
-		}
-		return keywordIds.stream().map(KeywordUi::new).collect(Collectors.toList());
-	}
 }

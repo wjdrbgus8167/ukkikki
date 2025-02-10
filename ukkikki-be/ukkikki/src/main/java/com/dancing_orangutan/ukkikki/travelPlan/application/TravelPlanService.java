@@ -18,12 +18,17 @@ import com.dancing_orangutan.ukkikki.travelPlan.mapper.TravelPlanMapper;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.request.KeywordUi;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.*;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.travelPlan.TravelPlanRepository;
-
+import com.dancing_orangutan.ukkikki.travelPlan.ui.response.FetchSuggestedTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.response.JoinTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.response.SearchTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.response.FetchAllTravelPlansResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -230,6 +235,11 @@ public class TravelPlanService {
 				.build());
 	}
 
+	public FetchAllTravelPlansResponse getAllTravelPlans(Pageable pageable) {
+		Page<TravelPlanEntity> entityPage = travelPlanRepository.getAllTravelPlans(pageable);
+		return FetchAllTravelPlansResponse.toResponse(entityPage);
+	}
+
 	public FetchSuggestedTravelPlanDetailsResponse fetchTravelPlanDetails(Integer travelPlanId) {
 		TravelPlanEntity travelPlanEntity = travelPlanRepository.fetchTravelPlan(travelPlanId);
 		return FetchSuggestedTravelPlanDetailsResponse.toResponse(travelPlanEntity);
@@ -247,4 +257,5 @@ public class TravelPlanService {
 						.collect(Collectors.toList()))
 				.build();
     }
+
 }
