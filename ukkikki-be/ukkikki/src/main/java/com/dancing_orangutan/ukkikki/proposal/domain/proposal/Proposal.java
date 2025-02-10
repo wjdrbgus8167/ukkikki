@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class Proposal {
 
     private final Integer proposalId;
+    private final String name;
     private final LocalDate startDate;
     private final LocalDate endDate;
     private final String airline;
@@ -33,13 +34,14 @@ public class Proposal {
     private final String arrivalAirportCode;
 
     @Builder
-    public Proposal(Integer proposalId,LocalDate startDate,LocalDate endDate,String airline
+    public Proposal(Integer proposalId,String name,LocalDate startDate,LocalDate endDate,String airline
             ,LocalDateTime startDateBoardingTime,LocalDateTime startDateArrivalTime,LocalDateTime endDateBoardingTime
             ,LocalDateTime endDateArrivalTime,int deposit,int minPeople,boolean guideIncluded,String productIntroduction
             ,String refundPolicy,boolean insuranceIncluded,ProposalStatus proposalStatus,LocalDateTime createTime
             ,LocalDateTime updateTime,Integer companyId, Integer travelPlanId, String departureAirportCode, String arrivalAirportCode) {
 
         this.proposalId = proposalId;
+        this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.airline = airline;

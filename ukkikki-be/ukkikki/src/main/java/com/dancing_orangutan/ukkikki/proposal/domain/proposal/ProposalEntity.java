@@ -28,6 +28,9 @@ public class ProposalEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer proposalId;
 
+	@Column(nullable = false, length = 20)
+	private String name;
+
 	@Column(nullable = false, name = "start_date")
 	private LocalDate startDate;
 
@@ -95,13 +98,14 @@ public class ProposalEntity {
 	private AirportEntity arrivalAirport;
 
 	@Builder
-	public ProposalEntity(Integer proposalId, LocalDate startDate, LocalDate endDate, String airline
+	public ProposalEntity(Integer proposalId, String name, LocalDate startDate, LocalDate endDate, String airline
 	, LocalDateTime startDateBoardingTime, LocalDateTime startDateArrivalTime, LocalDateTime endDateBoardingTime
 	, LocalDateTime endDateArrivalTime, int deposit, int minPeople, boolean guideIncluded, String productIntroduction
 	, String refundPolicy, boolean insuranceIncluded, ProposalStatus proposalStatus, LocalDateTime createTime
 	, LocalDateTime updateTime, CompanyEntity company, TravelPlanEntity travelPlan, AirportEntity departureAirport, AirportEntity arrivalAirport) {
 
 		this.proposalId = proposalId;
+		this.name = name;
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.airline = airline;

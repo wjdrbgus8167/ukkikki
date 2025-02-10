@@ -11,6 +11,7 @@ public class CompanyProposalListResponse {
 
     private final Integer proposalId;
     private final Integer travelPlanId;
+    private final String name;
     private final LocalDate startDate;
     private final LocalDate endDate;
     private final String airline;
@@ -22,11 +23,12 @@ public class CompanyProposalListResponse {
     private final LocalDateTime createTime;
 
     @Builder
-    public CompanyProposalListResponse(Integer proposalId, Integer travelPlanId, LocalDate startDate, LocalDate endDate,
+    public CompanyProposalListResponse(Integer proposalId, Integer travelPlanId, String name, LocalDate startDate, LocalDate endDate,
                                        String airline, String departureAirportName, String arrivalAirportName,
                                        int deposit, int minPeople, String proposalStatus, LocalDateTime createTime) {
         this.proposalId = proposalId;
         this.travelPlanId = travelPlanId;
+        this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.airline = airline;

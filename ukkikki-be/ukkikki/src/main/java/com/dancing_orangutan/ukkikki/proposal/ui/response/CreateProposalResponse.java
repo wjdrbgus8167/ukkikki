@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class CreateProposalResponse {
 
     private Integer proposalId;
+    private String name;
     private LocalDate startDate;
     private LocalDate endDate;
     private String airline;

@@ -33,6 +33,7 @@ public class ProposalRepository  {
         TravelPlanEntity travelPlan = travelPlanFinder.getReferenceById(proposalDomain.getTravelPlanId());
 
         ProposalEntity proposalEntity = ProposalEntity.builder()
+                .name(proposalDomain.getName())
                 .startDate(proposalDomain.getStartDate())
                 .endDate(proposalDomain.getEndDate())
                 .airline(proposalDomain.getAirline())
