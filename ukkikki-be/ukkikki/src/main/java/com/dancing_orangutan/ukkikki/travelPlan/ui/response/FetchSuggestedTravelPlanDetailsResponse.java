@@ -14,7 +14,7 @@ public record FetchSuggestedTravelPlanDetailsResponse(TravelPlan travelPlan) {
     public FetchSuggestedTravelPlanDetailsResponse {
     }
 
-    private record TravelPlan(String name, City arrivalCity, City departureCity,
+    private record TravelPlan(Integer travelPlanId,String name, City arrivalCity, City departureCity,
                               LocalDate startDate, LocalDate endDate,
                               int currentParticipants, List<Keyword> keywords, List<Place> places) {
         @Builder
@@ -52,6 +52,7 @@ public record FetchSuggestedTravelPlanDetailsResponse(TravelPlan travelPlan) {
         return FetchSuggestedTravelPlanDetailsResponse.builder()
                 .travelPlan(
                         TravelPlan.builder()
+                                .travelPlanId(entity.getTravelPlanId())
                                 .name(entity.getName())
                                 .arrivalCity(
                                         City.builder()
@@ -99,4 +100,5 @@ public record FetchSuggestedTravelPlanDetailsResponse(TravelPlan travelPlan) {
                 )
                 .build();
     }
+
 }
