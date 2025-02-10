@@ -2,25 +2,23 @@
 
 import React, { useEffect, useState } from "react";
 import ListCard from "../common/ListCard";
-import { fetchAgencyProposals } from "../../apis/agency";
-import Cookies from "js-cookie";
+import { AgencyProposalslist } from "../../apis/agency";
 
 
 const AgencyProposals = () => {
 
    
-  const [proposals, setProposal ] = useState([]);
+  const [proposals, setProposals ] = useState([]);
   const [error, setError] = useState(null);
-
-  const jwtToken = Cookies.get('jwtToken');
 
   useEffect(() => {
     const getAgencyProposals = async() => {
         setError(null);
         
         try{
-            const data = await fetchAgencyProposals(jwtToken);
-            setProposal(data);
+            const data = await AgencyProposalslist();
+            console.log("API 응답 데이터:", data);
+            setProposals(data);
         } catch(error) {
             setError('제안서를 불러오는 데 실패했습니다.');
             console.log('Error:',error);
@@ -29,19 +27,19 @@ const AgencyProposals = () => {
 
     getAgencyProposals();
   
-    }, [jwtToken]);
+    },[]);
 
     return(
         <div className="flex flex-wrap">
-            {proposals && proposals.length > 0 ? (
+            {proposals ? (
                 proposals.map((proposal) => (
                     <ListCard 
                         key = {proposal.proposalId}
-                        trip_name = {proposal.travelPlanName}
+                        trip_name = {proposal.deposit}
                     />
                 ))
             ) : (
-              <p>제안서가 없습니다.</p>
+              <p>제안서가 없습니다. </p>
             )}
           </div>
     );

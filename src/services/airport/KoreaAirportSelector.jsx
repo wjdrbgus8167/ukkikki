@@ -1,37 +1,84 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { publicRequest } from '../../hooks/requestMethod';
 
-const KoreaAirportSelector = ({ selectedAirport, onChange }) => {
-  // ✅ 하드코딩된 한국 출발 도시 목록
-  const koreaAirports = [
-    { code: 'ICN', name: '인천국제공항' },
-    { code: 'GMP', name: '김포국제공항' },
-    { code: 'PUS', name: '김해국제공항' },
-    { code: 'CJU', name: '제주국제공항' },
-    { code: 'TAE', name: '대구국제공항' },
-    { code: 'KWJ', name: '광주공항' },
-    { code: 'USN', name: '울산공항' },
-  ];
+const KoreaAirportModal = ({ isOpen, onClose, onSelect }) => {
+  const [cities, setCities] = useState([]);
+  const [airports, setAirports] = useState([]);
+  const [selectedCity, setSelectedCity] = useState('');
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const response = await publicRequest.get(
+          '/api/v1/geography/continents/1/countries/1/cities',
+        );
+        setCities(response.data.data || []);
+      } catch (error) {
+        console.error('🚨 한국 도시 데이터 오류:', error);
+      }
+    };
+    fetchCities();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedCity) return;
+
+    const fetchAirports = async () => {
+      try {
+        const response = await publicRequest.get(
+          `/api/v1/geography/continents/1/countries/1/cities/${selectedCity}`,
+        );
+        setAirports(response.data.data || []);
+      } catch (error) {
+        console.error('🚨 공항 데이터 오류:', error);
+      }
+    };
+    fetchAirports();
+  }, [selectedCity]);
+
+  if (!isOpen) return null;
 
   return (
-    <div className="w-full">
-      <label className="block text-sm font-medium text-gray-700">
-        출발 도시
-      </label>
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="p-6 bg-white rounded-md w-96">
+        <h2 className="mb-4 text-xl font-bold">출발지 선택</h2>
+        <button
+          onClick={onClose}
+          className="absolute text-gray-500 top-3 right-3"
+        >
+          ❌
+        </button>
 
-      <select
-        value={selectedAirport}
-        onChange={onChange}
-        className="w-full px-4 py-2 bg-transparent border text-white placeholder-white border-white rounded-md focus:outline-none focus:ring-2 focus:bg-dark-green"
-      >
-        <option value="">출발 공항 선택</option>
-        {koreaAirports.map((airport) => (
-          <option key={airport.code} value={airport.code}>
-            {airport.name}
-          </option>
-        ))}
-      </select>
+        {/* 도시 선택 */}
+        {!selectedCity ? (
+          <div className="grid grid-cols-2 gap-2">
+            {cities.map((city) => (
+              <button
+                key={city.cityId}
+                onClick={() => setSelectedCity(city.cityId)}
+                className="p-2 bg-gray-200 rounded-md"
+              >
+                {city.name}
+              </button>
+            ))}
+          </div>
+        ) : (
+          // 공항 선택
+          <div className="grid grid-cols-2 gap-2">
+            {airports.map((airport) => (
+              <button
+                key={airport.airportCode}
+                onClick={() => onSelect(selectedCity, airport.name)}
+                className="p-2 bg-gray-200 rounded-md"
+              >
+                {airport.name}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-export default KoreaAirportSelector;
+export default KoreaAirportModal;
