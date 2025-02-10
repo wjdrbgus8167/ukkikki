@@ -1,6 +1,5 @@
 package com.dancing_orangutan.ukkikki.travelPlan.ui;
 
-import com.dancing_orangutan.ukkikki.event.eventPublisher.SpringEventPublisher;
 import com.dancing_orangutan.ukkikki.global.security.MemberUserDetails;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.*;
@@ -8,15 +7,17 @@ import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchSuggested
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.request.*;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.response.CreateTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.response.*;
 import com.dancing_orangutan.ukkikki.travelPlan.application.TravelPlanService;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.response.FetchSuggestedTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.response.FetchSuggestedTravelPlansResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.JoinTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.response.SearchTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.response.FetchAllTravelPlansResponse;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.*;
@@ -76,7 +77,7 @@ public class TravelPlanController {
 
 	//여행사 제안받은 여행 계획서 조회
 	@GetMapping("/list")
-	public ApiUtils.ApiResponse<FetchSuggestedTravelPlanResponse> fetchSuggestedTravelPlans() {
+	public ApiUtils.ApiResponse<FetchSuggestedTravelPlansResponse> fetchSuggestedTravelPlans() {
 		FetchSuggestedTravelPlanQuery query = new FetchSuggestedTravelPlanQuery(
 				PlanningStatus.BIDDING);
 		return ApiUtils.success(travelPlanService.fetchSuggestedTravelPlans(query));
@@ -143,5 +144,21 @@ public class TravelPlanController {
 
 		travelPlanService.updateHost(command);
 		return ApiUtils.success("인원이 성공적으로 변경되었습니다.");
+	}
+
+	@GetMapping
+	public ApiUtils.ApiResponse<FetchAllTravelPlansResponse> getAllTravelPlans(Pageable pageable) {
+		return  ApiUtils.success(travelPlanService.getAllTravelPlans(pageable));
+	}
+
+	@GetMapping("/{travelPlanId}")
+	public ApiUtils.ApiResponse<FetchSuggestedTravelPlanDetailsResponse> getTravelPlanDetails(@PathVariable(name = "travelPlanId") Integer travelPlanId) {
+		return ApiUtils.success(travelPlanService.fetchTravelPlanDetails(travelPlanId));
+	}
+
+	@GetMapping("/keywords")
+	public ApiUtils.ApiResponse<GetKeywordsResponse> getKeywords() {
+		GetKeywordsResponse response = travelPlanService.getKeywords();
+		return ApiUtils.success(response);
 	}
 }

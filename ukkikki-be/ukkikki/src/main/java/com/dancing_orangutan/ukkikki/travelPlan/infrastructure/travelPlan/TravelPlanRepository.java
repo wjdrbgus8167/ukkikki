@@ -1,8 +1,9 @@
 package com.dancing_orangutan.ukkikki.travelPlan.infrastructure.travelPlan;
 
-import com.dancing_orangutan.ukkikki.entity.info.CityEntity;
+import com.dancing_orangutan.ukkikki.geography.domain.CityEntity;
 import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
 import com.dancing_orangutan.ukkikki.member.infrastructure.member.MemberFinder;
+import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.keyword.KeywordEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.*;
@@ -13,6 +14,8 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
@@ -30,7 +33,7 @@ public class TravelPlanRepository {
 
 	private final MemberFinder memberFinder;
 
-	public TravelPlan save(final TravelPlan travelPlanDomain) {
+	public TravelPlanEntity save(final TravelPlan travelPlanDomain) {
 
 		CityEntity arrivalCity = cityFinder.getReferenceById(
 				travelPlanDomain.getTravelPlanInfo().arrivalCityId());
@@ -66,24 +69,7 @@ public class TravelPlanRepository {
 				travelPlanDomain.getHost().adultCount(), travelPlanDomain.getHost().childCount(),
 				travelPlanDomain.getHost().infantCount(), true);
 
-		TravelPlanEntity entity = jpaTravelPlanRepository.save(travelPlanEntity);
-
-		return TravelPlan.builder()
-				.travelPlanInfo(TravelPlanInfo.builder()
-						.name(entity.getName())
-						.departureCityId(entity.getDepartureCity().getCityId())
-						.maxPeople(entity.getMaxPeople())
-						.minPeople(entity.getMinPeople())
-						.arrivalCityId(entity.getArrivalCity().getCityId())
-						.planningStatus(entity.getPlanningStatus())
-						.startDate(entity.getStartDate())
-						.endDate(entity.getEndDate())
-						.keywords(entity.getTravelPlanKeywords()
-								.stream()
-								.map(travelPlanKeywordEntity -> travelPlanKeywordEntity.getKeyword().getKeywordId())
-								.toList())
-						.build())
-				.build();
+		return jpaTravelPlanRepository.save(travelPlanEntity);
 	}
 
 	public void joinTravelPlan(final TravelPlan travelPlanDomain) {
@@ -155,7 +141,7 @@ public class TravelPlanRepository {
 	}
 
 	//TODO : 반복되는 코드 매퍼로 분리해야함
-	public List<TravelPlan> fetchTravelPlan(final TravelPlan travelPlanDomain) {
+	public List<TravelPlan> fetchTravelPlans(final TravelPlan travelPlanDomain) {
 		List<TravelPlanEntity> travelPlanEntities = queryDslTravelPlanRepository.fetchSuggestedTravelPlan(travelPlanDomain.getTravelPlanInfo().planningStatus());
 
 		return travelPlanEntities.stream()
@@ -230,5 +216,13 @@ public class TravelPlanRepository {
 				domain.getTravelPlanInfo().travelPlanId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 여행 계획입니다."));
 
 		travelPlanEntity.updateHostInfo(domain.getHost().memberId(), domain.getHost().adultCount(), domain.getHost().childCount(), domain.getHost().infantCount());
+	}
+
+	public Page<TravelPlanEntity> getAllTravelPlans(Pageable pageable) {
+		return jpaTravelPlanRepository.findByPlanningStatusNot(PlanningStatus.CONFIRMED,pageable);
+	}
+
+	public TravelPlanEntity fetchTravelPlan(Integer travelPlanId) {
+		return jpaTravelPlanRepository.findAllByTravelPlanId(travelPlanId).orElseThrow(() -> new IllegalArgumentException("존재 하지않는 여행계획입니다."));
 	}
 }

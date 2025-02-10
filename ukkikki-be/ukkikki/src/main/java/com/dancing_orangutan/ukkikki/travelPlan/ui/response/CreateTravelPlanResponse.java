@@ -1,38 +1,80 @@
 package com.dancing_orangutan.ukkikki.travelPlan.ui.response;
 
-import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlan;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.request.KeywordUi;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.request.TravelPlanInfoUi;
+
+import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
+import lombok.Builder;
 
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public record CreateTravelPlanResponse(TravelPlanInfoUi travelPlan) {
+public record CreateTravelPlanResponse(TravelPlan travelPlan) {
 
-	public static CreateTravelPlanResponse toResponse(TravelPlan travelPlan) {
-		if (travelPlan == null) {
-			return null;
-		}
-		TravelPlanInfoUi travelPlanInfoUi = new TravelPlanInfoUi(
-				travelPlan.getTravelPlanInfo().name(),
-				travelPlan.getTravelPlanInfo().departureCityId(),
-				travelPlan.getTravelPlanInfo().arrivalCityId(),
-				travelPlan.getTravelPlanInfo().startDate(),
-				travelPlan.getTravelPlanInfo().endDate(),
-				travelPlan.getTravelPlanInfo().minPeople(),
-				travelPlan.getTravelPlanInfo().maxPeople(),
-				travelPlan.getTravelPlanInfo().planningStatus(),
-				mapKeywords(travelPlan.getTravelPlanInfo().keywords())
-		);
+    
+    @Builder 
+    public CreateTravelPlanResponse{
+        
+    }
 
-		return new CreateTravelPlanResponse(travelPlanInfoUi);
-	}
+    private record TravelPlan(Integer travelPlanId, String name, City arrivalCity, City departureCity,
+                              LocalDate startDate, LocalDate endDate, PlanningStatus planningStatus,int minPeople,int maxPeople,
+                              int currentParticipants, List<Keyword> keywords) {
+        @Builder
+        public TravelPlan {
+        }
+    }
 
-	private static List<KeywordUi> mapKeywords(List<Integer> keywordIds) {
-		if (keywordIds == null) {
-			return null;
-		}
-		return keywordIds.stream().map(KeywordUi::new).collect(Collectors.toList());
-	}
+    private record City(Integer cityId, String name) {
+        @Builder
+        public City {
+        }
+    }
+
+    private record Keyword(Integer keywordId, String name) {
+        @Builder
+        public Keyword {
+        }
+    }
+
+    public static CreateTravelPlanResponse toResponse(final TravelPlanEntity entity) {
+        return CreateTravelPlanResponse.builder()
+                .travelPlan(
+                         TravelPlan.builder()
+                                .travelPlanId(entity.getTravelPlanId())
+                                .name(entity.getName())
+                                 .maxPeople(entity.getMaxPeople())
+                                 .maxPeople(entity.getMaxPeople())
+                                 .planningStatus(entity.getPlanningStatus())
+                                .arrivalCity(
+                                         City.builder()
+                                                .cityId(entity.getArrivalCity().getCityId())
+                                                .name(entity.getArrivalCity().getName())
+                                                .build()
+                                )
+                                .departureCity(
+                                         City.builder()
+                                                .cityId(entity.getDepartureCity().getCityId())
+                                                .name(entity.getDepartureCity().getName())
+                                                .build()
+                                )
+                                .startDate(entity.getStartDate())
+                                .endDate(entity.getEndDate())
+                                .currentParticipants(entity.getMemberTravelPlans().stream().mapToInt(
+                                        memberTravelPlanEntity -> memberTravelPlanEntity.getAdultCount() + memberTravelPlanEntity.getChildCount() + memberTravelPlanEntity.getInfantCount()
+                                ).sum())
+                                .keywords(
+                                        entity.getTravelPlanKeywords().stream()
+                                                .map(k ->  Keyword.builder()
+                                                        .keywordId(k.getKeyword().getKeywordId())
+                                                        .name(k.getTravelPlan().getName())
+                                                        .build())
+                                                .toList()
+                                )
+                                .build()
+                )
+                .build();
+    }
+
+
 }

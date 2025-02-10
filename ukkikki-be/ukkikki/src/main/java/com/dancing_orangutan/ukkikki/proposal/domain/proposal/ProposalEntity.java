@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.proposal.domain.proposal;
 
-import com.dancing_orangutan.ukkikki.entity.info.Airport;
+import com.dancing_orangutan.ukkikki.geography.domain.AirportEntity;
 import com.dancing_orangutan.ukkikki.member.domain.company.CompanyEntity;
 import com.dancing_orangutan.ukkikki.proposal.constant.ProposalStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
@@ -88,18 +88,18 @@ public class ProposalEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "departure_airport_code")
-	private Airport departureAirport;
+	private AirportEntity departureAirport;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "arrival_airport_code")
-	private Airport arrivalAirport;
+	private AirportEntity arrivalAirport;
 
 	@Builder
 	public ProposalEntity(Integer proposalId, LocalDate startDate, LocalDate endDate, String airline
 	, LocalDateTime startDateBoardingTime, LocalDateTime startDateArrivalTime, LocalDateTime endDateBoardingTime
 	, LocalDateTime endDateArrivalTime, int deposit, int minPeople, boolean guideIncluded, String productIntroduction
 	, String refundPolicy, boolean insuranceIncluded, ProposalStatus proposalStatus, LocalDateTime createTime
-	, LocalDateTime updateTime, CompanyEntity company, TravelPlanEntity travelPlan, Airport departureAirport, Airport arrivalAirport) {
+	, LocalDateTime updateTime, CompanyEntity company, TravelPlanEntity travelPlan, AirportEntity departureAirport, AirportEntity arrivalAirport) {
 
 		this.proposalId = proposalId;
 		this.startDate = startDate;

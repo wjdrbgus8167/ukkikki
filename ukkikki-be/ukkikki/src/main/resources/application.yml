@@ -17,13 +17,14 @@ spring:
   jpa:
     generate-ddl: 'true'
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         show_sql: true
         format_sql: true
         use_sql_comments: true
+    defer-datasource-initialization: true
 
   security:
     oauth2:
@@ -50,10 +51,14 @@ spring:
             user-name-attribute: id
           google:
             user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
+      host: ${REDIS_HOST}
       port: 6379
+
+    mongodb:
+      uri: mongodb://${MONGO_HOST}:${MONGO_PORT}/${MONGO_DATABASE}
 
   cloud:
     aws:
@@ -64,7 +69,10 @@ spring:
         static: ap-northeast-2
       s3:
         bucket: ${AWS_S3_BUCKET_NAME}
-
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:data.sql
 
 logging:
   level:
@@ -72,12 +80,11 @@ logging:
     org.springframework.data.redis: INFO
     io.lettuce.core: INFO
 
-
 jwt:
   secret_key: nD/99zQMrX/fypNsi0J2IG+h46ePk0hddF3uCwRQITw=
   access_expiration: 3600000
   refresh_expiration: 604800000
 
 app:
-  domain: ${REDIS_HOST:localhost}
+  domain: ${REDIS_HOST}
 

@@ -49,5 +49,17 @@ public class LikeEntity {
 		this.likesCnt = likesCnt;
 		this.createdAt = createdAt;
 	}
+
+	public void setMember(MemberEntity member) {
+		this.member = member;
+	}
+
+	public void setPlace(PlaceEntity placeEntity) {
+		this.placeEntity = placeEntity;
+	}
+
+	public void updateLikeCnt(int newLikeCount) {
+		this.likesCnt = newLikeCount;
+	}
 }
 
