@@ -47,8 +47,11 @@ const Map = ({ coordinates, markers, onPlaceSelected }) => {
       </GoogleMap>
 
       {/* 검색바 위치: absolute로 화면 상단 왼쪽 */}
-      <div className="absolute top-2 left-2 z-10">
-        <MapSearchBar onPlaceSelected={onPlaceSelected} />
+      <div className="absolute z-10 top-2 left-2">
+        <MapSearchBar
+          onPlaceSelected={onPlaceSelected}
+          handleLikePlace={handleLikePlace} // ✅ handleLikePlace 전달
+        />{' '}
       </div>
     </div>
   );
