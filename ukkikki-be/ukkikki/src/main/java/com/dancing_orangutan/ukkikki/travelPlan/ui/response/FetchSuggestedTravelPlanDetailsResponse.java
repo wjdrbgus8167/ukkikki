@@ -34,7 +34,7 @@ public record FetchSuggestedTravelPlanDetailsResponse(TravelPlan travelPlan) {
         }
     }
 
-    private record Place(Integer placeId, String name, List<PlaceTag> tags, Integer likeCount) {
+    private record Place(Integer placeId, String name, List<PlaceTag> tags, Integer likeCount, double latitude, double longitude) {
         @Builder
         public Place {
         }
@@ -93,6 +93,8 @@ public record FetchSuggestedTravelPlanDetailsResponse(TravelPlan travelPlan) {
                                                         .likeCount(p.getLikes().stream()
                                                                 .mapToInt(LikeEntity::getLikesCnt)
                                                                 .sum())
+                                                        .latitude(p.getLatitude())
+                                                        .longitude(p.getLongitude())
                                                         .build())
                                                 .toList()
                                 )
