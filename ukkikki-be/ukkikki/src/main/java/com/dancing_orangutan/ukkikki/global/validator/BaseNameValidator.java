@@ -12,11 +12,12 @@ public abstract class BaseNameValidator<T extends Annotation> implements Constra
     protected ErrorCode requiredErrorCode;
     protected ErrorCode tooLongErrorCode;
 
+    protected abstract void setUp(T constraintAnnotation);
+
     @Override
     public void initialize(T constraintAnnotation) {
         setUp(constraintAnnotation);
     }
-    protected abstract void setUp(T constraintAnnotation);
 
     @Override
     public boolean isValid(String s, ConstraintValidatorContext context){

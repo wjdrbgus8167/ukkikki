@@ -8,7 +8,7 @@ public class PlaceTagNameValidator extends BaseNameValidator<ValidPlaceTagName> 
     @Override
     protected void setUp(ValidPlaceTagName constraintAnnotation) {
         this.max = constraintAnnotation.max();
-        this.requiredErrorCode = ErrorCode.NAME_REQUIRED;
-        this.tooLongErrorCode = ErrorCode.NAME_TOO_LONG;
+        this.requiredErrorCode = ErrorCode.PLACE_TAG_NAME_REQUIRED;
+        this.tooLongErrorCode = ErrorCode.PLACE_TAG_NAME_TOO_LONG;
     }
 }
