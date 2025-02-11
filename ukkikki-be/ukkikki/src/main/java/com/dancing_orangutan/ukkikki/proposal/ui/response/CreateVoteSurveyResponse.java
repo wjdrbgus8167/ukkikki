@@ -11,12 +11,14 @@ public class CreateVoteSurveyResponse {
     private LocalDateTime surveyStartTime;
     private LocalDateTime surveyEndTime;
     private Integer travelPlanId;
+    private Integer voteSurveyId;
 
     @Builder
-    public CreateVoteSurveyResponse(LocalDateTime surveyStartTime, LocalDateTime surveyEndTime, Integer travelPlanId) {
+    public CreateVoteSurveyResponse(LocalDateTime surveyStartTime, LocalDateTime surveyEndTime, Integer travelPlanId,Integer voteSurveyId) {
 
         this.surveyStartTime = surveyStartTime;
         this.surveyEndTime = surveyEndTime;
         this.travelPlanId = travelPlanId;
+        this.voteSurveyId = voteSurveyId;
     }
 }

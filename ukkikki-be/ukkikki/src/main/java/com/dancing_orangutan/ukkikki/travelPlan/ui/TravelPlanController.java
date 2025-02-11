@@ -58,7 +58,8 @@ public class TravelPlanController {
 			@RequestParam(value = "departureCityId") Integer departureCityId,
 			@RequestParam(value = "arrivalCityId") Integer arrivalCityId,
 			@RequestParam(value = "keyword", required = false) List<Integer> keywords,
-			@RequestParam(value = "status", required = false) PlanningStatus status) {
+			@RequestParam(value = "status", required = false) PlanningStatus status,
+			@AuthenticationPrincipal MemberUserDetails memberUserDetails) {
 
 		SearchTravelPlanQuery searchQuery = SearchTravelPlanQuery
 				.builder()
@@ -68,6 +69,7 @@ public class TravelPlanController {
 				.arrivalCityId(arrivalCityId)
 				.keywords(keywords)
 				.status(status)
+				.memberId(memberUserDetails.getMemberId())
 				.build();
 
 		searchQuery.validate();

@@ -1,10 +1,13 @@
 package com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan;
 
 import com.dancing_orangutan.ukkikki.geography.domain.CityEntity;
+import com.dancing_orangutan.ukkikki.global.error.ApiException;
+import com.dancing_orangutan.ukkikki.global.error.ErrorCode;
 import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
 import com.dancing_orangutan.ukkikki.place.domain.place.PlaceEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.MessageEntity;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.event.TravelPlanCloseTimeChangedEvent;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanId;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.keyword.KeywordEntity;
@@ -144,13 +147,30 @@ public class TravelPlanEntity {
 		this.hostComment = hostComment;
 	}
 
-	public void updateCloseTime(LocalDateTime closeTime) {
+	public TravelPlanCloseTimeChangedEvent updateCloseTime(LocalDateTime closeTime) {
 		this.closeTime = closeTime;
+		return TravelPlanCloseTimeChangedEvent.builder().travelPlanId(travelPlanId).closeTime(closeTime).build();
 	}
 
 	public void updateHostInfo(Integer memberId, int adultCount, int childCount, int infantCount) {
 		MemberTravelPlanEntity memberTravelPlan = findMemberTravelPlan(memberId);
 		memberTravelPlan.updateHost(adultCount, childCount, infantCount);
+	}
+
+	public void submitPlan() {
+		validateMinimumParticipantsRequirement();
+		this.planningStatus = PlanningStatus.BIDDING;
+	}
+
+	private void validateMinimumParticipantsRequirement() {
+		if (calCurrentParticipants() < minPeople) {
+			throw new ApiException(ErrorCode.MINIMUM_PARTICIPANTS_NOT_FULFILLED);
+		}
+	}
+
+	public int calCurrentParticipants() {
+		return memberTravelPlans.stream().mapToInt(memberTravelPlan -> memberTravelPlan.getChildCount()
+				+ memberTravelPlan.getInfantCount() + memberTravelPlan.getAdultCount()).sum();
 	}
 
 	private MemberTravelPlanEntity findMemberTravelPlan(Integer memberId) {
@@ -160,5 +180,4 @@ public class TravelPlanEntity {
 				.findFirst()
 				.orElseThrow(() -> new IllegalArgumentException("해당 멤버는 여행 계획에 포함되지 않습니다."));
 	}
-
 }

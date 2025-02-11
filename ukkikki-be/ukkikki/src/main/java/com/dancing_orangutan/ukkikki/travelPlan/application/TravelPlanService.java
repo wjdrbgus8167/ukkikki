@@ -6,6 +6,7 @@ import com.dancing_orangutan.ukkikki.event.travelPlanEvent.HostUpdatedEvent;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.*;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchSuggestedTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.event.TravelPlanCloseTimeChangedEvent;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.keyword.KeywordEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.*;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.keyword.JpaKeywordRepository;
@@ -108,7 +109,7 @@ public class TravelPlanService {
 								.build())
 				.build();
 
-		return SearchTravelPlanResponse.toResponse(travelPlanRepository.searchTravelPlan(domain));
+		return SearchTravelPlanResponse.toResponse(travelPlanRepository.searchTravelPlan(domain),query.memberId());
 	}
 
 	public FetchSuggestedTravelPlansResponse fetchSuggestedTravelPlans(
@@ -170,17 +171,10 @@ public class TravelPlanService {
 
 	@Transactional
 	public void updateCloseTime(UpdateCloseTimeCommand command) {
+		TravelPlanEntity entity = travelPlanRepository.updateCloseTime(command.travelPlanId());
+		TravelPlanCloseTimeChangedEvent closeTimeChangedEvent = entity.updateCloseTime(command.closeTime());
 
-		TravelPlan domain = TravelPlan.builder()
-				.travelPlanInfo(TravelPlanInfo
-						.builder()
-						.travelPlanId(command.travelPlanId())
-						.closeTime(command.closeTime())
-						.build())
-				.build();
-
-		TravelPlan result = travelPlanRepository.updateCloseTime(domain);
-		result.validateCreatedAndCloseTime();
+		springEventPublisher.publish(closeTimeChangedEvent);
 	}
 
 	@Transactional
