@@ -25,6 +25,9 @@ const Map = ({ coordinates, markers, onPlaceSelected }) => {
     anchor: new window.google.maps.Point(15, 15),
   };
 
+  // 이미 LoadScript로 스크립트가 로드되었으므로 useLoadScript 제거
+  // 대신 API가 로드되어 있다고 가정하고 GoogleMap을 바로 렌더링합니다.
+
   return (
     <div className="relative w-full h-full">
       <GoogleMap
@@ -36,7 +39,7 @@ const Map = ({ coordinates, markers, onPlaceSelected }) => {
         {/* 도시 중심 마커 */}
         <Marker position={coordinates} icon={bananaIconObject} />
 
-        {/* 찜한 마커들 */}
+        {/* 즐겨찾기 마커들 */}
         {markers.map((marker, index) => (
           <Marker
             key={index}
@@ -46,12 +49,9 @@ const Map = ({ coordinates, markers, onPlaceSelected }) => {
         ))}
       </GoogleMap>
 
-      {/* 검색바 위치: absolute로 화면 상단 왼쪽 */}
+      {/* 검색바 위치: absolute */}
       <div className="absolute z-10 top-2 left-2">
-        <MapSearchBar
-          onPlaceSelected={onPlaceSelected}
-          handleLikePlace={handleLikePlace} // ✅ handleLikePlace 전달
-        />{' '}
+        <MapSearchBar onPlaceSelected={onPlaceSelected} />
       </div>
     </div>
   );
