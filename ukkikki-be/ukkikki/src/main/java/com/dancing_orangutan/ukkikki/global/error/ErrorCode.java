@@ -29,7 +29,28 @@ public enum ErrorCode {
     GEOGRAPHY_COUNTRY_VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "G001", "도시 조회 필수 파라미터가 유효하지 않습니다."),
 
     // S3
-    S3_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S001", "S3 파일 업로드 중 오류가 발생했습니다.");
+    S3_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S001", "S3 파일 업로드 중 오류가 발생했습니다."),
+
+    // Validation
+    INVALID_INPUT_PARAMETER(HttpStatus.BAD_REQUEST, "V001", "입력값이 유효하지 않습니다."),
+    PASSWORD_REQUIRED(HttpStatus.BAD_REQUEST, "V002", "비밀번호는 필수입니다."),
+    PASSWORD_TOO_SHORT(HttpStatus.BAD_REQUEST, "V003", "비밀번호는 최소 8자 이상이어야 합니다."),
+    PASSWORD_TOO_LONG(HttpStatus.BAD_REQUEST, "V004", "비밀번호는 72자 이하여야 합니다."),
+    EMAIL_REQUIRED(HttpStatus.BAD_REQUEST, "V005", "이메일은 필수입니다."),
+    INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST, "V006", "유효하지 않은 이메일 형식입니다."),
+    EMAIL_TOO_LONG(HttpStatus.BAD_REQUEST, "V007", "이메일은 30자 이하여야 합니다."),
+    NAME_REQUIRED(HttpStatus.BAD_REQUEST, "V008", "이름은 필수입니다."),
+    NAME_TOO_LONG(HttpStatus.BAD_REQUEST, "V009", "이름은 20자 이하여야 합니다."),
+    COMPANY_NAME_REQUIRED(HttpStatus.BAD_REQUEST, "V010", "회사 이름은 필수입니다."),
+    COMPANY_NAME_TOO_LONG(HttpStatus.BAD_REQUEST, "V011", "회사 이름은 30자 이하여야 합니다."),
+    IMAGE_URL_TOO_LONG(HttpStatus.BAD_REQUEST, "V012", "이미지 url은 2000자 이하여야 합니다."),
+    PHONE_NUMBER_REQUIRED(HttpStatus.BAD_REQUEST, "V013", "전화번호는 필수입니다."),
+    PHONE_NUMBER_INVALID_CHARACTERS(HttpStatus.BAD_REQUEST, "V014", "전화번호는 숫자만 포함해야 합니다."),
+    PHONE_NUMBER_TOO_LONG(HttpStatus.BAD_REQUEST, "V015", "전화번호는 11자리 이하여야 합니다."),
+    BUSINESS_REGISTRATION_NUMBER_REQUIRED(HttpStatus.BAD_REQUEST, "V016", "사업자 번호는 필수입니다."),
+    BUSINESS_REGISTRATION_NUMBER_INVALID_CHARACTERS(HttpStatus.BAD_REQUEST, "V017", "사업자 번호는 숫자만 포함해야 합니다."),
+    BUSINESS_REGISTRATION_NUMBER_TOO_LONG(HttpStatus.BAD_REQUEST, "V018", "사업자 번호는 12자리 이하여야 합니다.");
+
 
 
     private final HttpStatus status;
