@@ -1,7 +1,16 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { 
+  CardContainer, 
+  CardWrapper, 
+  CardImage, 
+  CardContent, 
+  CardTitle, 
+  CardText, 
+  DetailButton 
+} from './style/ListCardStyle';
 
-const ListCard = ({ imageSrc, trip_name, dataRange, location, min_people, max_people, proposal }) => {
+const ListCard = ({ imageSrc, trip_name, start_date, end_date, location, min_people, max_people, proposal }) => {
   const navigate = useNavigate(); // useNavigate 훅 사용
 
   const onhandleDetail = () => {
@@ -9,28 +18,25 @@ const ListCard = ({ imageSrc, trip_name, dataRange, location, min_people, max_pe
   };
 
   return (
-    <div className="card p-10">
-      <div className="flex bg-white rounded-lg border-2 overflow-hidden w-full mb-6">
+    <CardContainer>
+      <CardWrapper>
         {/* 이미지 자동 생성 */}
-        <img src={imageSrc} alt={location} className="w-1/3 object-cover rounded-lg" />
+        <CardImage src={imageSrc} alt={location} />
 
         {/* 카드 본문 */}
-        <div className="flex flex-col p-4 w-2/3">
-          <h2 className="font-bold leading-snug text-xl mb-2">title: {trip_name}</h2>
-          <p className="text-sm text-gray-500 mb-1">여행날짜: {dataRange}</p>
-          <p className="text-sm text-gray-500 mb-1">여행지: {location}</p>
-          <p className="text-sm text-gray-500 mb-1">최소인원: {min_people}</p>
-          <p className="text-sm text-gray-500 mb-1">최대인원: {max_people}</p>
+        <CardContent>
+          <CardTitle>title: {trip_name}</CardTitle>
+          <CardText>여행날짜: {start_date} ~ {end_date}</CardText>
+          <CardText>여행지: {location}</CardText>
+          <CardText>최소인원: {min_people}</CardText>
+          <CardText>최대인원: {max_people}</CardText>
 
-          <button 
-            onClick={onhandleDetail} 
-            className="mt-auto ml-auto bg-[#412B2B] text-white px-4 py-2 rounded-md text-sm"
-          >
+          <DetailButton onClick={onhandleDetail}>
             자세히 보기 →
-          </button>
-        </div>
-      </div>
-    </div>
+          </DetailButton>
+        </CardContent>
+      </CardWrapper>
+    </CardContainer>
   );
 };
 

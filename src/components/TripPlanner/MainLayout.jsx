@@ -59,22 +59,33 @@ const MainLayout = () => {
 
     const handleTogglePlace = (place) => {
         if (!place.latitude || !place.longitude) {
-            console.error('경도 또는 위도가 없습니다!', place);
-            return;
+          console.error('경도 또는 위도가 없습니다!', place);
+          return;
         }
+      
         setTravelDays((prevDays) =>
-            prevDays.map((day) =>
-                day.id === selectedDayId
-                    ? {
-                        ...day,
-                        selectedPlaces: day.selectedPlaces?.some((p) => p.id === place.id)
-                            ? day.selectedPlaces.filter((p) => p.id !== place.id)
-                            : [...(day.selectedPlaces || []), place],
-                    }
-                    : day
-            )
+          prevDays.map((day) => {
+            if (day.id === selectedDayId) {
+              // 해당 장소가 이미 선택되었는지 확인
+              const isSelected = day.selectedPlaces.some((p) => p.id === place.id);
+              
+              // 선택된 장소 배열을 업데이트
+              const updatedSelectedPlaces = isSelected
+                ? day.selectedPlaces.filter((p) => p.id !== place.id)  // 선택된 장소라면 제거
+                : [...day.selectedPlaces, place]; // 선택되지 않은 장소라면 추가
+      
+              return {
+                ...day,
+                selectedPlaces: updatedSelectedPlaces,  // 업데이트된 selectedPlaces 배열
+              };
+            }
+      
+            return day;
+          })
         );
-    };
+      };
+      
+      
 
     const selectedDay = travelDays.find((day) => day.id === selectedDayId);
 
