@@ -15,6 +15,7 @@ import {
   MapWrapper,
   PlaceListWrapper,
   AcceptButton,
+  ButtonPosition
 } from "./style/ProposalDetailPageStyle.jsx"; // 스타일드 컴포넌트 import
 
 const ProposalDetail = () => {
@@ -22,7 +23,7 @@ const ProposalDetail = () => {
   const navigate = useNavigate();
 
   const onhandleCreatePlan = () => {
-    navigate(`/agency-detail/${travelPlanId}/proposals`);
+    navigate(`/travel-plans/${travelPlanId}/proposals`);
   };
 
   return (
@@ -42,9 +43,11 @@ const ProposalDetail = () => {
             </PlaceListWrapper>
           </MapAndPlaceWrapper>
         </ContentContainer>
-        <AcceptButton onClick={onhandleCreatePlan}>
-          수락
-        </AcceptButton>
+        <ButtonPosition>
+          <AcceptButton onClick={onhandleCreatePlan}>
+            수락
+          </AcceptButton>
+        </ButtonPosition>
           <Footer />
       </ProposalDetailContainer>
     </ProposalDetailProvider>
