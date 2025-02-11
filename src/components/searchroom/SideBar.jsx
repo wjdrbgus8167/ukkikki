@@ -2,8 +2,19 @@ import React, { useState } from 'react';
 
 const Sidebar = ({ onFilter }) => {
   const themes = [
-    '골프', '관광+휴양', '휴양', '관광', '럭셔리', '식도락', '축구',
-    '현지문화체험', '해양스포츠', '온천', 'SNS핫플', '성지순례', '기차여행'
+    '골프',
+    '관광+휴양',
+    '휴양',
+    '관광',
+    '럭셔리',
+    '식도락',
+    '축구',
+    '현지문화체험',
+    '해양스포츠',
+    '온천',
+    'SNS핫플',
+    '성지순례',
+    '기차여행',
   ];
   const roomStates = ['진행중', '제안중', '예약중', '여행확정'];
 
@@ -45,10 +56,10 @@ const Sidebar = ({ onFilter }) => {
   };
 
   return (
-    <aside className="bg-gray-100 w-80 p-6 shadow-md space-y-6">
+    <aside className="p-6 space-y-6 bg-gray-100 shadow-md w-80">
       {/* 방 상태 필터 */}
       <div>
-        <h3 className="font-bold text-lg mb-4">방 상태</h3>
+        <h3 className="mb-4 text-lg font-bold">방 상태</h3>
         <div className="flex flex-wrap gap-2">
           {['전체보기', ...roomStates].map((state, index) => (
             <button
@@ -68,7 +79,7 @@ const Sidebar = ({ onFilter }) => {
 
       {/* 여행 테마 필터 */}
       <div>
-        <h3 className="font-bold text-lg mb-4">여행 테마</h3>
+        <h3 className="mb-4 text-lg font-bold">여행 테마</h3>
         <div className="flex flex-wrap gap-2">
           {['전체보기', ...themes].map((theme, index) => (
             <button
