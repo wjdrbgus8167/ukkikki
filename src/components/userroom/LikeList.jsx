@@ -1,57 +1,68 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { publicRequest } from '../../hooks/requestMethod';
+import useAuthStore from '../../stores/authStore';
 
-const LikeList = ({ wishlists }) => {
-  const [expandedIndex, setExpandedIndex] = useState(null);
+const LikeList = ({ selectedCard }) => {
+  const { user } = useAuthStore(); // 현재 로그인한 유저 정보
+  const [favorites, setFavorites] = useState([]);
 
-  // 좋아요 순으로 정렬된 리스트
+  useEffect(() => {
+    if (selectedCard && selectedCard.places) {
+      // ✅ 백엔드에서 isLiked 값을 보내주지 않는 경우, 프론트에서 처리
+      const updatedPlaces = selectedCard.places.map((place) => ({
+        ...place,
+        isLiked: place.likedUsers?.includes(user?.id) || false, // 유저가 좋아요했는지 체크
+      }));
+      setFavorites(updatedPlaces);
+    }
+  }, [selectedCard, user]);
+
+  // ✅ 좋아요 순으로 정렬
   const sortedWishlists = useMemo(() => {
-    return [...wishlists].sort((a, b) => b.likes - a.likes); // 좋아요 내림차순 정렬
-  }, [wishlists]);
+    return [...favorites].sort((a, b) => b.likeCount - a.likeCount);
+  }, [favorites]);
 
-  // 순위에 따른 색상 스타일
-  const getRankStyle = (rank) => {
-    switch (rank) {
-      case 1:
-        return 'text-gold font-bold'; // 1등: 금색
-      case 2:
-        return 'text-silver font-bold'; // 2등: 은색
-      case 3:
-        return 'text-bronze font-bold'; // 3등: 동색
-      default:
-        return 'text-gray-700'; // 기타 순위
-    }
-  };
-
-  // 항목 클릭 핸들러
-  const handleItemClick = (index) => {
-    setExpandedIndex(expandedIndex === index ? null : index);
-  };
-
-  const handleLikeButtonClick = async (place) => {
-    if (!place || !selectedCard || !selectedCard.id) {
-      console.error('🚨 장소 정보 또는 여행방 ID가 없습니다.');
-      return;
-    }
-
-    const travelPlanId = selectedCard.id;
-    const placeId = place.id;
+  // ✅ 좋아요 토글 핸들러 (중복 실행 방지)
+  const handleLikeToggle = async (place) => {
+    const travelPlanId = selectedCard.travelPlanId;
+    const placeId = place.placeId;
+    const isLiked = place.isLiked; // 현재 좋아요 상태
 
     try {
-      await axios.post(
-        `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
-      );
+      if (!isLiked) {
+        // ✅ 좋아요 추가 요청 (POST)
+        const response = await publicRequest.post(
+          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
+        );
 
-      // ✅ 좋아요 개수 업데이트
-      setFavorites((prev) =>
-        prev.map((fav) =>
-          fav.id === placeId ? { ...fav, likes: fav.likes + 1 } : fav,
-        ),
-      );
+        if (response.status === 200) {
+          setFavorites((prev) =>
+            prev.map((fav) =>
+              fav.placeId === placeId
+                ? { ...fav, likeCount: fav.likeCount + 1, isLiked: true }
+                : fav,
+            ),
+          );
+        }
+      } else {
+        // ✅ 좋아요 취소 요청 (DELETE)
+        const response = await publicRequest.delete(
+          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
+        );
 
-      console.log('✅ 좋아요 증가 성공:', place);
+        if (response.status === 200) {
+          setFavorites((prev) =>
+            prev.map((fav) =>
+              fav.placeId === placeId
+                ? { ...fav, likeCount: fav.likeCount - 1, isLiked: false }
+                : fav,
+            ),
+          );
+        }
+      }
     } catch (error) {
-      console.error('🚨 좋아요 증가 실패:', error);
-      alert('🚨 좋아요를 추가하는 중 오류가 발생했습니다.');
+      console.error('🚨 좋아요 처리 실패:', error);
+      alert('🚨 좋아요 처리 중 오류가 발생했습니다.');
     }
   };
 
@@ -64,36 +75,23 @@ const LikeList = ({ wishlists }) => {
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <span className={`text-lg ${getRankStyle(index + 1)}`}>
-                {index + 1}위
-              </span>
               <h3 className="text-lg font-semibold text-gray-700">
-                {item.name}
+                {index + 1}. {item.name}
               </h3>
             </div>
 
             {/* 좋아요 버튼 */}
             <button
-              className="px-2 py-1 text-sm text-red-500 bg-gray-200 rounded-md"
-              onClick={() => handleLikeButtonClick(item)}
+              className={`px-2 py-1 text-sm rounded-md ${
+                item.isLiked
+                  ? 'text-red-500 bg-gray-300'
+                  : 'text-gray-500 bg-gray-200'
+              }`}
+              onClick={() => handleLikeToggle(item)}
             >
-              ❤️ {item.likes}
+              {item.isLiked ? '❤️' : '🤍'} {item.likeCount}
             </button>
           </div>
-
-          {expandedIndex === index && (
-            <div className="mt-2 text-gray-600">
-              <p>
-                <strong>주소:</strong> {item.address}
-              </p>
-              <p>
-                <strong>위도:</strong> {item.latitude}
-              </p>
-              <p>
-                <strong>경도:</strong> {item.longitude}
-              </p>
-            </div>
-          )}
         </div>
       ))}
     </div>

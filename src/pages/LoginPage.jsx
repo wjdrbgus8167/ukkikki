@@ -15,18 +15,18 @@ const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { user, setUser } = useAuthStore();
+  const { setUser } = useAuthStore();
   const [isCompany, setIsCompany] = useState(false);
 
-  // OAuth 로그인 후 리디렉션된 경우 처리
+  // ✅ OAuth 로그인 후 리디렉션된 경우 처리
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
 
     if (token) {
-      setUser({ token });
-      localStorage.setItem('accessToken', token);
-      navigate('/');
+      localStorage.setItem('accessToken', token); // ✅ 토큰 저장
+      setUser({ token }); // ✅ 상태 업데이트
+      navigate('/'); // ✅ 메인 페이지로 이동
     }
   }, [navigate, setUser]);
 
@@ -46,14 +46,14 @@ const LoginPage = () => {
             {/* 일반 유저 / 여행사 스위치 버튼 */}
             <div className="flex items-center justify-center mb-6">
               <span
-                className={`text-sm font-semibold transition-colors ${
+                className={`text-sm font-semibold ${
                   !isCompany ? 'text-brown' : 'text-gray-400'
                 }`}
               >
                 일반 유저
               </span>
               <div
-                className={`relative w-14 h-7 mx-4 bg-gray-300 rounded-full cursor-pointer transition-all ${
+                className={`relative w-14 h-7 mx-4 bg-gray-300 rounded-full cursor-pointer ${
                   isCompany ? 'bg-brown' : 'bg-gray-300'
                 }`}
                 onClick={() => setIsCompany(!isCompany)}
@@ -65,7 +65,7 @@ const LoginPage = () => {
                 ></div>
               </div>
               <span
-                className={`text-sm font-semibold transition-colors ${
+                className={`text-sm font-semibold ${
                   isCompany ? 'text-brown' : 'text-gray-400'
                 }`}
               >
@@ -76,53 +76,52 @@ const LoginPage = () => {
             {/* 로그인 폼 */}
             <LoginForm isCompany={isCompany} />
 
-            {!user && (
-              <div className="mt-6 space-y-4">
-                <button
-                  className="relative flex items-center w-full py-3 text-black transition bg-white border border-gray-200 rounded-xl"
-                  onClick={() =>
-                    (window.location.href = `${baseUrl}api/v1/oauth2/authorization/google`)
-                  }
-                >
-                  <img
-                    src={googleLogo}
-                    alt="Google"
-                    className="absolute w-5 h-5 left-4"
-                  />
-                  <span className="flex-1 text-center">
-                    구글 계정으로 로그인하기
-                  </span>
-                </button>
-                <button
-                  className="relative flex items-center w-full py-3 transition bg-yellow text-brown rounded-xl"
-                  onClick={() =>
-                    (window.location.href = `${baseUrl}api/v1/oauth2/authorization/kakao`)
-                  }
-                >
-                  <img
-                    src={kakaoLogo}
-                    alt="Kakao"
-                    className="absolute w-6 h-6 left-4"
-                  />
-                  <span className="flex-1 text-center">
-                    카카오 계정으로 로그인하기
-                  </span>
-                </button>
-                {/* 카카오 로그인 버튼 밑에 회원가입 링크 추가 */}
-                <div className="flex items-center justify-center mt-4 space-x-2">
-                  <Link to="/signup" className="text-gray-600 hover:underline">
-                    이메일로 회원가입
-                  </Link>
-                  <span className="text-gray-400">|</span>
-                  <Link
-                    to="/signup?type=company"
-                    className="text-blue-500 hover:underline"
-                  >
-                    기업으로 회원가입하기
-                  </Link>
-                </div>
-              </div>
-            )}
+            {/* ✅ 소셜 로그인 버튼 */}
+            <div className="mt-6 space-y-4">
+              <button
+                className="relative flex items-center w-full py-3 text-black transition bg-white border border-gray-200 rounded-xl"
+                onClick={() =>
+                  (window.location.href = `${baseUrl}api/v1/oauth2/authorization/google`)
+                }
+              >
+                <img
+                  src={googleLogo}
+                  alt="Google"
+                  className="absolute w-5 h-5 left-4"
+                />
+                <span className="flex-1 text-center">
+                  구글 계정으로 로그인하기
+                </span>
+              </button>
+              <button
+                className="relative flex items-center w-full py-3 transition bg-yellow text-brown rounded-xl"
+                onClick={() =>
+                  (window.location.href = `${baseUrl}api/v1/oauth2/authorization/kakao`)
+                }
+              >
+                <img
+                  src={kakaoLogo}
+                  alt="Kakao"
+                  className="absolute w-6 h-6 left-4"
+                />
+                <span className="flex-1 text-center">
+                  카카오 계정으로 로그인하기
+                </span>
+              </button>
+            </div>
+
+            <div className="flex items-center justify-center mt-4 space-x-2">
+              <Link to="/signup" className="text-gray-600 hover:underline">
+                이메일로 회원가입
+              </Link>
+              <span className="text-gray-400">|</span>
+              <Link
+                to="/signup?type=company"
+                className="text-blue-500 hover:underline"
+              >
+                기업으로 회원가입하기
+              </Link>
+            </div>
           </div>
         </div>
       </main>

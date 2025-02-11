@@ -55,7 +55,12 @@ const UserRegisterForm = () => {
       alert('회원가입 성공!');
       navigate('/login');
     } catch (error) {
-      setErrorMessage(error.response?.data?.message || '회원가입 실패');
+      const errorData = error.response?.data;
+      if (errorData?.error?.code === 'M002') {
+        setErrorMessage('중복된 이메일입니다.');
+      } else {
+        setErrorMessage(errorData?.message || '회원가입 실패');
+      }
     }
   };
 
