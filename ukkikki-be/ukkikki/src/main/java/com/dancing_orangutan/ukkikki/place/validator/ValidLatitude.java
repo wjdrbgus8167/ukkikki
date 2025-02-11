@@ -10,11 +10,14 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = GeoCoordinateValidator.class)
-public @interface ValidGeoCoordinate {
-    String message() default "지리 좌표가 유효하지 않습니다.";
+@Constraint(validatedBy = LatitudeValidator.class)
+public @interface ValidLatitude {
+    String message() default "위도값이 유효하지 않습니다.";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
+
+    int min() default -90;
+    int max() default 90;
 }
