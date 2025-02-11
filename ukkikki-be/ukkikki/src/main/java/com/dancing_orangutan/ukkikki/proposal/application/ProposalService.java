@@ -66,8 +66,10 @@ public class ProposalService {
     private final TravelerMapper travelerMapper;;
     private final JpaVoteSurveyRepository voteSurveyRepository;
     private final VoteSurveyMapper voteSurveyMapper;
+
     // 제안서 작성
-   public Proposal createProposal(CreateProposalCommand command){
+    @Transactional
+   public CreateProposalResponse createProposal(CreateProposalCommand command){
 
        Proposal domain= Proposal.builder()
                .name(command.getName())
@@ -93,7 +95,32 @@ public class ProposalService {
                .travelPlanId(command.getTravelPlanId())
                .build();
 
-       return proposalRepository.save(domain);
+       Proposal savedProposal = proposalRepository.save(domain);
+
+       log.info("Saved proposal {}", savedProposal.getProposalId());
+
+       List<Schedule> schedules = command.getSchedules().stream()
+               .map(scheduleCommand -> Schedule.builder()
+                       .scheduleName(scheduleCommand.getScheduleName())
+                       .startTime(scheduleCommand.getStartDate())
+                       .endTime(scheduleCommand.getEndDate())
+                       .imageUrl(scheduleCommand.getImageUrl())
+                       .proposalId(savedProposal.getProposalId()) // 저장된 Proposal ID 설정
+                       .build())
+               .collect(Collectors.toList());
+
+       // 새로운 일정 리스트 내부에서 중복 일정이 있는지 확인
+       if (Schedule.hasOverlappingSchedules(schedules)) {
+           throw new IllegalArgumentException("겹치는 일정이 존재합니다.");
+       }
+
+       // 일정 저장 (Batch insert)
+       List<Schedule> scheduleList =scheduleRepository.saveAll(schedules);
+
+       return CreateProposalResponse.builder()
+               .proposal(savedProposal)
+               .schedules(scheduleList)
+               .build();
    }
 
    // 제안서 상세 조회
@@ -204,10 +231,10 @@ public class ProposalService {
     }
 
     // 제안서 내 일정 등록
-    public Schedule createSchedule(CreateScheduleCommand command) {
+    public Schedule createSchedule(CreateScheduleCommand command,Integer proposalId) {
 
        // 일정 등록 전 겹치는 일정이 있는지 확인
-        Proposal proposal = proposalRepository.findById(command.getProposalId());
+        Proposal proposal = proposalRepository.findById(proposalId);
 
         List<Schedule> existingSchedules = scheduleFinder.findSchedulesByProposalId(proposal.getProposalId()).stream()
                 .map(scheduleMapper::entityToDomain)
@@ -223,7 +250,7 @@ public class ProposalService {
                 .startTime(command.getStartDate())
                 .endTime(command.getEndDate())
                 .imageUrl(command.getImageUrl())
-                .proposalId(command.getProposalId())
+                .proposalId(proposalId)
                 .build();
 
         return scheduleRepository.save(schedule);
@@ -249,7 +276,7 @@ public class ProposalService {
         ScheduleEntity scheduleEntity = optionalScheduleEntity
                 .orElseThrow(() -> new EntityNotFoundException("해당 일정을 찾을 수 없습니다."));
 
-        List<Schedule> existingSchedules = scheduleFinder.findSchedulesByProposalId(command.getProposalId()).stream()
+        List<Schedule> existingSchedules = scheduleFinder.findSchedulesByProposalId(scheduleEntity.getProposal().getProposalId()).stream()
                 .filter(s -> !s.getScheduleId().equals(scheduleEntity.getScheduleId()))
                 .map(scheduleMapper::entityToDomain)
                 .collect(Collectors.toList());

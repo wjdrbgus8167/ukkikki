@@ -25,11 +25,10 @@ public class CreateScheduleRequest {
         this.imageUrl = imageUrl;
     }
 
-    public CreateScheduleCommand requestToDomain(Integer proposalId) {
-        validate(proposalId);
+    public CreateScheduleCommand toCommand() {
+        validate(scheduleName,startTime,endTime);
         return CreateScheduleCommand
                 .builder()
-                .proposalId(proposalId)
                 .scheduleName(scheduleName)
                 .startDate(startTime)
                 .endDate(endTime)
@@ -37,15 +36,8 @@ public class CreateScheduleRequest {
                 .build();
     }
 
-    private void validate(Integer proposalId) {
+    private void validate(String scheduleName,LocalDateTime startTime,LocalDateTime endTime) {
 
-        if(proposalId == null) {
-            throw new IllegalArgumentException("제안서 ID는 필수입니다.");
-        }
-
-        if(proposalId <=0) {
-            throw new IllegalArgumentException("제안서 ID는 양수이어야 합니다.");
-        }
         if (scheduleName ==null ) {
             throw new IllegalArgumentException("일정 제목을 입력해주세요");
         }
