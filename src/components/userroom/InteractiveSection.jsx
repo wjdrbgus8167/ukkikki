@@ -8,9 +8,6 @@ import { publicRequest } from '../../hooks/requestMethod';
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
 const InteractiveSection = ({ selectedCard }) => {
-  console.log('📌 InteractiveSection.jsx - selectedCard:', selectedCard);
-  const city = selectedCard.arrivalCity.name || '기본 도시'; // 선택된 도시
-
   const [isLikeList, setIsLikeList] = useState(true);
 
   // 즐겨찾기 목록을 state로 관리 (검색한 장소도 여기에 추가)
@@ -21,26 +18,31 @@ const InteractiveSection = ({ selectedCard }) => {
     lng: 139.6917,
   }); // 기본 위치: 도쿄
 
+  // 초기 렌더링 시 selectedCard.places가 있으면 favorites에 저장
   useEffect(() => {
+    if (selectedCard && Array.isArray(selectedCard.places)) {
+      setFavorites(selectedCard.places);
+    }
+  }, [selectedCard]);
+  // 예시: 지도 중심 좌표 업데이트 (도착 도시 기반)
+  useEffect(() => {
+    if (!selectedCard || !selectedCard.arrivalCity?.name) return;
+    const city = selectedCard.arrivalCity.name;
     const getCoordinates = async () => {
       const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${city}&key=${apiKey}`;
       try {
         const response = await fetch(url);
         const data = await response.json();
-        console.log('data:', data);
         if (data.status === 'OK') {
           const { lat, lng } = data.results[0].geometry.location;
           setCoordinates({ lat, lng });
-        } else {
-          console.error('Geocoding API 오류:', data.status);
         }
       } catch (error) {
-        console.error('API 요청 실패:', error);
+        console.error('Geocoding 요청 실패:', error);
       }
     };
-
     getCoordinates();
-  }, [city]);
+  }, [selectedCard, apiKey]);
 
   // Map 컴포넌트로부터 호출되어 새로운 즐겨찾기를 추가
   const handlePlaceSelected = (place) => {
@@ -123,16 +125,20 @@ const InteractiveSection = ({ selectedCard }) => {
               <Map
                 coordinates={coordinates}
                 markers={favorites}
-                onPlaceSelected={handleLikePlace}
+                onPlaceSelected={handlePlaceSelected}
               />
             ) : (
-              <LikeList wishlists={favorites} />
+              <LikeList
+                wishlists={favorites}
+                selectedCard={selectedCard}
+                setFavorites={setFavorites}
+              />
             )}
           </div>
 
           {/* 오른쪽: 채팅방 */}
           <div className="w-full h-full p-4 overflow-y-auto md:w-1/3">
-            <Chat />
+            <Chat travelPlanId={selectedCard.travelPlanId} />
           </div>
         </div>
       </LoadScript>
