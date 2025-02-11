@@ -28,6 +28,10 @@ public enum ErrorCode {
     GEOGRAPHY_CONTINENT_VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "G001", "대륙 조회 필수 파라미터가 유효하지 않습니다."),
     GEOGRAPHY_COUNTRY_VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "G001", "도시 조회 필수 파라미터가 유효하지 않습니다."),
 
+    //TRAVEL_PLAN
+    TRAVEL_PLAN_NOT_FOUND(HttpStatus.NOT_FOUND,"TP001", "해당 여행 계획을 찾을 수 없습니다."),
+    MINIMUM_PARTICIPANTS_NOT_FULFILLED(HttpStatus.BAD_REQUEST, "TP002", "최소 인원을 충족하지 못하여 제출할 수 없습니다."),
+
     // S3
     S3_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S001", "S3 파일 업로드 중 오류가 발생했습니다.");
 
