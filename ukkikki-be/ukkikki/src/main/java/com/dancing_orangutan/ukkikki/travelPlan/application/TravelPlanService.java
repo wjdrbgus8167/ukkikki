@@ -109,7 +109,7 @@ public class TravelPlanService {
 								.build())
 				.build();
 
-		return SearchTravelPlanResponse.toResponse(travelPlanRepository.searchTravelPlan(domain));
+		return SearchTravelPlanResponse.toResponse(travelPlanRepository.searchTravelPlan(domain),query.memberId());
 	}
 
 	public FetchSuggestedTravelPlansResponse fetchSuggestedTravelPlans(
