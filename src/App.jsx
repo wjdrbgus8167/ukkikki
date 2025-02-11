@@ -28,7 +28,7 @@ const App = () => {
         <Route path="/search-room" element={<SearchRooms />} />
         <Route path="/agency-room" element={<AgencyRoomList />} />
         <Route path="/travel-plans/:travelPlanId/proposals" element={<TravelCreate />} />
-        <Route path="/agency-detail/:travelPlanId" element={<ProposalDetail />} />
+        <Route path="/agency-detail/:travelPlanId/" element={<ProposalDetail />} />
         <Route path="/user-vote" element={<UserVotePage />} />
         <Route path="/oauth/success" element={<OAuthSuccessPage />} />
       </Routes>
@@ -37,3 +37,5 @@ const App = () => {
 };
 
 export default App;
+
+// /travel-plans/:travelPlanId/proposals

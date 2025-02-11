@@ -6,7 +6,8 @@ import {
   PlaceName,
   LikeCount,
   PlaceTag,
-  NoTagsMessage
+  NoTagsMessage,
+  TagContainer
 } from './style/PlaceListStyle'; // 스타일 컴포넌트 import
 
 const PlaceList = () => {
@@ -18,11 +19,11 @@ const PlaceList = () => {
   }
 
   const { places } = proposal.data.travelPlan;
-
+  
   // places가 없다면 '장소가 없습니다.' 메시지 표시
   if (!places || places.length === 0) {
     return <div>장소가 없습니다.</div>;
-  }
+  };
 
   return (
     <PlaceContainer>
@@ -32,18 +33,18 @@ const PlaceList = () => {
             <PlaceName>{place.name}</PlaceName>
             <LikeCount>👍 {place.likeCount}</LikeCount>
 
-            {/* tags가 빈 배열인 경우 처리를 추가 */}
-            {place.tags && place.tags.length > 0 ? (
-              place.tags.map((tag, index) => {
-                return (
+            {/* 태그들이 수평으로 나열되도록 */}
+            <TagContainer>
+              {place.tags && place.tags.length > 0 ? (
+                place.tags.map((tag, index) => (
                   <PlaceTag key={index}>
-                    # {tag}
+                    # {tag.name}
                   </PlaceTag>
-                );
-              })
-            ) : (
-              <NoTagsMessage>태그가 없습니다.</NoTagsMessage>
-            )}
+                ))
+              ) : (
+                <NoTagsMessage>태그가 없습니다.</NoTagsMessage>
+              )}
+            </TagContainer>
           </PlaceCard>
         );
       })}

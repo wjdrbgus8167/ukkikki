@@ -6,19 +6,14 @@ const ProposalDetailContext = createContext();
 
 export const ProposalDetailProvider = ({children, travelPlanId}) => {
   const [proposal, setProposals ] = useState(null);
-  const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     const fetchProposalData = async() => {
       try {
         const data = await AgencyProposalDetail(travelPlanId);
-        console.log('context:',data.data)
+        console.log('context:',data)
         setProposals(data);
 
-        if (data.users) {
-          const count = data.users.reduce((sum, user) => sum + user.totalCount, 0);
-          setTotalCount(count);
-        }
       } catch(error) {
         console.log('error:', error);
       }
@@ -29,7 +24,7 @@ export const ProposalDetailProvider = ({children, travelPlanId}) => {
   },[travelPlanId]);
 
   return (
-    <ProposalDetailContext.Provider value={{proposal,totalCount}}>
+    <ProposalDetailContext.Provider value={{proposal}}>
       {children}
     </ProposalDetailContext.Provider>
   );
