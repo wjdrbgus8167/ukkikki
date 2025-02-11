@@ -18,7 +18,8 @@ public class CorsConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173", "http://fe.i12c204.p.ssafy.io:5173", "http://"+appConfig.getDomain()));
+        config.setAllowedOrigins(List.of("http://localhost:5173", "http://fe.i12c204.p.ssafy.io:5173", "http://"+appConfig.getDomain(),
+                "https://localhost:5173", "https://fe.i12c204.p.ssafy.io:5173", "https://"+appConfig.getDomain()));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setAllowCredentials(true);  // 쿠키 전송 허용
