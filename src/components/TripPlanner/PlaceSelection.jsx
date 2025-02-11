@@ -5,17 +5,18 @@ import { Info, TabButton, SearchSection,Places } from './style/PlaceSelectionSty
 const libraries = ['places'];
 
 const PlaceSelection = ({
-  destinationCity,
-  travelStart,
-  travelEnd,
-  placeList,
+  arrivalCity,
+  startDate,
+  endDate,
+  places,
   onTogglePlace = () => {},
   selectedPlaces = [],
 }) => {
   const [isSearchMode, setIsSearchMode] = useState(false);
   const autocompleteRef = useRef(null);
   const [searchedPlace, setSearchedPlace] = useState(null);
-
+  console.log('placesSelection:',places)
+  
   // ★ 1) Google Maps API 로드
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: 'YOUR_API_KEY',
@@ -23,7 +24,7 @@ const PlaceSelection = ({
   });
 
   // 좋아요 순 정렬
-  const sortedPlaceList = [...placeList].sort((a, b) => b.likes - a.likes);
+  const sortedPlaceList = [...places].sort((a, b) => b.likes - a.likes);
 
   // ★ 2) 기존 placeList에 대해 (사진, rating) 정보를 추가해 저장할 state
   const [enhancedPlaceList, setEnhancedPlaceList] = useState([]);
@@ -31,7 +32,7 @@ const PlaceSelection = ({
   // ★ 3) isLoaded 이후, placeList 각 항목에 대해 Places API 호출
   useEffect(() => {
     if (!isLoaded) return;
-    if (!placeList || placeList.length === 0) return;
+    if (!places || places.length === 0) return;
 
     // 구글 PlacesService를 위한 가짜 <div> 생성
     const service = new window.google.maps.places.PlacesService(
@@ -40,7 +41,7 @@ const PlaceSelection = ({
 
     // 모든 place에 대해 findPlaceFromQuery -> 데이터 보강
     Promise.all(
-      placeList.map((p) => {
+      places.map((p) => {
         return new Promise((resolve) => {
           // address, name 등을 합쳐서 query를 구성 (상황에 맞게 수정 가능)
           const query = `${p.name} ${p.address}`;
@@ -95,7 +96,7 @@ const PlaceSelection = ({
       // 모든 place에 대한 정보 보강을 마친 뒤 state에 저장
       setEnhancedPlaceList(enhanced);
     });
-  }, [isLoaded, placeList]);
+  }, [isLoaded, places]);
 
   // Autocomplete에서 장소가 선택되었을 때 실행
   const onPlaceChanged = () => {
@@ -129,9 +130,9 @@ const PlaceSelection = ({
   return (
     <div className="">
       <Info>
-        <h1> {destinationCity}</h1>
+        <h1> {arrivalCity}</h1>
         <h3>
-          {travelStart} ~ {travelEnd}
+          {startDate} ~ {endDate}
         </h3>
       </Info>
   
@@ -185,12 +186,12 @@ const PlaceSelection = ({
                       <p className="font-semibold">{place.name}</p>
                       <p className="text-sm text-gray-600">{place.address}</p>
                       <p className="text-sm text-gray-600">
-                        좋아요: {place.likes}
+                        좋아요👍: {place.likeCount}
                       </p>
                       {/* 평점이 있을 때만 표시 */}
                       {place.rating && (
                         <p className="text-sm text-gray-600">
-                          평점: ★ {place.rating}
+                          평점❤️:  {place.rating}
                         </p>
                       )}
                     </div>
