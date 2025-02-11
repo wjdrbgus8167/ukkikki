@@ -67,6 +67,12 @@ const CompanyRegisterForm = () => {
       setErrorMessage('모든 필드를 입력해주세요.');
       return;
     }
+
+    // 비밀번호 길이 검증: 8자리 이상이어야 함
+    if (formData.password.length < 8) {
+      setErrorMessage('비밀번호는 8자리 이상이어야 합니다.');
+      return;
+    }
     if (formData.password !== formData.confirmPassword) {
       setErrorMessage('비밀번호가 일치하지 않습니다.');
       return;

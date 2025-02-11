@@ -41,12 +41,14 @@ const Chat = () => {
   return (
     <div className="flex flex-col h-full">
       {/* 채팅 메시지 표시 */}
-      <div className="flex-1 overflow-y-auto p-4 bg-gray-100 rounded-md">
+      <div className="flex-1 p-4 overflow-y-auto bg-gray-100 rounded-md">
         {messages.map((msg, index) => (
           <div
             key={index}
             className={`mb-2 p-2 rounded-md ${
-              index % 2 === 0 ? 'bg-blue-100 text-blue-900' : 'bg-gray-300 text-gray-800'
+              index % 2 === 0
+                ? 'bg-blue-100 text-blue-900'
+                : 'bg-gray-300 text-gray-800'
             }`}
           >
             <span>{msg.content}</span>
@@ -58,7 +60,7 @@ const Chat = () => {
       </div>
 
       {/* 입력창 */}
-      <div className="mt-4 flex">
+      <div className="flex mt-4">
         <input
           type="text"
           className="flex-1 px-4 py-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -70,7 +72,7 @@ const Chat = () => {
           }}
         />
         <button
-          className="px-4 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600"
+          className="px-4 py-2 text-white bg-blue-500 rounded-r-md hover:bg-blue-600"
           onClick={sendMessage}
         >
           전송

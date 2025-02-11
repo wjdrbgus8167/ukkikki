@@ -76,7 +76,7 @@ const LoginPage = () => {
             {/* 로그인 폼 */}
             <LoginForm isCompany={isCompany} />
 
-            {!user && (
+            {!user && !isCompany && (
               <div className="mt-6 space-y-4">
                 <button
                   className="relative flex items-center w-full py-3 text-black transition bg-white border border-gray-200 rounded-xl"
@@ -109,20 +109,20 @@ const LoginPage = () => {
                   </span>
                 </button>
                 {/* 카카오 로그인 버튼 밑에 회원가입 링크 추가 */}
-                <div className="flex items-center justify-center mt-4 space-x-2">
-                  <Link to="/signup" className="text-gray-600 hover:underline">
-                    이메일로 회원가입
-                  </Link>
-                  <span className="text-gray-400">|</span>
-                  <Link
-                    to="/signup?type=company"
-                    className="text-blue-500 hover:underline"
-                  >
-                    기업으로 회원가입하기
-                  </Link>
-                </div>
               </div>
             )}
+            <div className="flex items-center justify-center mt-4 space-x-2">
+              <Link to="/signup" className="text-gray-600 hover:underline">
+                이메일로 회원가입
+              </Link>
+              <span className="text-gray-400">|</span>
+              <Link
+                to="/signup?type=company"
+                className="text-blue-500 hover:underline"
+              >
+                기업으로 회원가입하기
+              </Link>
+            </div>
           </div>
         </div>
       </main>
