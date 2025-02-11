@@ -1,7 +1,6 @@
-// src/services/Map.jsx
+// src/services/PlaceMap.jsx
 import React from 'react';
 import { GoogleMap, Marker } from '@react-google-maps/api';
-import MapSearchBar from './MapSearchBar';
 import bananaIcon from '../../assets/loading-spinner.png'; // 예시
 
 const containerStyle = {
@@ -16,7 +15,7 @@ const mapOptions = {
   fullscreenControl: false,
 };
 
-const Map = ({ coordinates, markers, onPlaceSelected }) => {
+const PlaceMap = ({ coordinates, markers, onPlaceSelected }) => {
   // 마커 아이콘 옵션 (크기 30×30)
   const bananaIconObject = {
     url: bananaIcon,
@@ -24,9 +23,6 @@ const Map = ({ coordinates, markers, onPlaceSelected }) => {
     origin: new window.google.maps.Point(0, 0),
     anchor: new window.google.maps.Point(15, 15),
   };
-
-  // 이미 LoadScript로 스크립트가 로드되었으므로 useLoadScript 제거
-  // 대신 API가 로드되어 있다고 가정하고 GoogleMap을 바로 렌더링합니다.
 
   return (
     <div className="relative w-full h-full">
@@ -39,7 +35,7 @@ const Map = ({ coordinates, markers, onPlaceSelected }) => {
         {/* 도시 중심 마커 */}
         <Marker position={coordinates} icon={bananaIconObject} />
 
-        {/* 즐겨찾기 마커들 */}
+        {/* 찜한 마커들 */}
         {markers.map((marker, index) => (
           <Marker
             key={index}
@@ -48,13 +44,8 @@ const Map = ({ coordinates, markers, onPlaceSelected }) => {
           />
         ))}
       </GoogleMap>
-
-      {/* 검색바 위치: absolute */}
-      <div className="absolute z-10 top-2 left-2">
-        <MapSearchBar onPlaceSelected={onPlaceSelected} />
-      </div>
     </div>
   );
 };
 
-export default Map;
+export default PlaceMap;

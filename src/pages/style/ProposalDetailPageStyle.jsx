@@ -28,21 +28,24 @@ export const MapAndPlaceWrapper = styled.div`
 // 지도 영역
 export const MapWrapper = styled.div`
   flex-grow: 1;
-  background-color: #e5e5e5; /* 배경색을 추가 */
   padding: 1rem;
-  border-radius: 8px;
 `;
 
 // 장소 리스트 영역
 export const PlaceListWrapper = styled.div`
-  width: 33.33%; /* w-1/3 */
+  width: 440px;
+  margin: 1rem;
+  height: 400px;
+  overflow-y: auto; /* 세로 스크롤 */
 `;
 
 // 수락 버튼 스타일
 export const AcceptButton = styled.button`
+
   width: 90px;
-  hight: 10px;
+  hight: 40px;
   background-color: #FFFFFF;
+  bottom:
   color: black;
   font-size: 1rem;
   font-weight: 10;
@@ -57,3 +60,10 @@ export const AcceptButton = styled.button`
   }
 `;
 
+export const ButtonPosition = styled.div`
+ display: flex;
+ justify-content: end;
+ align-items:flex-end;
+ margin-right: 80px;
+ margin-bottom: 20px;
+`;

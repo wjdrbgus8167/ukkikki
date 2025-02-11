@@ -44,19 +44,13 @@ const MapSearchBar = ({ onPlaceSelected }) => {
   const handleToggleBookmark = () => {
     if (!searchedPlace) return;
 
-    // 만약 찜이 아니라면 → 부모로 새 장소 전달
     if (!isBookmarked) {
-      handleLikePlace(searchedPlace); // ✅ API 요청 (찜하기)
-      setIsBookmarked(!isBookmarked);
-
-      onPlaceSelected(searchedPlace);
+      onPlaceSelected(searchedPlace); // onPlaceSelected를 호출하도록 수정
+      setIsBookmarked(true);
     } else {
-      // 여기서 "찜 취소" 시, 부모 쪽에서 제거 로직을 원하면
-      // 추가 로직(onRemovePlace) 호출 가능
+      // "찜 취소" 시 로직 추가 (필요한 경우)
+      setIsBookmarked(false);
     }
-
-    // 토글
-    setIsBookmarked(!isBookmarked);
   };
 
   return (

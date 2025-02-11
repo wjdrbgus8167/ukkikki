@@ -6,7 +6,7 @@ import { PorposalContentContainer} from "./style/ProposalContentStyle";
 
 const ProposalContent = () => {
   const {proposal} = useContext(ProposalDetailContext);
-
+  
   if(!proposal) {
     return <div>제안서 불러오는 중,,</div>
   }

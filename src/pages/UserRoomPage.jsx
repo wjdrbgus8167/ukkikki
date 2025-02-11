@@ -1,27 +1,35 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { publicRequest } from '../hooks/requestMethod';
+import InteractiveSection from '../components/userroom/InteractiveSection';
+import DashBoard from '../components/userroom/DashBoard';
+import Header from '../components/layout/Header';
+import Footer from '../components/layout/Footer';
 
 const UserRoom = () => {
+  const { travelPlanId: travelPlanIdFromUrl } = useParams();
   const location = useLocation();
-  const [selectedCard, setSelectedCard] = useState(
-    location.state?.selectedCard,
-  );
-  console.log('📌 UserRoom.jsx - selectedCard:', selectedCard);
+  const initialSelectedCard = location.state?.selectedCard;
+  const [selectedCard, setSelectedCard] = useState(initialSelectedCard);
+
+  // 우선, URL에서 travelPlanId를 가져오고, 만약 location.state가 없다면 이를 사용하도록 함
+  const travelPlanId = initialSelectedCard?.travelPlanId || travelPlanIdFromUrl;
 
   useEffect(() => {
-    if (!selectedCard) {
-      console.log('🔍 selectedCard가 없음 → 백엔드에서 데이터 요청');
-      fetchRoomData();
+    if (travelPlanId) {
+      fetchRoomData(travelPlanId);
+    } else {
+      console.error(
+        '🚨 travelPlanId가 없습니다. 올바른 ID를 전달했는지 확인하세요.',
+      );
     }
-  }, []);
+  }, [travelPlanId]);
 
-  const fetchRoomData = async () => {
+  const fetchRoomData = async (id) => {
     try {
-      const response = await publicRequest.get(`/api/v1/travel-plans`);
-      console.log('✅ 여행방 데이터 다시 가져오기:', response.data);
-      if (response.data?.data?.travelPlans) {
-        setSelectedCard(response.data.data.travelPlans[0]); // 첫 번째 방을 기본으로 설정
+      const response = await publicRequest.get(`/api/v1/travel-plans/${id}`);
+      if (response.data?.data?.travelPlan) {
+        setSelectedCard(response.data.data.travelPlan);
       }
     } catch (error) {
       console.error('🚨 여행방 데이터 가져오기 실패:', error);
@@ -38,7 +46,12 @@ const UserRoom = () => {
 
   return (
     <div>
-      <DashBoard selectedCard={selectedCard} />
+      <Header />
+      <div className="container px-8 py-8 mx-auto">
+        <DashBoard selectedCard={selectedCard} />
+        <InteractiveSection selectedCard={selectedCard} />
+      </div>
+      <Footer />
     </div>
   );
 };
