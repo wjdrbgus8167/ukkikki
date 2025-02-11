@@ -1,5 +1,6 @@
 package com.dancing_orangutan.ukkikki.travelPlan.infrastructure.travelPlan;
 
+import com.dancing_orangutan.ukkikki.event.eventPublisher.SpringEventPublisher;
 import com.dancing_orangutan.ukkikki.geography.domain.CityEntity;
 import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
 import com.dancing_orangutan.ukkikki.member.infrastructure.member.MemberFinder;
@@ -32,6 +33,9 @@ public class TravelPlanRepository {
 	private final KeywordFinder keywordFinder;
 
 	private final MemberFinder memberFinder;
+
+	private final SpringEventPublisher eventPublisher;
+
 
 	public TravelPlanEntity save(final TravelPlan travelPlanDomain) {
 
@@ -156,18 +160,9 @@ public class TravelPlanRepository {
 		entity.updateComment(domain.getTravelPlanInfo().hostComment());
 	}
 
-	public TravelPlan updateCloseTime(final TravelPlan domain) {
-		TravelPlanEntity entity = jpaTravelPlanRepository.findById(
-						domain.getTravelPlanInfo().travelPlanId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 여행 계획입니다."));
+	public TravelPlanEntity updateCloseTime(Integer travelPlanId) {
+		return jpaTravelPlanRepository.findById(travelPlanId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 여행 계획입니다."));
 
-		entity.updateCloseTime(domain.getTravelPlanInfo().closeTime());
-
-		return TravelPlan.builder()
-				.travelPlanInfo(TravelPlanInfo.builder().
-						createTime(entity.getCreateTime())
-						.closeTime(entity.getCloseTime())
-						.build())
-				.build();
 	}
 
 	public void updateHost(final TravelPlan domain) {
