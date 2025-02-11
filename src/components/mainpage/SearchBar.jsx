@@ -115,12 +115,18 @@ const SearchBar = () => {
     console.log('🛬 도착 항공편 요청 파라미터:', returnParams);
 
     try {
-      const departureResponse = await axios.get(API_BASE_URL, {
-        params: departureParams,
-      });
-      const returnResponse = await axios.get(API_BASE_URL, {
-        params: returnParams,
-      });
+      const departureResponse = await axios.get(
+        'http://openapi.airport.co.kr' + API_BASE_URL,
+        {
+          params: departureParams,
+        },
+      );
+      const returnResponse = await axios.get(
+        'http://openapi.airport.co.kr' + API_BASE_URL,
+        {
+          params: returnParams,
+        },
+      );
 
       // 디버깅: 전체 응답 객체 출력
       console.log('✈️ 출발 항공편 전체 응답:', departureResponse.data);
