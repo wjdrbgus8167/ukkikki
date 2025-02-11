@@ -8,7 +8,7 @@ import { publicRequest } from '../../hooks/requestMethod';
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
 const InteractiveSection = ({ selectedCard }) => {
-  const travelPlanId = selectedCard.id; // 여행방 ID
+  console.log('📌 InteractiveSection.jsx - selectedCard:', selectedCard);
   const city = selectedCard.arrivalCity.name || '기본 도시'; // 선택된 도시
 
   const [isLikeList, setIsLikeList] = useState(true);
@@ -49,33 +49,43 @@ const InteractiveSection = ({ selectedCard }) => {
 
   //장소에 찜하기 누를 때 호출되는 함수
   const handleLikePlace = async (place) => {
-    if (!place || !selectedCard || !selectedCard.id) {
+    if (!place || !selectedCard || !selectedCard.travelPlanId) {
       console.error('🚨 장소 정보 또는 여행방 ID가 없습니다.');
       return;
     }
 
-    const travelPlanId = selectedCard.id; // 선택된 여행방 ID
-    const placeId = place.id; // 장소 ID (API 응답에서 받아옴)
+    const travelPlanId = selectedCard.travelPlanId;
+    // API 요청 시 요청 본문에 필요한 데이터 전달
+    const payload = {
+      name: place.name,
+      address: place.address,
+      latitude: place.latitude,
+      longitude: place.longitude,
+    };
 
     try {
-      await publicRequest.post(`/travel-plans/${travelPlanId}/places`);
+      await publicRequest.post(
+        `/api/v1/travel-plans/${travelPlanId}/places`,
+        payload,
+      );
 
       // ✅ 찜한 장소를 `favorites` 목록에 추가
       setFavorites((prev) => {
         // 중복 체크 (같은 장소를 여러 번 찜하지 않도록)
-        if (prev.some((fav) => fav.id === placeId)) return prev;
+        if (prev.some((fav) => fav.name === place.name)) return prev;
         return [...prev, { ...place, likes: 1 }]; // 기본 좋아요 1로 설정
       });
 
       console.log('✅ 장소 찜 성공:', place);
     } catch (error) {
       console.error('🚨 장소 찜 실패:', error);
+      console.log('payload:', payload);
       alert('🚨 장소를 찜하는 중 오류가 발생했습니다.');
     }
   };
 
   return (
-    <div className="relative flex flex-col h-screen p-8 bg-white md:flex-row">
+    <div className="relative flex flex-col h-screen p-8 md:flex-row">
       {/* LoadScript는 한 번만 로드합니다 */}
       <LoadScript googleMapsApiKey={apiKey} libraries={['places']}>
         {/* 상단의 버튼 섹션 */}
