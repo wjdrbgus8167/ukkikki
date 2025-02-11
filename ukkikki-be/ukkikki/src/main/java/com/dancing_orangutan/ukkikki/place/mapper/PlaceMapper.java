@@ -15,4 +15,14 @@ public class PlaceMapper {
                 .travelPlan(travelPlan)
                 .build();
     }
+
+    public static Place mapToDomain(PlaceEntity placeEntity) {
+        return Place.builder()
+                .name(placeEntity.getName())
+                .address(placeEntity.getAddress())
+                .latitude(placeEntity.getLatitude())
+                .longitude(placeEntity.getLongitude())
+                .travelPlanId(placeEntity.getTravelPlan().getTravelPlanId())
+                .build();
+    }
 }
