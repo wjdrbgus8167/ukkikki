@@ -91,6 +91,10 @@ public class MemberTravelPlanEntity {
 		this.childCount = childCount;
 		this.infantCount = infantCount;
 	}
+
+	public boolean hasJoined(Integer memberId) {
+		return this.getMember().getMemberId().equals(memberId);
+	}
 }
 
 
