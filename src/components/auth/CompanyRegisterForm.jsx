@@ -149,7 +149,7 @@ const CompanyRegisterForm = () => {
     if (
       !formData.companyName ||
       !formData.businessRegistrationNumber ||
-      !formData.phoneNumber
+      !formData.companyPhone
     ) {
       setErrorMessage('모든 필드를 입력해주세요.');
       return;
@@ -165,19 +165,24 @@ const CompanyRegisterForm = () => {
       ceoName: formData.ceoName,
       companyName: formData.companyName,
       businessRegistrationNumber: formData.businessRegistrationNumber,
-      phoneNumber: formData.phoneNumber,
+      companyPhone: formData.companyPhone,
       profileImageUrl: '',
     };
 
     try {
       await publicRequest.post('api/v1/auth/companies/register', requestBody);
       alert('기업 회원가입 성공!');
-      navigate('/login'); // ✅ 회원가입 성공 시 /login으로 이동
+      navigate('/login'); // 회원가입 성공 시 /login으로 이동
     } catch (error) {
-      setErrorMessage(error.response?.data?.message || '회원가입 실패');
+      const errorData = error.response?.data;
+      console.log('📌 회원가입 실패:', errorData);
+      if (errorData?.error?.code === 'M002') {
+        setErrorMessage('중복된 이메일입니다.');
+      } else {
+        setErrorMessage(errorData?.message || '회원가입 실패');
+      }
     }
   };
-
   return (
     <div className="w-full max-w-md p-6 mx-auto bg-white rounded-lg ">
       <h1 className="mb-6 text-3xl font-bold text-center text-brown">
@@ -185,7 +190,7 @@ const CompanyRegisterForm = () => {
       </h1>
 
       {errorMessage && (
-        <p className="mb-4 text-sm text-red-500">{errorMessage}</p>
+        <p className="mb-4 text-sm text-center text-red-500">{errorMessage}</p>
       )}
 
       {step === 1 ? (
@@ -287,7 +292,7 @@ const CompanyRegisterForm = () => {
           <div className="mb-4">
             <input
               type="text"
-              name="phoneNumber"
+              name="companyPhone"
               placeholder="회사 전화번호"
               value={formData.phoneNumber}
               onChange={handleChange}
