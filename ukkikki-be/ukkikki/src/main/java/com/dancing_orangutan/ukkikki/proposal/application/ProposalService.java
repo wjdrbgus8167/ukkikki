@@ -11,6 +11,7 @@ import com.dancing_orangutan.ukkikki.proposal.domain.schedule.Schedule;
 import com.dancing_orangutan.ukkikki.proposal.domain.schedule.ScheduleEntity;
 import com.dancing_orangutan.ukkikki.proposal.domain.traveler.Traveler;
 import com.dancing_orangutan.ukkikki.proposal.domain.traveler.TravelerEntity;
+import com.dancing_orangutan.ukkikki.proposal.domain.vote.VoteEntity;
 import com.dancing_orangutan.ukkikki.proposal.domain.voteSurvey.VoteSurvey;
 import com.dancing_orangutan.ukkikki.proposal.domain.voteSurvey.VoteSurveyEntity;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.inquiry.InquiryFinder;
@@ -24,6 +25,7 @@ import com.dancing_orangutan.ukkikki.proposal.infrastructure.schedule.ScheduleFi
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.schedule.ScheduleRepository;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.travelPlan.TravelPlanFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.traveler.JpaTravelerRepository;
+import com.dancing_orangutan.ukkikki.proposal.infrastructure.vote.JpaVoteRepository;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.voteSurvey.JpaVoteSurveyRepository;
 import com.dancing_orangutan.ukkikki.proposal.mapper.ProposalMapper;
 import com.dancing_orangutan.ukkikki.proposal.mapper.ScheduleMapper;
@@ -66,7 +68,7 @@ public class ProposalService {
     private final TravelerMapper travelerMapper;;
     private final JpaVoteSurveyRepository voteSurveyRepository;
     private final VoteSurveyMapper voteSurveyMapper;
-
+    private final JpaVoteRepository voteRepository;
     // 제안서 작성
     @Transactional
    public CreateProposalResponse createProposal(CreateProposalCommand command){
@@ -308,22 +310,85 @@ public class ProposalService {
         }
 
         // 투표 설문 생성 (현재 시간 기준 +72시간 설정)
-        VoteSurveyEntity savedvoteSurvey = VoteSurveyEntity.builder()
+        VoteSurveyEntity savedVoteSurvey = VoteSurveyEntity.builder()
                 .surveyStartTime(command.getSurveyStartTime())
                 .surveyEndTime(command.getSurveyEndTime()) // 72시간 후 종료
                 .travelPlan(memberTravelPlan.getTravelPlan())
                 .build();
 
         // 투표 설문 저장
-        VoteSurvey voteSurvey = voteSurveyMapper.entityToDomain(voteSurveyRepository.save(savedvoteSurvey));
+        VoteSurvey voteSurvey = voteSurveyMapper.entityToDomain(voteSurveyRepository.save(savedVoteSurvey));
 
         return CreateVoteSurveyResponse.builder()
                 .surveyStartTime(voteSurvey.getSurveyStartTime())
                 .surveyEndTime(voteSurvey.getSurveyEndTime())
                 .travelPlanId(memberTravelPlan.getTravelPlan().getTravelPlanId())
+                .voteSurveyId(voteSurvey.getVoteSurveyId())
                 .build();
 
     }
+
+    // 제안서 투표
+    @Transactional
+    public VoteProposalResponse voteProposal(VoteProposalCommand command) {
+
+        // 투표 조사 확인
+        VoteSurveyEntity voteSurvey = voteSurveyRepository.findById(command.getVoteSurveyId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 여행 계획에 대한 투표 조사가 존재하지 않습니다."));
+
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isBefore(voteSurvey.getSurveyStartTime()) || now.isAfter(voteSurvey.getSurveyEndTime())) {
+            throw new IllegalArgumentException("현재는 투표 기간이 아닙니다.");
+        }
+
+        // 제안서 확인 (투표 진행 중인지 확인)
+        ProposalEntity proposal = jpaProposalRepository.findByProposalIdAndTravelPlan_TravelPlanId(
+                        command.getProposalId(), voteSurvey.getTravelPlan().getTravelPlanId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 제안서를 찾을 수 없습니다."));
+
+        if (!ProposalStatus.V.equals(proposal.getProposalStatus())) {
+            throw new IllegalArgumentException("투표가 진행 중인 제안서가 아닙니다.");
+        }
+
+        // 여행자가 해당 여행 계획에 포함되어 있는지 확인
+        MemberTravelPlanEntity memberTravelPlan = memberTravelPlanFinder.findByTravelPlanIdAndMemberId(
+                voteSurvey.getTravelPlan().getTravelPlanId(), command.getMemberId());
+
+        log.info("voteSurvey:{}",voteSurvey.getTravelPlan().getTravelPlanId());
+        log.info("memberid:{}",command.getMemberId());
+        log.info("memberPlanId:{}",memberTravelPlan.getMember().getMemberId());
+
+        if (memberTravelPlan == null) {
+            throw new EntityNotFoundException("해당 여행 계획에 참여된 회원이 아닙니다.");
+        }
+
+        // 이미 투표했는지 확인
+        boolean hasAlreadyVoted = voteRepository.existsByVoteSurvey_VoteSurveyIdAndMember_MemberId(
+                command.getVoteSurveyId(), command.getMemberId());
+
+        if (hasAlreadyVoted) {
+            throw new IllegalArgumentException("이미 투표를 진행한 회원입니다.");
+        }
+
+        // 투표 저장
+        VoteEntity vote = VoteEntity.builder()
+                .proposal(proposal)
+                .voteSurvey(voteSurvey)
+                .member(memberTravelPlan.getMember())
+                .voteTime(now)
+                .build();
+
+        VoteEntity savedVote = voteRepository.save(vote);
+
+        // 응답 반환
+        return VoteProposalResponse.builder()
+                .voteId(savedVote.getVoteId())
+                .proposalId(savedVote.getProposal().getProposalId())
+                .voteSurveyId(savedVote.getVoteSurvey().getVoteSurveyId())
+                .voteTime(savedVote.getVoteTime())
+                .build();
+    }
+
 
     // 일정 확정 후 여행자 등록
     public List<Traveler> createTravelers(List<CreateTravelerCommand> commands) {
