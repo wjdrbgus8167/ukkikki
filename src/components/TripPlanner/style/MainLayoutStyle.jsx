@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
 export const StyledLoadScript = styled.div`
-  width: 25%; /* 원하는 너비 */
-  height: 100%; /* 원하는 높이 */
+  width: 400px; /* 원하는 너비 */
+  height: 800px; /* 원하는 높이 */
   display: flex; /* 유연한 레이아웃 */
   flex-direction: column; /* 세로로 배치 */
   justify-content: flex-start;

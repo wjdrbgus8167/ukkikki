@@ -1,40 +1,37 @@
+// DateSidebar.jsx
 import React, { useState } from 'react';
+import {
+  SidebarContainer,
+  ButtonList,
+  ScheduleButton,
+  DetailButton,
+} from './style/DateSidebarStyle';
 
+const DateSidebar = ({ travelDays, selectedDayId, onDaySelect, onToggleDetailForm }) => {
+  const [detailActive, setDetailActive] = useState(false);
 
-const DateSidebar = ({ travelDays, selectedDayId, onDaySelect,onToggleDetailForm }) => {
-
-  const [ detailActive, setDetailActive ] = useState(false);
-  
   const handleDetailClick = () => {
     setDetailActive((prev) => !prev);
-    onToggleDetailForm()
-  }
+    onToggleDetailForm();
+  };
 
   return (
-    <div className="p-4">
-      <div className="flex flex-col space-y-2">
+    <SidebarContainer>
+      <ButtonList>
         {travelDays.map((day) => (
-          <button
+          <ScheduleButton
             key={day.id}
+            active={day.id === selectedDayId}
             onClick={() => onDaySelect(day.id)}
-            className={`schedule-btn bg-white text-black text-x font-semibold py-2 px-4 border-2 border-gray-300 rounded-lg w-[26] h-16 transition-colors 
-              ${
-                day.id === selectedDayId
-                  ? 'bg-yellow text-brown'
-                  : 'hover:bg-gray-100'
-              }`}
           >
             {day.label}
-          </button>
+          </ScheduleButton>
         ))}
-        <button 
-        onClick={handleDetailClick}
-        className={`detail-schedule-btn text-black text-x font-semibold py-2 px-4 border-2 border-gray-300 rounded-lg w-[26] h-16 transition-colors
-          `}>
+        <DetailButton onClick={handleDetailClick}>
           상세내용
-        </button>
-      </div>
-    </div>
+        </DetailButton>
+      </ButtonList>
+    </SidebarContainer>
   );
 };
 
