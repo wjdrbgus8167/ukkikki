@@ -10,10 +10,7 @@ import com.dancing_orangutan.ukkikki.proposal.domain.schedule.Schedule;
 import com.dancing_orangutan.ukkikki.proposal.domain.traveler.Traveler;
 import com.dancing_orangutan.ukkikki.proposal.domain.traveler.TravelerEntity;
 import com.dancing_orangutan.ukkikki.proposal.ui.request.*;
-import com.dancing_orangutan.ukkikki.proposal.ui.response.CreateInquiryResponse;
-import com.dancing_orangutan.ukkikki.proposal.ui.response.CreateVoteSurveyResponse;
-import com.dancing_orangutan.ukkikki.proposal.ui.response.InquiryListResponse;
-import com.dancing_orangutan.ukkikki.proposal.ui.response.ProposalDetailResponse;
+import com.dancing_orangutan.ukkikki.proposal.ui.response.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -37,14 +34,10 @@ public class ProposalController {
 
     // 제안서 작성
     @PostMapping
-    public ApiUtils.ApiResponse<Proposal> createProposal(
+    public ApiUtils.ApiResponse<CreateProposalResponse> createProposal(
             @PathVariable Integer travelPlanId,
             @AuthenticationPrincipal CompanyUserDetails companyUserDetails,
             @Validated @RequestBody CreateProposalRequest request){
-
-        if (request == null || request.getProposalRequest() == null) {
-            throw new IllegalArgumentException("Request body or proposalRequest is missing!");
-        }
 
         CreateProposalCommand command = request.toCommand(travelPlanId, companyUserDetails.getCompanyId());
 
@@ -92,9 +85,9 @@ public class ProposalController {
         @Validated @RequestBody CreateScheduleRequest request
     ){
 
-        CreateScheduleCommand command = request.requestToDomain(proposalId);
+        CreateScheduleCommand command = request.toCommand();
 
-        return ApiUtils.success(proposalService.createSchedule(command));
+        return ApiUtils.success(proposalService.createSchedule(command,proposalId));
     }
 
     // 일정 삭제
