@@ -25,7 +25,7 @@ public record FetchAllTravelPlansResponse(
 	}
 
 	private record TravelPlan(Integer travelPlanId, String name, City arrivalCity,
-							  City departureCity,
+							  City departureCity,int minPeople, int maxPeople,
 							  LocalDate startDate, LocalDate endDate, PlanningStatus planningStatus,
 							  int currentParticipants, List<Keyword> keywords) {
 
@@ -48,7 +48,6 @@ public record FetchAllTravelPlansResponse(
 		}
 	}
 
-
 	public static FetchAllTravelPlansResponse toResponse(Page<TravelPlanEntity> page) {
 		List<TravelPlan> travelPlans = page.getContent().stream()
 				.map(entity -> TravelPlan.builder()
@@ -64,6 +63,8 @@ public record FetchAllTravelPlansResponse(
 						.name(entity.getName())
 						.startDate(entity.getStartDate())
 						.endDate(entity.getEndDate())
+						.minPeople(entity.getMinPeople())
+						.maxPeople(entity.getMaxPeople())
 						.planningStatus(entity.getPlanningStatus())
 						.currentParticipants(entity.getMemberTravelPlans().stream().mapToInt(
 								memberTravelPlanEntity -> memberTravelPlanEntity.getAdultCount()
