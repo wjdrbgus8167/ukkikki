@@ -137,12 +137,16 @@ const TravelPackageCarousel = () => {
   const handleViewDetails = async () => {
     try {
       const response = await publicRequest.get('/api/v1/travel-plans');
+      console.log(
+        'response.data.data.travelPlans',
+        response.data.data.travelPlans,
+      );
       if (!response.data || !Array.isArray(response.data.data.travelPlans)) {
         throw new Error('🚨 API 응답이 올바르지 않습니다.');
       }
 
       navigate('/search-room', {
-        state: { rooms: response.data.data.travelPlans },
+        state: { rooms: { travelPlans: response.data.data.travelPlans } },
       });
     } catch (error) {
       console.error('🚨 여행방 전체 조회 실패:', error);
