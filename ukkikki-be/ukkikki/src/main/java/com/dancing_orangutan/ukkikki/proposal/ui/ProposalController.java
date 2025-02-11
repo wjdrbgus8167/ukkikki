@@ -5,17 +5,14 @@ import com.dancing_orangutan.ukkikki.global.security.MemberUserDetails;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.proposal.application.ProposalService;
 import com.dancing_orangutan.ukkikki.proposal.application.command.*;
-import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
 import com.dancing_orangutan.ukkikki.proposal.domain.schedule.Schedule;
 import com.dancing_orangutan.ukkikki.proposal.domain.traveler.Traveler;
-import com.dancing_orangutan.ukkikki.proposal.domain.traveler.TravelerEntity;
 import com.dancing_orangutan.ukkikki.proposal.ui.request.*;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -146,6 +143,27 @@ public class ProposalController {
 
         return ApiUtils.success(response);
     }
+
+    // 투표하기
+    @PostMapping("/{proposalId}/vote-survey/{voteSurveyId}")
+    public ApiUtils.ApiResponse<VoteProposalResponse> voteSurvey(
+            @PathVariable Integer travelPlanId,
+            @PathVariable Integer proposalId,
+            @PathVariable Integer voteSurveyId,
+            @AuthenticationPrincipal MemberUserDetails memberUserDetails
+    ){
+        VoteProposalCommand command = VoteProposalCommand.builder()
+                .travelerId(travelPlanId)
+                .proposalId(proposalId)
+                .memberId(memberUserDetails.getMemberId())
+                .voteSurveyId(voteSurveyId)
+                .build();
+
+        VoteProposalResponse response = proposalService.voteProposal(command);
+
+        return ApiUtils.success(response);
+    }
+
     // 확정 제안서에 관한 여행자 등록
     @PostMapping("/{proposalId}/travelers")
     public ApiUtils.ApiResponse<List<Traveler>> createTravelers(
