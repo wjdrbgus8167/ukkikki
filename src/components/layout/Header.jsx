@@ -13,11 +13,16 @@ const Header = () => {
   const handleLogout = async () => {
     try {
       // ✅ 백엔드로 로그아웃 요청 (쿠키 삭제)
-      const response = await publicRequest.post('/api/v1/auth/logout');
+      const response = await publicRequest.post(
+        '/api/v1/auth/logout',
+        {},
+        { withCredentials: true }, // ✅ 쿠키 포함 요청
+      );
 
       if (response.status === 200) {
         console.log('✅ 로그아웃 성공:', response.data);
-        useAuthStore.getState().setUser(false);
+        useAuthStore.getState().setUser(null);
+        localStorage.removeItem('auth-store');
 
         logout();
         // ✅ 페이지 새로고침 없이 상태 업데이트 반영
@@ -33,7 +38,7 @@ const Header = () => {
       <Link to="/">
         <img src={logo} alt="Logo" className="object-contain w-32 h-32 ml-10" />
       </Link>
-      <nav className="hidden mr-10 space-x-6 md:flex">
+      <nav className="block mr-10 space-x-6 md:flex">
         {!user ? (
           <>
             <Link
