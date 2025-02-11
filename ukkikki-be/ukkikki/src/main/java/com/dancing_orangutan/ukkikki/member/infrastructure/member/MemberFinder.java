@@ -1,5 +1,7 @@
 package com.dancing_orangutan.ukkikki.member.infrastructure.member;
 
+import com.dancing_orangutan.ukkikki.global.error.ApiException;
+import com.dancing_orangutan.ukkikki.global.error.ErrorCode;
 import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -25,5 +27,9 @@ public class MemberFinder {
 
 	public MemberEntity findById(Integer memberId) {
 		return memberRepository.findById(memberId).orElse(null);
+	}
+
+	public MemberEntity findNameByEmail(String email) {
+		return memberRepository.findByEmail(email).orElseThrow(()->new ApiException(ErrorCode.MEMBER_NOT_FOUND));
 	}
 }
