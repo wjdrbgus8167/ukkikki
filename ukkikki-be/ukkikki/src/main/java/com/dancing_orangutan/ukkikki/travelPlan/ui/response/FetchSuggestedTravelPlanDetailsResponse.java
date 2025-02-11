@@ -17,7 +17,7 @@ public record FetchSuggestedTravelPlanDetailsResponse(TravelPlan travelPlan) {
 
     private record TravelPlan(Integer travelPlanId, String name, City arrivalCity, City departureCity,
                               LocalDate startDate, LocalDate endDate, PlanningStatus planningStatus,
-                              int currentParticipants, List<Keyword> keywords, List<Place> places) {
+                              int currentParticipants, List<Keyword> keywords, List<Place> places,int minPeople, int maxPeople) {
         @Builder
         public TravelPlan {
         }
@@ -69,6 +69,8 @@ public record FetchSuggestedTravelPlanDetailsResponse(TravelPlan travelPlan) {
                                 )
                                 .startDate(entity.getStartDate())
                                 .endDate(entity.getEndDate())
+                                .minPeople(entity.getMinPeople())
+                                .maxPeople(entity.getMaxPeople())
                                 .planningStatus(entity.getPlanningStatus())
                                 .currentParticipants(entity.getMemberTravelPlans().stream().mapToInt(
                                         memberTravelPlanEntity -> memberTravelPlanEntity.getAdultCount() + memberTravelPlanEntity.getChildCount() + memberTravelPlanEntity.getInfantCount()
