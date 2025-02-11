@@ -20,7 +20,7 @@ COPY --from=builder /build/build/libs/ukkikki-0.0.1-SNAPSHOT.jar app.jar
 #로그 디렉토리 생성
 RUN mkdir -p /app/logs
 
-EXPOSE 8081
+EXPOSE 8080
 
 # 애플리케이션 실행
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
