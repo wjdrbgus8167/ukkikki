@@ -67,7 +67,7 @@ public record CreateTravelPlanResponse(TravelPlan travelPlan) {
                                         entity.getTravelPlanKeywords().stream()
                                                 .map(k ->  Keyword.builder()
                                                         .keywordId(k.getKeyword().getKeywordId())
-                                                        .name(k.getTravelPlan().getName())
+                                                        .name(k.getKeyword().getName())
                                                         .build())
                                                 .toList()
                                 )
