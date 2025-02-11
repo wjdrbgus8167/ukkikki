@@ -104,6 +104,12 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
 
   // 방 만들기 완료 시: 선택된 키워드를 요청 바디에 포함하여 API 호출 후, 생성된 방으로 이동
   const handleRoomCreation = async () => {
+    // 총 인원 체크: 0명일 경우 alert를 띄우고 함수 실행 중단
+    if (totalPeople === 0) {
+      alert('총 인원이 0명입니다. 최소 1명 이상의 인원을 추가해주세요.');
+      return;
+    }
+
     // 변환: 선택된 키워드 배열을 백엔드가 기대하는 형식으로 변환 (예: { keywordId: 1 })
     const keywordsPayload = roomData.selectedKeywords.map((item) => ({
       keywordId: item.id,
@@ -139,7 +145,9 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
       // API 응답 구조에 따라 생성된 방 정보 추출 (예: response.data.data.travelPlan)
       const createdRoom = response.data.data.travelPlan;
       // 방 생성 후 /user-room으로 이동하면서 생성된 방 데이터를 state에 담아 전달
-      navigate('/user-room', { state: { selectedCard: createdRoom } });
+      navigate(`/user-room/${createdRoom.travelPlanId}`, {
+        state: { selectedCard: createdRoom },
+      });
     } catch (error) {
       console.error('여행 플랜 생성 실패:', error);
       alert('여행 플랜 생성 중 오류가 발생했습니다.');

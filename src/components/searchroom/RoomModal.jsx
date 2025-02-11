@@ -52,7 +52,13 @@ function RoomModal({
       return;
     }
 
-    const travelPlanId = selectedCard.travelPlanId; // API 응답에 따른 ID 필드
+    const totalPeople = people.adult + people.child + people.infant;
+    if (totalPeople === 0) {
+      alert('🚨 최소 한 명 이상의 인원을 선택해야 합니다.');
+      return;
+    }
+
+    const travelPlanId = selectedCard.travelPlanId;
     const requestBody = {
       adultCount: people.adult,
       childCount: people.child,
@@ -65,8 +71,8 @@ function RoomModal({
         requestBody,
       );
       console.log('✅ 여행방 입장 성공:', response.data);
-      console.log('📌 넘겨지는 selectedCard:', response.data.data.travelPlan); // 생성된 방 정보를 담아 /user-room으로 이동
-      navigate('/user-room', {
+      console.log('📌 넘겨지는 selectedCard:', response.data.data.travelPlan);
+      navigate(`/user-room/${response.data.data.travelPlan.travelPlanId}`, {
         state: { selectedCard: response.data.data.travelPlan },
       });
     } catch (error) {
@@ -171,6 +177,10 @@ function RoomModal({
                   </div>
                 </div>
               ))}
+            </div>
+            {/* 총 인원 수 표시 */}
+            <div className="mt-4 text-lg font-semibold text-center text-gray-800">
+              총 인원: {people.adult + people.child + people.infant}명
             </div>
             <div className="mt-6">
               <ProgressBar step={step} totalSteps={totalSteps} />

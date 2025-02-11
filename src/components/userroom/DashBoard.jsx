@@ -1,8 +1,33 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ProposalButton from './ProposalButton';
 
 const apiKey = import.meta.env.VITE_APP_UNSPLASH_API_KEY;
-
+const statusMap = {
+  IN_PROGRESS: '진행중',
+  BIDDING: '입찰중',
+  BOOKING: '예약중',
+  CONFIRMED: '확정됨',
+};
+// 테마에 따른 색상 반환 함수 (원래 있던 함수, 필요에 따라 사용)
+const getThemeColor = (theme) => {
+  const themeColors = {
+    골프: 'bg-golf text-white',
+    '관광+휴양': 'bg-tourism-relaxation text-white',
+    식도락: 'bg-food text-white',
+    현지문화체험: 'bg-local-culture text-white',
+    기차여행: 'bg-train-trip text-white',
+    SNS핫플: 'bg-sns-hot text-white',
+    럭셔리: 'bg-luxury text-white',
+    해양스포츠: 'bg-marine-sports text-white',
+    온천: 'bg-hot-spring text-white',
+    성지순례: 'bg-pilgrimage text-white',
+    '디저트 골프': 'bg-dessert-golf text-white',
+    축구: 'bg-soccer text-white',
+  };
+  return themeColors[theme] || 'bg-gray-500 text-white';
+};
 const DashBoard = ({ selectedCard }) => {
+  console.log('--selectedCard', selectedCard);
   const [imageUrl, setImageUrl] = useState('');
   const hasFetched = useRef(false); // fetch 여부를 추적
   if (!selectedCard) {
@@ -29,6 +54,20 @@ const DashBoard = ({ selectedCard }) => {
     <div className="flex flex-col items-center justify-between p-8 bg-gray-100 md:flex-row">
       {/* 여행 이미지 */}
       <div className="relative">
+        <span
+          className={`absolute top-6 left-2 px-3 py-1 rounded-full text-sm font-semibold ${
+            selectedCard.planningStatus === 'IN_PROGRESS'
+              ? 'bg-progress text-white'
+              : selectedCard.planningStatus === 'BIDDING'
+              ? 'bg-proposal text-white'
+              : selectedCard.planningStatus === 'BOOKING'
+              ? 'bg-reservation text-white'
+              : 'bg-confirmed text-white'
+          }`}
+        >
+          {statusMap[selectedCard.planningStatus]}
+        </span>
+
         {imageUrl && (
           <img
             src={imageUrl}
@@ -37,11 +76,6 @@ const DashBoard = ({ selectedCard }) => {
           />
         )}
         {/* 이미지 왼쪽 상단에 planningStatus 추가 */}
-        {selectedCard.planningStatus && (
-          <span className="absolute px-3 py-1 text-sm font-semibold text-white bg-blue-500 rounded-full shadow-md top-2 left-2">
-            {selectedCard.planningStatus}
-          </span>
-        )}
       </div>
 
       {/* 여행 패키지 정보 */}
@@ -54,15 +88,16 @@ const DashBoard = ({ selectedCard }) => {
         </p>
         <p className="text-gray-700">{selectedCard.arrivalCity.name}</p>
         <div className="flex flex-wrap gap-2 mt-4">
-          <strong>키워드:</strong>
+          <strong>테마:</strong>
           {selectedCard.keywords && selectedCard.keywords.length > 0 ? (
             selectedCard.keywords.map((keyword, index) => (
               <span
                 key={index}
-                className="px-3 py-1 text-sm font-semibold text-white bg-gray-500 rounded-full"
+                className={`px-3 py-1 text-sm font-semibold rounded-full ${getThemeColor(
+                  keyword.name,
+                )}`}
               >
                 {keyword.name}
-                {keyword.keywordId}
               </span>
             ))
           ) : (
@@ -71,18 +106,12 @@ const DashBoard = ({ selectedCard }) => {
         </div>
       </div>
 
-      {/* 여행사에 제안하기 버튼 */}
-      <div className="p-4 text-center bg-yellow-100 rounded-lg shadow-md md:w-1/3">
-        <button
-          className="px-4 py-2 text-white bg-yellow-600 rounded-md hover:bg-yellow-700"
-          onClick={() => {
-            // 여행사에 제안하기 버튼 클릭 시 동작
-            alert('여행사에 제안하기 버튼이 클릭되었습니다!');
-          }}
-        >
-          여행사에 제안하기
-        </button>
-      </div>
+      {/* 여행사에 제안하기 버튼 컴포넌트 사용 */}
+      <ProposalButton
+        travelPlanId={selectedCard.travelPlanId}
+        currentParticipants={selectedCard.currentParticipants}
+        minPeople={selectedCard.minPeople}
+      />
     </div>
   );
 };
