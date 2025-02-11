@@ -9,15 +9,13 @@ import java.time.LocalDateTime;
 @Getter
 public class CreateScheduleCommand {
 
-    Integer proposalId;
     String scheduleName;
     LocalDateTime startDate;
     LocalDateTime endDate;
     String imageUrl;
     @Builder
-    public CreateScheduleCommand(Integer proposalId, String scheduleName, LocalDateTime startDate, LocalDateTime endDate, String imageUrl) {
+    public CreateScheduleCommand(String scheduleName, LocalDateTime startDate, LocalDateTime endDate, String imageUrl) {
 
-        this.proposalId = proposalId;
         this.scheduleName = scheduleName;
         this.startDate = startDate;
         this.endDate = endDate;

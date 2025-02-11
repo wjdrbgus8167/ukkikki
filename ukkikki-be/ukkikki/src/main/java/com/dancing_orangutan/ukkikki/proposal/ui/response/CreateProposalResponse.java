@@ -1,32 +1,25 @@
 package com.dancing_orangutan.ukkikki.proposal.ui.response;
 
 import com.dancing_orangutan.ukkikki.proposal.constant.ProposalStatus;
+import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
+import com.dancing_orangutan.ukkikki.proposal.domain.schedule.Schedule;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
-@Builder
 public class CreateProposalResponse {
 
-    private Integer proposalId;
-    private String name;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private String airline;
-    private String departureAirportCode;
-    private String arrivalAirportCode;
-    private LocalDateTime startDateBoardingTime;
-    private LocalDateTime startDateArrivalTime;
-    private LocalDateTime endDateBoardingTime;
-    private LocalDateTime endDateArrivalTime;
-    private int deposit;
-    private int minPeople;
-    private boolean guideIncluded;
-    private String productIntroduction;
-    private String refundPolicy;
-    private boolean insuranceIncluded;
-    private ProposalStatus proposalStatus;
+    private Proposal proposal;
+    private List<Schedule> schedules;
+
+    @Builder
+    public CreateProposalResponse(Proposal proposal, List<Schedule> schedules) {
+        this.proposal = proposal;
+        this.schedules = schedules;
+    }
+
 }

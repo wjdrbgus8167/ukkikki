@@ -1,11 +1,14 @@
 package com.dancing_orangutan.ukkikki.proposal.application.command;
 
 import com.dancing_orangutan.ukkikki.proposal.constant.ProposalStatus;
+import com.dancing_orangutan.ukkikki.proposal.domain.schedule.Schedule;
+import com.dancing_orangutan.ukkikki.proposal.ui.request.CreateScheduleRequest;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -29,4 +32,5 @@ public class CreateProposalCommand {
     private String refundPolicy;
     private boolean insuranceIncluded;
     private ProposalStatus proposalStatus;
+    private List<CreateScheduleCommand> schedules;
 }

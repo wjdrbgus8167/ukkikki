@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class MessageEntity {
 
 	@Id
-	private Integer messageId;
+	private String messageId;
 
 	private String content;
 
@@ -26,10 +26,13 @@ public class MessageEntity {
 
 	private Integer memberId;
 
+	private String memberName;
+
 	@Builder
-	public MessageEntity(String content, Integer travelPlanId, Integer memberId) {
+	public MessageEntity(String content, Integer travelPlanId, Integer memberId, String memberName) {
 		this.content = content;
 		this.travelPlanId = travelPlanId;
 		this.memberId = memberId;
+		this.memberName = memberName;
 	}
 }
