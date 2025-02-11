@@ -30,12 +30,16 @@ const AgencyProposals = () => {
     },[]);
 
     return(
-        <div className="flex flex-wrap">
+        <div className="flex flex-wrap justify-center">
             {proposals ? (
                 proposals.map((proposal) => (
                     <ListCard 
                         key = {proposal.proposalId}
-                        trip_name = {proposal.proposalState}
+                        trip_name = {proposal.name}
+                        start_date = {proposal.startDate}
+                        end_date= {proposal.endDate}
+                        
+
 
                     />
                 ))

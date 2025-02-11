@@ -4,6 +4,8 @@ import { Info, TabButton, SearchSection,Places } from './style/PlaceSelectionSty
 
 const libraries = ['places'];
 
+const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
+
 const PlaceSelection = ({
   arrivalCity,
   startDate,
@@ -19,7 +21,7 @@ const PlaceSelection = ({
   
   // ★ 1) Google Maps API 로드
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: 'YOUR_API_KEY',
+    googleMapsApiKey: apiKey,
     libraries,
   });
 
@@ -127,8 +129,9 @@ const PlaceSelection = ({
     }
   };
 
+  
   return (
-    <div className="">
+    <div>
       <Info>
         <h1> {arrivalCity}</h1>
         <h3>
