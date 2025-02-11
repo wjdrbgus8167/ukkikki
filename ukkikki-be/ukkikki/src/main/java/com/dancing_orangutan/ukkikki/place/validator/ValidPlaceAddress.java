@@ -17,4 +17,6 @@ public @interface ValidPlaceAddress {
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
+
+    int max() default 100;
 }
