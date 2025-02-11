@@ -1,6 +1,7 @@
 package com.dancing_orangutan.ukkikki.travelPlan.ui.response;
 
 import com.dancing_orangutan.ukkikki.place.domain.like.LikeEntity;
+import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import lombok.Builder;
@@ -14,8 +15,8 @@ public record FetchSuggestedTravelPlanDetailsResponse(TravelPlan travelPlan) {
     public FetchSuggestedTravelPlanDetailsResponse {
     }
 
-    private record TravelPlan(Integer travelPlanId,String name, City arrivalCity, City departureCity,
-                              LocalDate startDate, LocalDate endDate,
+    private record TravelPlan(Integer travelPlanId, String name, City arrivalCity, City departureCity,
+                              LocalDate startDate, LocalDate endDate, PlanningStatus planningStatus,
                               int currentParticipants, List<Keyword> keywords, List<Place> places) {
         @Builder
         public TravelPlan {
@@ -68,6 +69,7 @@ public record FetchSuggestedTravelPlanDetailsResponse(TravelPlan travelPlan) {
                                 )
                                 .startDate(entity.getStartDate())
                                 .endDate(entity.getEndDate())
+                                .planningStatus(entity.getPlanningStatus())
                                 .currentParticipants(entity.getMemberTravelPlans().stream().mapToInt(
                                         memberTravelPlanEntity -> memberTravelPlanEntity.getAdultCount() + memberTravelPlanEntity.getChildCount() + memberTravelPlanEntity.getInfantCount()
                                 ).sum())
@@ -75,7 +77,7 @@ public record FetchSuggestedTravelPlanDetailsResponse(TravelPlan travelPlan) {
                                         entity.getTravelPlanKeywords().stream()
                                                 .map(k -> Keyword.builder()
                                                         .keywordId(k.getKeyword().getKeywordId())
-                                                        .name(k.getTravelPlan().getName())
+                                                        .name(k.getKeyword().getName())
                                                         .build())
                                                 .toList()
                                 )
