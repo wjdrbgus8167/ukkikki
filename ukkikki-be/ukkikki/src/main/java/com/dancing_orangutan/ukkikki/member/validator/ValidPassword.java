@@ -18,4 +18,7 @@ public @interface ValidPassword {
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
+
+    int min() default 8;
+    int max() default 72; // Bcrypt가 처리 하는 최대 길이
 }
