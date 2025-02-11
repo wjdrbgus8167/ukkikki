@@ -21,7 +21,8 @@ public record SearchTravelPlanResponse(@JsonProperty("travelPlans") List<TravelP
 			int minPeople,
 			int maxPeople,
 			PlanningStatus planningStatus,
-			List<Keyword> keywords
+			List<Keyword> keywords,
+			boolean hasJoined
 	) {
 		@Builder
 		private TravelPlan {
@@ -44,7 +45,7 @@ public record SearchTravelPlanResponse(@JsonProperty("travelPlans") List<TravelP
 	public SearchTravelPlanResponse {
 	}
 
-	public static SearchTravelPlanResponse toResponse(final List<TravelPlanEntity> entities) {
+	public static SearchTravelPlanResponse toResponse(final List<TravelPlanEntity> entities,Integer memberId) {
 		return SearchTravelPlanResponse.builder().travelPlans(
 				entities.stream().map(entity -> TravelPlan.builder()
 						.travelPlanId(entity.getTravelPlanId())
@@ -71,6 +72,9 @@ public record SearchTravelPlanResponse(@JsonProperty("travelPlans") List<TravelP
 						.minPeople(entity.getMinPeople())
 						.maxPeople(entity.getMaxPeople())
 						.planningStatus(entity.getPlanningStatus())
+						.hasJoined(entity.getMemberTravelPlans()
+								.stream()
+								.anyMatch(memberTravelPlan-> memberTravelPlan.hasJoined(memberId)))
 						.keywords(
 								entity.getTravelPlanKeywords().stream()
 										.map(k -> Keyword.builder()
