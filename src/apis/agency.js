@@ -39,3 +39,15 @@ export const AgencyProposalDetail =  async(travelPlanId) => {
     console.log('Error:', error)
   };
 };
+
+//여행계획 제안서 (상세내용)
+
+export const CreateTravelProposal = async(travelPlanId) => {
+  try {
+    const response = await publicRequest.get(`api/v1/travel-plans/${travelPlanId}/proposals`);
+    console.log('여행 게획 제안서 보내기 성공:', response.data)
+    return response.data;
+  } catch(error) {
+    console.log('error:',error)
+  };
+};
