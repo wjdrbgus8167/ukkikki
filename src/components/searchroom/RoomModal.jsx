@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom'; // React Router 사용
 import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
+import { motion } from 'framer-motion';
 
 const ProgressBar = ({ step, totalSteps }) => {
   const progress = (step / totalSteps) * 100;
@@ -9,9 +10,11 @@ const ProgressBar = ({ step, totalSteps }) => {
   return (
     <div className="mb-4">
       <div className="relative w-full h-4 overflow-hidden bg-gray-200 rounded-full">
-        <div
-          className="h-full transition-all duration-300 ease-in-out bg-yellow"
-          style={{ width: `${progress}%` }}
+        <motion.div
+          className="h-full rounded-full bg-yellow"
+          initial={{ width: 0 }} // 초기 상태
+          animate={{ width: `${progress}%` }} // 애니메이션 대상 상태
+          transition={{ duration: 0.5, ease: 'easeInOut' }} // 부드러운 전환 효과
         />
       </div>
       <div className="flex justify-end mt-2 text-sm text-gray-600">

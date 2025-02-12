@@ -98,7 +98,7 @@ const WorldAirportModal = ({ isOpen, onClose, onSelect }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 animate-fadeIn">
-      <div className="p-8 transition-all duration-300 transform scale-100 bg-white shadow-2xl rounded-xl w-96">
+      <div className="p-8 w-[400px] h-[450px] transition-all duration-300 transform scale-100 bg-white shadow-2xl rounded-xl w-96">
         <h2 className="mb-6 text-2xl font-bold text-center text-gray-800">
           도착지 선택
         </h2>
@@ -107,7 +107,11 @@ const WorldAirportModal = ({ isOpen, onClose, onSelect }) => {
           onClick={onClose}
           className="absolute text-gray-500 top-3 right-3 hover:text-gray-700 focus:outline-none"
         >
-          ❌
+          <img
+            src="https://cdn-icons-png.flaticon.com/128/154/154616.png"
+            className="w-6"
+            alt="닫기"
+          />
         </button>
 
         {step === 1 && (
@@ -141,7 +145,7 @@ const WorldAirportModal = ({ isOpen, onClose, onSelect }) => {
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="mb-4 text-blue-500 hover:underline"
+              className="mb-4 font-bold text-blue-500 text-dark-green hover:underline"
             >
               ⬅️ 뒤로
             </button>

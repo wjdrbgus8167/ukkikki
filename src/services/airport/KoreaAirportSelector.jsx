@@ -41,28 +41,34 @@ const KoreaAirportModal = ({ isOpen, onClose, onSelect }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 animate-fadeIn">
       <div
         className="relative p-8 transition-all duration-300 transform scale-100 bg-white shadow-2xl rounded-xl 
-        w-[400px] h-[450px] flex flex-col justify-between"
+        w-[400px] h-[450px] flex flex-col justify-center items-center text-center"
       >
-        <h2 className="text-2xl font-bold text-center text-gray-800">
-          출발지 선택
-        </h2>
+        {/* 닫기 버튼 (오른쪽 상단) */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute text-gray-500 top-3 right-3 hover:text-gray-700 focus:outline-none"
+          className="absolute px-2 py-1 text-white rounded-md top-4 right-4 hover:bg-opacity-80"
         >
-          ❌
+          <img
+            src="https://cdn-icons-png.flaticon.com/128/154/154616.png"
+            className="w-6"
+            alt="닫기"
+          />
         </button>
 
-        <div className="flex-1 overflow-y-auto">
+        {/* 타이틀 */}
+        <h2 className="mb-4 text-2xl font-bold text-gray-800">출발지 선택</h2>
+
+        <div className="flex flex-col items-center justify-center flex-1 w-full overflow-y-auto">
           {/* 1단계: 도시 선택 */}
+
           {!selectedCity ? (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid w-full grid-cols-2 gap-4 px-6">
               {cities.map((city) => (
                 <button
                   key={city.cityId}
                   onClick={() => setSelectedCity(city.cityId)}
-                  className="p-3 transition-colors bg-gray-200 rounded-lg hover:bg-gray-300"
+                  className="w-full p-3 transition-colors bg-gray-200 rounded-lg hover:bg-gray-300"
                 >
                   {city.name}
                 </button>
@@ -74,11 +80,11 @@ const KoreaAirportModal = ({ isOpen, onClose, onSelect }) => {
               <button
                 type="button"
                 onClick={() => setSelectedCity('')}
-                className="mb-4 text-blue-500 hover:underline"
+                className="px-4 py-2 font-bold rounded-md text-dark-green hover:bg-opacity-80 "
               >
                 ⬅️ 뒤로
               </button>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid w-full grid-cols-2 gap-4 px-6">
                 {airports.map((airport) => (
                   <button
                     type="button"
@@ -87,7 +93,7 @@ const KoreaAirportModal = ({ isOpen, onClose, onSelect }) => {
                       onSelect(selectedCity, airport.name, airport.airportCode);
                       onClose();
                     }}
-                    className="p-3 transition-colors bg-gray-200 rounded-lg hover:bg-gray-300"
+                    className="w-full p-3 transition-colors bg-gray-200 rounded-lg hover:bg-gray-300"
                   >
                     {airport.name}
                   </button>

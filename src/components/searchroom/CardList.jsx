@@ -34,23 +34,44 @@ const CardList = ({ cards }) => {
   const [imageUrls, setImageUrls] = useState({});
   const navigate = useNavigate(); // ✅ 메인페이지 이동을 위한 훅 사용
 
+  // ✅ useEffect를 실행 전에 항상 실행되도록 유지
+  useEffect(() => {
+    const fetchImages = async () => {
+      if (!Array.isArray(cards) || cards.length === 0) return;
+
+      const newImages = {};
+      for (const card of cards) {
+        if (!newImages[card.country]) {
+          try {
+            const response = await fetch(
+              `https://api.unsplash.com/photos/random?query=${card.country}&client_id=${apiKey}`,
+            );
+            const data = await response.json();
+            newImages[card.country] =
+              data?.urls?.regular || '/default-image.jpg';
+          } catch (error) {
+            console.error('이미지 불러오기 실패:', error);
+            newImages[card.country] = '/default-image.jpg';
+          }
+        }
+      }
+      setImageUrls((prev) => ({ ...prev, ...newImages }));
+    };
+
+    fetchImages();
+  }, [cards]); // ✅ `apiKey` 제거 (변경되지 않는 값이므로)
+
+  // ✅ 조기 return을 useEffect 이후로 이동
   if (!Array.isArray(cards) || cards.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center w-full h-full mt-16 space-y-4">
-        {/* 바나나 로고 */}
-        <img
-          src={logo} // ✅ 바나나 로고 경로 수정 필요
-          alt="바나나 로고"
-          className="w-16 h-16"
-        />
-        {/* 검색 결과가 없다는 메시지 */}
+        <img src={logo} alt="바나나 로고" className="w-16 h-16" />
         <p className="text-center text-gray-500">
           검색 결과가 없습니다. <br />
           다른 조건으로 검색해보세요.
         </p>
-        {/* 메인페이지로 가기 버튼 */}
         <button
-          onClick={() => navigate('/')} // ✅ 메인페이지로 이동
+          onClick={() => navigate('/')}
           className="px-4 py-2 mt-4 text-white rounded-md bg-brown hover:bg-yellow hover:text-brown hover:font-bold"
         >
           메인페이지로 가기
@@ -78,28 +99,6 @@ const CardList = ({ cards }) => {
   // ------------------------------
   // 이미지 불러오기 (Unsplash)
   // ------------------------------
-  useEffect(() => {
-    const fetchImages = async () => {
-      for (const card of cards) {
-        // card.country가 정의되어 있다면 사용. 만약 room 데이터에 country 정보가 없다면 적절한 필드로 수정하세요.
-        if (!imageUrls[card.country]) {
-          try {
-            const response = await fetch(
-              `https://api.unsplash.com/photos/random?query=${card.country}&client_id=${apiKey}`,
-            );
-            const data = await response.json();
-            setImageUrls((prev) => ({
-              ...prev,
-              [card.country]: data?.urls?.regular,
-            }));
-          } catch (error) {
-            console.error('이미지 불러오기 실패:', error);
-          }
-        }
-      }
-    };
-    fetchImages();
-  }, [cards, apiKey, imageUrls]);
 
   return (
     <>
@@ -113,17 +112,19 @@ const CardList = ({ cards }) => {
             <div className="relative">
               <span
                 className={`absolute top-6 left-2 px-3 py-1 rounded-full text-sm font-semibold ${
-                  card.planningStatus === 'IN_PROGRESS'
-                    ? 'bg-progress text-white'
-                    : card.status === 'BIDDING'
-                    ? 'bg-proposal text-white'
-                    : card.status === 'BOOKING'
-                    ? 'bg-reservation text-white'
-                    : 'bg-confirmed text-white'
+                  statusMap[card.planningStatus]
+                    ? {
+                        IN_PROGRESS: 'bg-progress text-white',
+                        BIDDING: 'bg-proposal text-white',
+                        BOOKING: 'bg-reservation text-white',
+                        CONFIRMED: 'bg-confirmed text-white',
+                      }[card.planningStatus]
+                    : 'bg-gray-400 text-white'
                 }`}
               >
-                {statusMap[card.planningStatus]}
+                {statusMap[card.planningStatus] || '상태 없음'}
               </span>
+
               <img
                 src={imageUrls[card.country] || '/default-image.jpg'}
                 alt={card.country}
@@ -141,7 +142,14 @@ const CardList = ({ cards }) => {
                   <div
                     className="h-full bg-yellow"
                     style={{
-                      width: `${(card.people / card.minPeople) * 100}%`,
+                      width: `${
+                        card.minPeople > 0 && card.currentParticipants
+                          ? Math.min(
+                              (card.currentParticipants / card.minPeople) * 100,
+                              100,
+                            ) // 100% 초과 방지
+                          : 0
+                      }%`,
                     }}
                   />
                 </div>
