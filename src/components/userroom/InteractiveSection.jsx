@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  LoadScript,
-  GoogleMap,
-  Marker,
-  Autocomplete,
-} from '@react-google-maps/api';
+import { GoogleMap, Marker } from '@react-google-maps/api';
 import FavoriteList from './FavoriteList';
 import Chat from './Chat';
 import { publicRequest } from '../../hooks/requestMethod';
@@ -70,12 +65,10 @@ const InteractiveSection = ({ selectedCard }) => {
         `/api/v1/travel-plans/${travelPlanId}/places`,
         payload,
       );
-
       setFavorites((prev) => {
         if (prev.some((fav) => fav.name === place.name)) return prev;
         return [...prev, { ...place, likes: 1 }];
       });
-
       console.log('✅ 장소 찜 성공:', place);
     } catch (error) {
       console.error('🚨 장소 찜 실패:', error);
@@ -85,9 +78,6 @@ const InteractiveSection = ({ selectedCard }) => {
 
   return (
     <div className="relative w-full h-screen">
-      {/* LoadScript로 Google Maps API 스크립트 로드 */}
-
-      {/* 지도 영역 */}
       <div className="w-full h-full">
         <GoogleMap
           mapContainerStyle={{ width: '100%', height: '100%' }}
@@ -100,10 +90,6 @@ const InteractiveSection = ({ selectedCard }) => {
             fullscreenControl: false,
           }}
         >
-          {/* 도시 중심 마커 */}
-          <Marker position={coordinates} />
-
-          {/* 즐겨찾기 마커들 */}
           {favorites.map((marker, index) => (
             <Marker
               key={index}
@@ -112,8 +98,6 @@ const InteractiveSection = ({ selectedCard }) => {
           ))}
         </GoogleMap>
       </div>
-
-      {/* 채팅창 */}
       <div className="absolute bottom-4 right-4">
         {isChatOpen ? (
           <div className="relative transition-all duration-300 bg-white rounded-lg shadow-lg w-96 h-96">
