@@ -1,5 +1,6 @@
 package com.dancing_orangutan.ukkikki.proposal.application;
 
+import com.dancing_orangutan.ukkikki.member.domain.company.CompanyEntity;
 import com.dancing_orangutan.ukkikki.place.domain.placeTag.PlaceTagEntity;
 import com.dancing_orangutan.ukkikki.proposal.application.command.*;
 import com.dancing_orangutan.ukkikki.proposal.constant.ProposalStatus;
@@ -14,6 +15,7 @@ import com.dancing_orangutan.ukkikki.proposal.domain.traveler.TravelerEntity;
 import com.dancing_orangutan.ukkikki.proposal.domain.vote.VoteEntity;
 import com.dancing_orangutan.ukkikki.proposal.domain.voteSurvey.VoteSurvey;
 import com.dancing_orangutan.ukkikki.proposal.domain.voteSurvey.VoteSurveyEntity;
+import com.dancing_orangutan.ukkikki.proposal.infrastructure.company.CompanyFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.inquiry.InquiryFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.inquiry.InquiryRepository;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.memberTravelPlan.MemberTravelPlanFinder;
@@ -42,10 +44,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -69,6 +68,8 @@ public class ProposalService {
     private final JpaVoteSurveyRepository voteSurveyRepository;
     private final VoteSurveyMapper voteSurveyMapper;
     private final JpaVoteRepository voteRepository;
+    private final CompanyFinder companyFinder;
+
     // 제안서 작성
     @Transactional
    public CreateProposalResponse createProposal(CreateProposalCommand command){
@@ -90,7 +91,7 @@ public class ProposalService {
                .productIntroduction(command.getProductIntroduction())
                .refundPolicy(command.getRefundPolicy())
                .insuranceIncluded(command.isInsuranceIncluded())
-               .proposalStatus(command.getProposalStatus())
+               .proposalStatus(ProposalStatus.W)
                .createTime(LocalDateTime.now())
                .updateTime(LocalDateTime.now())
                .companyId(command.getCompanyId())
@@ -124,6 +125,66 @@ public class ProposalService {
                .schedules(scheduleList)
                .build();
    }
+
+   // 제안서 목록 조회
+    @Transactional
+    public List<ProposalListResponse> getProposalList(ProposalListCommand command) {
+
+        // 방에 있는 제안서 가져오기
+        List<ProposalEntity> proposals = proposalRepository.findByTravelPlanId(command.getTravelPlanId());
+
+        // 응답 리스트 만들기
+        List<ProposalListResponse> proposalResponses = proposals.stream()
+                .map(proposal -> {
+                    Integer proposalId = proposal.getProposalId();
+
+                    // 해당 제안서에 대한 투표 정보 가져오기
+                    List<VoteEntity> votes = voteRepository.findByProposal_ProposalId(proposalId)
+                            .orElseThrow(()-> new EntityNotFoundException("투표한 제안서가 없습니다"));
+
+                    // 투표한 멤버들의 id 가져오기
+                    Set<Integer> votedMemberIds = votes.stream()
+                            .map(vote -> vote.getMember().getMemberId())
+                            .collect(Collectors.toSet());
+
+                    // 현재 접속한 사용자가 투표했는지 여부 설정
+                    boolean votedYn = votedMemberIds.contains(command.getMemberId());
+
+                    // 투표한 멤버들의 여행 계획 정보 가져와서 voteCount 계산
+                    int voteCount = votedMemberIds.stream()
+                            .map(votedMemberId-> {
+
+                                try {
+                                    return memberTravelPlanFinder.findByTravelPlanIdAndMemberId(command.getTravelPlanId(), votedMemberId);
+                                } catch (EntityNotFoundException e) {
+                                    log.warn("투표한 멤버가 여행 계획에 참여하지 않음: memberId={}, travelPlanId={}", votedMemberId, command.getTravelPlanId());
+                                    return null; // 존재하지 않는 멤버는 제외
+                                }
+
+                            })
+                            .filter(Objects::nonNull) // null 값 제거
+                            .mapToInt(mtp -> mtp.getAdultCount() + mtp.getChildCount() + mtp.getInfantCount()) // 투표한 인원 수 합산
+                            .sum();
+
+                    // 회사 정보 가져오기
+                    String companyName =  companyFinder.getReferenceById(proposal.getCompany().getCompanyId()).getCompanyName();
+
+                    // ProposalListResponse 생성
+                    return ProposalListResponse.builder()
+                            .proposalId(proposalId)
+                            .deposit(proposal.getDeposit())
+                            .name(proposal.getName())
+                            .companyName(companyName)
+                            .voteCount(voteCount)
+                            .votedYn(votedYn)
+                            .build();
+
+                })// 제안서를 투표 순으로 나열
+                .sorted(Comparator.comparingInt(ProposalListResponse::getVoteCount).reversed())
+                .collect(Collectors.toList());
+
+        return proposalResponses;
+    }
 
    // 제안서 상세 조회
     public ProposalDetailResponse getProposalDetail(Integer proposalId) {

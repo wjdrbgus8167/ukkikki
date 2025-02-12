@@ -41,6 +41,22 @@ public class ProposalController {
         return ApiUtils.success(proposalService.createProposal(command));
     }
 
+    // 제안서 목록 조회
+    @GetMapping
+    public ApiUtils.ApiResponse<List<ProposalListResponse>> getProposalList(
+            @PathVariable Integer travelPlanId,
+            @AuthenticationPrincipal MemberUserDetails memberUserDetails
+    ){
+
+        ProposalListCommand command = ProposalListCommand.builder()
+                .travelPlanId(travelPlanId)
+                .memberId(memberUserDetails.getMemberId())
+                .build();
+
+        List<ProposalListResponse> response = proposalService.getProposalList(command);
+
+        return ApiUtils.success(response);
+    }
     // 제안서 상세 조회
     @GetMapping("/{proposalId}")
     public ApiUtils.ApiResponse<ProposalDetailResponse> getProposalDetail(
