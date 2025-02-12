@@ -4,6 +4,7 @@ import LikeList from './LikeList';
 import Map from '../../services/map/Map';
 import Chat from './Chat';
 import { publicRequest } from '../../hooks/requestMethod';
+import Swal from 'sweetalert2';
 
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
@@ -82,7 +83,7 @@ const InteractiveSection = ({ selectedCard }) => {
     } catch (error) {
       console.error('🚨 장소 찜 실패:', error);
       console.log('payload:', payload);
-      alert('🚨 장소를 찜하는 중 오류가 발생했습니다.');
+      Swal.fire('알림', '🚨 장소를 찜하는 중 오류가 발생했습니다.', 'error');
     }
   };
 

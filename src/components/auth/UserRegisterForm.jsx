@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { publicRequest } from '../../hooks/requestMethod';
 import { useNavigate } from 'react-router-dom'; // ✅ React Router v6 이상에서 사용
+import Swal from 'sweetalert2';
 
 const UserRegisterForm = () => {
   const navigate = useNavigate(); // ✅ 네비게이트 사용
@@ -52,7 +53,7 @@ const UserRegisterForm = () => {
         password: formData.password,
         profileImageUrl: '',
       });
-      alert('회원가입 성공!');
+      Swal.fire('회원가입 성공!');
       navigate('/login');
     } catch (error) {
       const errorData = error.response?.data;

@@ -41,14 +41,14 @@ const MyPage = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <div className="container mx-auto px-6 py-10">
-        <h2 className="text-2xl font-bold mb-6">마이페이지</h2>
+      <div className="container px-6 py-10 mx-auto">
+        <h2 className="mb-6 text-2xl font-bold">마이페이지</h2>
 
         <div className="flex">
           {/* ✅ 왼쪽 필터 사이드바 */}
-          <div className="w-1/4 bg-gray-100 p-4 rounded-lg shadow">
-            <h3 className="text-lg font-semibold mb-4">필터</h3>
-            {['전체보기', '진행중', '제안중', '예약중', '여행 확정'].map(
+          <div className="w-1/4 p-4 bg-gray-100 rounded-lg shadow">
+            <h3 className="mb-4 text-lg font-semibold">필터</h3>
+            {['전체보기', '진행중', '입찰중', '예약중', '여행 확정'].map(
               (filter) => (
                 <button
                   key={filter}
@@ -66,16 +66,16 @@ const MyPage = () => {
           </div>
 
           {/* ✅ 오른쪽 카드 목록 */}
-          <div className="w-3/4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid w-3/4 grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {(filteredRooms || []).length > 0 ? (
               filteredRooms.map((room) => (
                 <div
                   key={room.id}
-                  className="bg-white p-4 rounded-lg shadow-md"
+                  className="p-4 bg-white rounded-lg shadow-md"
                 >
                   <h3 className="text-lg font-semibold">{room.title}</h3>
                   <p className="text-sm text-gray-600">{room.description}</p>
-                  <span className="inline-block mt-2 px-3 py-1 text-sm text-white bg-blue-500 rounded">
+                  <span className="inline-block px-3 py-1 mt-2 text-sm text-white bg-blue-500 rounded">
                     {room.status}
                   </span>
                 </div>
