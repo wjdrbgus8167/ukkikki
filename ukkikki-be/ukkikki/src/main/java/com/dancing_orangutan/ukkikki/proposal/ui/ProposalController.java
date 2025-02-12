@@ -180,6 +180,16 @@ public class ProposalController {
         return ApiUtils.success(response);
     }
 
+    // 제안서 확정하기
+    @PutMapping("/{proposalId}/confirm")
+    public ApiUtils.ApiResponse<ConfirmProposalResponse> confirm(
+            @PathVariable Integer travelPlanId
+    ){
+        ConfirmProposalResponse response = proposalService.confirmProposal(travelPlanId);
+
+        return ApiUtils.success(response);
+    }
+
     // 확정 제안서에 관한 여행자 등록
     @PostMapping("/{proposalId}/travelers")
     public ApiUtils.ApiResponse<List<Traveler>> createTravelers(

@@ -450,6 +450,73 @@ public class ProposalService {
                 .build();
     }
 
+    // 제안서 확정하기
+    public ConfirmProposalResponse confirmProposal(Integer travelPlanId) {
+
+        // 방에 있는 제안서 가져오기
+        List<ProposalEntity> proposals = proposalRepository.findByTravelPlanId(travelPlanId);
+
+        //제안서
+        List<ConfirmProposalResponse> confirmProposalResponses = proposals.stream()
+                .map(proposal -> {
+                    Integer proposalId = proposal.getProposalId();
+
+                    // 해당 제안서에 대한 투표 정보 가져오기
+                    List<VoteEntity> votes = voteRepository.findByProposal_ProposalId(proposalId)
+                            .orElseThrow(()-> new EntityNotFoundException("투표한 제안서가 없습니다"));
+
+                    // 투표한 멤버들의 id 가져오기
+                    Set<Integer> votedMemberIds = votes.stream()
+                            .map(vote -> vote.getMember().getMemberId())
+                            .collect(Collectors.toSet());
+
+                    // 투표한 멤버들의 여행 계획 정보 가져와서 voteCount 계산
+                    int voteCount = votedMemberIds.stream()
+                            .map(votedMemberId-> {
+
+                                try {
+                                    return memberTravelPlanFinder.findByTravelPlanIdAndMemberId(travelPlanId, votedMemberId);
+                                } catch (EntityNotFoundException e) {
+                                    log.warn("투표한 멤버가 여행 계획에 참여하지 않음: memberId={}, travelPlanId={}", votedMemberId, travelPlanId);
+                                    return null; // 존재하지 않는 멤버는 제외
+                                }
+
+                            })
+                            .filter(Objects::nonNull) // null 값 제거
+                            .mapToInt(mtp -> mtp.getAdultCount() + mtp.getChildCount() + mtp.getInfantCount()) // 투표한 인원 수 합산
+                            .sum();
+
+                    // ProposalListResponse 생성
+                    return ConfirmProposalResponse.builder()
+                            .proposalId(proposalId)
+                            .deposit(proposal.getDeposit())
+                            .name(proposal.getName())
+                            .voteCount(voteCount)
+                            .build();
+
+                })// 제안서를 투표 순으로 나열
+                .sorted(Comparator.comparingInt(ConfirmProposalResponse::getVoteCount)
+                        .reversed()
+                        .thenComparingInt(ConfirmProposalResponse::getDeposit))
+                .collect(Collectors.toList());
+
+        ConfirmProposalResponse topProposal = confirmProposalResponses.get(0);
+
+        // 제안서 상태 업데이트 (최다 득표 제안서는 A, 나머지는 D)
+        proposals.forEach(proposal -> proposal.updateStatus(proposal.getProposalId().equals(topProposal.getProposalId())));
+
+        // 배치 업데이트
+        jpaProposalRepository.saveAll(proposals);
+
+        //최다 득표 제안서 정보 반환
+        return ConfirmProposalResponse.builder()
+                .proposalId(topProposal.getProposalId())
+                .name(topProposal.getName())
+                .deposit(topProposal.getDeposit())
+                .voteCount(topProposal.getVoteCount())
+                .status(ProposalStatus.A) // 확정된 제안서는 A 상태
+                .build();
+    }
 
     // 일정 확정 후 여행자 등록
     public List<Traveler> createTravelers(List<CreateTravelerCommand> commands) {
