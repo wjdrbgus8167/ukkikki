@@ -32,6 +32,7 @@
     "slick-carousel": "^1.8.1",
     "sockjs-client": "^1.6.1",
     "styled-components": "^6.1.15",
+    "sweetalert2": "^11.16.0",
     "three.js": "^0.77.1",
     "web-vitals": "^2.1.0",
     "zustand": "^5.0.3"

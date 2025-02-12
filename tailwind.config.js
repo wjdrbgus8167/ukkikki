@@ -3,6 +3,10 @@ export default {
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        pretendard: ['Pretendard-Regular'],
+        jalnan: ['JalnanGothic'],
+      },
       colors: {
         yellow: '#FFCF0E',
         'dark-green': '#4d6f7a', // 메인페이지 인디케이터 색상

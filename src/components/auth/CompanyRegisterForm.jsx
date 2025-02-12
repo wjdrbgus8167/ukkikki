@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // ✅ React Router v6 이상에서 사용
 import { publicRequest } from '../../hooks/requestMethod';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 const CompanyRegisterForm = () => {
   const navigate = useNavigate(); // ✅ 네비게이트 사용
@@ -14,7 +15,7 @@ const CompanyRegisterForm = () => {
     confirmPassword: '',
     companyName: '',
     businessRegistrationNumber: '',
-    companyPhone: '',
+    phoneNumber: '',
   });
   const [errorMessage, setErrorMessage] = useState('');
   const [businessCheckResult, setBusinessCheckResult] = useState(null);
@@ -31,7 +32,7 @@ const CompanyRegisterForm = () => {
     const { name, value } = e.target;
 
     // ✅ 사업자번호 및 전화번호 숫자만 입력 가능
-    if (name === 'businessRegistrationNumber' || name === 'companyPhone') {
+    if (name === 'businessRegistrationNumber' || name === 'phoneNumber') {
       const numericValue = value.replace(/[^0-9]/g, ''); // 숫자만 허용
 
       setFormData((prev) => ({
@@ -149,7 +150,7 @@ const CompanyRegisterForm = () => {
     if (
       !formData.companyName ||
       !formData.businessRegistrationNumber ||
-      !formData.companyPhone
+      !formData.phoneNumber
     ) {
       setErrorMessage('모든 필드를 입력해주세요.');
       return;
@@ -165,13 +166,13 @@ const CompanyRegisterForm = () => {
       ceoName: formData.ceoName,
       companyName: formData.companyName,
       businessRegistrationNumber: formData.businessRegistrationNumber,
-      companyPhone: formData.companyPhone,
+      phoneNumber: formData.phoneNumber,
       profileImageUrl: '',
     };
 
     try {
       await publicRequest.post('api/v1/auth/companies/register', requestBody);
-      alert('기업 회원가입 성공!');
+      Swal.fire('기업 회원가입 성공!');
       navigate('/login'); // 회원가입 성공 시 /login으로 이동
     } catch (error) {
       const errorData = error.response?.data;
@@ -292,7 +293,7 @@ const CompanyRegisterForm = () => {
           <div className="mb-4">
             <input
               type="text"
-              name="companyPhone"
+              name="phoneNumber"
               placeholder="회사 전화번호"
               value={formData.phoneNumber}
               onChange={handleChange}
