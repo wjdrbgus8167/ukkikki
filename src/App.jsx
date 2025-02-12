@@ -37,13 +37,13 @@ const App = () => {
         <Route path="/user-vote" element={<UserVotePage />} />
         <Route path="/oauth/success" element={<OAuthSuccessPage />} />
 
-        {/* <Route 
-          path="/travel-plans/:travelPlanId/proposalss"
-          element={<CreateTravel />}/> */}
-        <Route
+        <Route 
+          path="/travel-plans/:travelPlanId/proposals"
+          element={<CreateTravel />}/>
+        {/* <Route
           path="/travel-plans/:travelPlanId/proposals"
           element={<TravelCreate />}
-        />
+        /> */}
         
         <Route 
           path= "/travel-proposal/:travelPlanId/proposals/:proposalId" 
