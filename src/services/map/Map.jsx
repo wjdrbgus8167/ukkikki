@@ -17,6 +17,8 @@ const mapOptions = {
 };
 
 const Map = ({ coordinates, markers, onPlaceSelected }) => {
+  // window.google가 정의되어 있지 않다면 null을 반환하여 렌더링하지 않음
+  if (typeof window.google === 'undefined') return null;
   // 마커 아이콘 옵션 (크기 30×30)
   const bananaIconObject = {
     url: bananaIcon,

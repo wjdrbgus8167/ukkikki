@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { LoadScript } from '@react-google-maps/api';
+import {
+  LoadScript,
+  GoogleMap,
+  Marker,
+  Autocomplete,
+} from '@react-google-maps/api';
 import FavoriteList from './FavoriteList';
-import Map from '../../services/map/Map';
 import Chat from './Chat';
 import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
@@ -9,16 +13,15 @@ import Swal from 'sweetalert2';
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
 const InteractiveSection = ({ selectedCard }) => {
-  const [isLikeListOpen, setIsLikeListOpen] = useState(true); // 좋아요 리스트 열림/닫힘 상태
+  const [isLikeListOpen, setIsLikeListOpen] = useState(true);
   const [favorites, setFavorites] = useState([]);
-  const [isChatOpen, setIsChatOpen] = useState(false); // 채팅창 상태
-
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [coordinates, setCoordinates] = useState({
     lat: 35.6895,
     lng: 139.6917,
   });
+  const [scriptLoaded, setScriptLoaded] = useState(false);
 
-  // 초기 렌더링 시 selectedCard.places가 있으면 favorites에 저장
   useEffect(() => {
     if (selectedCard && Array.isArray(selectedCard.places)) {
       setFavorites(selectedCard.places);
@@ -82,42 +85,57 @@ const InteractiveSection = ({ selectedCard }) => {
 
   return (
     <div className="relative w-full h-screen">
-      <LoadScript googleMapsApiKey={apiKey} libraries={['places']}>
-        {/* 지도 영역 */}
-        <div className="w-full h-full">
-          <Map
-            coordinates={coordinates}
-            markers={favorites}
-            onPlaceSelected={handlePlaceSelected}
-          />
-        </div>
+      {/* LoadScript로 Google Maps API 스크립트 로드 */}
 
-        {/* ✅ 채팅창 (지도 위에 오버레이) */}
-        <div className="absolute bottom-4 right-4">
-          {isChatOpen ? (
-            <div className="relative transition-all duration-300 bg-white rounded-lg shadow-lg w-96 h-96">
-              {/* 채팅창 내용 */}
-              <Chat travelPlanId={selectedCard.travelPlanId} />
-              {/* 닫기 버튼 */}
-              <button
-                onClick={() => setIsChatOpen(false)}
-                className="absolute p-2 text-white bg-gray-800 rounded-full top-2 right-2"
-              >
-                ✕
-              </button>
-            </div>
-          ) : (
-            /* ✅ 채팅 아이콘 (작은 상태) */
+      {/* 지도 영역 */}
+      <div className="w-full h-full">
+        <GoogleMap
+          mapContainerStyle={{ width: '100%', height: '100%' }}
+          center={coordinates}
+          zoom={12}
+          options={{
+            mapTypeControl: false,
+            streetViewControl: false,
+            rotateControl: false,
+            fullscreenControl: false,
+          }}
+        >
+          {/* 도시 중심 마커 */}
+          <Marker position={coordinates} />
+
+          {/* 즐겨찾기 마커들 */}
+          {favorites.map((marker, index) => (
+            <Marker
+              key={index}
+              position={{ lat: marker.latitude, lng: marker.longitude }}
+            />
+          ))}
+        </GoogleMap>
+      </div>
+
+      {/* 채팅창 */}
+      <div className="absolute bottom-4 right-4">
+        {isChatOpen ? (
+          <div className="relative transition-all duration-300 bg-white rounded-lg shadow-lg w-96 h-96">
+            <Chat travelPlanId={selectedCard.travelPlanId} />
             <button
-              onClick={() => setIsChatOpen(true)}
-              className="flex items-center justify-center w-12 h-12 text-white transition-all duration-300 bg-gray-800 rounded-full shadow-lg hover:scale-110"
+              onClick={() => setIsChatOpen(false)}
+              className="absolute p-2 text-white bg-gray-800 rounded-full top-2 right-2"
             >
-              💬
+              ✕
             </button>
-          )}
-        </div>
-      </LoadScript>
+          </div>
+        ) : (
+          <button
+            onClick={() => setIsChatOpen(true)}
+            className="flex items-center justify-center w-12 h-12 text-white transition-all duration-300 bg-gray-800 rounded-full shadow-lg hover:scale-110"
+          >
+            💬
+          </button>
+        )}
+      </div>
     </div>
   );
 };
+
 export default InteractiveSection;
