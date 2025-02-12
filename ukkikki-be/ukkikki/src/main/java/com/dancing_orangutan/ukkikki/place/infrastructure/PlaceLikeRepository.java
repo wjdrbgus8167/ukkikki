@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface PlaceLikeRepository extends JpaRepository<LikeEntity, LikeId> {
     List<LikeEntity> findByLikeId_PlaceId(Integer placeId);
+    List<LikeEntity> findByLikeId_MemberId(Integer memberId);
 }
