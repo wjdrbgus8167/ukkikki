@@ -8,15 +8,12 @@ export const PorposalContentContainer = styled.div`
 
   .proposal-title {
     flex: 1.5;
-    font-size: clamp(70px, 5vw, 90px);; 
-    color: #412B2B; 
-    font-weight: 800; 
-    line-height: 100px; 
+    font-size: clamp(70px, 5vw, 90px);
+    color: #412b2b;
+    font-weight: 800;
+    line-height: 100px;
     text-align: center;
-    padding: 0 1.25rem; 
-
-
-    
+    padding: 0 1.25rem;
   }
 
   .proposal-content {
