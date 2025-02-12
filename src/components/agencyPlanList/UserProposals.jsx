@@ -19,7 +19,7 @@ const UserProposals = () => {
         <ListCard 
           key={proposal.travelPlanId}
           trip_name={proposal.name}
-          start_date={proposal.startDate} // dataRange 대신 start_date로 통일
+          start_date={proposal.startDate} 
           location={proposal.departureCityId}
           min_people={proposal.minPeople}
           max_people={proposal.maxPeople}
