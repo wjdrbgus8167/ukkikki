@@ -88,4 +88,14 @@ public class ProposalRepository  {
 
         return proposalMapper.entityToDomain(entity);
     }
+
+    public List<ProposalEntity> findByTravelPlanId(Integer travelPlanId) {
+
+        List<ProposalEntity> proposals = jpaProposalRepository.findByTravelPlan_TravelPlanId(travelPlanId)
+                .orElseThrow(()-> new EntityNotFoundException("등록된 제안서가 없습니다"));
+        if (proposals.isEmpty()) {
+            throw new EntityNotFoundException("등록된 제안서가 없습니다");
+        }
+            return proposals;
+    }
 }
