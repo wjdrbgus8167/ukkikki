@@ -22,4 +22,6 @@ public interface JpaProposalRepository extends JpaRepository<ProposalEntity,Inte
     );
 
     Optional<ProposalEntity> findByProposalIdAndTravelPlan_TravelPlanId(Integer proposalId, Integer travelPlanId);
+
+    Optional<List<ProposalEntity>> findByTravelPlan_TravelPlanId(Integer travelPlanId);
 }
