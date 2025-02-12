@@ -37,14 +37,14 @@ const App = () => {
         <Route path="/user-vote" element={<UserVotePage />} />
         <Route path="/oauth/success" element={<OAuthSuccessPage />} />
 
-        {/* <Route 
-          path="/travel-plans/:travelPlanId/proposalss"
-          element={<CreateTravel />}/> */}
-        <Route
+        <Route 
+          path="/travel-plans/:travelPlanId/proposals"
+          element={<CreateTravel />}/>
+        {/* <Route
           path="/travel-plans/:travelPlanId/proposals"
           element={<TravelCreate />}
-        />
-        {/* 제안서 디테일 페이지 */}
+        /> */}
+        
         <Route 
           path= "/travel-proposal/:travelPlanId/proposals/:proposalId" 
           element={< TravelProposal />}/>
