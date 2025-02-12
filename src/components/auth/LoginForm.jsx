@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { publicRequest } from '../../hooks/requestMethod';
 import useAuthStore from '../../stores/authStore';
+import Swal from 'sweetalert2';
 
 const LoginForm = ({ isCompany }) => {
   const [email, setEmail] = useState('');
@@ -24,8 +25,6 @@ const LoginForm = ({ isCompany }) => {
 
       if (response.status === 200) {
         useAuthStore.getState().setUser(true);
-
-        console.log('로그인 성공');
 
         // 기업 로그인 시 마이페이지로 이동, 일반 로그인 시 홈으로 이동
         navigate(isCompany ? '/mypage' : '/');
