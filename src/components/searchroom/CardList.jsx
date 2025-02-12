@@ -11,7 +11,7 @@ const statusMap = {
   BOOKING: '예약중',
   CONFIRMED: '확정됨',
 };
-// 테마에 따른 색상 반환 함수 (원래 있던 함수, 필요에 따라 사용)
+
 const getThemeColor = (theme) => {
   const themeColors = {
     골프: 'bg-golf text-white',
@@ -61,6 +61,22 @@ const CardList = ({ cards }) => {
     fetchImages();
   }, [cards]); // ✅ `apiKey` 제거 (변경되지 않는 값이므로)
 
+  // ➁ useRoomModal 훅 사용
+  const {
+    isModalOpen,
+    currentStep,
+    selectedCard,
+    people,
+    openModal,
+    closeModal,
+    nextStep,
+    prevStep,
+    handlePeopleChange,
+    handleIncrement,
+    handleDecrement,
+    handleComplete,
+  } = useRoomModal();
+
   // ✅ 조기 return을 useEffect 이후로 이동
   if (!Array.isArray(cards) || cards.length === 0) {
     return (
@@ -79,26 +95,6 @@ const CardList = ({ cards }) => {
       </div>
     );
   }
-
-  // ➁ useRoomModal 훅 사용
-  const {
-    isModalOpen,
-    currentStep,
-    selectedCard,
-    people,
-    openModal,
-    closeModal,
-    nextStep,
-    prevStep,
-    handlePeopleChange,
-    handleIncrement,
-    handleDecrement,
-    handleComplete,
-  } = useRoomModal();
-
-  // ------------------------------
-  // 이미지 불러오기 (Unsplash)
-  // ------------------------------
 
   return (
     <>

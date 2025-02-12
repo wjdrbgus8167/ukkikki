@@ -12,8 +12,8 @@ const ProgressBar = ({ step, totalSteps }) => {
       <div className="relative w-full h-4 overflow-hidden bg-gray-200 rounded-full">
         <motion.div
           className="h-full rounded-full bg-yellow"
-          initial={{ width: 0 }} // 초기 상태
-          animate={{ width: `${progress}%` }} // 애니메이션 대상 상태
+          initial={{ width: `${((step - 1) / totalSteps) * 100}%` }} // 이전 단계의 진행률로 초기 상태 설정
+          animate={{ width: `${progress}%` }} // 현재 단계의 진행률로 애니메이션
           transition={{ duration: 0.5, ease: 'easeInOut' }} // 부드러운 전환 효과
         />
       </div>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../../stores/authStore';
 import { publicRequest } from '../../hooks/requestMethod';
+import Swal from 'sweetalert2'; // ✅ SweetAlert2 추가
 import logo from '../../assets/logo.png';
 import defaultProfile from '../../assets/profile.png';
 
@@ -10,7 +11,24 @@ const Header = () => {
   const { user, setUser } = useAuthStore();
   const navigate = useNavigate();
   const { isAuthenticated, logout } = useAuthStore();
+
   const handleLogout = async () => {
+    // ✅ 먼저 확인 알림창 띄우기
+    const result = await Swal.fire({
+      title: '로그아웃 하시겠습니까?',
+      text: '로그아웃하면 다시 로그인해야 합니다.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: '로그아웃',
+      cancelButtonText: '취소',
+    });
+
+    if (!result.isConfirmed) {
+      return; // 사용자가 '취소' 버튼을 누르면 아무 작업도 하지 않음
+    }
+
     try {
       // ✅ 백엔드로 로그아웃 요청 (쿠키 삭제)
       const response = await publicRequest.post(
@@ -25,11 +43,28 @@ const Header = () => {
         localStorage.removeItem('auth-store');
 
         logout();
-        // ✅ 페이지 새로고침 없이 상태 업데이트 반영
         navigate('/');
+
+        // ✅ 로그아웃 성공 알림
+        Swal.fire({
+          title: '로그아웃 되었습니다!',
+          text: '메인 페이지로 이동합니다.',
+          icon: 'success',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: '확인',
+        });
       }
     } catch (error) {
       console.error('🚨 로그아웃 실패:', error);
+
+      // ✅ 로그아웃 실패 알림
+      Swal.fire({
+        title: '로그아웃 실패',
+        text: '다시 시도해주세요.',
+        icon: 'error',
+        confirmButtonColor: '#d33',
+        confirmButtonText: '확인',
+      });
     }
   };
 

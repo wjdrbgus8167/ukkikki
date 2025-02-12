@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './pages/mainPage';
 import About from './pages/AboutPage';
@@ -15,9 +15,17 @@ import UserVotePage from './pages/UserVotePage';
 import OAuthSuccessPage from './components/auth/OAuthSuccessPage';
 import CreateTravel from './pages/CreateTravelPage';
 import TravelProposal from './pages/TravelProposal';
-
-
+import AOS from 'aos';
+import 'aos/dist/aos.css'; // AOS 스타일 불러오기
 const App = () => {
+  useEffect(() => {
+    // AOS 초기화
+    AOS.init({
+      duration: 1000, // 애니메이션 지속 시간 (기본값: 400ms)
+      once: true, // 애니메이션을 한 번만 실행 (기본값: false)
+    });
+  }, []);
+
   return (
     <Router>
       <LoadingSpinner /> {/* 전역 로딩 스피너 */}
@@ -37,20 +45,20 @@ const App = () => {
         <Route path="/user-vote" element={<UserVotePage />} />
         <Route path="/oauth/success" element={<OAuthSuccessPage />} />
 
-        <Route 
+        <Route
           path="/travel-plans/:travelPlanId/proposals"
-          element={<CreateTravel />}/>
+          element={<CreateTravel />}
+        />
         {/* <Route
           path="/travel-plans/:travelPlanId/proposals"
           element={<TravelCreate />}
         /> */}
-        
-        <Route 
-          path= "/travel-proposal/:travelPlanId/proposals/:proposalId" 
-          element={< TravelProposal />}/>
-        <Route />
 
-        
+        <Route
+          path="/travel-proposal/:travelPlanId/proposals/:proposalId"
+          element={<TravelProposal />}
+        />
+        <Route />
       </Routes>
     </Router>
   );
