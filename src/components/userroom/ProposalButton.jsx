@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { publicRequest } from '../../hooks/requestMethod';
+import Swal from 'sweetalert2';
 
 const ProposalButton = ({ travelPlanId, currentParticipants, minPeople }) => {
-  // 상태 관리: API 요청 진행 여부, 예약 제출 스케줄링 여부, 날짜 입력 UI 표시, 날짜 입력 값
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isScheduled, setIsScheduled] = useState(false);
   const [showDateInput, setShowDateInput] = useState(false);
@@ -14,12 +14,23 @@ const ProposalButton = ({ travelPlanId, currentParticipants, minPeople }) => {
   // 버튼 클릭 핸들러
   const handleButtonClick = () => {
     if (!isEnabled) {
-      alert(
-        `최소 인원(${minPeople}명) 이상이어야 합니다. 현재 인원: ${currentParticipants}명.`,
-      );
+      Swal.fire({
+        title: '🚨 참가 인원 부족!',
+        html: `최소 인원 <b>${minPeople}명</b> 이상이어야 합니다.<br>현재 인원: <b>${currentParticipants}명</b>`,
+        icon: 'warning',
+        confirmButtonText: '확인',
+        confirmButtonColor: '#d33',
+        background: '#fffbee',
+        color: '#333',
+        showCancelButton: true,
+        cancelButtonText: '취소',
+        cancelButtonColor: '#aaa',
+        allowOutsideClick: false,
+        timer: 5000,
+        timerProgressBar: true,
+      });
       return;
     }
-    // 조건 충족 시 날짜 입력 UI 표시
     setShowDateInput(true);
   };
 
@@ -31,13 +42,23 @@ const ProposalButton = ({ travelPlanId, currentParticipants, minPeople }) => {
   // 설정 버튼 클릭 시 마감일시 API 호출 및 예약 제출 스케줄링
   const handleSubmitCloseTime = async () => {
     if (!closeTime) {
-      alert('날짜와 시간을 입력해주세요.');
+      Swal.fire({
+        title: '⚠️ 입력 필요!',
+        text: '날짜와 시간을 입력해주세요.',
+        icon: 'warning',
+        confirmButtonText: '확인',
+      });
       return;
     }
 
     const parsedDate = new Date(closeTime);
     if (isNaN(parsedDate.getTime())) {
-      alert('올바른 날짜 형식을 입력해주세요.');
+      Swal.fire({
+        title: '❌ 잘못된 입력!',
+        text: '올바른 날짜 형식을 입력해주세요.',
+        icon: 'error',
+        confirmButtonText: '확인',
+      });
       return;
     }
 
@@ -47,12 +68,23 @@ const ProposalButton = ({ travelPlanId, currentParticipants, minPeople }) => {
         `/api/v1/travel-plans/${travelPlanId}/closeTime`,
         { closeTime },
       );
-      alert('마감일시가 설정되었습니다.');
+      Swal.fire({
+        title: '✅ 마감일시 설정 완료!',
+        text: '여행사가 확인할 마감일시가 설정되었습니다.',
+        icon: 'success',
+        confirmButtonText: '확인',
+      });
+
       scheduleSubmission(parsedDate);
       setShowDateInput(false);
     } catch (error) {
       console.error('마감일시 설정 실패:', error);
-      alert('마감일시 설정에 실패했습니다.');
+      Swal.fire({
+        title: '❌ 오류 발생!',
+        text: '마감일시 설정에 실패했습니다.',
+        icon: 'error',
+        confirmButtonText: '확인',
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -78,11 +110,21 @@ const ProposalButton = ({ travelPlanId, currentParticipants, minPeople }) => {
       await publicRequest.put(`/api/v1/travel-plans/${travelPlanId}`, {
         planningStatus: 'BIDDING',
       });
-      alert('여행계획이 여행사에 제출되었습니다.');
+      Swal.fire({
+        title: '🎉 여행계획 제출 완료!',
+        text: '여행계획이 여행사에 성공적으로 제출되었습니다.',
+        icon: 'success',
+        confirmButtonText: '확인',
+      });
       setIsScheduled(false);
     } catch (error) {
       console.error('여행계획 제출 실패:', error);
-      alert('여행계획 제출에 실패했습니다.');
+      Swal.fire({
+        title: '❌ 제출 실패!',
+        text: '여행계획 제출에 실패했습니다.',
+        icon: 'error',
+        confirmButtonText: '확인',
+      });
     }
   };
 

@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; // React Router 사용
 import { publicRequest } from '../../hooks/requestMethod';
+import Swal from 'sweetalert2';
+import { motion } from 'framer-motion';
 
 const ProgressBar = ({ step, totalSteps }) => {
   const progress = (step / totalSteps) * 100;
@@ -8,9 +10,11 @@ const ProgressBar = ({ step, totalSteps }) => {
   return (
     <div className="mb-4">
       <div className="relative w-full h-4 overflow-hidden bg-gray-200 rounded-full">
-        <div
-          className="h-full transition-all duration-300 ease-in-out bg-yellow"
-          style={{ width: `${progress}%` }}
+        <motion.div
+          className="h-full rounded-full bg-yellow"
+          initial={{ width: 0 }} // 초기 상태
+          animate={{ width: `${progress}%` }} // 애니메이션 대상 상태
+          transition={{ duration: 0.5, ease: 'easeInOut' }} // 부드러운 전환 효과
         />
       </div>
       <div className="flex justify-end mt-2 text-sm text-gray-600">
@@ -48,13 +52,17 @@ function RoomModal({
   // 입장하기 버튼 클릭 시 UserRoom으로 이동
   const handleEnterRoom = async () => {
     if (!selectedCard || !selectedCard.travelPlanId) {
-      alert('🚨 여행방 정보를 찾을 수 없습니다.');
+      Swal.fire('알림', '🚨 여행방 정보를 찾을 수 없습니다.', 'error');
       return;
     }
 
     const totalPeople = people.adult + people.child + people.infant;
     if (totalPeople === 0) {
-      alert('🚨 최소 한 명 이상의 인원을 선택해야 합니다.');
+      Swal.fire(
+        '알림',
+        '🚨 최소 한 명 이상의 인원을 선택해야 합니다.',
+        'warning',
+      );
       return;
     }
 
@@ -77,7 +85,7 @@ function RoomModal({
       });
     } catch (error) {
       console.error('🚨 여행방 입장 실패:', error);
-      alert('🚨 여행방 입장 중 오류가 발생했습니다.');
+      Swal.fire('알림', '🚨 여행방 입장 중 오류가 발생했습니다.', 'error');
     }
   };
 
