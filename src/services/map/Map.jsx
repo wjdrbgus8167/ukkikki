@@ -17,19 +17,16 @@ const mapOptions = {
 const Map = ({ coordinates, markers }) => {
   const [bananaIconObject, setBananaIconObject] = useState(null);
 
+  // Google API가 로드된 후 아이콘 설정
   useEffect(() => {
-    const img = new Image();
-    img.src = bananaIcon;
-    img.onload = () => {
-      if (typeof window.google !== 'undefined') {
-        setBananaIconObject({
-          url: bananaIcon,
-          scaledSize: new window.google.maps.Size(30, 30),
-          origin: new window.google.maps.Point(0, 0),
-          anchor: new window.google.maps.Point(15, 15),
-        });
-      }
-    };
+    if (typeof window.google !== 'undefined') {
+      setBananaIconObject({
+        url: bananaIcon,
+        scaledSize: new window.google.maps.Size(30, 30), // 크기 조정
+        origin: new window.google.maps.Point(0, 0),
+        anchor: new window.google.maps.Point(15, 15),
+      });
+    }
   }, []);
 
   return (
@@ -40,9 +37,12 @@ const Map = ({ coordinates, markers }) => {
         zoom={12}
         options={mapOptions}
       >
+        {/* 도시 중심 마커 */}
         {bananaIconObject && (
           <Marker position={coordinates} icon={bananaIconObject} />
         )}
+
+        {/* 찜한 장소 마커들 */}
         {bananaIconObject &&
           markers.map((marker, index) => (
             <Marker
