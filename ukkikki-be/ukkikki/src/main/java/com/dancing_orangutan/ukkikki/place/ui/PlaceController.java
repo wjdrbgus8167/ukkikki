@@ -7,11 +7,11 @@ import com.dancing_orangutan.ukkikki.place.application.PlaceService;
 import com.dancing_orangutan.ukkikki.place.application.command.*;
 import com.dancing_orangutan.ukkikki.place.ui.request.CreatePlaceRequest;
 import com.dancing_orangutan.ukkikki.place.ui.request.CreatePlaceTagRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,7 +24,7 @@ public class PlaceController {
 
     @PostMapping("/places")
     public ApiUtils.ApiResponse<?> createPlace(@PathVariable Integer travelPlanId,
-                                               @RequestBody CreatePlaceRequest createPlaceRequest) {
+                                               @RequestBody @Valid CreatePlaceRequest createPlaceRequest) {
 
         CreatePlaceCommand command = CreatePlaceCommand.builder()
                 .travelPlanId(travelPlanId)
@@ -59,7 +59,7 @@ public class PlaceController {
     public ApiUtils.ApiResponse<?> createPlaceTag(@PathVariable Integer travelPlanId,
                                                   @PathVariable Integer placeId,
                                                   @AuthenticationPrincipal MemberUserDetails userDetails,
-                                                  @RequestBody CreatePlaceTagRequest createPlaceTagRequest) {
+                                                  @RequestBody @Valid CreatePlaceTagRequest createPlaceTagRequest) {
 
         CreatePlaceTagCommand command = CreatePlaceTagCommand.builder()
                 .travelPlanId(travelPlanId)
