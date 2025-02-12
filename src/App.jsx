@@ -44,7 +44,7 @@ const App = () => {
           path="/travel-plans/:travelPlanId/proposals"
           element={<TravelCreate />}
         />
-        {/* 제안서 디테일 페이지 */}
+        
         <Route 
           path= "/travel-proposal/:travelPlanId/proposals/:proposalId" 
           element={< TravelProposal />}/>
