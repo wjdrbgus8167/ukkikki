@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LoadScript } from '@react-google-maps/api';
-import LikeList from './LikeList';
+import FavoriteList from './FavoriteList';
 import Map from '../../services/map/Map';
 import Chat from './Chat';
 import { publicRequest } from '../../hooks/requestMethod';
@@ -91,33 +91,6 @@ const InteractiveSection = ({ selectedCard }) => {
     <div className="relative flex flex-col h-screen p-8 md:flex-row">
       {/* LoadScript는 한 번만 로드합니다 */}
       <LoadScript googleMapsApiKey={apiKey} libraries={['places']}>
-        {/* 상단의 버튼 섹션 */}
-        <div className="absolute w-full max-w-xs mb-4 transform -translate-x-1/2 top-8 left-1/2">
-          <div className="flex justify-center space-x-4">
-            <div
-              className={`flex-1 text-center py-2 font-semibold cursor-pointer ${
-                isLikeList ? 'text-brown' : 'text-gray-500'
-              }`}
-              onClick={() => setIsLikeList(true)}
-            >
-              찜하기
-            </div>
-            <div
-              className={`flex-1 text-center py-2 font-semibold cursor-pointer ${
-                !isLikeList ? 'text-brown' : 'text-gray-500'
-              }`}
-              onClick={() => setIsLikeList(false)}
-            >
-              리스트
-            </div>
-          </div>
-          <div
-            className={`absolute bottom-0 left-0 w-1/2 h-1 bg-yellow transition-all duration-300 ${
-              isLikeList ? 'left-0' : 'left-1/2'
-            }`}
-          ></div>
-        </div>
-
         {/* 메인 컨텐츠 영역 */}
         <div className="flex flex-1 mt-16">
           {/* 왼쪽: 지도 또는 리스트 */}
@@ -129,7 +102,7 @@ const InteractiveSection = ({ selectedCard }) => {
                 onPlaceSelected={handlePlaceSelected}
               />
             ) : (
-              <LikeList
+              <FavoriteList
                 wishlists={favorites}
                 selectedCard={selectedCard}
                 setFavorites={setFavorites}

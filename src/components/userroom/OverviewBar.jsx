@@ -26,7 +26,7 @@ const getThemeColor = (theme) => {
   };
   return themeColors[theme] || 'bg-gray-500 text-white';
 };
-const DashBoard = ({ selectedCard }) => {
+const OverviewBar = ({ selectedCard }) => {
   const [imageUrl, setImageUrl] = useState('');
   const hasFetched = useRef(false); // fetch 여부를 추적
   if (!selectedCard) {
@@ -115,4 +115,4 @@ const DashBoard = ({ selectedCard }) => {
   );
 };
 
-export default DashBoard;
+export default OverviewBar;

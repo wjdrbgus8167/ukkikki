@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { publicRequest } from '../hooks/requestMethod';
 import InteractiveSection from '../components/userroom/InteractiveSection';
-import DashBoard from '../components/userroom/DashBoard';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import OverviewBar from '../components/userroom/OverviewBar';
+import FavoriteList from '../components/userroom/FavoriteList';
 
 const UserRoom = () => {
   const { travelPlanId: travelPlanIdFromUrl } = useParams();
@@ -12,7 +13,7 @@ const UserRoom = () => {
   const initialSelectedCard = location.state?.selectedCard;
   const [selectedCard, setSelectedCard] = useState(initialSelectedCard);
 
-  // 우선, URL에서 travelPlanId를 가져오고, 만약 location.state가 없다면 이를 사용하도록 함
+  // travelPlanId 결정
   const travelPlanId = initialSelectedCard?.travelPlanId || travelPlanIdFromUrl;
 
   useEffect(() => {
@@ -47,12 +48,24 @@ const UserRoom = () => {
   }
 
   return (
-    <div>
+    <div className="flex flex-col min-h-screen">
       <Header />
-      <div className="container px-8 py-8 mx-auto">
-        <DashBoard selectedCard={selectedCard} />
-        <InteractiveSection selectedCard={selectedCard} />
+      {/* ✅ 여행 개요 바 */}
+      <OverviewBar selectedCard={selectedCard} />
+
+      {/* ✅ FavoriteList + InteractiveSection을 가로 배치 */}
+      <div className="flex flex-1 px-8 py-6">
+        {/* 좌측: 좋아요 리스트 */}
+        <div className="w-1/4 pr-4">
+          <FavoriteList selectedCard={selectedCard} />
+        </div>
+
+        {/* ✅ 우측: 지도 + 채팅 */}
+        <div className="w-3/4">
+          <InteractiveSection selectedCard={selectedCard} />
+        </div>
       </div>
+
       <Footer />
     </div>
   );

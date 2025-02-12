@@ -3,7 +3,7 @@ import { publicRequest } from '../../hooks/requestMethod';
 import useAuthStore from '../../stores/authStore';
 import Swal from 'sweetalert2';
 
-const LikeList = ({ selectedCard }) => {
+const FavoriteList = ({ selectedCard }) => {
   const { user } = useAuthStore(); // 현재 로그인한 유저 정보
   const [favorites, setFavorites] = useState([]);
 
@@ -99,4 +99,4 @@ const LikeList = ({ selectedCard }) => {
   );
 };
 
-export default LikeList;
+export default FavoriteList;
