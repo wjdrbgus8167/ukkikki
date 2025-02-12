@@ -80,6 +80,21 @@ public class ProposalController {
         return ApiUtils.success(proposalService.createInquiry(command));
     }
 
+    //제안서 문의 답변
+    @PutMapping("/{proposalId}/inquiries/{inquiryId}")
+    public ApiUtils.ApiResponse<CreateInquiryAnswerResponse> createInquiryAnswer(
+            @PathVariable Integer travelPlanId,
+            @PathVariable Integer proposalId,
+            @PathVariable Integer inquiryId,
+            @AuthenticationPrincipal CompanyUserDetails companyUserDetails,
+            @RequestBody CreateInquiryAnswerRequest request
+    ){
+        CreateInquiryAnswerCommand command = request.toCommand(proposalId,travelPlanId,companyUserDetails.getCompanyId(),inquiryId);
+
+        CreateInquiryAnswerResponse response = proposalService.createInquiryAnswer(command);
+
+        return ApiUtils.success(response);
+    }
     // 제안서 문의 목록 조회
     @GetMapping("/{proposalId}/inquiries")
     public ApiUtils.ApiResponse<List<InquiryListResponse>> getInquiryList(

@@ -18,6 +18,7 @@ import com.dancing_orangutan.ukkikki.proposal.domain.voteSurvey.VoteSurveyEntity
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.company.CompanyFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.inquiry.InquiryFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.inquiry.InquiryRepository;
+import com.dancing_orangutan.ukkikki.proposal.infrastructure.inquiry.JpaInquiryRepository;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.memberTravelPlan.MemberTravelPlanFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.proposal.JpaProposalRepository;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.proposal.ProposalFinder;
@@ -29,10 +30,7 @@ import com.dancing_orangutan.ukkikki.proposal.infrastructure.travelPlan.TravelPl
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.traveler.JpaTravelerRepository;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.vote.JpaVoteRepository;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.voteSurvey.JpaVoteSurveyRepository;
-import com.dancing_orangutan.ukkikki.proposal.mapper.ProposalMapper;
-import com.dancing_orangutan.ukkikki.proposal.mapper.ScheduleMapper;
-import com.dancing_orangutan.ukkikki.proposal.mapper.TravelerMapper;
-import com.dancing_orangutan.ukkikki.proposal.mapper.VoteSurveyMapper;
+import com.dancing_orangutan.ukkikki.proposal.mapper.*;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.*;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanId;
@@ -59,6 +57,7 @@ public class ProposalService {
     private final ProposalFinder proposalFinder;
     private final InquiryRepository inquiryRepository;
     private final InquiryFinder inquiryFinder;
+    private final JpaInquiryRepository jpaInquiryRepository;
     private final ScheduleRepository scheduleRepository;
     private final JpaScheduleRepository jpaScheduleRepository;
     private final ScheduleMapper scheduleMapper;
@@ -69,7 +68,6 @@ public class ProposalService {
     private final VoteSurveyMapper voteSurveyMapper;
     private final JpaVoteRepository voteRepository;
     private final CompanyFinder companyFinder;
-
     // 제안서 작성
     @Transactional
    public CreateProposalResponse createProposal(CreateProposalCommand command){
@@ -235,6 +233,39 @@ public class ProposalService {
         Inquiry savedInquiry = inquiryRepository.save(inquiry);
 
         return CreateInquiryResponse.from(savedInquiry);
+    }
+
+    //제안서 문의 답변
+    public CreateInquiryAnswerResponse createInquiryAnswer(CreateInquiryAnswerCommand command) {
+
+        // 제안서 존재 여부 확인
+        ProposalEntity proposal = jpaProposalRepository.findByProposalIdAndCompany_CompanyId(command.getProposalId(), command.getCompanyId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 제안서를 찾을 수 없거나 접근 권한이 없습니다."));
+        log.info("proposal:{}", proposal.getProposalId());
+        // 문의 존재 여부 확인
+        InquiryEntity inquiry = jpaInquiryRepository.findByInquiryIdAndProposal_ProposalId(command.getInquiryId(), proposal.getProposalId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 문의를 찾을 수 없습니다."));
+
+        log.info("inquiry:{}", inquiry.getInquiryId());
+        // 3️⃣ 이미 답변이 있는지 확인
+        if (inquiry.getAnswer() != null && !inquiry.getAnswer().isEmpty()) {
+            throw new IllegalArgumentException("이미 답변이 작성된 문의입니다.");
+        }
+
+        // 4️⃣ 답변 저장
+        inquiry.updateAnswer(command.getAnswer(),LocalDateTime.now());
+        jpaInquiryRepository.save(inquiry);
+
+        // 5️⃣ 응답 반환
+        return CreateInquiryAnswerResponse.builder()
+                .inquiryId(inquiry.getInquiryId())
+                .proposalId(inquiry.getProposal().getProposalId())
+                .answer(inquiry.getAnswer())
+                .companyId(command.getCompanyId())
+                .title(inquiry.getTitle())
+                .content(inquiry.getContent())
+                .build();
+
     }
 
     // 제안서 문의 목록 조회
