@@ -62,4 +62,9 @@ public class InquiryEntity {
 		this.proposal = proposal;
 		this.memberTravelPlan = memberTravelPlan;
 	}
+
+	public void updateAnswer(String answer,LocalDateTime completedTIme) {
+		this.answer = answer;
+		this.completedTIme = completedTIme;
+	}
 }
