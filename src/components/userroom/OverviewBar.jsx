@@ -8,7 +8,8 @@ const statusMap = {
   BOOKING: '예약중',
   CONFIRMED: '확정됨',
 };
-// 테마에 따른 색상 반환 함수 (원래 있던 함수, 필요에 따라 사용)
+
+// 테마에 따른 색상 반환 함수
 const getThemeColor = (theme) => {
   const themeColors = {
     골프: 'bg-golf text-white',
@@ -26,16 +27,17 @@ const getThemeColor = (theme) => {
   };
   return themeColors[theme] || 'bg-gray-500 text-white';
 };
+
 const OverviewBar = ({ selectedCard }) => {
   const [imageUrl, setImageUrl] = useState('');
-  const hasFetched = useRef(false); // fetch 여부를 추적
+  const hasFetched = useRef(false);
+
   if (!selectedCard) {
-    // 데이터가 없을 경우 로딩 상태 표시
     return <p>로딩 중입니다...</p>;
   }
+
   useEffect(() => {
-    // 일본과 관련된 랜덤 이미지를 가져오기
-    if (hasFetched.currrnt) return;
+    if (hasFetched.current) return;
     hasFetched.current = true;
 
     const fetchImage = async () => {
@@ -50,62 +52,37 @@ const OverviewBar = ({ selectedCard }) => {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-between p-8 bg-gray-100 md:flex-row">
-      {/* 여행 이미지 */}
-      <div className="relative">
+    <div className="flex items-center justify-between p-4 bg-gray-100 rounded-lg shadow-md">
+      {/* ✅ 방 상태 */}
+      <div className="flex items-center">
         <span
-          className={`absolute top-6 left-2 px-3 py-1 rounded-full text-sm font-semibold ${
-            selectedCard.planningStatus === 'IN_PROGRESS'
-              ? 'bg-progress text-white'
-              : selectedCard.planningStatus === 'BIDDING'
-              ? 'bg-proposal text-white'
-              : selectedCard.planningStatus === 'BOOKING'
-              ? 'bg-reservation text-white'
-              : 'bg-confirmed text-white'
+          className={`px-3 py-1 rounded-full text-sm font-semibold ${
+            statusMap[selectedCard.planningStatus]
+              ? {
+                  IN_PROGRESS: 'bg-progress text-white',
+                  BIDDING: 'bg-proposal text-white',
+                  BOOKING: 'bg-reservation text-white',
+                  CONFIRMED: 'bg-confirmed text-white',
+                }[selectedCard.planningStatus]
+              : 'bg-gray-400 text-white'
           }`}
         >
           {statusMap[selectedCard.planningStatus]}
         </span>
-
-        {imageUrl && (
-          <img
-            src={imageUrl}
-            alt="Travel"
-            className="object-cover w-full h-64 rounded-lg shadow-md md:w-96"
-          />
-        )}
-        {/* 이미지 왼쪽 상단에 planningStatus 추가 */}
       </div>
 
-      {/* 여행 패키지 정보 */}
-      <div className="p-4 md:w-1/3">
-        <h2 className="mb-4 text-2xl font-bold">
-          {selectedCard?.name || '기본 이름'}
-        </h2>
-        <p className="text-gray-700">
-          {selectedCard.startDate} ~ {selectedCard.endDate}
-        </p>
-        <p className="text-gray-700">{selectedCard.arrivalCity.name}</p>
-        <div className="flex flex-wrap gap-2 mt-4">
-          <strong>테마:</strong>
-          {selectedCard.keywords && selectedCard.keywords.length > 0 ? (
-            selectedCard.keywords.map((keyword, index) => (
-              <span
-                key={index}
-                className={`px-3 py-1 text-sm font-semibold rounded-full ${getThemeColor(
-                  keyword.name,
-                )}`}
-              >
-                {keyword.name}
-              </span>
-            ))
-          ) : (
-            <span className="text-sm text-gray-500">키워드가 없습니다.</span>
-          )}
-        </div>
-      </div>
+      {/* ✅ 방 제목 */}
+      <h2 className="text-lg font-bold">{selectedCard?.name || '기본 이름'}</h2>
 
-      {/* 여행사에 제안하기 버튼 컴포넌트 사용 */}
+      {/* ✅ 여행지 */}
+      <p className="text-gray-700">{selectedCard.arrivalCity.name}</p>
+
+      {/* ✅ 여행 일정 */}
+      <p className="text-right text-gray-700">
+        {selectedCard.startDate} ~ {selectedCard.endDate}
+      </p>
+
+      {/* ✅ 여행사 제안 버튼 */}
       <ProposalButton
         travelPlanId={selectedCard.travelPlanId}
         currentParticipants={selectedCard.currentParticipants}

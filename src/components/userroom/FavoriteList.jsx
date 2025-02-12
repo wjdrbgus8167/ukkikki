@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { publicRequest } from '../../hooks/requestMethod';
 import useAuthStore from '../../stores/authStore';
 import Swal from 'sweetalert2';
+import MapSearchBar from '../../services/map/MapSearchBar';
 
 const FavoriteList = ({ selectedCard }) => {
   const { user } = useAuthStore(); // 현재 로그인한 유저 정보
@@ -17,6 +18,14 @@ const FavoriteList = ({ selectedCard }) => {
       setFavorites(updatedPlaces);
     }
   }, [selectedCard, user]);
+
+  // ✅ 검색한 장소를 리스트에 추가하는 함수
+  const handlePlaceSelected = (newPlace) => {
+    setFavorites((prev) => {
+      if (prev.some((fav) => fav.name === newPlace.name)) return prev; // 중복 추가 방지
+      return [...prev, { ...newPlace, likeCount: 0, isLiked: false }];
+    });
+  };
 
   // ✅ 좋아요 순으로 정렬
   const sortedWishlists = useMemo(() => {
@@ -69,6 +78,10 @@ const FavoriteList = ({ selectedCard }) => {
 
   return (
     <div className="space-y-4">
+      {/* ✅ MapSearchBar 추가 */}
+      <MapSearchBar onPlaceSelected={handlePlaceSelected} />
+
+      {/* ✅ 찜한 장소 목록 */}
       {sortedWishlists.map((item, index) => (
         <div
           key={index}
