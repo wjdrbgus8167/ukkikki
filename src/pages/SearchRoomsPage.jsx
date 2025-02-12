@@ -19,18 +19,29 @@ const SearchRoom = () => {
 
   // 필터링 결과를 관리하는 상태 (초기값을 rooms 배열로 설정)
   const [filteredRooms, setFilteredRooms] = useState(rooms);
-
+  const statusMap = {
+    IN_PROGRESS: '진행중',
+    BIDDING: '입찰중',
+    BOOKING: '예약중',
+    CONFIRMED: '여행확정',
+  };
   const handleFilter = (themes, states) => {
-    let filtered = rooms; // 원본 데이터인 rooms를 사용
+    let filtered = [...rooms]; // 원본 데이터 복사
 
+    // ✅ 여행 테마 필터링 (undefined 체크 추가)
     if (!themes.includes('전체보기')) {
-      filtered = filtered.filter((room) =>
-        themes.some((theme) => room.theme.includes(theme)),
+      filtered = filtered.filter(
+        (room) =>
+          Array.isArray(room.keywords) &&
+          room.keywords.some((keyword) => themes.includes(keyword.name)),
       );
     }
 
+    // ✅ 방 상태 필터링 (statusMap을 활용하여 상태 변환 후 비교)
     if (!states.includes('전체보기')) {
-      filtered = filtered.filter((room) => states.includes(room.status));
+      filtered = filtered.filter((room) =>
+        states.includes(statusMap[room.planningStatus] || '기타'),
+      );
     }
 
     setFilteredRooms(filtered);

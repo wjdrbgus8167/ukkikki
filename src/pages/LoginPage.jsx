@@ -76,39 +76,41 @@ const LoginPage = () => {
             {/* 로그인 폼 */}
             <LoginForm isCompany={isCompany} />
 
-            {/* ✅ 소셜 로그인 버튼 */}
-            <div className="mt-6 space-y-4">
-              <button
-                className="relative flex items-center w-full py-3 text-black transition bg-white border border-gray-200 rounded-xl"
-                onClick={() =>
-                  (window.location.href = `${baseUrl}api/v1/oauth2/authorization/google`)
-                }
-              >
-                <img
-                  src={googleLogo}
-                  alt="Google"
-                  className="absolute w-5 h-5 left-4"
-                />
-                <span className="flex-1 text-center">
-                  구글 계정으로 로그인하기
-                </span>
-              </button>
-              <button
-                className="relative flex items-center w-full py-3 transition bg-yellow text-brown rounded-xl"
-                onClick={() =>
-                  (window.location.href = `${baseUrl}api/v1/oauth2/authorization/kakao`)
-                }
-              >
-                <img
-                  src={kakaoLogo}
-                  alt="Kakao"
-                  className="absolute w-6 h-6 left-4"
-                />
-                <span className="flex-1 text-center">
-                  카카오 계정으로 로그인하기
-                </span>
-              </button>
-            </div>
+            {/* ✅ 기업 로그인 시 소셜 로그인 버튼 숨김 */}
+            {!isCompany && (
+              <div className="mt-6 space-y-4">
+                <button
+                  className="relative flex items-center w-full py-3 text-black transition bg-white border border-gray-200 rounded-xl"
+                  onClick={() =>
+                    (window.location.href = `${baseUrl}api/v1/oauth2/authorization/google`)
+                  }
+                >
+                  <img
+                    src={googleLogo}
+                    alt="Google"
+                    className="absolute w-5 h-5 left-4"
+                  />
+                  <span className="flex-1 text-center">
+                    구글 계정으로 로그인하기
+                  </span>
+                </button>
+                <button
+                  className="relative flex items-center w-full py-3 transition bg-yellow text-brown rounded-xl"
+                  onClick={() =>
+                    (window.location.href = `${baseUrl}api/v1/oauth2/authorization/kakao`)
+                  }
+                >
+                  <img
+                    src={kakaoLogo}
+                    alt="Kakao"
+                    className="absolute w-6 h-6 left-4"
+                  />
+                  <span className="flex-1 text-center">
+                    카카오 계정으로 로그인하기
+                  </span>
+                </button>
+              </div>
+            )}
 
             <div className="flex items-center justify-center mt-4 space-x-2">
               <Link to="/signup" className="text-gray-600 hover:underline">

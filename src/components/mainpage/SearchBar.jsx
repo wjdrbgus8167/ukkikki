@@ -8,6 +8,7 @@ import KoreaAirportModal from '../../services/airport/KoreaAirportSelector';
 import WorldAirportModal from '../../services/airport/WorldAirportSelector';
 import CreateRoomModal from './CreateRoomModal';
 import { publicRequest } from '../../hooks/requestMethod';
+import Swal from 'sweetalert2';
 const SearchBar = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -40,12 +41,16 @@ const SearchBar = () => {
     console.log('🚀 최종 출발일:', startDate);
     console.log('🚀 최종 도착일:', endDate);
     if (!startDate || !endDate || !departureCityId || !arrivalCityId) {
-      alert('출발일, 돌아오는 날, 출발 도시, 도착 도시를 모두 선택해주세요.');
+      Swal.fire(
+        '알림',
+        '출발일, 돌아오는 날, 출발 도시, 도착 도시를 모두 선택해주세요.',
+        'info',
+      );
       return;
     }
 
     if (departureCityId === arrivalCityId) {
-      alert('출발지와 도착지는 달라야 합니다.');
+      Swal.fire('알림', '출발지와 도착지는 달라야 합니다.', 'warning');
       return;
     }
 
@@ -75,7 +80,7 @@ const SearchBar = () => {
         arrivalCityId,
       });
       console.error('🚨 방 찾기 실패:', error);
-      alert('🚨 방 찾기 중 오류가 발생했습니다.');
+      Swal.fire('알림', '🚨 방 찾기 중 오류가 발생했습니다.', 'error');
     }
   };
 
@@ -88,7 +93,11 @@ const SearchBar = () => {
     console.log('🚀 최종 도착일:', endDate);
 
     if (!startDate || !endDate || !arrivalCityId || !departureCityId) {
-      alert('출발일, 돌아오는 날, 출발 공항, 도착 공항을 모두 선택해주세요.');
+      Swal.fire(
+        '알림',
+        '출발일, 돌아오는 날, 출발 공항, 도착 공항을 모두 선택해주세요.',
+        'warning',
+      );
       return;
     }
 
@@ -112,48 +121,47 @@ const SearchBar = () => {
 
     console.log('🛫 출발 항공편 요청 파라미터:', departureParams);
     console.log('🛬 도착 항공편 요청 파라미터:', returnParams);
-    setIsModalOpen(true);
-    // try {
-    //   const departureResponse = await axios.get(
-    //     'http://openapi.airport.co.kr' + API_BASE_URL,
-    //     {
-    //       params: departureParams,
-    //     },
-    //   );
-    //   const returnResponse = await axios.get(
-    //     'http://openapi.airport.co.kr' + API_BASE_URL,
-    //     {
-    //       params: returnParams,
-    //     },
-    //   );
+    try {
+      const departureResponse = await axios.get(
+        'http://openapi.airport.co.kr' + API_BASE_URL,
+        {
+          params: departureParams,
+        },
+      );
+      const returnResponse = await axios.get(
+        'http://openapi.airport.co.kr' + API_BASE_URL,
+        {
+          params: returnParams,
+        },
+      );
 
-    //   // 디버깅: 전체 응답 객체 출력
-    //   console.log('✈️ 출발 항공편 전체 응답:', departureResponse.data);
-    //   console.log('✈️ 도착 항공편 전체 응답:', returnResponse.data);
+      // 디버깅: 전체 응답 객체 출력
+      console.log('✈️ 출발 항공편 전체 응답:', departureResponse.data);
+      console.log('✈️ 도착 항공편 전체 응답:', returnResponse.data);
 
-    //   // 항공편 데이터 추출 (항공편 데이터가 단일 객체로 반환될 수도 있으므로 배열 처리)
-    //   let departureFlights =
-    //     departureResponse.data.response?.body?.items?.item || [];
-    //   if (departureFlights && !Array.isArray(departureFlights)) {
-    //     departureFlights = [departureFlights];
-    //   }
-    //   let returnFlights = returnResponse.data.response?.body?.items?.item || [];
-    //   if (returnFlights && !Array.isArray(returnFlights)) {
-    //     returnFlights = [returnFlights];
-    //   }
+      // 항공편 데이터 추출 (항공편 데이터가 단일 객체로 반환될 수도 있으므로 배열 처리)
+      let departureFlights =
+        departureResponse.data.response?.body?.items?.item || [];
+      if (departureFlights && !Array.isArray(departureFlights)) {
+        departureFlights = [departureFlights];
+      }
+      let returnFlights = returnResponse.data.response?.body?.items?.item || [];
+      if (returnFlights && !Array.isArray(returnFlights)) {
+        returnFlights = [returnFlights];
+      }
 
-    //   console.log('🛫 출발 항공편 데이터:', departureFlights);
-    //   console.log('🛬 도착 항공편 데이터:', returnFlights);
+      console.log('🛫 출발 항공편 데이터:', departureFlights);
+      console.log('🛬 도착 항공편 데이터:', returnFlights);
 
-    //   if (departureFlights.length > 0 && returnFlights.length > 0) {
-    //     setIsModalOpen(true);
-    //   } else {
-    //     alert('❌ 해당 날짜에 왕복 항공편이 없습니다.');
-    //   }
-    // } catch (error) {
-    //   console.error('🚨 항공권 조회 실패:', error);
-    //   alert('🚨 항공권 조회 중 오류가 발생했습니다.');
-    // }
+      if (departureFlights.length > 0 && returnFlights.length > 0) {
+        setIsModalOpen(true);
+      } else {
+        Swal.fire('알림', '❌ 해당 날짜에 왕복 항공편이 없습니다.', 'warning');
+      }
+    } catch (error) {
+      console.error('🚨 항공권 조회 실패:', error);
+      Swal.fire('알림', '🚨 항공권 조회 중 오류가 발생했습니다.', 'warning');
+    }
   };
 
   return (

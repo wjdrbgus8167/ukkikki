@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { publicRequest } from '../../hooks/requestMethod';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
   // travelData: { departureCityId, arrivalCityId, startDate, endDate }
@@ -43,7 +44,7 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
   // 1단계 → 2단계 이동
   const handleNextStep = () => {
     if (!roomData.title || !roomData.minPeople || !roomData.maxPeople) {
-      alert('모든 항목을 입력해주세요.');
+      Swal.fire('알림', '모든 항목을 입력해주세요.', 'warning');
       return;
     }
     setStep(2);
@@ -106,7 +107,11 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
   const handleRoomCreation = async () => {
     // 총 인원 체크: 0명일 경우 alert를 띄우고 함수 실행 중단
     if (totalPeople === 0) {
-      alert('총 인원이 0명입니다. 최소 1명 이상의 인원을 추가해주세요.');
+      Swal.fire(
+        '알림',
+        '총 인원이 0명입니다. 최소 1명 이상의 인원을 추가해주세요.',
+        'warning',
+      );
       return;
     }
 
@@ -140,7 +145,7 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
         requestBody,
       );
       console.log('여행 플랜 생성 성공:', response.data);
-      alert('여행 플랜이 성공적으로 생성되었습니다.');
+      Swal.fire('알림', '여행 플랜이 성공적으로 생성되었습니다.', 'success');
 
       // API 응답 구조에 따라 생성된 방 정보 추출 (예: response.data.data.travelPlan)
       const createdRoom = response.data.data.travelPlan;
@@ -150,7 +155,7 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
       });
     } catch (error) {
       console.error('여행 플랜 생성 실패:', error);
-      alert('여행 플랜 생성 중 오류가 발생했습니다.');
+      Swal.fire('알림', '여행 플랜 생성 중 오류가 발생했습니다.', 'error');
     }
   };
 
@@ -208,7 +213,11 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
                     onChange={(e) => {
                       const value = parseInt(e.target.value, 10);
                       if (value < 1) {
-                        alert('최소 인원은 1명 이상이어야 합니다.');
+                        Swal.fire(
+                          '알림',
+                          '최소 인원은 1명 이상이어야 합니다.',
+                          'warning',
+                        );
                         return;
                       }
                       setRoomData((prev) => ({
@@ -230,7 +239,11 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
                     onChange={(e) => {
                       const value = parseInt(e.target.value, 10);
                       if (value < roomData.minPeople) {
-                        alert('최대 인원은 최소 인원 이상이어야 합니다.');
+                        Swal.fire(
+                          '알림',
+                          '최대 인원은 최소 인원 이상이어야 합니다.',
+                          'warning',
+                        );
                         return;
                       }
                       setRoomData((prev) => ({
