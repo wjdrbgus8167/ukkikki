@@ -1,7 +1,7 @@
 // src/services/Map.jsx
 import React from 'react';
 import { GoogleMap, Marker } from '@react-google-maps/api';
-import MapSearchBar from './MapSearchBar';
+
 import bananaIcon from '../../assets/loading-spinner.png'; // 예시
 
 const containerStyle = {
@@ -50,9 +50,6 @@ const Map = ({ coordinates, markers, onPlaceSelected }) => {
       </GoogleMap>
 
       {/* 검색바 위치: absolute */}
-      <div className="absolute z-10 top-2 left-2">
-        <MapSearchBar onPlaceSelected={onPlaceSelected} />
-      </div>
     </div>
   );
 };

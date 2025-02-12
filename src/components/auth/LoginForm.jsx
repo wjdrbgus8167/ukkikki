@@ -13,10 +13,9 @@ const LoginForm = ({ isCompany }) => {
     e.preventDefault();
 
     try {
-      // isCompany에 따라 로그인 API 경로 변경
       const loginEndpoint = isCompany
-        ? 'api/v1/auth/companies/login' // 기업 로그인 API
-        : '/api/v1/auth/members/login'; // 일반 사용자 로그인 API
+        ? 'api/v1/auth/companies/login'
+        : '/api/v1/auth/members/login';
 
       const response = await publicRequest.post(loginEndpoint, {
         email,
@@ -24,11 +23,12 @@ const LoginForm = ({ isCompany }) => {
       });
 
       if (response.status === 200) {
-        // 로그인 성공 시 인증 상태 업데이트
         useAuthStore.getState().setUser(true);
 
         console.log('로그인 성공');
-        navigate('/');
+
+        // 기업 로그인 시 마이페이지로 이동, 일반 로그인 시 홈으로 이동
+        navigate(isCompany ? '/mypage' : '/');
       } else {
         setErrorMessage('로그인 실패');
       }
