@@ -1,6 +1,9 @@
 package com.dancing_orangutan.ukkikki.place.application;
 
 import com.dancing_orangutan.ukkikki.place.application.command.*;
+import com.dancing_orangutan.ukkikki.place.domain.like.LikeEntity;
+
+import java.util.List;
 
 public interface PlaceService {
 
@@ -10,7 +13,7 @@ public interface PlaceService {
 
     void deletePlaceTag(DeletePlaceTagCommand command);
 
-    void createPlaceLike(CreatePlaceLikeCommand command);
+    List<LikeEntity> createPlaceLike(CreatePlaceLikeCommand command);
 
     void deletePlaceLike(DeletePlaceLikeCommand command);
 
