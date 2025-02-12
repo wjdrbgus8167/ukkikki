@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { publicRequest } from '../../hooks/requestMethod';
 import useAuthStore from '../../stores/authStore';
+import Swal from 'sweetalert2';
 
 const LikeList = ({ selectedCard }) => {
   const { user } = useAuthStore(); // 현재 로그인한 유저 정보
@@ -62,7 +63,7 @@ const LikeList = ({ selectedCard }) => {
       }
     } catch (error) {
       console.error('🚨 좋아요 처리 실패:', error);
-      alert('🚨 좋아요 처리 중 오류가 발생했습니다.');
+      Swal.fire('알림', '🚨 좋아요 처리 중 오류가 발생했습니다.', 'error');
     }
   };
 

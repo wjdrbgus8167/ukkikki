@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; // React Router 사용
 import { publicRequest } from '../../hooks/requestMethod';
+import Swal from 'sweetalert2';
 
 const ProgressBar = ({ step, totalSteps }) => {
   const progress = (step / totalSteps) * 100;
@@ -48,13 +49,17 @@ function RoomModal({
   // 입장하기 버튼 클릭 시 UserRoom으로 이동
   const handleEnterRoom = async () => {
     if (!selectedCard || !selectedCard.travelPlanId) {
-      alert('🚨 여행방 정보를 찾을 수 없습니다.');
+      Swal.fire('알림', '🚨 여행방 정보를 찾을 수 없습니다.', 'error');
       return;
     }
 
     const totalPeople = people.adult + people.child + people.infant;
     if (totalPeople === 0) {
-      alert('🚨 최소 한 명 이상의 인원을 선택해야 합니다.');
+      Swal.fire(
+        '알림',
+        '🚨 최소 한 명 이상의 인원을 선택해야 합니다.',
+        'warning',
+      );
       return;
     }
 
@@ -77,7 +82,7 @@ function RoomModal({
       });
     } catch (error) {
       console.error('🚨 여행방 입장 실패:', error);
-      alert('🚨 여행방 입장 중 오류가 발생했습니다.');
+      Swal.fire('알림', '🚨 여행방 입장 중 오류가 발생했습니다.', 'error');
     }
   };
 

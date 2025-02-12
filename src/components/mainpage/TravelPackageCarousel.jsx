@@ -5,6 +5,7 @@ import 'slick-carousel/slick/slick-theme.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { publicRequest } from '../../hooks/requestMethod';
+import Swal from 'sweetalert2';
 
 const apiKey = import.meta.env.VITE_APP_UNSPLASH_API_KEY;
 
@@ -150,7 +151,11 @@ const TravelPackageCarousel = () => {
       });
     } catch (error) {
       console.error('🚨 여행방 전체 조회 실패:', error);
-      alert('🚨 여행방 데이터를 불러오는 중 오류가 발생했습니다.');
+      Swal.fire(
+        '알림림',
+        '🚨 여행방 데이터를 불러오는 중 오류가 발생했습니다.',
+        'error',
+      );
     }
   };
 
