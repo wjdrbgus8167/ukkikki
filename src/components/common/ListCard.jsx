@@ -10,7 +10,7 @@ import {
   DetailButton 
 } from './style/ListCardStyle';
 
-const ListCard = ({ imageSrc, trip_name, start_date, end_date, location, min_people, max_people, proposal }) => {
+const ListCard = ({trip_name, start_date, end_date, location, min_people, max_people, proposal }) => {
   const navigate = useNavigate(); // useNavigate 훅 사용
 
   const onhandleDetail = () => {
@@ -20,9 +20,6 @@ const ListCard = ({ imageSrc, trip_name, start_date, end_date, location, min_peo
   return (
     <CardContainer>
       <CardWrapper>
-        {/* 이미지 자동 생성 */}
-        <CardImage src={imageSrc} alt={location} />
-
         {/* 카드 본문 */}
         <CardContent>
           <CardTitle>title: {trip_name}</CardTitle>
