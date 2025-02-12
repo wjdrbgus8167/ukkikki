@@ -6,6 +6,7 @@ const ProposalDetailContext = createContext();
 
 export const ProposalDetailProvider = ({children, travelPlanId}) => {
   const [proposal, setProposals ] = useState(null);
+  const [selectedDayId, setSelectedDayId] = useState(null);
 
   useEffect(() => {
     const fetchProposalData = async() => {
@@ -23,8 +24,11 @@ export const ProposalDetailProvider = ({children, travelPlanId}) => {
     }
   },[travelPlanId]);
 
+  const setSelectedDay = (dayId) => {
+    setSelectedDayId(dayId);
+  }
   return (
-    <ProposalDetailContext.Provider value={{proposal}}>
+    <ProposalDetailContext.Provider value={{proposal, selectedDayId, setSelectedDay}}>
       {children}
     </ProposalDetailContext.Provider>
   );

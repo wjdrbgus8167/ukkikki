@@ -1,5 +1,4 @@
-// DateSidebar.jsx
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect, useMemo } from "react";
 import ProposalDetailContext from "../../contexts/ProposalDetailContext";
 import {
   SidebarContainer,
@@ -8,19 +7,14 @@ import {
   DetailButton,
 } from "./style/DateSidebarStyle";
 
-const DateSidebar = ({ }) => {
-  const { proposal } = useContext(ProposalDetailContext);
+const DateSidebar = () => {
+  const { proposal, setSelectedDay, selectedDayId } = useContext(ProposalDetailContext);
   const [detailActive, setDetailActive] = useState(false);
 
-  const [selectedDayId, setSelectedDayId] = useState(null);
-  if (!proposal) {
-    return <div>Loading...</div>;
-  }
-
-  const { startDate, endDate } = proposal.data.travelPlan;
-
-  // travelDays 계산 함수
-  const getTravelDays = (startDate, endDate) => {
+  // 훅은 항상 호출되어야 하므로 여기서 travelDays를 메모이제이션
+  const travelDays = useMemo(() => {
+    if (!proposal) return [];
+    const { startDate, endDate } = proposal.data.travelPlan;
     const start = new Date(startDate);
     const end = new Date(endDate);
     const diffDays = Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1;
@@ -32,18 +26,22 @@ const DateSidebar = ({ }) => {
         .split("T")[0],
       selectedPlaces: [],
     }));
-  };
+  }, [proposal]);
 
-  const travelDays = getTravelDays(startDate, endDate);
+  useEffect(() => {
+    if (proposal && selectedDayId === null && travelDays.length > 0) {
+      setSelectedDay(travelDays[0].id); // 첫 번째 일자(1일차)를 기본으로 설정
+    }
+  }, [proposal, selectedDayId, travelDays, setSelectedDay]);
 
-  // 컴포넌트가 처음 렌더링될 때, 첫 번째 일자를 선택 상태로 설정
-  if (selectedDayId === null && travelDays.length > 0) {
-    setSelectedDayId(travelDays[0].id);
+  // proposal이 없으면 여기서 로딩 상태를 반환
+  if (!proposal) {
+    return <div>Loading...</div>;
   }
-    
-    // 일자 버튼 클릭 시 호출되는 핸들러: 선택 상태 업데이트
+
+  // 나머지 렌더링
   const handleDaySelect = (dayId) => {
-    setSelectedDayId(dayId);
+    setSelectedDay(dayId);
   };
 
   const handleDetailClick = () => {

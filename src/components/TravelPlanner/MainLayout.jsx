@@ -1,10 +1,9 @@
 import React, { useContext, useState } from "react";
 import ProposalDetailContext from "../../contexts/ProposalDetailContext";
-import DateSidebar from "./DateSideBar";
+import DateSidebar from "./DateSidebar";
 import MapDisplay from "./MapDisplay";
 import ScheduleByDate from "./ScheduleByDate";
 import PlaceSelection from "./PlaceSelection";
-import { LoadScript } from "@react-google-maps/api";
 import { 
   StyledMainLayout,
   StyledDateSidebar,
@@ -14,8 +13,6 @@ import {
   StylePlaceSelection,
   StyledOverlayButton
 } from "./style/MainLayoutStyle";
-
-const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
 const MainLayout = () => {
   const { proposal } = useContext(ProposalDetailContext);
@@ -56,7 +53,7 @@ const MainLayout = () => {
           />
           {/* showPlaceSelection이 true일 경우에만 PlaceSelection 렌더링 */}
           {showPlaceSelection && (
-            <StylePlaceSelection>
+            <StylePlaceSelection show={showPlaceSelection}>
               <PlaceSelection />
             </StylePlaceSelection>
           )}
