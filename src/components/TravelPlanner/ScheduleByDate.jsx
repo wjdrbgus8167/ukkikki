@@ -4,16 +4,18 @@ import React, { useContext } from "react";
 import ProposalDetailContext from "../../contexts/ProposalDetailContext";
 import { 
     Info, 
-    ScheduleByDateContainer
+    ScheduleByDateContainer,
+    ScheduleContainer,
 } from "./style/ScheduleByDateStyle";
 
-const ScheduleByDate = () => {
+const ScheduleByDate = ({onTogglePlaceSelection}) => {
     const { proposal } = useContext(ProposalDetailContext);
     if(!proposal) {
         return <div>로딩중</div>
     }
     const { arrivalCity, startDate, endDate } = proposal.data.travelPlan;
     
+
     return (
         <ScheduleByDateContainer>
             <Info>
@@ -22,6 +24,12 @@ const ScheduleByDate = () => {
                 {startDate} ~ {endDate}
                 </h3>
             </Info>
+            <ScheduleContainer>
+                <button onClick={onTogglePlaceSelection}>
+                    장소 추가
+                </button>
+            </ScheduleContainer>
+
         </ScheduleByDateContainer>
     );
 };
