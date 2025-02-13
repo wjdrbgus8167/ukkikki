@@ -233,7 +233,11 @@ const InteractiveSection = ({ selectedCard }) => {
           </div>
         ) : (
           <button
-            onClick={() => setIsChatOpen(true)}
+            onClick={() => {
+              console.log('채팅 열기 클릭됨');
+              setIsChatOpen(true);
+              console.log('isChatOpen:', isChatOpen);
+            }}
             className="flex items-center justify-center w-full h-full text-white transition-all duration-300 bg-gray-800 rounded-full shadow-lg hover:scale-110"
           >
             💬
