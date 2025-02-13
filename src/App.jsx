@@ -8,7 +8,10 @@ import AgencyRoomList from './pages/AgencyRoomListPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import LoadingSpinner from './components/common/LoadingSpinner';
-import MyPage from './pages/UserMyPage';
+// import MyPage from './pages/UserMyPage';
+import MyPage from './pages/TestMyPage';
+
+import TravelCreate from './pages/TravelCreatePage';
 import ProposalDetail from './pages/ProposalDetailPage';
 import UserVotePage from './pages/UserVotePage';
 import OAuthSuccessPage from './components/auth/OAuthSuccessPage';

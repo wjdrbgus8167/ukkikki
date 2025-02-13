@@ -69,7 +69,7 @@ const Header = () => {
   };
 
   return (
-    <header className="flex items-center justify-between h-20 px-6 bg-white shadow-md">
+    <header className="flex items-center justify-between h-20 px-6 bg-white shadow-sm">
       <Link to="/">
         <img src={logo} alt="Logo" className="object-contain w-32 h-32 ml-10" />
       </Link>
