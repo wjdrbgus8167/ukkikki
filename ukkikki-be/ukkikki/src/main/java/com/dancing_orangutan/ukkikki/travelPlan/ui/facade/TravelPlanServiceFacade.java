@@ -42,4 +42,6 @@ public interface TravelPlanServiceFacade {
 	FetchTravelPlanDetailsResponse fetchTravelPlanDetails(final Integer travelPlanId);
 
 	FetchKeywordsResponse fetchKeywords();
+
+	void exitTravelPlan(Integer travelPlanId, Integer memberId);
 }

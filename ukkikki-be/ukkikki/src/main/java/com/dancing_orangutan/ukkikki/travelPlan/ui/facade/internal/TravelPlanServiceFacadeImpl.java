@@ -1,10 +1,12 @@
 package com.dancing_orangutan.ukkikki.travelPlan.ui.facade.internal;
 
 import com.dancing_orangutan.ukkikki.travelPlan.application.CreateTravelPlanService;
+import com.dancing_orangutan.ukkikki.travelPlan.application.ExitTravelPlanService;
 import com.dancing_orangutan.ukkikki.travelPlan.application.JoinTravelPlanService;
 import com.dancing_orangutan.ukkikki.travelPlan.application.QueryTravelPlanService;
 import com.dancing_orangutan.ukkikki.travelPlan.application.UpdateCloseTimeService;
 import com.dancing_orangutan.ukkikki.travelPlan.application.UpdateCompanionCountService;
+import com.dancing_orangutan.ukkikki.travelPlan.application.command.ExitTravelPlanCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchAvailableTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
@@ -41,6 +43,7 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 	private final WriteCommentService writeCommentService;
 	private final UpdateCloseTimeService updateCloseTimeService;
 	private final UpdateCompanionCountService updateCompanionCountService;
+	private final ExitTravelPlanService exitTravelPlanService;
 	private final TravelPlanResponseMapper mapper;
 
 	@Override
@@ -80,6 +83,15 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 			final Integer travelPlanId,
 			final Integer memberId) {
 		updateCompanionCountService.updateCompanionCount(request.toCommand(memberId, travelPlanId));
+	}
+
+	@Override
+	public void exitTravelPlan(final Integer travelPlanId, final Integer memberId) {
+		ExitTravelPlanCommand command = ExitTravelPlanCommand.builder()
+				.travelPlanId(travelPlanId)
+				.memberId(memberId)
+				.build();
+		exitTravelPlanService.exitTravelPlan(command);
 	}
 
 	@Override

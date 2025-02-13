@@ -115,4 +115,13 @@ public class TravelPlanController {
 		return ApiUtils.success(travelPlanServiceFacade.fetchKeywords());
 	}
 
+	@PutMapping("/{travelPlanId}/exit")
+	public ApiUtils.ApiResponse<String> exitTravelPlan(
+			@AuthenticationPrincipal MemberUserDetails memberUserDetails,
+			@PathVariable(name = "travelPlanId") Integer travelPlanId) {
+
+		travelPlanServiceFacade.exitTravelPlan(travelPlanId, memberUserDetails.getMemberId());
+		return ApiUtils.success("여행계획이 성공적으로 퇴장되었습니다.");
+	}
+
 }

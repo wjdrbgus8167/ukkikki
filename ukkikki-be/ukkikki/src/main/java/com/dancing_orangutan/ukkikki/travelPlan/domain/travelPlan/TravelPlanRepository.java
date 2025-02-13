@@ -16,5 +16,6 @@ public interface TravelPlanRepository {
 
 	Page<TravelPlanEntity> findByPlanningStatusNot(PlanningStatus status, Pageable pageable);
 
+	void deleteById(Integer travelPlanId);
 
 }

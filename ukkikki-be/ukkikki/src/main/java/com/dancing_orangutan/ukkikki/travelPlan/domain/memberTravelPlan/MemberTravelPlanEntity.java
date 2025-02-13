@@ -96,6 +96,11 @@ public class MemberTravelPlanEntity {
 	public boolean isHost() {
 		return isHostYn();
 	}
+
+	public void exit() {
+		this.exitYn = true;
+		this.exitTime = LocalDateTime.now();
+	}
 }
 
 
