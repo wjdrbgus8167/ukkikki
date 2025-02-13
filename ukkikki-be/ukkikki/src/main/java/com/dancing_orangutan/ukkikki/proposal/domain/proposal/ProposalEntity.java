@@ -128,4 +128,8 @@ public class ProposalEntity {
 		this.arrivalAirport = arrivalAirport;
 	}
 
+	public void updateStatus(boolean isTopProposal) {
+		this.proposalStatus = isTopProposal ? ProposalStatus.A : ProposalStatus.D;
+	}
+
 }

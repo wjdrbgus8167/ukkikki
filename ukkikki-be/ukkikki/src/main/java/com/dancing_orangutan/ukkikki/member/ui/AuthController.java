@@ -7,6 +7,7 @@ import com.dancing_orangutan.ukkikki.member.application.command.*;
 import com.dancing_orangutan.ukkikki.member.ui.request.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +24,7 @@ public class AuthController {
      */
     @PostMapping("/members/register")
 
-    public ApiUtils.ApiResponse<?> memberRegister(@RequestBody MemberRegisterRequest request){
+    public ApiUtils.ApiResponse<?> memberRegister(@RequestBody @Valid MemberRegisterRequest request){
 
         MemberRegisterCommand command = MemberRegisterCommand.builder()
                 .name(request.getName())
@@ -43,7 +44,7 @@ public class AuthController {
      */
     @PostMapping("/members/login")
     public ApiUtils.ApiResponse<?> memberLogin(
-            @RequestBody MemberLoginRequest request,
+            @RequestBody @Valid MemberLoginRequest request,
             HttpServletResponse response
     ) {
 
@@ -64,7 +65,7 @@ public class AuthController {
      * 여행사 회원가입
      */
     @PostMapping("/companies/register")
-    public ApiUtils.ApiResponse<?> companyRegister(@RequestBody CompanyRegisterRequest request) {
+    public ApiUtils.ApiResponse<?> companyRegister(@RequestBody @Valid CompanyRegisterRequest request) {
 
         CompanyRegisterCommand command = CompanyRegisterCommand.builder()
                 .email(request.getEmail())
@@ -86,7 +87,7 @@ public class AuthController {
      */
     @PostMapping("/companies/login")
     public ApiUtils.ApiResponse<?> companyLogin(
-            @RequestBody CompanyLoginRequest request,
+            @RequestBody @Valid CompanyLoginRequest request,
             HttpServletResponse response
     ) {
         CompanyLoginCommand command = CompanyLoginCommand.builder()

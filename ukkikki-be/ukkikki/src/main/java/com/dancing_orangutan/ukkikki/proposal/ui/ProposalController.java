@@ -41,6 +41,22 @@ public class ProposalController {
         return ApiUtils.success(proposalService.createProposal(command));
     }
 
+    // 제안서 목록 조회
+    @GetMapping
+    public ApiUtils.ApiResponse<List<ProposalListResponse>> getProposalList(
+            @PathVariable Integer travelPlanId,
+            @AuthenticationPrincipal MemberUserDetails memberUserDetails
+    ){
+
+        ProposalListCommand command = ProposalListCommand.builder()
+                .travelPlanId(travelPlanId)
+                .memberId(memberUserDetails.getMemberId())
+                .build();
+
+        List<ProposalListResponse> response = proposalService.getProposalList(command);
+
+        return ApiUtils.success(response);
+    }
     // 제안서 상세 조회
     @GetMapping("/{proposalId}")
     public ApiUtils.ApiResponse<ProposalDetailResponse> getProposalDetail(
@@ -64,6 +80,21 @@ public class ProposalController {
         return ApiUtils.success(proposalService.createInquiry(command));
     }
 
+    //제안서 문의 답변
+    @PutMapping("/{proposalId}/inquiries/{inquiryId}")
+    public ApiUtils.ApiResponse<CreateInquiryAnswerResponse> createInquiryAnswer(
+            @PathVariable Integer travelPlanId,
+            @PathVariable Integer proposalId,
+            @PathVariable Integer inquiryId,
+            @AuthenticationPrincipal CompanyUserDetails companyUserDetails,
+            @RequestBody CreateInquiryAnswerRequest request
+    ){
+        CreateInquiryAnswerCommand command = request.toCommand(proposalId,travelPlanId,companyUserDetails.getCompanyId(),inquiryId);
+
+        CreateInquiryAnswerResponse response = proposalService.createInquiryAnswer(command);
+
+        return ApiUtils.success(response);
+    }
     // 제안서 문의 목록 조회
     @GetMapping("/{proposalId}/inquiries")
     public ApiUtils.ApiResponse<List<InquiryListResponse>> getInquiryList(
@@ -160,6 +191,16 @@ public class ProposalController {
                 .build();
 
         VoteProposalResponse response = proposalService.voteProposal(command);
+
+        return ApiUtils.success(response);
+    }
+
+    // 제안서 확정하기
+    @PutMapping("/{proposalId}/confirm")
+    public ApiUtils.ApiResponse<ConfirmProposalResponse> confirm(
+            @PathVariable Integer travelPlanId
+    ){
+        ConfirmProposalResponse response = proposalService.confirmProposal(travelPlanId);
 
         return ApiUtils.success(response);
     }

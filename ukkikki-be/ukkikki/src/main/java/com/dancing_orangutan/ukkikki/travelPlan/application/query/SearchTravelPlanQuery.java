@@ -8,7 +8,7 @@ import lombok.Builder;
 
 public record SearchTravelPlanQuery(LocalDate startDate, LocalDate endDate, Integer departureCityId,
 									Integer arrivalCityId, List<Integer> keywords,
-									PlanningStatus planningStatus) {
+									PlanningStatus status) {
 
 	@Builder
 	public SearchTravelPlanQuery {

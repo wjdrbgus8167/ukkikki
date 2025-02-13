@@ -128,7 +128,7 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Transactional
     @Override
-    public void createPlaceLike(CreatePlaceLikeCommand command) {
+    public List<LikeEntity> createPlaceLike(CreatePlaceLikeCommand command) {
 
         // Like 도메인 객체 생성
         Like like = Like.builder()
@@ -163,6 +163,11 @@ public class PlaceServiceImpl implements PlaceService {
 
         // PlaceLike save
         placeLikeRepository.save(likeEntity);
+
+        // 위의 좋아요를 반영한 해당 사용자의 좋아요 목록 조회
+        List<LikeEntity> likeEntities = placeLikeRepository.findByLikeId_MemberId(like.getCreatorId());
+
+        return likeEntities;
     }
 
     @Override
