@@ -13,29 +13,37 @@ const Chat = ({ travelPlanId }) => {
   useEffect(() => {
     const socket = new SockJS(
       `${import.meta.env.VITE_APP_API_BASE_URL}api/v1/ws`,
+      null,
+      { withCredentials: true }, // 쿠키 전송 활성화
     );
     const client = over(socket);
 
-    client.connect({}, () => {
-      console.log('WebSocket 연결 성공');
-      setStompClient(client);
+    client.connect(
+      {},
+      () => {
+        console.log('WebSocket 연결 성공');
+        setStompClient(client);
 
-      // 채팅방 구독
-      client.subscribe(
-        `api/v1/sub/chat/travel-plan/${travelPlanId}`,
-        (message) => {
-          const newMessage = JSON.parse(message.body);
-          setMessages((prev) => [...prev, newMessage]);
-        },
-      );
+        // 채팅방 구독
+        client.subscribe(
+          `api/v1/sub/chat/travel-plan/${travelPlanId}`,
+          (message) => {
+            const newMessage = JSON.parse(message.body);
+            setMessages((prev) => [...prev, newMessage]);
+          },
+        );
 
-      // 채팅방 입장 메시지 전송
-      client.send(
-        'api/v1/pub/chat/enter',
-        {},
-        JSON.stringify({ travelPlanId, type: 'ENTER' }),
-      );
-    });
+        // 채팅방 입장 메시지 전송
+        client.send(
+          'api/v1/pub/chat/enter',
+          {},
+          JSON.stringify({ travelPlanId, type: 'ENTER' }),
+        );
+      },
+      (error) => {
+        console.error('WebSocket 연결 실패:', error); // 에러 로깅
+      },
+    );
 
     return () => {
       if (client) {
