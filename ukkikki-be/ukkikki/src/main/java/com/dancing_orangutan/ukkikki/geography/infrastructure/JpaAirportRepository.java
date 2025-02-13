@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.geography.infrastructure;
 
-import com.dancing_orangutan.ukkikki.geography.domain.AirportEntity;
+import com.dancing_orangutan.ukkikki.geography.domain.airport.AirportEntity;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 

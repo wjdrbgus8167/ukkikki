@@ -13,7 +13,7 @@ import com.dancing_orangutan.ukkikki.member.infrastructure.refreshToken.RefreshT
 import com.dancing_orangutan.ukkikki.member.mapper.RefreshTokenMapper;
 import com.dancing_orangutan.ukkikki.member.ui.*;
 import com.dancing_orangutan.ukkikki.member.infrastructure.company.CompanyRepository;
-import com.dancing_orangutan.ukkikki.member.infrastructure.member.MemberRepository;
+import com.dancing_orangutan.ukkikki.member.infrastructure.member.JpaMemberRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AuthService {
 
-    private final MemberRepository memberRepository;
+    private final JpaMemberRepository jpaMemberRepository;
     private final CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
@@ -37,11 +37,11 @@ public class AuthService {
     @Transactional
     public void memberRegister(MemberRegisterCommand command){
         // 이메일 중복 체크
-        if(memberRepository.findByEmail(command.getEmail()).isPresent() || companyRepository.findByEmail(command.getEmail()).isPresent()){
+        if(jpaMemberRepository.findByEmail(command.getEmail()).isPresent() || companyRepository.findByEmail(command.getEmail()).isPresent()){
             throw new ApiException(ErrorCode.EMAIL_ALREADY_IN_USE);
         }
 
-        memberRepository.save(MemberEntity.builder()
+        jpaMemberRepository.save(MemberEntity.builder()
                 .email(command.getEmail())
                 .password(passwordEncoder.encode(command.getPassword()))
                 .name(command.getName())
@@ -55,7 +55,7 @@ public class AuthService {
      *  일반 사용자 로그인 - access token(쿠키), refresh token(쿠키) 발급
      */
     public AuthTokens memberLogin(MemberLoginCommand command) {
-        MemberEntity memberEntity = memberRepository.findByEmail(command.getEmail())
+        MemberEntity memberEntity = jpaMemberRepository.findByEmail(command.getEmail())
                 .orElseThrow(() -> new ApiException(ErrorCode.MEMBER_NOT_FOUND));
 
         if (!passwordEncoder.matches(command.getPassword(), memberEntity.getPassword())) {
@@ -84,7 +84,7 @@ public class AuthService {
     @Transactional
     public void companyRegister(CompanyRegisterCommand command) {
         // 이메일 중복 체크
-        if(memberRepository.findByEmail(command.getEmail()).isPresent() || companyRepository.findByEmail(command.getEmail()).isPresent()){
+        if(jpaMemberRepository.findByEmail(command.getEmail()).isPresent() || companyRepository.findByEmail(command.getEmail()).isPresent()){
             throw new ApiException(ErrorCode.EMAIL_ALREADY_IN_USE);
         }
 

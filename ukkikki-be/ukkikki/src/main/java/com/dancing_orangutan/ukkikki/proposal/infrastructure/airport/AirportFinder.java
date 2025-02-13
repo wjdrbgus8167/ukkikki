@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.proposal.infrastructure.airport;
 
-import com.dancing_orangutan.ukkikki.geography.domain.AirportEntity;
+import com.dancing_orangutan.ukkikki.geography.domain.airport.AirportEntity;
 import com.dancing_orangutan.ukkikki.geography.infrastructure.JpaAirportRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

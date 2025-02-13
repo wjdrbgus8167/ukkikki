@@ -1,7 +1,7 @@
 package com.dancing_orangutan.ukkikki.member.domain.member;
 
 
-import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravelPlan.MemberTravelPlanEntity;
 import jakarta.persistence.*;
 import java.util.List;
 import lombok.AccessLevel;

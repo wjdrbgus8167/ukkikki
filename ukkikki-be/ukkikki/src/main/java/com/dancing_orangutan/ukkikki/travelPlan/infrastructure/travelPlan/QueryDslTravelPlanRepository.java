@@ -1,12 +1,12 @@
 package com.dancing_orangutan.ukkikki.travelPlan.infrastructure.travelPlan;
 
-import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
+import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.constant.PlanningStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.QTravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlanKeyword.QTravelPlanKeywordEntity;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -18,30 +18,26 @@ public class QueryDslTravelPlanRepository {
 	private final JPAQueryFactory queryFactory;
 
 	public List<TravelPlanEntity> searchTravelPlan(
-			LocalDate startDate,
-			LocalDate endDate,
-			Integer departureCityId,
-			Integer arrivalCityId,
-			PlanningStatus status,
-			List<Integer> keywords
+			SearchTravelPlanQuery query
 	) {
 		QTravelPlanEntity entity = QTravelPlanEntity.travelPlanEntity;
 		QTravelPlanKeywordEntity keywordEntity = QTravelPlanKeywordEntity.travelPlanKeywordEntity;
 		BooleanBuilder booleanBuilder = new BooleanBuilder();
 
 		// 기본 검색 조건
-		booleanBuilder.and(entity.startDate.between(startDate, endDate));
-		booleanBuilder.and(entity.departureCity.cityId.eq(departureCityId));
-		booleanBuilder.and(entity.arrivalCity.cityId.eq(arrivalCityId));
+		booleanBuilder.and(entity.startDate.between(query.startDate(), query.startDate()));
+		booleanBuilder.and(entity.departureCity.cityId.eq(query.departureCityId()));
+		booleanBuilder.and(entity.arrivalCity.cityId.eq(query.arrivalCityId()));
 
 		// 추가 조건(상태)
-		if (status != null) {
-			booleanBuilder.and(entity.planningStatus.eq(status));
+		if (query.status() != null) {
+			booleanBuilder.and(entity.planningStatus.eq(query.status()));
 		}
 
 		// 추가 조건(키워드)
-		if (keywords != null && !keywords.isEmpty()) {
-			booleanBuilder.and(entity.travelPlanKeywords.any().keyword.keywordId.in(keywords));
+		if (query.keywords() != null && !query.keywords().isEmpty()) {
+			booleanBuilder.and(
+					entity.travelPlanKeywords.any().keyword.keywordId.in(query.keywords()));
 		}
 
 		return queryFactory
@@ -52,16 +48,12 @@ public class QueryDslTravelPlanRepository {
 				.fetch();
 	}
 
-	public List<TravelPlanEntity> fetchSuggestedTravelPlan(
-			PlanningStatus status
+	public List<TravelPlanEntity> fetchSuggestedTravelPlans(
 	) {
 		QTravelPlanEntity entity = QTravelPlanEntity.travelPlanEntity;
 		BooleanBuilder booleanBuilder = new BooleanBuilder();
 
-		// 추가 조건(상태)
-		if (status != null) {
-			booleanBuilder.and(entity.planningStatus.eq(status));
-		}
+		booleanBuilder.and(entity.planningStatus.eq(PlanningStatus.BIDDING));
 
 		return queryFactory
 				.selectFrom(entity)

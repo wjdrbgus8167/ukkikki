@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.place.domain.like;
 
-import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravelPlan.MemberTravelPlanEntity;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;

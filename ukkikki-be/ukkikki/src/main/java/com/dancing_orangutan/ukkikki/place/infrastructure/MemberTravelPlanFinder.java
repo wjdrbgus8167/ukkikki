@@ -1,7 +1,7 @@
 package com.dancing_orangutan.ukkikki.place.infrastructure;
 
-import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
-import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanId;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravelPlan.MemberTravelPlanEntity;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravelPlan.MemberTravelPlanId;
 import com.dancing_orangutan.ukkikki.travelPlan.infrastructure.memberTravel.MemberTravelPlanRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

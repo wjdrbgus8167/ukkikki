@@ -31,43 +31,61 @@ public enum ErrorCode {
     //TRAVEL_PLAN
     TRAVEL_PLAN_NOT_FOUND(HttpStatus.NOT_FOUND,"TP001", "해당 여행 계획을 찾을 수 없습니다."),
     MINIMUM_PARTICIPANTS_NOT_FULFILLED(HttpStatus.BAD_REQUEST, "TP002", "최소 인원을 충족하지 못하여 제출할 수 없습니다."),
+	TRAVEL_PLAN_NOT_AUTHORIZED(HttpStatus.FORBIDDEN,"TP003","해당 작업을 수행할 권한이 없습니다."),
 
-    // S3
-    S3_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S001", "S3 파일 업로드 중 오류가 발생했습니다."),
+	//MEMBER_TRAVEL_PLAN
+	MEMBER_TRAVEL_PLAN_NOT_FOUND(HttpStatus.NOT_FOUND,"MTP001","해당 멤버-여행계획을 찾을 수 없습니다."),
 
-    // Validation
-    INVALID_INPUT_PARAMETER(HttpStatus.BAD_REQUEST, "V001", "입력값이 유효하지 않습니다."),
+	//CITY
+	CITY_NOT_FOUND(HttpStatus.NOT_FOUND,"C0001","해당 도시를 찾을 수 없습니다."),
 
-    PASSWORD_REQUIRED(HttpStatus.BAD_REQUEST, "V002", "비밀번호는 필수입니다."),
-    PASSWORD_TOO_SHORT(HttpStatus.BAD_REQUEST, "V003", "비밀번호는 최소 8자 이상이어야 합니다."),
-    PASSWORD_TOO_LONG(HttpStatus.BAD_REQUEST, "V004", "비밀번호는 72자 이하여야 합니다."),
-    EMAIL_REQUIRED(HttpStatus.BAD_REQUEST, "V005", "이메일은 필수입니다."),
-    INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST, "V006", "유효하지 않은 이메일 형식입니다."),
-    EMAIL_TOO_LONG(HttpStatus.BAD_REQUEST, "V007", "이메일은 30자 이하여야 합니다."),
-    MEMBER_NAME_REQUIRED(HttpStatus.BAD_REQUEST, "V008", "회원 이름은 필수입니다."),
-    MEMBER_NAME_TOO_LONG(HttpStatus.BAD_REQUEST, "V009", "회원 이름은 20자 이하여야 합니다."),
-    COMPANY_NAME_REQUIRED(HttpStatus.BAD_REQUEST, "V010", "회사 이름은 필수입니다."),
-    COMPANY_NAME_TOO_LONG(HttpStatus.BAD_REQUEST, "V011", "회사 이름은 30자 이하여야 합니다."),
-    IMAGE_URL_TOO_LONG(HttpStatus.BAD_REQUEST, "V012", "이미지 url은 2000자 이하여야 합니다."),
-    PHONE_NUMBER_REQUIRED(HttpStatus.BAD_REQUEST, "V013", "전화번호는 필수입니다."),
-    PHONE_NUMBER_INVALID_CHARACTERS(HttpStatus.BAD_REQUEST, "V014", "전화번호는 숫자만 포함해야 합니다."),
-    PHONE_NUMBER_TOO_LONG(HttpStatus.BAD_REQUEST, "V015", "전화번호는 11자리 이하여야 합니다."),
-    BUSINESS_REGISTRATION_NUMBER_REQUIRED(HttpStatus.BAD_REQUEST, "V016", "사업자 번호는 필수입니다."),
-    BUSINESS_REGISTRATION_NUMBER_INVALID_CHARACTERS(HttpStatus.BAD_REQUEST, "V017", "사업자 번호는 숫자만 포함해야 합니다."),
-    BUSINESS_REGISTRATION_NUMBER_TOO_LONG(HttpStatus.BAD_REQUEST, "V018", "사업자 번호는 12자리 이하여야 합니다."),
+	// S3
+	S3_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S001", "S3 파일 업로드 중 오류가 발생했습니다."),
 
-    PLACE_NAME_REQUIRED(HttpStatus.BAD_REQUEST, "V019", "장소 이름은 필수입니다."),
-    PLACE_NAME_TOO_LONG(HttpStatus.BAD_REQUEST, "V020", "장소 이름은 50자 이하여야 합니다."),
-    PLACE_TAG_NAME_REQUIRED(HttpStatus.BAD_REQUEST, "V021", "장소 태그 이름은 필수입니다."),
-    PLACE_TAG_NAME_TOO_LONG(HttpStatus.BAD_REQUEST, "V022", "장소 태그 이름은 50자 이하여야 합니다."),
-    PLACE_ADDRESS_REQUIRED(HttpStatus.BAD_REQUEST, "V023", "장소 주소는 필수입니다."),
-    PLACE_ADDRESS_TOO_LONG(HttpStatus.BAD_REQUEST, "V023", "장소 주소는 100자 이하여야 합니다."),
-    LATITUDE_REQUIRED(HttpStatus.BAD_REQUEST, "V024", "위도는 필수입니다."),
-    LATITUDE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST, "V025", "위도 값은 -90과 90 사이여야 합니다."),
-    LONGITUDE_REQUIRED(HttpStatus.BAD_REQUEST, "V026", "경도는 필수입니다."),
-    LONGITUDE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST, "V027", "경도 값은 -180과 180 사이여야 합니다.");
+	// Validation
+	INVALID_INPUT_PARAMETER(HttpStatus.BAD_REQUEST, "V001", "입력값이 유효하지 않습니다."),
 
+	PASSWORD_REQUIRED(HttpStatus.BAD_REQUEST, "V002", "비밀번호는 필수입니다."),
+	PASSWORD_TOO_SHORT(HttpStatus.BAD_REQUEST, "V003", "비밀번호는 최소 8자 이상이어야 합니다."),
+	PASSWORD_TOO_LONG(HttpStatus.BAD_REQUEST, "V004", "비밀번호는 72자 이하여야 합니다."),
+	EMAIL_REQUIRED(HttpStatus.BAD_REQUEST, "V005", "이메일은 필수입니다."),
+	INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST, "V006", "유효하지 않은 이메일 형식입니다."),
+	EMAIL_TOO_LONG(HttpStatus.BAD_REQUEST, "V007", "이메일은 30자 이하여야 합니다."),
+	MEMBER_NAME_REQUIRED(HttpStatus.BAD_REQUEST, "V008", "회원 이름은 필수입니다."),
+	MEMBER_NAME_TOO_LONG(HttpStatus.BAD_REQUEST, "V009", "회원 이름은 20자 이하여야 합니다."),
+	COMPANY_NAME_REQUIRED(HttpStatus.BAD_REQUEST, "V010", "회사 이름은 필수입니다."),
+	COMPANY_NAME_TOO_LONG(HttpStatus.BAD_REQUEST, "V011", "회사 이름은 30자 이하여야 합니다."),
+	IMAGE_URL_TOO_LONG(HttpStatus.BAD_REQUEST, "V012", "이미지 url은 2000자 이하여야 합니다."),
+	PHONE_NUMBER_REQUIRED(HttpStatus.BAD_REQUEST, "V013", "전화번호는 필수입니다."),
+	PHONE_NUMBER_INVALID_CHARACTERS(HttpStatus.BAD_REQUEST, "V014", "전화번호는 숫자만 포함해야 합니다."),
+	PHONE_NUMBER_TOO_LONG(HttpStatus.BAD_REQUEST, "V015", "전화번호는 11자리 이하여야 합니다."),
+	BUSINESS_REGISTRATION_NUMBER_REQUIRED(HttpStatus.BAD_REQUEST, "V016", "사업자 번호는 필수입니다."),
+	BUSINESS_REGISTRATION_NUMBER_INVALID_CHARACTERS(HttpStatus.BAD_REQUEST, "V017",
+			"사업자 번호는 숫자만 포함해야 합니다."),
+	BUSINESS_REGISTRATION_NUMBER_TOO_LONG(HttpStatus.BAD_REQUEST, "V018", "사업자 번호는 12자리 이하여야 합니다."),
 
+	PLACE_NAME_REQUIRED(HttpStatus.BAD_REQUEST, "V019", "장소 이름은 필수입니다."),
+	PLACE_NAME_TOO_LONG(HttpStatus.BAD_REQUEST, "V020", "장소 이름은 50자 이하여야 합니다."),
+	PLACE_TAG_NAME_REQUIRED(HttpStatus.BAD_REQUEST, "V021", "장소 태그 이름은 필수입니다."),
+	PLACE_TAG_NAME_TOO_LONG(HttpStatus.BAD_REQUEST, "V022", "장소 태그 이름은 50자 이하여야 합니다."),
+	PLACE_ADDRESS_REQUIRED(HttpStatus.BAD_REQUEST, "V023", "장소 주소는 필수입니다."),
+	PLACE_ADDRESS_TOO_LONG(HttpStatus.BAD_REQUEST, "V023", "장소 주소는 100자 이하여야 합니다."),
+	LATITUDE_REQUIRED(HttpStatus.BAD_REQUEST, "V024", "위도는 필수입니다."),
+	LATITUDE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST, "V025", "위도 값은 -90과 90 사이여야 합니다."),
+	LONGITUDE_REQUIRED(HttpStatus.BAD_REQUEST, "V026", "경도는 필수입니다."),
+	LONGITUDE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST, "V027", "경도 값은 -180과 180 사이여야 합니다."),
+
+	TRAVEL_PLAN_NAME_REQUIRED(HttpStatus.BAD_REQUEST, "V028", "여행 계획 이름은 필수입니다."),
+	TRAVEL_PLAN_NAME_TOO_LONG(HttpStatus.BAD_REQUEST, "V029", "여행 계획 이름은 20자 이하여야 합니다."),
+	START_DATE_REQUIRED(HttpStatus.BAD_REQUEST, "V030", "시작 날짜는 필수입니다."),
+	END_DATE_REQUIRED(HttpStatus.BAD_REQUEST, "V031", "종료 날짜는 필수입니다."),
+	MIN_PEOPLE_REQUIRED(HttpStatus.BAD_REQUEST, "V032", "최소 인원은 1명 이상이어야 합니다."),
+	MAX_PEOPLE_INVALID(HttpStatus.BAD_REQUEST, "V033", "최대 인원은 최소 인원 이상이어야 합니다."),
+	ARRIVAL_CITY_REQUIRED(HttpStatus.BAD_REQUEST, "V034", "도착 도시는 필수입니다."),
+	DEPARTURE_CITY_REQUIRED(HttpStatus.BAD_REQUEST, "V035", "출발 도시는 필수입니다."),
+	KEYWORDS_REQUIRED(HttpStatus.BAD_REQUEST, "V036", "키워드는 최소 1개 이상 필요합니다."),
+	PARTICIPANT_COUNT_NEGATIVE(HttpStatus.BAD_REQUEST, "V037", "성인, 유아, 어린이 인원 수는 음수가 될 수 없습니다."),
+	PARTICIPANT_COUNT_ZERO(HttpStatus.BAD_REQUEST, "V038", "성인, 유아, 어린이 인원 수의 합은 0이 될 수 없습니다.");
 
 
     private final HttpStatus status;

@@ -6,7 +6,6 @@ import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEnti
 import jakarta.persistence.*;
 
 import lombok.*;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -42,4 +41,9 @@ public class PlaceEntity {
 
 	@OneToMany(mappedBy = "placeEntity", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<LikeEntity> likes;
+
+
+	public int countLikes() {
+		return likes.stream().mapToInt(LikeEntity::getLikesCnt).sum();
+	}
 }

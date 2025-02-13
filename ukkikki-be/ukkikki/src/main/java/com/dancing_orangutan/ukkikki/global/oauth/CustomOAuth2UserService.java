@@ -1,7 +1,7 @@
 package com.dancing_orangutan.ukkikki.global.oauth;
 
 import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
-import com.dancing_orangutan.ukkikki.member.infrastructure.member.MemberRepository;
+import com.dancing_orangutan.ukkikki.member.infrastructure.member.JpaMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -16,7 +16,7 @@ import java.util.Map;
 @Service
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
-    private final MemberRepository memberRepository;
+    private final JpaMemberRepository jpaMemberRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -31,8 +31,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String profileImageUrl = (String) attributes.get("profileImageUrl");
 
         // 회원이 존재하지 않으면 새로 저장
-        MemberEntity member = memberRepository.findByEmail(email)
-                .orElseGet(() -> memberRepository.save(
+        MemberEntity member = jpaMemberRepository.findByEmail(email)
+                .orElseGet(() -> jpaMemberRepository.save(
                         MemberEntity.builder()
                                 .email(email)
                                 .name(name)

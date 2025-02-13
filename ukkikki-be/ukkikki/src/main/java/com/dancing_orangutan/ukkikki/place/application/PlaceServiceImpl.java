@@ -13,7 +13,7 @@ import com.dancing_orangutan.ukkikki.place.infrastructure.*;
 import com.dancing_orangutan.ukkikki.place.mapper.PlaceLikeMapper;
 import com.dancing_orangutan.ukkikki.place.mapper.PlaceMapper;
 import com.dancing_orangutan.ukkikki.place.mapper.PlaceTagMapper;
-import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravelPlan.MemberTravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
