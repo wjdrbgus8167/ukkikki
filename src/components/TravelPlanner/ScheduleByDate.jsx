@@ -8,19 +8,18 @@ import {
     ScheduleByDateContainer,
     ScheduleContainer,
     SelectedPlacesContainer,
+    SelectedPlacesContent,
 } from "./style/ScheduleByDateStyle";
 import clock from  '../../assets/clock.png'; 
 import trashCan from '../../assets/trash_can.png'; 
 
-const ScheduleByDate = ({onTogglePlaceSelection, selectedPlaces=[] }) => {
+const ScheduleByDate = ({onTogglePlaceSelection, selectedPlaces=[], onDeletePlace }) => {
     
     const { proposal } = useContext(ProposalDetailContext);
     if(!proposal) {
         return <div>로딩중</div>
     }
     const { arrivalCity, startDate, endDate } = proposal.data.travelPlan;
-    
-    
 
     return (
         <ScheduleByDateContainer>
@@ -34,16 +33,21 @@ const ScheduleByDate = ({onTogglePlaceSelection, selectedPlaces=[] }) => {
             {/* 선택된 장소들을 표시하는 영역 */}
             {selectedPlaces.length > 0 && (
                 <SelectedPlacesContainer>
-                    {selectedPlaces.map((place) => (
+                    {selectedPlaces.map((place, index) => (
                         <div key={place.id} className="selected-place">
-                            <p>{place.name}</p>
-                            
-                            <button>
-                                <img src={clock} alt="clock icon" className="w-4 h-4" />
-                            </button>
-                            <button>
-                                <img src={trashCan} alt="trashCan icon" className="w-4 h-4" />
-                            </button>
+                            <span className="index">{index+1}</span>
+                            <SelectedPlacesContent>
+                                <p className="place">{place.name}</p>
+                                <span className="btns">
+                                    <button>
+                                        <img src={clock} alt="clock icon" className="w-6 h-6" />
+                                    </button>
+                                    <button onClick={() => {onDeletePlace(place.placeId)}}>
+                                        <img src={trashCan} alt="trashCan icon" className="w-6 h-6" />
+                                    </button>
+                                </span>
+                                
+                            </SelectedPlacesContent>
                         </div>
                     ))}
                 </SelectedPlacesContainer>

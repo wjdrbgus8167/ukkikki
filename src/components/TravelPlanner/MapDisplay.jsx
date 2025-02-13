@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { GoogleMap, Marker, LoadScript } from '@react-google-maps/api';
 
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
-const MapDisplay = ({ destinationCity, selectedPlaces = [] }) => {
-  const [coordinates, setCoordinates] = useState({ lat: 48.8566, lng: 2.3522 });
+const MapDisplay = ({ arrivalCity, selectedPlaces = [], day }) => {
+  const [coordinates, setCoordinates] = useState({ lat: 0, lng: 0 });
 
   useEffect(() => {
     const fetchCoordinates = async () => {
-      const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${destinationCity}&key=${apiKey}`;
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${arrivalCity}&key=${apiKey}`;
       try {
         const response = await fetch(url);
         const data = await response.json();
@@ -23,10 +23,26 @@ const MapDisplay = ({ destinationCity, selectedPlaces = [] }) => {
       }
     };
 
-    if (destinationCity) {
+    if (arrivalCity) {
       fetchCoordinates();
     }
-  }, [destinationCity]);
+  }, [arrivalCity]);
+
+  const getCustomMarkerIcon = (day, order) => {
+    const text = `${day}-${order}`;
+    const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40">
+      <circle cx="20" cy="20" r="16" fill="#FFD21C" stroke="white" stroke-width="2" />
+      <text x="20" y="24" text-anchor="middle" font-size="14" fill="black" font-family="Arial" font-weight="bold">
+        ${text}
+      </text>
+    </svg>
+  `;
+    return {
+      url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+      scaledSize: new window.google.maps.Size(50, 50)
+    };
+  };
 
   return (
     <LoadScript googleMapsApiKey={apiKey} libraries={['places']}>
@@ -49,7 +65,7 @@ const MapDisplay = ({ destinationCity, selectedPlaces = [] }) => {
               <Marker
                 key={index}
                 position={{ lat: place.latitude, lng: place.longitude }}
-              />
+                icon={getCustomMarkerIcon(day, index + 1)}/>
             ))}
         </GoogleMap>
       </div>
