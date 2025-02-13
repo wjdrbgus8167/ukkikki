@@ -43,20 +43,19 @@ export const StylePlaceSelection = styled.div`
   height: 565px;
   /* 필요에 따라 배경색, 투명도 등 추가 스타일 적용 가능 */
   background-color: white;
-  
-  
+  opacity: 1;
 `;
 
-export const StyledOverlayButton = styled.button`
-  position: absolute;
-  top: 20px;   /* 지도 상단에서 20px 아래 */
-  right: 20px;   /* 지도 우측에서 20px 떨어짐 */
-  z-index: 20;   /* PlaceSelection보다 높은 z-index */
-  padding: 10px 20px;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: border-color 0.3s ease;
-
+export const DetailFormWrapper = styled.div`
+  position: fixed; /* 화면에 고정 */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100; /* 다른 요소보다 위에 표시 */
+  width: 80%;  /* 원하는 크기 설정 */
+  max-width: 800px;
+  background-color: rgba(255, 255, 255, 0.95); /* 약간 투명한 배경 */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
 `;

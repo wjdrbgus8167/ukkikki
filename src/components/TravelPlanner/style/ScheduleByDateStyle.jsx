@@ -25,7 +25,7 @@ export const Info = styled.div`
   }
 `;
 
-export const ScheduleContainer = styled.div`
+export const ScheduleContainer = styled.span`
   width: 100%;
   height: 460px;
   padding-top: 10px;
@@ -39,5 +39,21 @@ export const ScheduleContainer = styled.div`
       border-color: #FFD21C;
     }
 
+  }
+`;
+export const SelectedPlacesContainer = styled.div`
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .selected-place {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+
+  .selected-place {
+    border-radius: 10px;
   }
 `;

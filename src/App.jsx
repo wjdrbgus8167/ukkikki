@@ -9,7 +9,6 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import MyPage from './pages/UserMyPage';
-import TravelCreate from './pages/TravelCreatePage';
 import ProposalDetail from './pages/ProposalDetailPage';
 import UserVotePage from './pages/UserVotePage';
 import OAuthSuccessPage from './components/auth/OAuthSuccessPage';
