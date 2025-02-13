@@ -1,15 +1,12 @@
 package com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan;
 
-import com.dancing_orangutan.ukkikki.geography.domain.CityEntity;
+import com.dancing_orangutan.ukkikki.geography.domain.city.CityEntity;
 import com.dancing_orangutan.ukkikki.global.error.ApiException;
 import com.dancing_orangutan.ukkikki.global.error.ErrorCode;
-import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
 import com.dancing_orangutan.ukkikki.place.domain.place.PlaceEntity;
-import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
-import com.dancing_orangutan.ukkikki.travelPlan.domain.MessageEntity;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.constant.PlanningStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.event.TravelPlanCloseTimeChangedEvent;
-import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
-import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanId;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravelPlan.MemberTravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.keyword.KeywordEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlanKeyword.TravelPlanKeywordEntity;
 import jakarta.persistence.*;
@@ -79,19 +76,14 @@ public class TravelPlanEntity {
 	@OneToMany(mappedBy = "travelPlan", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<PlaceEntity> places;
 
-	@OneToMany(mappedBy = "travelPlan", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<MessageEntity> messages;
-
 	@Builder
 	public TravelPlanEntity(String name, LocalDate startDate, LocalDate endDate,
-			String hostComment, PlanningStatus planningStatus,
+			PlanningStatus planningStatus,
 			int minPeople, int maxPeople, CityEntity departureCity,
-			CityEntity arrivalCity, List<KeywordEntity> keywords,
-			Integer memberId, int adultCount, int infantCount, int childCount) {
+			CityEntity arrivalCity, List<KeywordEntity> keywordEntities) {
 		this.name = name;
 		this.startDate = startDate;
 		this.endDate = endDate;
-		this.hostComment = hostComment;
 		this.planningStatus = planningStatus;
 		this.minPeople = minPeople;
 		this.maxPeople = maxPeople;
@@ -100,16 +92,16 @@ public class TravelPlanEntity {
 		this.travelPlanKeywords = new HashSet<>();
 		this.memberTravelPlans = new HashSet<>();
 		this.places = new HashSet<>();
-		this.messages = new HashSet<>();
+		addTravelKeywords(keywordEntities);
 	}
 
-	public void addTravelKeywords(List<KeywordEntity> keywords) {
-		if (keywords != null) {
-			keywords.forEach(this::addTravelKeyword);
+	private void addTravelKeywords(final List<KeywordEntity> keywordEntities) {
+		if (keywordEntities != null) {
+			keywordEntities.forEach(this::addTravelKeyword);
 		}
 	}
 
-	private void addTravelKeyword(KeywordEntity keyword) {
+	private void addTravelKeyword(final KeywordEntity keyword) {
 		this.travelPlanKeywords.add(
 				TravelPlanKeywordEntity.builder()
 						.travelPlan(this)
@@ -118,41 +110,23 @@ public class TravelPlanEntity {
 		);
 	}
 
-	public void addMemberTravelPlan(MemberEntity member, int adultCount, int infantCount, int childCount, boolean hostYn) {
-		MemberTravelPlanEntity memberTravelPlan = MemberTravelPlanEntity.builder()
-				.memberTravelPlanId(
-						MemberTravelPlanId.builder()
-								.travelPlanId(this.travelPlanId)
-								.memberId(member.getMemberId())
-								.build()
-				)
-				.travelPlan(this)
-				.member(member)
-				.hostYn(hostYn)
-				.adultCount(adultCount)
-				.childCount(childCount)
-				.infantCount(infantCount)
-				.exitYn(false)
-				.exitTime(null)
-				.build();
-
-		this.memberTravelPlans.add(memberTravelPlan);
-	}
-
 	public void updateStatus(PlanningStatus planningStatus) {
 		this.planningStatus = planningStatus;
 	}
 
-	public void updateComment(String hostComment) {
-		this.hostComment = hostComment;
-	}
+	public TravelPlanCloseTimeChangedEvent updateCloseTime(final LocalDateTime closeTime,
+			final Integer memberId) {
+		if (!isHost(memberId)) {
+			throw new ApiException(ErrorCode.TRAVEL_PLAN_NOT_AUTHORIZED);
+		}
 
-	public TravelPlanCloseTimeChangedEvent updateCloseTime(LocalDateTime closeTime) {
 		this.closeTime = closeTime;
-		return TravelPlanCloseTimeChangedEvent.builder().travelPlanId(travelPlanId).closeTime(closeTime).build();
+		return TravelPlanCloseTimeChangedEvent.builder().travelPlanId(travelPlanId)
+				.closeTime(closeTime).build();
 	}
 
-	public void updateHostInfo(Integer memberId, int adultCount, int childCount, int infantCount) {
+	public void updateCompanionCount(final Integer memberId, final int adultCount, int childCount,
+			final int infantCount) {
 		MemberTravelPlanEntity memberTravelPlan = findMemberTravelPlan(memberId);
 		memberTravelPlan.updateHost(adultCount, childCount, infantCount);
 	}
@@ -169,15 +143,30 @@ public class TravelPlanEntity {
 	}
 
 	public int calCurrentParticipants() {
-		return memberTravelPlans.stream().mapToInt(memberTravelPlan -> memberTravelPlan.getChildCount()
-				+ memberTravelPlan.getInfantCount() + memberTravelPlan.getAdultCount()).sum();
+		return memberTravelPlans.stream()
+				.mapToInt(memberTravelPlan -> memberTravelPlan.getChildCount()
+						+ memberTravelPlan.getInfantCount() + memberTravelPlan.getAdultCount())
+				.sum();
 	}
 
-	private MemberTravelPlanEntity findMemberTravelPlan(Integer memberId) {
+	public void writeHostComment(final Integer memberId, final String hostComment) {
+		if (!isHost(memberId)) {
+			throw new ApiException(ErrorCode.TRAVEL_PLAN_NOT_AUTHORIZED);
+		}
+		this.hostComment = hostComment;
+	}
+
+	private boolean isHost(final Integer memberId) {
+		return memberTravelPlans.stream()
+				.filter(mtp -> mtp.getMemberTravelPlanId().getMemberId().equals(memberId))
+				.anyMatch(MemberTravelPlanEntity::isHost);
+	}
+
+	private MemberTravelPlanEntity findMemberTravelPlan(final Integer memberId) {
 		return memberTravelPlans
 				.stream()
 				.filter(mtp -> mtp.getMemberTravelPlanId().getMemberId().equals(memberId))
 				.findFirst()
-				.orElseThrow(() -> new IllegalArgumentException("해당 멤버는 여행 계획에 포함되지 않습니다."));
+				.orElseThrow(() -> new ApiException(ErrorCode.MEMBER_TRAVEL_PLAN_NOT_FOUND));
 	}
 }

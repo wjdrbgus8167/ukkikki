@@ -1,6 +1,5 @@
 package com.dancing_orangutan.ukkikki.proposal.application;
 
-import com.dancing_orangutan.ukkikki.place.domain.placeTag.PlaceTagEntity;
 import com.dancing_orangutan.ukkikki.proposal.application.command.*;
 import com.dancing_orangutan.ukkikki.proposal.constant.ProposalStatus;
 import com.dancing_orangutan.ukkikki.proposal.domain.Inquiry.Inquiry;
@@ -23,18 +22,14 @@ import com.dancing_orangutan.ukkikki.proposal.infrastructure.proposal.ProposalRe
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.schedule.JpaScheduleRepository;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.schedule.ScheduleFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.schedule.ScheduleRepository;
-import com.dancing_orangutan.ukkikki.proposal.infrastructure.travelPlan.TravelPlanFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.traveler.JpaTravelerRepository;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.vote.JpaVoteRepository;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.voteSurvey.JpaVoteSurveyRepository;
-import com.dancing_orangutan.ukkikki.proposal.mapper.ProposalMapper;
 import com.dancing_orangutan.ukkikki.proposal.mapper.ScheduleMapper;
 import com.dancing_orangutan.ukkikki.proposal.mapper.TravelerMapper;
 import com.dancing_orangutan.ukkikki.proposal.mapper.VoteSurveyMapper;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.*;
-import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
-import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanId;
-import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravelPlan.MemberTravelPlanEntity;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

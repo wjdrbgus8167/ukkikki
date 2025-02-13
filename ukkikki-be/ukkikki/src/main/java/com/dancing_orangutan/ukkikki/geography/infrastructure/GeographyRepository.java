@@ -1,12 +1,12 @@
 package com.dancing_orangutan.ukkikki.geography.infrastructure;
 
 
-import com.dancing_orangutan.ukkikki.geography.domain.Airport;
-import com.dancing_orangutan.ukkikki.geography.domain.AirportEntity;
-import com.dancing_orangutan.ukkikki.geography.domain.CityEntity;
+import com.dancing_orangutan.ukkikki.geography.domain.airport.Airport;
+import com.dancing_orangutan.ukkikki.geography.domain.airport.AirportEntity;
+import com.dancing_orangutan.ukkikki.geography.domain.city.CityEntity;
 import com.dancing_orangutan.ukkikki.geography.domain.ContinentEntity;
 import com.dancing_orangutan.ukkikki.geography.domain.CountryEntity;
-import com.dancing_orangutan.ukkikki.geography.domain.City;
+import com.dancing_orangutan.ukkikki.geography.domain.city.City;
 import com.dancing_orangutan.ukkikki.geography.domain.Continent;
 import com.dancing_orangutan.ukkikki.geography.domain.Country;
 import com.dancing_orangutan.ukkikki.geography.mapper.AirportMapper;
