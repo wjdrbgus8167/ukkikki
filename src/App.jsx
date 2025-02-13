@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './pages/mainPage';
+import Home from './pages/MainPage';
 import About from './pages/AboutPage';
 import UserRoom from './pages/UserRoomPage';
 import SearchRooms from './pages/SearchRoomsPage';
@@ -17,13 +17,13 @@ import TravelProposal from './pages/TravelProposal';
 import AOS from 'aos';
 import 'aos/dist/aos.css'; // AOS 스타일 불러오기
 const App = () => {
-  useEffect(() => {
-    // AOS 초기화
-    AOS.init({
-      duration: 1000, // 애니메이션 지속 시간 (기본값: 400ms)
-      once: true, // 애니메이션을 한 번만 실행 (기본값: false)
-    });
-  }, []);
+  // useEffect(() => {
+  //   // AOS 초기화
+  //   AOS.init({
+  //     duration: 1000, // 애니메이션 지속 시간 (기본값: 400ms)
+  //     once: true, // 애니메이션을 한 번만 실행 (기본값: false)
+  //   });
+  // }, []);
 
   return (
     <Router>

@@ -23,19 +23,19 @@ const Home = () => {
       <Header />
 
       {/* HeroSection: fade-up 애니메이션 적용 */}
-      <div data-aos="fade-up">
-        <HeroSection />
-      </div>
+      {/* <div data-aos="fade-up"> */}
+      <HeroSection />
+      {/* </div> */}
 
       {/* TravelPackageCarousel: fade-left 애니메이션 적용 */}
-      <div data-aos="fade-left" data-aos-delay="300">
-        <TravelPackageCarousel />
-      </div>
+      {/* <div data-aos="fade-left" data-aos-delay="300"> */}
+      <TravelPackageCarousel />
+      {/* </div> */}
 
       {/* PartnerBrandSlider: fade-right 애니메이션 적용 */}
-      <div data-aos="fade-right" data-aos-delay="300">
-        <PartnerBrandSlider />
-      </div>
+      {/* <div data-aos="fade-right" data-aos-delay="300"> */}
+      <PartnerBrandSlider />
+      {/* </div> */}
 
       {/* Footer는 스크롤 애니메이션 적용 X */}
       <Footer />
