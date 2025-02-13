@@ -35,6 +35,7 @@ public class ScheduleRepository {
         ScheduleEntity savedScheduleEntity = jpaScheduleRepository.save(scheduleEntity);
 
         return Schedule.builder()
+                .scheduleId(savedScheduleEntity.getScheduleId())
                 .scheduleName(savedScheduleEntity.getScheduleName())
                 .startTime(savedScheduleEntity.getStartTime())
                 .endTime(savedScheduleEntity.getEndTime())
