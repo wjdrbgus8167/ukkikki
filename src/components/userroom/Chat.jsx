@@ -14,70 +14,74 @@ const Chat = ({ travelPlanId }) => {
   const [isConnected, setIsConnected] = useState(false); // 연결 상태
   const chatContainerRef = useRef(null); // 스크롤 조정을 위한 ref
 
+  // 디버깅: 현재 messages 상태 출력
   useEffect(() => {
-    try {
-      // 환경변수에 설정된 API URL (https://...)를 WebSocket URL로 변환
-      const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
-      // HTTPS라면 wss://, HTTP라면 ws:// 사용
-      const wsProtocol = baseUrl.startsWith('https') ? 'wss' : 'ws';
-      const wsUrl = baseUrl.replace(/^https?/, wsProtocol) + 'api/v1/ws';
-      console.log('WebSocket 연결 시도:', wsUrl);
+    console.log('messages 상태:', messages);
+  }, [messages]);
 
-      // 순수 WebSocket 사용
-      const socket = new WebSocket(wsUrl);
-      const client = over(socket); // STOMP 클라이언트 생성
+  useEffect(() => {
+    const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
+    const wsProtocol = baseUrl.startsWith('https') ? 'wss' : 'ws';
+    const wsUrl = baseUrl.replace(/^https?/, wsProtocol) + 'api/v1/ws';
+    console.log('WebSocket 연결 시도:', wsUrl);
 
-      client.connect(
-        {},
-        () => {
-          console.log('WebSocket 연결 성공');
-          setStompClient(client);
-          setIsConnected(true);
+    const socket = new WebSocket(wsUrl);
+    const client = over(socket);
 
-          // 채팅방 구독 (경로 앞에 슬래시 추가)
-          client.subscribe(
-            `/api/v1/sub/chat/travel-plan/${travelPlanId}`,
-            (message) => {
-              console.log('메시지 수신:', message.body);
-              try {
-                const newMessage = JSON.parse(message.body);
-                setMessages((prev) => [...prev, newMessage]);
-              } catch (error) {
-                console.error('메시지 파싱 에러:', error);
-              }
-            },
-          );
+    client.connect(
+      {},
+      () => {
+        console.log('WebSocket 연결 성공');
+        setStompClient(client);
+        setIsConnected(true);
 
-          // 연결 후 잠시 지연 후 "enter" 메시지 전송 (100ms 지연)
-          setTimeout(() => {
+        client.subscribe(
+          `/api/v1/sub/chat/travel-plan/${travelPlanId}`,
+          (message) => {
+            console.log('메시지 수신:', message.body);
             try {
-              client.send(
-                `/api/v1/pub/chat/enter`,
-                {},
-                JSON.stringify({ travelPlanId, type: 'ENTER' }),
-              );
-            } catch (err) {
-              console.error('enter 메시지 전송 에러:', err);
+              const newMessage = JSON.parse(message.body);
+              setMessages((prev) => [...prev, newMessage]);
+            } catch (error) {
+              console.error('메시지 파싱 에러:', error);
             }
-          }, 100);
-        },
-        (error) => {
-          console.error('WebSocket 연결 실패:', error);
-        },
-      );
+          },
+        );
 
-      return () => {
-        if (client) {
-          client.disconnect();
-          console.log('WebSocket 연결 종료');
+        setTimeout(() => {
+          try {
+            client.send(
+              `/api/v1/pub/chat/enter`,
+              {},
+              JSON.stringify({ travelPlanId, type: 'ENTER' }),
+            );
+          } catch (err) {
+            console.error('enter 메시지 전송 에러:', err);
+          }
+        }, 100);
+      },
+      (error) => {
+        console.error('WebSocket 연결 실패:', error);
+      },
+    );
+
+    return () => {
+      try {
+        if (client && client.ws && client.ws.readyState === WebSocket.OPEN) {
+          client.disconnect(() => {
+            console.log('WebSocket 연결 종료');
+          });
+        } else {
+          console.log(
+            'WebSocket이 아직 OPEN 상태가 아니므로 disconnect 호출 건너뜀',
+          );
         }
-      };
-    } catch (error) {
-      console.error('Chat useEffect 내부 오류:', error);
-    }
+      } catch (error) {
+        console.error('disconnect 호출 중 에러:', error);
+      }
+    };
   }, [travelPlanId]);
 
-  // 새로운 메시지가 추가될 때마다 스크롤을 맨 아래로 유지
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop =
@@ -85,31 +89,26 @@ const Chat = ({ travelPlanId }) => {
     }
   }, [messages]);
 
-  // 메시지 전송 함수
   const sendMessage = () => {
-    if (!isConnected) {
+    if (!isConnected || !stompClient) {
       console.warn('WebSocket 연결이 아직 완료되지 않았습니다.');
       return;
     }
-    if (inputMessage.trim() && stompClient) {
-      const message = {
-        travelPlanId,
-        sender: '사용자', // 실제 사용자 정보를 넣어주세요
-        content: inputMessage,
-        type: 'TALK',
-      };
+    if (inputMessage.trim() === '') return;
 
-      try {
-        stompClient.send(
-          `/api/v1/pub/chat/message`,
-          {},
-          JSON.stringify(message),
-        );
-      } catch (err) {
-        console.error('메시지 전송 에러:', err);
-      }
-      setInputMessage('');
+    const message = {
+      travelPlanId,
+      sender: '사용자', // 실제 사용자 정보로 대체
+      content: inputMessage,
+      type: 'TALK',
+    };
+
+    try {
+      stompClient.send(`/api/v1/pub/chat/message`, {}, JSON.stringify(message));
+    } catch (err) {
+      console.error('메시지 전송 에러:', err);
     }
+    setInputMessage('');
   };
 
   return (
@@ -119,29 +118,31 @@ const Chat = ({ travelPlanId }) => {
         ref={chatContainerRef}
         className="flex-1 p-4 overflow-y-auto bg-gray-100"
       >
-        {messages.length === 0 && (
+        {messages.length === 0 ? (
           <div className="text-center text-gray-500">
             채팅 메시지가 없습니다.
           </div>
-        )}
-        {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`flex ${
-              message.sender === '사용자' ? 'justify-end' : 'justify-start'
-            } mb-4`}
-          >
+        ) : (
+          (console.log('messages:', messages),
+          messages.map((msg, index) => (
             <div
-              className={`max-w-[70%] p-3 rounded-lg ${
-                message.sender === '사용자'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-300 text-gray-800'
-              }`}
+              key={index}
+              className={`flex ${
+                msg.sender === '사용자' ? 'justify-end' : 'justify-start'
+              } mb-4`}
             >
-              <p className="text-sm">{message.content}</p>
+              <div
+                className={`max-w-[70%] p-3 rounded-lg ${
+                  msg.sender === '사용자'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-300 text-gray-800'
+                }`}
+              >
+                <p className="text-sm">{msg.content}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          )))
+        )}
       </div>
 
       {/* 메시지 입력창 */}
@@ -151,7 +152,12 @@ const Chat = ({ travelPlanId }) => {
             type="text"
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+              }
+            }}
             className="flex-1 p-2 border rounded-lg focus:outline-none"
             placeholder="메시지를 입력하세요..."
           />
