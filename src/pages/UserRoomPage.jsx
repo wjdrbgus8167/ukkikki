@@ -75,7 +75,7 @@ const UserRoom = () => {
             }`}
             style={{ width: '320px', zIndex: 10 }}
           >
-            <div className="relative h-full bg-white shadow-lg">
+            <div className="relative h-full bg-white ">
               <FavoriteList selectedCard={selectedCard} />
               {/* ✅ 닫기 버튼 */}
               <button

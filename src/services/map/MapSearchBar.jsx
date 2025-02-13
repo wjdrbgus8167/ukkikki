@@ -66,7 +66,7 @@ const MapSearchBar = ({ onPlaceSelected }) => {
             placeholder=""
             className="
               w-full h-[44px] pl-4 pr-[48px]
-              text-sm rounded-full border border-gray-300
+              text-sm  border border-gray-300
               focus:outline-none
             "
           />
