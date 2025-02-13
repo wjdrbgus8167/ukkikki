@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './pages/mainPage';
+import Home from './pages/MainPage';
 import About from './pages/AboutPage';
 import UserRoom from './pages/UserRoomPage';
 import SearchRooms from './pages/SearchRoomsPage';
