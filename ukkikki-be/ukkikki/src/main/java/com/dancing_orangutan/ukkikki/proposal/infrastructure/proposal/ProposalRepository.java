@@ -59,12 +59,12 @@ public class ProposalRepository  {
         return proposalMapper.entityToDomain(jpaProposalRepository.save(proposalEntity));
     }
 
-    public Proposal findById(Integer proposalId) {
+    public ProposalEntity findById(Integer proposalId) {
 
         ProposalEntity entity = jpaProposalRepository.findById(proposalId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 제안서를 찾을 수 없습니다."));
 
-        return proposalMapper.entityToDomain(entity);
+        return entity;
     }
 
     public List<ProposalEntity> findByCompanyId(Integer companyId) {
@@ -81,12 +81,12 @@ public class ProposalRepository  {
 
     }
 
-    public Proposal findByProposalIdAndCompany_CompanyId(Integer proposalId,Integer companyId) {
+    public ProposalEntity findByProposalIdAndCompany_CompanyId(Integer proposalId,Integer companyId) {
 
         ProposalEntity entity = jpaProposalRepository.findByProposalIdAndCompany_CompanyId(proposalId,companyId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 제안서를 찾을 수 없습니다."));
 
-        return proposalMapper.entityToDomain(entity);
+        return entity;
     }
 
     public List<ProposalEntity> findByTravelPlanId(Integer travelPlanId) {
