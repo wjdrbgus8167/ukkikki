@@ -11,6 +11,7 @@ const Chat = ({ travelPlanId }) => {
   const [messages, setMessages] = useState([]); // 채팅 메시지 목록
   const [inputMessage, setInputMessage] = useState(''); // 입력 중인 메시지
   const [stompClient, setStompClient] = useState(null); // STOMP 클라이언트
+  const [isConnected, setIsConnected] = useState(false); // 연결 상태
   const chatContainerRef = useRef(null); // 스크롤 조정을 위한 ref
 
   useEffect(() => {
@@ -24,13 +25,14 @@ const Chat = ({ travelPlanId }) => {
 
       // 순수 WebSocket 사용
       const socket = new WebSocket(wsUrl);
-      const client = over(socket); // STOMP 클라이언트 생성 (순수 WebSocket 위에서 동작)
+      const client = over(socket); // STOMP 클라이언트 생성
 
       client.connect(
         {},
         () => {
           console.log('WebSocket 연결 성공');
           setStompClient(client);
+          setIsConnected(true);
 
           // 채팅방 구독 (경로 앞에 슬래시 추가)
           client.subscribe(
@@ -46,12 +48,18 @@ const Chat = ({ travelPlanId }) => {
             },
           );
 
-          // 채팅방 입장 메시지 전송
-          client.send(
-            `/api/v1/pub/chat/enter`,
-            {},
-            JSON.stringify({ travelPlanId, type: 'ENTER' }),
-          );
+          // 연결 후 잠시 지연 후 "enter" 메시지 전송 (100ms 지연)
+          setTimeout(() => {
+            try {
+              client.send(
+                `/api/v1/pub/chat/enter`,
+                {},
+                JSON.stringify({ travelPlanId, type: 'ENTER' }),
+              );
+            } catch (err) {
+              console.error('enter 메시지 전송 에러:', err);
+            }
+          }, 100);
         },
         (error) => {
           console.error('WebSocket 연결 실패:', error);
@@ -79,6 +87,10 @@ const Chat = ({ travelPlanId }) => {
 
   // 메시지 전송 함수
   const sendMessage = () => {
+    if (!isConnected) {
+      console.warn('WebSocket 연결이 아직 완료되지 않았습니다.');
+      return;
+    }
     if (inputMessage.trim() && stompClient) {
       const message = {
         travelPlanId,
@@ -87,7 +99,15 @@ const Chat = ({ travelPlanId }) => {
         type: 'TALK',
       };
 
-      stompClient.send(`/api/v1/pub/chat/message`, {}, JSON.stringify(message));
+      try {
+        stompClient.send(
+          `/api/v1/pub/chat/message`,
+          {},
+          JSON.stringify(message),
+        );
+      } catch (err) {
+        console.error('메시지 전송 에러:', err);
+      }
       setInputMessage('');
     }
   };
@@ -137,7 +157,10 @@ const Chat = ({ travelPlanId }) => {
           />
           <button
             onClick={sendMessage}
-            className="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+            disabled={!isConnected}
+            className={`px-4 py-2 text-white rounded-lg ${
+              isConnected ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-400'
+            }`}
           >
             전송
           </button>
