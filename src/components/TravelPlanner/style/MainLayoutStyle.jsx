@@ -5,7 +5,7 @@ export const StyledMainLayout = styled.div`
   display: flex;
   width: 100%;
   flex-direction: row; /* 수평 배열, 기본값이므로 생략 가능 */
-
+  height: 100%;
 `;
 
 export const StyledDateSidebar = styled.div`
@@ -40,7 +40,7 @@ export const StylePlaceSelection = styled.div`
   left: 0;
   z-index: 10; /* MapDisplay보다 높은 값으로 설정 */
   width: 30%;
-  height: 565px;
+  height: 100%;;
   /* 필요에 따라 배경색, 투명도 등 추가 스타일 적용 가능 */
   background-color: white;
   opacity: 1;

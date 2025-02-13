@@ -24,6 +24,9 @@ const MainLayout = () => {
   // 상세 내용 페이지 표시 여부
   const [showDetailForm, setShowDetailForm] = useState(false);
 
+  //post 보낼 schedules 배열 상태관리
+  const [schedules, setSchedules] = useState([])
+
   if (!proposal) {
     return <div>로딩중...</div>;
   }
@@ -52,6 +55,18 @@ const MainLayout = () => {
   // 현재 선택된 날짜의 장소 목록
   const currentDayPlaces = selectedPlacesByDay[selectedDayId] || [];
 
+  //장소 삭제 
+  const handleDeletePlace = (placeId) => {
+    console.log("삭제하려는 id:", placeId);
+    console.log("현재 장소 목록:", currentDayPlaces);
+    const updatedPlaces = currentDayPlaces.filter(place => place.placeId !== placeId);
+    console.log("삭제 후 장소 목록:", updatedPlaces);
+    setSelectedPlacesByDay(prev => ({
+      ...prev,
+      [selectedDayId]: updatedPlaces
+    }));
+  };
+
   return (
     <StyledMainLayout>
       {/* 사이드바 영역 */}
@@ -65,6 +80,7 @@ const MainLayout = () => {
         <ScheduleByDate 
           onTogglePlaceSelection={togglePlaceSelection} 
           selectedPlaces={currentDayPlaces}
+          onDeletePlace={handleDeletePlace}
         />
       </StyleScheduleByDate>
 
@@ -73,7 +89,8 @@ const MainLayout = () => {
         <StyleMapContainer>
           <MapDisplay 
             arrivalCity={arrivalCity.name}
-            seletedPlaces={currentDayPlaces}
+            selectedPlaces={currentDayPlaces}
+            day={selectedDayId}
           />
           {showPlaceSelection && (
             <StylePlaceSelection show="true">

@@ -6,7 +6,7 @@ export const StyledContainer = styled.div`
   padding: 0px 5px;
 
   .place-list {
-   height:450px;
+   height:550px;
    overflow-y:auto;
 `;
 
