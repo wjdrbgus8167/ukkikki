@@ -13,6 +13,7 @@ import com.dancing_orangutan.ukkikki.proposal.domain.traveler.TravelerEntity;
 import com.dancing_orangutan.ukkikki.proposal.domain.vote.VoteEntity;
 import com.dancing_orangutan.ukkikki.proposal.domain.voteSurvey.VoteSurvey;
 import com.dancing_orangutan.ukkikki.proposal.domain.voteSurvey.VoteSurveyEntity;
+import com.dancing_orangutan.ukkikki.proposal.infrastructure.airport.AirportFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.company.CompanyFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.inquiry.InquiryFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.inquiry.InquiryRepository;
@@ -65,6 +66,8 @@ public class ProposalService {
     private final VoteSurveyMapper voteSurveyMapper;
     private final JpaVoteRepository voteRepository;
     private final CompanyFinder companyFinder;
+    private final AirportFinder airportFinder;
+
     // 제안서 작성
     @Transactional
    public CreateProposalResponse createProposal(CreateProposalCommand command){
@@ -184,7 +187,7 @@ public class ProposalService {
    // 제안서 상세 조회
     public ProposalDetailResponse getProposalDetail(Integer proposalId) {
 
-        Proposal proposal = proposalRepository.findById(proposalId);
+        ProposalEntity proposal = proposalRepository.findById(proposalId);
 
         List<ScheduleResponse> schedules = scheduleFinder.findSchedulesByProposalId(proposalId).stream()
                 .map(schedule -> new ScheduleResponse(
@@ -194,7 +197,28 @@ public class ProposalService {
                         schedule.getImageUrl()))
                 .collect(Collectors.toList());
 
-        return new ProposalDetailResponse(proposal,schedules);
+        return ProposalDetailResponse.builder()
+                .proposalId(proposal.getProposalId())
+                .companyId(proposal.getCompany().getCompanyId())
+                .name(proposal.getName())
+                .airLine(proposal.getAirline())
+                .startDate(proposal.getStartDate())
+                .endDate(proposal.getEndDate())
+                .endDateBoardingTime(proposal.getEndDateBoardingTime())
+                .endDateArrivalTime(proposal.getEndDateArrivalTime())
+                .startDateBoardingTime(proposal.getStartDateBoardingTime())
+                .startDateArrivalTime(proposal.getStartDateArrivalTime())
+                .confirmStatus(proposal.getProposalStatus())
+                .arrivalAirport(proposal.getArrivalAirport().getAirportName())
+                .departureAirport(proposal.getDepartureAirport().getAirportName())
+                .minPeople(proposal.getMinPeople())
+                .guideIncluded(proposal.isGuideIncluded())
+                .deposit(proposal.getDeposit())
+                .refundPolicy(proposal.getRefundPolicy())
+                .insuranceIncluded(proposal.isInsuranceIncluded())
+                .productInformation(proposal.getProductIntroduction())
+                .schedules(schedules)
+                .build();
     }
 
     //제안서 문의
@@ -212,7 +236,7 @@ public class ProposalService {
                 .findByTravelPlanIdAndMemberId(command.getTravelPlanId(), command.getMemberId());
 
         // ProposalEntity 조회
-        Proposal proposal = proposalFinder.getProposalDomain(command.getProposalId());
+        ProposalEntity proposal = proposalFinder.getProposalDomain(command.getProposalId());
 
         if (proposal == null) {
             throw new IllegalArgumentException("제안서를 찾을 수 없습니다.");
@@ -308,7 +332,7 @@ public class ProposalService {
     //여행사 본인 제안서 상세 조회
     public CompanyProposalDetailResponse getCompanyProposalDetail(Integer proposalId,Integer companyId) {
 
-        Proposal proposal = proposalRepository.findByProposalIdAndCompany_CompanyId(proposalId, companyId);
+        ProposalEntity proposal = proposalRepository.findByProposalIdAndCompany_CompanyId(proposalId, companyId);
 
         List<ScheduleResponse> schedules = scheduleFinder.findSchedulesByProposalId(proposal.getProposalId()).stream()
                 .map(schedule -> new ScheduleResponse(
@@ -318,14 +342,35 @@ public class ProposalService {
                         schedule.getImageUrl()))
                 .collect(Collectors.toList());
 
-        return new CompanyProposalDetailResponse(proposal, schedules);
+        return CompanyProposalDetailResponse.builder()
+                .proposalId(proposal.getProposalId())
+                .companyId(proposal.getCompany().getCompanyId())
+                .name(proposal.getName())
+                .airLine(proposal.getAirline())
+                .startDate(proposal.getStartDate())
+                .endDate(proposal.getEndDate())
+                .endDateBoardingTime(proposal.getEndDateBoardingTime())
+                .endDateArrivalTime(proposal.getEndDateArrivalTime())
+                .startDateBoardingTime(proposal.getStartDateBoardingTime())
+                .startDateArrivalTime(proposal.getStartDateArrivalTime())
+                .confirmStatus(proposal.getProposalStatus())
+                .arrivalAirport(proposal.getArrivalAirport().getAirportName())
+                .departureAirport(proposal.getDepartureAirport().getAirportName())
+                .minPeople(proposal.getMinPeople())
+                .guideIncluded(proposal.isGuideIncluded())
+                .deposit(proposal.getDeposit())
+                .refundPolicy(proposal.getRefundPolicy())
+                .insuranceIncluded(proposal.isInsuranceIncluded())
+                .productInformation(proposal.getProductIntroduction())
+                .schedules(schedules)
+                .build();
     }
 
     // 제안서 내 일정 등록
     public Schedule createSchedule(CreateScheduleCommand command,Integer proposalId) {
 
        // 일정 등록 전 겹치는 일정이 있는지 확인
-        Proposal proposal = proposalRepository.findById(proposalId);
+        ProposalEntity proposal = proposalRepository.findById(proposalId);
 
         List<Schedule> existingSchedules = scheduleFinder.findSchedulesByProposalId(proposal.getProposalId()).stream()
                 .map(scheduleMapper::entityToDomain)

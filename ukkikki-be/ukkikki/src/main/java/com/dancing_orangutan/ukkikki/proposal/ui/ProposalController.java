@@ -34,7 +34,7 @@ public class ProposalController {
     public ApiUtils.ApiResponse<CreateProposalResponse> createProposal(
             @PathVariable Integer travelPlanId,
             @AuthenticationPrincipal CompanyUserDetails companyUserDetails,
-            @Validated @RequestBody CreateProposalRequest request){
+            @RequestBody CreateProposalRequest request){
 
         CreateProposalCommand command = request.toCommand(travelPlanId, companyUserDetails.getCompanyId());
 
@@ -73,7 +73,7 @@ public class ProposalController {
             @PathVariable Integer travelPlanId,
             @PathVariable Integer proposalId,
             @AuthenticationPrincipal MemberUserDetails memberUserDetails,
-            @Validated @RequestBody CreateInquiryRequest request) {
+            @RequestBody CreateInquiryRequest request) {
 
         CreateInquiryCommand command = request.requestToDomain(proposalId,travelPlanId,memberUserDetails.getMemberId());
 
@@ -110,7 +110,7 @@ public class ProposalController {
     public ApiUtils.ApiResponse<Schedule> createSchedule(
         @PathVariable Integer proposalId,
         @AuthenticationPrincipal CompanyUserDetails companyUserDetails,
-        @Validated @RequestBody CreateScheduleRequest request
+        @RequestBody CreateScheduleRequest request
     ){
 
         CreateScheduleCommand command = request.toCommand();
@@ -145,7 +145,7 @@ public class ProposalController {
     public ApiUtils.ApiResponse<?> updateSchedule(
             @PathVariable Integer proposalId,
             @PathVariable Integer scheduleId,
-            @Validated @RequestBody UpdateScheduleRequest request
+            @RequestBody UpdateScheduleRequest request
     ){
 
        UpdateScheduleCommand command = request.requestToDomain(proposalId,scheduleId);
@@ -211,7 +211,7 @@ public class ProposalController {
             @PathVariable Integer travelPlanId,
             @PathVariable Integer proposalId,
             @AuthenticationPrincipal MemberUserDetails memberUserDetails,
-            @Validated @RequestBody List<CreateTravelerRequest> requests) {
+            @RequestBody List<CreateTravelerRequest> requests) {
 
         // 요청된 모든 여행자 정보를 CreateTravelerCommand로 변환
         List<CreateTravelerCommand> command = requests.stream()

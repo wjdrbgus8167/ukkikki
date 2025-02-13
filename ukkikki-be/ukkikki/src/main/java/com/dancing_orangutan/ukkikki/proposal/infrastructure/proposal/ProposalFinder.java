@@ -13,7 +13,7 @@ public class ProposalFinder {
     private final ProposalRepository proposalRepository;
     private final JpaProposalRepository jpaProposalRepository;
 
-    public Proposal getProposalDomain(Integer proposalId) {
+    public ProposalEntity getProposalDomain(Integer proposalId) {
 
         return proposalRepository.findById(proposalId);
     }
