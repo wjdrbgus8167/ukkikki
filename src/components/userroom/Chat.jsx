@@ -35,12 +35,14 @@ const Chat = ({ travelPlanId }) => {
         setStompClient(client);
         setIsConnected(true);
 
+        // 구독 콜백 예시
         client.subscribe(
           `/api/v1/sub/chat/travel-plan/${travelPlanId}`,
           (message) => {
-            console.log('메시지 수신:', message.body);
+            console.log('메시지 수신:', message.body); // 이 메시지가 출력되는지 확인
             try {
               const newMessage = JSON.parse(message.body);
+              console.log('파싱된 메시지:', newMessage); // 이 메시지가 출력되는지 확인
               setMessages((prev) => [...prev, newMessage]);
             } catch (error) {
               console.error('메시지 파싱 에러:', error);
