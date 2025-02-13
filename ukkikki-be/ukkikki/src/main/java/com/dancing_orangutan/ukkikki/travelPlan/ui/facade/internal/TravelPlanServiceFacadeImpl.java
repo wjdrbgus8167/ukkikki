@@ -123,7 +123,7 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 				.endDate(endDate)
 				.departureCityId(departureCityId)
 				.arrivalCityId(arrivalCityId)
-				.planningStatus(planningStatus)
+				.status(planningStatus)
 				.keywords(keywords)
 				.build();
 

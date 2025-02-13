@@ -30,8 +30,8 @@ public class QueryDslTravelPlanRepository {
 		booleanBuilder.and(entity.arrivalCity.cityId.eq(query.arrivalCityId()));
 
 		// 추가 조건(상태)
-		if (query.planningStatus() != null) {
-			booleanBuilder.and(entity.planningStatus.eq(query.planningStatus()));
+		if (query.status() != null) {
+			booleanBuilder.and(entity.planningStatus.eq(query.status()));
 		}
 
 		// 추가 조건(키워드)
