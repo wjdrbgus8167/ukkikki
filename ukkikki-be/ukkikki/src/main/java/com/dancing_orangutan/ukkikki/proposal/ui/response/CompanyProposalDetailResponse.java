@@ -1,5 +1,6 @@
 package com.dancing_orangutan.ukkikki.proposal.ui.response;
 
+import com.dancing_orangutan.ukkikki.proposal.constant.ProposalStatus;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,9 +18,10 @@ public class CompanyProposalDetailResponse {
     private LocalDate startDate;
     private LocalDate endDate;
     private String airLine;
-    private String departureAirportCode;
-    private String arrivalAirportCode;
+    private String departureAirport;
+    private String arrivalAirport;
     private LocalDateTime startDateBoardingTime;
+    private LocalDateTime startDateArrivalTime;
     private LocalDateTime endDateBoardingTime;
     private LocalDateTime endDateArrivalTime;
     private int deposit;
@@ -28,31 +30,36 @@ public class CompanyProposalDetailResponse {
     private String productInformation;
     private String refundPolicy;
     private boolean insuranceIncluded;
-    private String confirmStatus;
+    private ProposalStatus confirmStatus;
     private List<ScheduleResponse> schedules;
 
     @Builder
-    public CompanyProposalDetailResponse(Proposal proposal, List<ScheduleResponse> schedules) {
+    public CompanyProposalDetailResponse(Integer proposalId,Integer companyId, String name, LocalDate startDate, LocalDate endDate
+            ,String airLine,String departureAirport,String arrivalAirport,LocalDateTime startDateBoardingTime
+            ,LocalDateTime startDateArrivalTime, LocalDateTime endDateBoardingTime, LocalDateTime endDateArrivalTime
+    , int deposit, int minPeople, boolean guideIncluded, String productInformation, String refundPolicy
+    , boolean insuranceIncluded, ProposalStatus confirmStatus, List<ScheduleResponse> schedules) {
 
-        this.proposalId = proposal.getProposalId();
-        this.companyId = proposal.getCompanyId();
-        this.name = proposal.getName();
-        this.startDate = proposal.getStartDate();
-        this.endDate = proposal.getEndDate();
-        this.airLine = proposal.getAirline();
-        this.departureAirportCode = proposal.getDepartureAirportCode();
-        this.arrivalAirportCode = proposal.getArrivalAirportCode();
-        this.startDateBoardingTime = proposal.getStartDateBoardingTime();
-        this.endDateBoardingTime = proposal.getEndDateBoardingTime();
-        this.endDateArrivalTime = proposal.getEndDateArrivalTime();
-        this.deposit = proposal.getDeposit();
-        this.minPeople = proposal.getMinPeople();
-        this.guideIncluded = proposal.isGuideIncluded();
-        this.productInformation = proposal.getProductIntroduction();
-        this.refundPolicy = proposal.getRefundPolicy();
-        this.insuranceIncluded = proposal.isInsuranceIncluded();
-        this.confirmStatus = proposal.getProposalStatus().name();
-        this.schedules = schedules;
+      this.proposalId = proposalId;
+      this.companyId = companyId;
+      this.name = name;
+      this.startDate = startDate;
+      this.endDate = endDate;
+      this.airLine = airLine;
+      this.departureAirport = departureAirport;
+      this.arrivalAirport = arrivalAirport;
+      this.startDateBoardingTime = startDateBoardingTime;
+      this.startDateArrivalTime = startDateArrivalTime;
+      this.endDateBoardingTime = endDateBoardingTime;
+      this.endDateArrivalTime = endDateArrivalTime;
+      this.deposit = deposit;
+      this.minPeople = minPeople;
+      this.guideIncluded = guideIncluded;
+      this.productInformation = productInformation;
+      this.refundPolicy = refundPolicy;
+      this.insuranceIncluded = insuranceIncluded;
+      this.confirmStatus = confirmStatus;
+      this.schedules = schedules;
 
     }
 
