@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { over } from 'stompjs';
 
 const Chat = ({ travelPlanId }) => {
-  // travelPlanId가 없으면 안내 메시지 렌더링
   if (!travelPlanId) {
     return (
       <div className="p-4 text-center">여행 계획 ID가 제공되지 않았습니다.</div>
@@ -16,14 +15,16 @@ const Chat = ({ travelPlanId }) => {
 
   useEffect(() => {
     try {
-      // 환경변수의 HTTP URL을 WebSocket URL로 변환 (http:// → ws://, https:// → wss://)
-      const httpUrl = import.meta.env.VITE_APP_API_BASE_URL;
-      const wsUrl = httpUrl.replace(/^http/, 'ws') + 'api/v1/ws';
+      // 환경변수에 설정된 API URL (https://...)를 WebSocket URL로 변환
+      const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
+      // HTTPS라면 wss://, HTTP라면 ws:// 사용
+      const wsProtocol = baseUrl.startsWith('https') ? 'wss' : 'ws';
+      const wsUrl = baseUrl.replace(/^https?/, wsProtocol) + 'api/v1/ws';
       console.log('WebSocket 연결 시도:', wsUrl);
 
-      // native WebSocket 사용
+      // 순수 WebSocket 사용
       const socket = new WebSocket(wsUrl);
-      const client = over(socket);
+      const client = over(socket); // STOMP 클라이언트 생성 (순수 WebSocket 위에서 동작)
 
       client.connect(
         {},
@@ -68,7 +69,7 @@ const Chat = ({ travelPlanId }) => {
     }
   }, [travelPlanId]);
 
-  // 메시지 업데이트 시 스크롤을 아래로 유지
+  // 새로운 메시지가 추가될 때마다 스크롤을 맨 아래로 유지
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop =
@@ -81,7 +82,7 @@ const Chat = ({ travelPlanId }) => {
     if (inputMessage.trim() && stompClient) {
       const message = {
         travelPlanId,
-        sender: '사용자', // 실제 사용자 정보 사용 가능
+        sender: '사용자', // 실제 사용자 정보를 넣어주세요
         content: inputMessage,
         type: 'TALK',
       };
