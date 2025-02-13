@@ -4,6 +4,8 @@ import Footer from "../components/layout/Footer";
 import { useParams } from "react-router";
 import { ProposalDetailProvider } from "../contexts/ProposalDetailContext";
 import MainLayout from "../components/TravelPlanner/MainLayout";
+import { StyledMainLayout } from "./style/CreateTravelPageStyle";
+
 
 const CreateTravel = () => {
     const { travelPlanId } = useParams();
@@ -13,7 +15,9 @@ const CreateTravel = () => {
         <div>
             <Header />
                 <ProposalDetailProvider travelPlanId={travelPlanId}>
-                    <MainLayout />
+                    <StyledMainLayout>
+                        <MainLayout />
+                    </StyledMainLayout>
                 </ProposalDetailProvider>
             <Footer />
         </div>
