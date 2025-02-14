@@ -11,7 +11,7 @@ import { DetailFormContainer,TravelWrapper, TravelTitle,FlexWrapper,InputWrapper
 
 
 const DetailForm = () => {
-
+ 
     const [proposal, setProposal] = useState({
         startDate:'',
         endDate:'',

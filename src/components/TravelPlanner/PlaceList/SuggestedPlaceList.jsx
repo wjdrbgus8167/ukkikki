@@ -37,7 +37,15 @@ const SuggestedPlaceList = ({ places, onSelectPlace, onSelectDay }) => {
                   <p className="text-sm text-gray-600">좋아요 👍: {place.likeCount}</p>
                 </StylePlaceContent>
 
-                  <button onClick={() => handleClick(place)}>
+                  <button onClick={() => 
+                    handleClick({
+                      name: place.name,
+                      latitude: place.latitude,
+                      longitude: place.longitude,
+                      photoUrl: place.photoUrl,
+        
+                    })}
+                    >
                     {selectedMap[place.id] ? onSelectDay : '✔️'}
                   </button>
 

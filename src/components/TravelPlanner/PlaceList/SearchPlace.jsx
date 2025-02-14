@@ -48,7 +48,15 @@ const SearchPlace = ({
               </p>
             )}
           </div>
-          <button onClick={() => onSelectPlace(searchedPlace)}>
+          <button onClick={() => 
+            onSelectPlace({
+              id: searchedPlace.id,
+              name: searchedPlace.name,
+              latitude: searchedPlace.latitude,
+              longitude: searchedPlace.longitude,
+              photoUrl: searchedPlace.photoUrl,
+
+            })}>
             ✔️
           </button>
         </div>

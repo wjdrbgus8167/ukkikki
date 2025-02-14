@@ -1,6 +1,6 @@
 // 날짜별 일정 구성
 
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import ProposalDetailContext from "../../contexts/ProposalDetailContext";
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { 
@@ -13,14 +13,33 @@ import {
 import clock from  '../../assets/clock.png'; 
 import trashCan from '../../assets/trash_can.png'; 
 
-const ScheduleByDate = ({onTogglePlaceSelection, selectedPlaces=[], onDeletePlace }) => {
-    
+const ScheduleByDate = ({onTogglePlaceSelection, selectedPlaces=[], onDeletePlace, onAddTime }) => {
+    const [timeData, setTimeData] = useState({});
+    const [showTimeInput, setShowTimeInput] = useState(null);
     const { proposal } = useContext(ProposalDetailContext);
     if(!proposal) {
         return <div>로딩중</div>
     }
     const { arrivalCity, startDate, endDate } = proposal.data.travelPlan;
 
+    const handleSaveTime = (placeId) => {
+        onAddTime(placeId, timeData[placeId]?.startTime, timeData[placeId]?.endTime);
+        setShowTimeInput(null);
+    };
+
+    const handleTimeInputToggle = (placeId) => {
+        setShowTimeInput(showTimeInput ===placeId ? null: placeId)
+    };
+
+    const handleTimeChange = (placeId, type, value) => {
+        setTimeData((prevData) => ({
+            ...prevData,
+            [placeId]: {
+                ...prevData[placeId],
+                [type]: value,
+            },
+        }));
+    };
     return (
         <ScheduleByDateContainer>
             <Info>
@@ -34,12 +53,12 @@ const ScheduleByDate = ({onTogglePlaceSelection, selectedPlaces=[], onDeletePlac
             {selectedPlaces.length > 0 && (
                 <SelectedPlacesContainer>
                     {selectedPlaces.map((place, index) => (
-                        <div key={place.id} className="selected-place">
+                        <div key={place.placeId} className="selected-place">
                             <span className="index">{index+1}</span>
                             <SelectedPlacesContent>
                                 <p className="place">{place.name}</p>
                                 <span className="btns">
-                                    <button>
+                                    <button onClick={()=> handleTimeInputToggle(place.placeId)}>
                                         <img src={clock} alt="clock icon" className="w-6 h-6" />
                                     </button>
                                     <button onClick={() => {onDeletePlace(place.placeId)}}>
@@ -47,6 +66,26 @@ const ScheduleByDate = ({onTogglePlaceSelection, selectedPlaces=[], onDeletePlac
                                     </button>
                                 </span>
                                 
+                                {/* 시간 입력 폼 */}
+                                {showTimeInput === place.placeId && (
+                                    <div className="time-input">
+                                        <div className="time-input-fields">
+                                            <input
+                                                type="time"
+                                                value={timeData[place.placeId]?.startTime || ""}
+                                                onChange={(e) => handleTimeChange(place.placeId, "startTime", e.target.value)}
+                                            />
+                                            <input
+                                                type="time"
+                                                value={timeData[place.placeId]?.endTime || ""}
+                                                onChange={(e) => handleTimeChange(place.placeId, "endTime", e.target.value)}
+                                            />
+                                        </div>
+                                        <button
+                                            className="btn"
+                                            onClick={() => handleSaveTime(place.placeId)}>완료</button>
+                                    </div>
+                                )}
                             </SelectedPlacesContent>
                         </div>
                     ))}

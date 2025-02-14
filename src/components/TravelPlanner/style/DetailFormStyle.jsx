@@ -4,12 +4,12 @@ import styled from 'styled-components'
 export const DetailFormContainer = styled.div`
   width: 90%;                 /* 전체 너비의 90%로 설정 */
   max-width: 1300px;           /* 최대 너비를 1300px로 제한 */
-  margin: 20px auto;
+  margin: 10px auto;
   border: 4px solid black;
   border-radius: 20px;
   padding: 20px;
   background-color: #fff;
-  font-family: '여기어때 잘난체', sans-serif; /* 여기어때 잘난체 폰트 적용 */
+
 
   box-shadow: 30px 20px 0px rgba(255, 204, 0, 0.6); /* 노란색 그림자 */
 
