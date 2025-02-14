@@ -16,6 +16,7 @@ export default defineConfig({
       },
     },
     // host: 'openapi.airport.co.kr',
+
     host: 'fe.i12c204.p.ssafy.io',
   },
   define: {
