@@ -14,9 +14,8 @@ const Chat = ({ travelPlanId }) => {
   const [isConnected, setIsConnected] = useState(false); // 연결 상태
   const chatContainerRef = useRef(null); // 스크롤 조정을 위한 ref
 
-  // 디버깅: 현재 messages 상태 출력
   useEffect(() => {
-    console.log('messages 상태:', messages);
+    console.log('Updated messages:', messages);
   }, [messages]);
 
   useEffect(() => {
@@ -36,24 +35,21 @@ const Chat = ({ travelPlanId }) => {
         setIsConnected(true);
 
         // 구독 콜백 예시
-        client.subscribe(
-          `/api/v1/sub/chat/travel-plan/${travelPlanId}`,
-          (message) => {
-            console.log('메시지 수신:', message.body); // 이 메시지가 출력되는지 확인
-            try {
-              const newMessage = JSON.parse(message.body);
-              console.log('파싱된 메시지:', newMessage); // 이 메시지가 출력되는지 확인
-              setMessages((prev) => [...prev, newMessage]);
-            } catch (error) {
-              console.error('메시지 파싱 에러:', error);
-            }
-          },
-        );
+        client.subscribe(`/sub/chat/travel-plan/${travelPlanId}`, (message) => {
+          console.log('메시지 수신:', message.body); // 이 메시지가 출력되는지 확인
+          try {
+            const newMessage = JSON.parse(message.body);
+            console.log('파싱된 메시지:', newMessage); // 이 메시지가 출력되는지 확인
+            setMessages((prev) => [...prev, newMessage]);
+          } catch (error) {
+            console.error('메시지 파싱 에러:', error);
+          }
+        });
 
         setTimeout(() => {
           try {
             client.send(
-              `/api/v1/pub/chat/enter`,
+              `/pub/chat/enter`,
               {},
               JSON.stringify({ travelPlanId, type: 'ENTER' }),
             );
@@ -106,7 +102,7 @@ const Chat = ({ travelPlanId }) => {
     };
 
     try {
-      stompClient.send(`/api/v1/pub/chat/message`, {}, JSON.stringify(message));
+      stompClient.send(`/pub/chat/message`, {}, JSON.stringify(message));
     } catch (err) {
       console.error('메시지 전송 에러:', err);
     }
@@ -125,7 +121,6 @@ const Chat = ({ travelPlanId }) => {
             채팅 메시지가 없습니다.
           </div>
         ) : (
-          (console.log('messages:', messages),
           messages.map((msg, index) => (
             <div
               key={index}
@@ -143,7 +138,7 @@ const Chat = ({ travelPlanId }) => {
                 <p className="text-sm">{msg.content}</p>
               </div>
             </div>
-          )))
+          ))
         )}
       </div>
 
