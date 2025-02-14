@@ -6,45 +6,23 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ko } from "date-fns/locale";
 import { format } from "date-fns";
-import { DetailFormContainer,TravelWrapper, TravelTitle,FlexWrapper,InputWrapper} from "./style/DetailFormStyle";
+import { DetailFormContainer,TravelWrapper, TravelTitle, FlexWrapper, InputWrapper, AirportWrapper} from "./style/DetailFormStyle";
 
 
 
-const DetailForm = () => {
-
-    const [proposal, setProposal] = useState({
-        startDate:'',
-        endDate:'',
-        airLine:'',
-        departureAirportCode: '',
-        departureAirportName: '',
-        arrivalAirportCode: '',
-        arrivalAirportName: '',
-        startDateBoardingTime: '',
-        startDateArrivalTime: '',
-        endDateBoardingTime: '',
-        endDateArrivalTime: '',
-        deposit: '',
-        minPeople: '',
-        guideIncluded: '',
-        productIntroduction: '',
-        refundPolicy: '',
-        insuranceIncluded: '',
-        proposalStatus: 'V',
-    });
-
-    const [error, setError] = useState('');
-
+const DetailForm = ({proposalData, setProposalData}) => {
+ 
 
     const handleChange = (e) => {
-        setProposal({
-            ...proposal,
+        setProposalData({
+            ...proposalData,
             [e.target.name]: e.target.value
         });
     };
+
     //Date객체로 변환하기 위한 함수
     const getDateValue = (field) => {
-        return proposal[field] ? new Date(proposal[field]) : null
+        return proposalData[field] ? new Date(proposalData[field]) : null
     }
     
       // 필드명을 인자로 받아 해당 필드의 값만 업데이트하는 핸들러 함수
@@ -59,12 +37,18 @@ const DetailForm = () => {
                 formattedValue = format(date, "yyyy-MM-dd'T'HH:mm");
             }
         }
-        setProposal((prev) => ({
+        setProposalData((prev) => ({
         ...prev,
         [field]: formattedValue,
         }));
     };
 
+    const handleNumberChange = (e) => {
+        setProposalData({
+          ...proposalData,
+          [e.target.name]: Number(e.target.value),
+        });
+      };
 
     return (
         <DetailFormContainer>
@@ -76,6 +60,15 @@ const DetailForm = () => {
             <div className="content-container">
                 
             <form action="">
+                <div>
+                    <label htmlFor="name" className="name"> 여행 이름</label>
+                    <input 
+                    id="name"
+                    name="name"
+                    value={proposalData.name}
+                    onChange={handleChange}
+                    type="text" />
+                </div>
                 {/* 여행 시작일 */}
                 <div className="flex items-center mb-4 space-x-10">
                     <TravelTitle>여행 일정</TravelTitle>
@@ -114,16 +107,58 @@ const DetailForm = () => {
                 {/* 항공사 */}
                 <div className="">
                 <TravelWrapper>
-                    <TravelTitle htmlFor="airLine">항공사</TravelTitle>
+                    <TravelTitle htmlFor="airline">항공사</TravelTitle>
                     <input 
-                    id='airLine'
-                    name='airLine'
+                    id='airline'
+                    name='airline'
                     type="text" 
-                    value={proposal.airLine}
+                    value={proposalData.airline}
                     onChange={handleChange}
                     className="airline-input border border-gray-300"
                     />
                 </TravelWrapper>
+
+                </div>
+                {/* 공항 */}
+                <div className="">
+                    <AirportWrapper>
+                        <label htmlFor="departureAirportCode">출발 공항 코드</label>
+                        <input 
+                            id='departureAirportCode'
+                            name='departureAirportCode'
+                            type="text" 
+                            value={proposalData.departureAirportCode}
+                            onChange={handleChange}
+                            className="departure-airport-code-input border border-gray-300"
+                            />
+                        <label htmlFor="departureAirportName">출발 공항 이름</label>
+                        <input 
+                            id='departureAirportName'
+                            name='departureAirportName'
+                            type="text" 
+                            value={proposalData.departureAirportName}
+                            onChange={handleChange}
+                            className="departure-airport-name-input border border-gray-300"
+                            />
+                        <label htmlFor="arrivalAirportCode">도착 공항 코드</label>
+                        <input 
+                            id='arrivalAirportCode'
+                            name='arrivalAirportCode'
+                            type="text" 
+                            value={proposalData.arrivalAirportCode}
+                            onChange={handleChange}
+                            className="arrival-airport-code-input border border-gray-300"
+                            />
+                        <label htmlFor="arrivalAirportName">도착 공항 이름</label>
+                        <input 
+                            id='arrivalAirportName'
+                            name='arrivalAirportName'
+                            type="text" 
+                            value={proposalData.arrivalAirportName}
+                            onChange={handleChange}
+                            className="arrival-airport-name-input border border-gray-300"
+                            />
+                    </AirportWrapper>
 
                 </div>
 
@@ -218,14 +253,14 @@ const DetailForm = () => {
                         id="deposit"
                         name="deposit"
                         placeholder="예약금을 입력하세요"
-                        defaultValue={proposal.deposit}
+                        value={proposalData.deposit}
                         decimalScale={2}
                         prefix="₩"
                         onValueChange={(value) =>
-                            setProposal((prev) => ({ ...prev, deposit: value }))
-                          }
-                        className="deposit-input"
-                    />
+                            setProposalData((prev) => ({ ...prev, deposit: value ? parseFloat(value) : 0 }))
+                        }
+                        className="border border-gray-300"
+                        />
                 </div>
                 {/* 최소 인원 */}
                 <div>
@@ -236,8 +271,8 @@ const DetailForm = () => {
                     type="number" 
                     min="1"
                     step="1"
-                    value={proposal.minPeople}
-                    onChange={handleChange}
+                    value={proposalData.minPeople}
+                    onChange={handleNumberChange}
                     className="minpeople-input"
                     />
                 </div>
@@ -248,9 +283,9 @@ const DetailForm = () => {
                     id="guideIncluded"
                     name="guideIncluded"
                     type="checkbox"
-                    checked={proposal.guideIncluded}
+                    checked={proposalData.guideIncluded}
                     onChange={(e)=>
-                        setProposal((prev) => ({
+                        setProposalData((prev) => ({
                             ...prev,
                             guideIncluded: e.target.checked,
                         }))
@@ -265,9 +300,9 @@ const DetailForm = () => {
                     id="insuranceIncluded"
                     name="guideIncluded"
                     type="checkbox"
-                    checked={proposal.insuranceIncluded}
+                    checked={proposalData.insuranceIncluded}
                     onChange={(e)=>
-                        setProposal((prev) => ({
+                        setProposalData((prev) => ({
                             ...prev,
                             insuranceIncluded: e.target.checked,
                         }))
@@ -282,7 +317,7 @@ const DetailForm = () => {
                     id="productIntroduction"
                     name="productIntroduction"
                     type="text"
-                    value={proposal.productIntroduction}
+                    value={proposalData.productIntroduction}
                     onChange={handleChange}
                     className="producintrodution-input"
                     />
@@ -295,7 +330,7 @@ const DetailForm = () => {
                     id="refundPolicy"
                     name="refundPolicy"
                     type="text"
-                    value={proposal.refundPolicy}
+                    value={proposalData.refundPolicy}
                     onChange={handleChange}
                     className="refundpolicy-input "
                     />

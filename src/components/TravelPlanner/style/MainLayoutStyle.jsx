@@ -17,13 +17,13 @@ export const StyledDateSidebar = styled.div`
 
 export const StyledMapDisplay = styled.div`
   display: flex;
-  width: 72%;
+  width: 100%;
   margin: 10px 0px;
 `;
 
 export const StyleScheduleByDate = styled.div`
   display: flex;
-  width: 18%;
+  width: 25%;
 
 `;
 
@@ -47,15 +47,18 @@ export const StylePlaceSelection = styled.div`
 `;
 
 export const DetailFormWrapper = styled.div`
-  position: fixed; /* 화면에 고정 */
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 100; /* 다른 요소보다 위에 표시 */
-  width: 80%;  /* 원하는 크기 설정 */
-  max-width: 800px;
+  height: 90%;
+  width: 90%;  /* 원하는 크기 설정 */
   background-color: rgba(255, 255, 255, 0.95); /* 약간 투명한 배경 */
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+
+`;
+
+export const ContentArea = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  padding-top:10px;
+  margin: 0;
+
 `;

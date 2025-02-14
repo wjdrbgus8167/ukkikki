@@ -169,8 +169,8 @@ const PlaceSelection = ({ onSelectPlace }) => {
                       onPlaceChanged={onPlaceChanged}
                       searchedPlace={searchedPlace}
                       onSelectPlace={(place) => {
-                        console.log('onSelectPlace called with:', place);
-                        onSelectPlace(place); // 부모의 함수 호출
+                      console.log('onSelectPlace called with:', place);
+                      onSelectPlace(place); 
                       }}
                     />
                 )}
