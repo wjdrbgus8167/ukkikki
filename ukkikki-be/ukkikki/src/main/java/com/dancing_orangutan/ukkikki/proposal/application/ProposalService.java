@@ -161,7 +161,7 @@ public class ProposalService {
 
                             })
                             .filter(Objects::nonNull) // null 값 제거
-                            .mapToInt(mtp -> mtp.getAdultCount() + mtp.getChildCount() + mtp.getInfantCount()) // 투표한 인원 수 합산
+                            .mapToInt(mtp -> Math.min(mtp.getAdultCount() + mtp.getChildCount() + mtp.getInfantCount(), 10)) // 투표한 인원 수 합산
                             .sum();
 
                     // 회사 정보 가져오기

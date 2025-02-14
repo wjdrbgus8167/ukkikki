@@ -36,7 +36,7 @@ public class Like {
         totalCount += memberTravelPlanEntity.getAdultCount();
         totalCount += memberTravelPlanEntity.getChildCount();
         totalCount += memberTravelPlanEntity.getInfantCount();
-        this.likeCount = totalCount;
+        this.likeCount = Math.min(totalCount, 10);
     }
 
     /**
