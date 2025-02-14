@@ -9,16 +9,27 @@ import com.dancing_orangutan.ukkikki.travelPlan.application.UpdateCompanionCount
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.ExitTravelPlanCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchAvailableTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQuery;
+import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQueryByMember;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchMyTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.WriteCommentService;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.constant.PlanningStatus;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.TravelPlanServiceFacade;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.CreateTravelPlanRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.JoinTravelPlanRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.UpdateCloseTimeRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.UpdateCompanionCountRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.WriteCommentRequest;
+<<<<<<< ukkikki-be/ukkikki/src/main/java/com/dancing_orangutan/ukkikki/travelPlan/ui/facade/internal/TravelPlanServiceFacadeImpl.java
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.CreateTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchAvailableTravelPlansResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchKeywordsResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchSuggestedTravelPlansResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchTravelPlanDetailsByMemberResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchTravelPlanDetailsByCompanyResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.JoinTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.SearchTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.*;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.internal.mapper.TravelPlanResponseMapper;
 import java.time.LocalDate;
@@ -52,13 +63,15 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 	}
 
 	@Override
-	public JoinTravelPlanResponse joinTravelPlan(final JoinTravelPlanRequest request,
-			final Integer memberId,
+	public JoinTravelPlanResponse joinTravelPlan(final JoinTravelPlanRequest request, final Integer memberId,
 			final Integer travelPlanId) {
+
 		Integer joinedTravelPlanId = joinTravelPlanService.joinTravelPlan(
 				request.toCommand(memberId, travelPlanId));
-		return mapper.joinTravelPlanResponse(
-				queryTravelPlanService.findWithRelationsByTravelPlanId(joinedTravelPlanId));
+		TravelPlanEntity entity = queryTravelPlanService.findWithRelationsByTravelPlanId(
+				joinedTravelPlanId);
+
+		return mapper.joinTravelPlanResponse(entity,memberId);
 	}
 
 	@Override
@@ -109,11 +122,23 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 	}
 
 	@Override
-	public FetchTravelPlanDetailsResponse fetchTravelPlanDetails(final Integer travelPlanId) {
+	public FetchTravelPlanDetailsByCompanyResponse fetchTravelPlanDetails(final Integer travelPlanId) {
 		return mapper.fetchTravelPlanDetailsResponse(
 				queryTravelPlanService.fetchTravelPlanDetails(FetchTravelPlanDetailsQuery.builder()
 						.travelPlanId(travelPlanId)
 						.build()));
+	}
+
+	@Override
+	public FetchTravelPlanDetailsByMemberResponse fetchTravelPlanDetailsByMember(
+			Integer travelPlanId, Integer memberId) {
+		TravelPlanEntity entity = queryTravelPlanService.fetchTravelPlanDetailsByMember(
+				FetchTravelPlanDetailsQueryByMember.builder()
+						.memberId(memberId)
+						.travelPlanId(travelPlanId)
+						.build());
+
+		return mapper.fetchTravelPlanDetailsByMemberResponse(entity, memberId);
 	}
 
 	@Override

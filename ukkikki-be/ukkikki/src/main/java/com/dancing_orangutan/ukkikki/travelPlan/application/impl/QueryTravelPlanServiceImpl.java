@@ -6,6 +6,7 @@ import com.dancing_orangutan.ukkikki.global.error.ErrorCode;
 import com.dancing_orangutan.ukkikki.travelPlan.application.QueryTravelPlanService;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchAvailableTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQuery;
+import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQueryByMember;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchMyTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.constant.PlanningStatus;
@@ -54,6 +55,13 @@ public class QueryTravelPlanServiceImpl implements QueryTravelPlanService {
 		return travelPlanRepository.findWithRelationsByTravelPlanId(query.travelPlanId())
 				.orElseThrow(() ->
 						new ApiException(ErrorCode.TRAVEL_PLAN_NOT_FOUND));
+	}
+
+	@Override
+	public TravelPlanEntity fetchTravelPlanDetailsByMember(
+			FetchTravelPlanDetailsQueryByMember query) {
+		return travelPlanRepository.findWithRelationsByTravelPlanId(query.travelPlanId())
+				.orElseThrow(() -> new ApiException(ErrorCode.TRAVEL_PLAN_NOT_FOUND));
 	}
 
 	@Override

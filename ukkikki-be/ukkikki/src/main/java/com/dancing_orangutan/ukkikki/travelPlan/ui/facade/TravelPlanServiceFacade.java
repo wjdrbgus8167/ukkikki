@@ -6,8 +6,15 @@ import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.JoinTravel
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.UpdateCloseTimeRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.UpdateCompanionCountRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.WriteCommentRequest;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.CreateTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchAvailableTravelPlansResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchTravelPlanDetailsByMemberResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchTravelPlanDetailsByCompanyResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchSuggestedTravelPlansResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchKeywordsResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.JoinTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.SearchTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.*;
-
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +41,11 @@ public interface TravelPlanServiceFacade {
 
 	FetchAvailableTravelPlansResponse fetchAvailableTravelPlans(final Pageable pageable);
 
-	FetchTravelPlanDetailsResponse fetchTravelPlanDetails(final Integer travelPlanId);
+	FetchTravelPlanDetailsByCompanyResponse fetchTravelPlanDetails(final Integer travelPlanId);
+
+
+	FetchTravelPlanDetailsByMemberResponse fetchTravelPlanDetailsByMember(
+			final Integer travelPlanId, final Integer memberId);
 
 	FetchKeywordsResponse fetchKeywords();
 

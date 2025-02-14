@@ -101,6 +101,10 @@ public class MemberTravelPlanEntity {
 		this.exitYn = true;
 		this.exitTime = LocalDateTime.now();
 	}
+
+	public boolean hasJoined(Integer memberId) {
+		return member.getMemberId().equals(memberId);
+	}
 }
 
 

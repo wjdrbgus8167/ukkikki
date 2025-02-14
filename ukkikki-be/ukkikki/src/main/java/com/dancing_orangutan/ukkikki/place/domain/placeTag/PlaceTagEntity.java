@@ -40,4 +40,8 @@ public class PlaceTagEntity {
 		this.memberTravelPlan = memberTravelPlan;
 	}
 
+	public boolean isMyTag(Integer memberId) {
+		return memberTravelPlan.getMember().getMemberId().equals(memberId);
+	}
+
 }
