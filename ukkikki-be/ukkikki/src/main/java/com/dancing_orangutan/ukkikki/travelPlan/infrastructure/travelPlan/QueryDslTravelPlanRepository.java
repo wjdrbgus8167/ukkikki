@@ -1,5 +1,6 @@
 package com.dancing_orangutan.ukkikki.travelPlan.infrastructure.travelPlan;
 
+import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchMyTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.constant.PlanningStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.QTravelPlanEntity;
@@ -57,6 +58,26 @@ public class QueryDslTravelPlanRepository {
 
 		return queryFactory
 				.selectFrom(entity)
+				.where(booleanBuilder)
+				.distinct()
+				.fetch();
+	}
+
+	public List<TravelPlanEntity> searchMyTravelPlan(SearchMyTravelPlanQuery query){
+		QTravelPlanEntity entity = QTravelPlanEntity.travelPlanEntity;
+		QTravelPlanKeywordEntity keywordEntity = QTravelPlanKeywordEntity.travelPlanKeywordEntity;
+		BooleanBuilder booleanBuilder = new BooleanBuilder();
+
+		if (query.status() != null) {
+			booleanBuilder.and(entity.planningStatus.eq(query.status()));
+		}
+
+		booleanBuilder.and(entity.memberTravelPlans.any().member.memberId.eq(query.memberId()));
+
+
+		return queryFactory
+				.selectFrom(entity)
+				.leftJoin(entity.travelPlanKeywords, keywordEntity).fetchJoin()
 				.where(booleanBuilder)
 				.distinct()
 				.fetch();

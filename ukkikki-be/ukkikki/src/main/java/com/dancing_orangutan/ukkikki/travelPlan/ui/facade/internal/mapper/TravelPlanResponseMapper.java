@@ -6,17 +6,11 @@ import com.dancing_orangutan.ukkikki.place.domain.place.PlaceEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.keyword.KeywordEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravelPlan.MemberTravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchAvailableTravelPlansResponse;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchKeywordsResponse;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchTravelPlanDetailsResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.*;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.common.CityResponse;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.CreateTravelPlanResponse;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchSuggestedTravelPlansResponse;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.JoinTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.common.KeywordResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.common.MemberResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.common.PlaceResponse;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.SearchTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.common.PlaceTagResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.common.TravelPlanResponse;
 import java.util.List;
@@ -49,6 +43,16 @@ public class TravelPlanResponseMapper {
 						.toList())
 				.build();
 	}
+
+	public SearchMyTravelPlanResponse searchMyTravelPlanResponse(final List<TravelPlanEntity> entities) {
+		return SearchMyTravelPlanResponse.builder()
+				.travelPlans(entities.stream()
+						.map(this::buildBaseTravelPlanResponse)
+						.map(TravelPlanResponse.TravelPlanResponseBuilder::build)
+						.toList())
+				.build();
+	}
+
 
 	public FetchSuggestedTravelPlansResponse fetchSuggestedTravelPlansResponse(
 			final List<TravelPlanEntity> entities) {
@@ -172,5 +176,6 @@ public class TravelPlanResponseMapper {
 				.totalPeopleCount(entity.calTotalParticipants())
 				.build();
 	}
+
 
 }

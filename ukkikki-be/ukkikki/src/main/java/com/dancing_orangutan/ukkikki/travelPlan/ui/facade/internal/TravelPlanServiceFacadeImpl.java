@@ -9,6 +9,7 @@ import com.dancing_orangutan.ukkikki.travelPlan.application.UpdateCompanionCount
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.ExitTravelPlanCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchAvailableTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQuery;
+import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchMyTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.WriteCommentService;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.constant.PlanningStatus;
@@ -18,13 +19,7 @@ import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.JoinTravel
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.UpdateCloseTimeRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.UpdateCompanionCountRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.WriteCommentRequest;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.CreateTravelPlanResponse;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchAvailableTravelPlansResponse;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchKeywordsResponse;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchSuggestedTravelPlansResponse;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchTravelPlanDetailsResponse;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.JoinTravelPlanResponse;
-import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.SearchTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.*;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.internal.mapper.TravelPlanResponseMapper;
 import java.time.LocalDate;
 import java.util.List;
@@ -92,6 +87,16 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 				.memberId(memberId)
 				.build();
 		exitTravelPlanService.exitTravelPlan(command);
+	}
+
+	@Override
+	public SearchMyTravelPlanResponse searchMyTravelPlans(final PlanningStatus status, final Integer memberId) {
+		final SearchMyTravelPlanQuery query = SearchMyTravelPlanQuery.builder()
+				.status(status)
+				.memberId(memberId)
+				.build();
+
+		return mapper.searchMyTravelPlanResponse(queryTravelPlanService.searchMyTravelPlans(query));
 	}
 
 	@Override
