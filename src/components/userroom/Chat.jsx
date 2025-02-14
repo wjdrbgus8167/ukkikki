@@ -14,6 +14,9 @@ const Chat = ({ travelPlanId }) => {
   const [isConnected, setIsConnected] = useState(false); // 연결 상태
   const chatContainerRef = useRef(null); // 스크롤 조정을 위한 ref
 
+  // ENTER 메시지 중복 전송을 방지하기 위한 ref
+  const hasSentEnterRef = useRef(false);
+
   useEffect(() => {
     console.log('Updated messages:', messages);
   }, [messages]);
@@ -34,29 +37,33 @@ const Chat = ({ travelPlanId }) => {
         setStompClient(client);
         setIsConnected(true);
 
-        // 구독 콜백 예시
+        // 구독 콜백
         client.subscribe(`/sub/chat/travel-plan/${travelPlanId}`, (message) => {
-          console.log('메시지 수신:', message.body); // 이 메시지가 출력되는지 확인
+          console.log('메시지 수신:', message.body);
           try {
             const newMessage = JSON.parse(message.body);
-            console.log('파싱된 메시지:', newMessage); // 이 메시지가 출력되는지 확인
+            console.log('파싱된 메시지:', newMessage);
             setMessages((prev) => [...prev, newMessage]);
           } catch (error) {
             console.error('메시지 파싱 에러:', error);
           }
         });
 
-        setTimeout(() => {
-          try {
-            client.send(
-              `/pub/chat/enter`,
-              {},
-              JSON.stringify({ travelPlanId, type: 'ENTER' }),
-            );
-          } catch (err) {
-            console.error('enter 메시지 전송 에러:', err);
-          }
-        }, 100);
+        // ENTER 메시지 전송 (한 번만 전송)
+        if (!hasSentEnterRef.current) {
+          setTimeout(() => {
+            try {
+              client.send(
+                `/pub/chat/enter`,
+                {},
+                JSON.stringify({ travelPlanId, type: 'ENTER' }),
+              );
+              hasSentEnterRef.current = true;
+            } catch (err) {
+              console.error('enter 메시지 전송 에러:', err);
+            }
+          }, 100);
+        }
       },
       (error) => {
         console.error('WebSocket 연결 실패:', error);
