@@ -50,11 +50,10 @@ const SearchPlace = ({
           </div>
           <button onClick={() => 
             onSelectPlace({
-              id: searchedPlace.id,
-              name: searchedPlace.name,
+              scheduleName: searchedPlace.name,
               latitude: searchedPlace.latitude,
               longitude: searchedPlace.longitude,
-              photoUrl: searchedPlace.photoUrl,
+              imageUrl: searchedPlace.photoUrl,
 
             })}>
             ✔️

@@ -17,13 +17,13 @@ export const StyledDateSidebar = styled.div`
 
 export const StyledMapDisplay = styled.div`
   display: flex;
-  width: 72%;
+  width: 100%;
   margin: 10px 0px;
 `;
 
 export const StyleScheduleByDate = styled.div`
   display: flex;
-  width: 18%;
+  width: 25%;
 
 `;
 
@@ -56,7 +56,9 @@ export const DetailFormWrapper = styled.div`
 
 export const ContentArea = styled.div`
   display: flex;
-  width: 90%;
+  width: 100%;
   height: 100%;
-  margin-top:10px;
+  padding-top:10px;
+  margin: 0;
+
 `;

@@ -22,10 +22,14 @@ const ScheduleByDate = ({onTogglePlaceSelection, selectedPlaces=[], onDeletePlac
     }
     const { arrivalCity, startDate, endDate } = proposal.data.travelPlan;
 
-    const handleSaveTime = (placeId) => {
-        onAddTime(placeId, timeData[placeId]?.startTime, timeData[placeId]?.endTime);
+    const handleSaveTime = (placeId, dayNumber) => {
+        const rawData = timeData[placeId];
+        if (!rawData || !rawData.startTime || !rawData.endTime) return;
+        const fullStartTime = computeFullTime(dayNumber, rawData.startTime);
+        const fullEndTime = computeFullTime(dayNumber, rawData.endTime);
+        onAddTime(placeId, fullStartTime, fullEndTime);
         setShowTimeInput(null);
-    };
+      };
 
     const handleTimeInputToggle = (placeId) => {
         setShowTimeInput(showTimeInput ===placeId ? null: placeId)
@@ -40,6 +44,17 @@ const ScheduleByDate = ({onTogglePlaceSelection, selectedPlaces=[], onDeletePlac
             },
         }));
     };
+    
+    const computeFullTime = (dayNumber, timeStr) => {
+
+        const baseDate = new Date(startDate); 
+        baseDate.setDate(baseDate.getDate() + (dayNumber - 1));
+
+        const [hours, minutes] = timeStr.split(":");
+        baseDate.setHours(Number(hours), Number(minutes), 0, 0);
+        return baseDate.toISOString().split('.')[0];
+    };
+    
     return (
         <ScheduleByDateContainer>
             <Info>
@@ -56,7 +71,7 @@ const ScheduleByDate = ({onTogglePlaceSelection, selectedPlaces=[], onDeletePlac
                         <div key={place.placeId} className="selected-place">
                             <span className="index">{index+1}</span>
                             <SelectedPlacesContent>
-                                <p className="place">{place.name}</p>
+                                <p className="place">{place.scheduleName}</p>
                                 <span className="btns">
                                     <button onClick={()=> handleTimeInputToggle(place.placeId)}>
                                         <img src={clock} alt="clock icon" className="w-6 h-6" />
@@ -81,9 +96,7 @@ const ScheduleByDate = ({onTogglePlaceSelection, selectedPlaces=[], onDeletePlac
                                                 onChange={(e) => handleTimeChange(place.placeId, "endTime", e.target.value)}
                                             />
                                         </div>
-                                        <button
-                                            className="btn"
-                                            onClick={() => handleSaveTime(place.placeId)}>완료</button>
+                                        <button className="btn" onClick={() => handleSaveTime(place.placeId, place.dayNumber)}>완료</button>
                                     </div>
                                 )}
                             </SelectedPlacesContent>

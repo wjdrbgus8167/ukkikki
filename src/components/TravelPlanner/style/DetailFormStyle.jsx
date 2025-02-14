@@ -78,3 +78,8 @@ export const InputWrapper = styled.div`
   position: relative; /* 두 input 사이에 선을 추가하려면 relative 위치 설정 */
 `;
 
+export const AirportWrapper = styled.div`
+ display: flex;
+ width: 300px;
+  flex-direction: column; /* 세로 정렬 */
+`;

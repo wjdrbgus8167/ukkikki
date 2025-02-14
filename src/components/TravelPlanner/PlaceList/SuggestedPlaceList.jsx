@@ -39,10 +39,10 @@ const SuggestedPlaceList = ({ places, onSelectPlace, onSelectDay }) => {
 
                   <button onClick={() => 
                     handleClick({
-                      name: place.name,
+                      scheduleName: place.name,
                       latitude: place.latitude,
                       longitude: place.longitude,
-                      photoUrl: place.photoUrl,
+                      imageUrl: place.photoUrl,
         
                     })}
                     >

@@ -4,7 +4,8 @@ import DateSidebar from "./DateSidebar";
 import MapDisplay from "./MapDisplay";
 import ScheduleByDate from "./ScheduleByDate";
 import PlaceSelection from "./PlaceSelection";
-import DetailForm from "./DetailForm"; // 상세 내용 페이지 import
+import DetailForm from "./DetailForm";
+import { CreateTravelProposal } from "../../apis/agency";
 import { 
   StyledMainLayout,
   StyledDateSidebar,
@@ -24,9 +25,31 @@ const generateUniqueId = () => {
 const MainLayout = () => {
   const { proposal, selectedDayId } = useContext(ProposalDetailContext);
   
+  const [ proposalData, setProposalData ] = useState({
+    name: '',
+    startDate: '',
+    endDate: '',
+    airline:'',
+    departureAirportCode: '',
+    departureAirportName: '',
+    arrivalAirportCode: '',
+    arrivalAirportName: '',
+    startDateBoardingTime: '',
+    startDateArrivalTime: '',
+    endDateBoardingTime: '',
+    endDateArrivalTime: '',
+    deposit: 0,
+    minPeople:0,
+    guideIncluded: '',
+    productIntroduction: '',
+    refundPolicy: '',
+    insuranceIncluded: '',
+    proposalStatus: 'V',
+  });
+
   // 날짜별 선택된 장소들을 저장하는 상태 (객체: key는 day id)
   const [selectedPlacesByDay, setSelectedPlacesByDay] = useState({});
-  console.log('저장된 데이터:', selectedPlacesByDay);
+  console.log('ScheduleItems:', selectedPlacesByDay);
   
   
   const [showPlaceSelection, setShowPlaceSelection] = useState(false);
@@ -52,7 +75,11 @@ const MainLayout = () => {
   // 선택된 장소를 현재 날짜(selectedDayId)에 추가
   const handleSelectPlace = (place) => {
     // 고유 식별자가 없다면, generateUniqueId()를 이용해 생성합니다.
-    const placeWithId = { ...place, placeId: place.placeId || generateUniqueId() };
+    const placeWithId = { 
+      ...place, 
+      placeId: place.placeId || generateUniqueId(), 
+      dayNumber: selectedDayId
+    };
     setSelectedPlacesByDay((prev) => ({
       ...prev,
       [selectedDayId]: [...(prev[selectedDayId] || []), placeWithId],
@@ -87,19 +114,52 @@ const MainLayout = () => {
     });
   };
 
+  const handleDaySelectFromSidebar = () => {
+    if (showDetailForm) {
+      setShowDetailForm(false);
+    }
+  };
+
+  const handleSubmitProposal = async () => {
+    // 1. 모든 day의 장소들을 평탄화하고, 각 객체에서 placeId를 제거
+    const scheduleItems = Object.values(selectedPlacesByDay)
+      .flat()
+      .map(({ placeId, ...rest }) => rest);
+  
+    // 2. 최종 payload 구성
+    const payload = {
+      ...proposalData,
+      scheduleItems,
+    };
+  
+    console.log("POST할 데이터:", payload);
+  
+    try {
+      // 여행계획 제안서를 전송할 때 travelPlanId와 payload를 함께 전달
+      const data = await CreateTravelProposal(proposal.data.travelPlan.travelPlanId, payload);
+      console.log("제출 성공:", data);
+    } catch (error) {
+      console.error("제출 오류:", error);
+    }
+  };
+
   return (
     <StyledMainLayout>
-      {/* 항상 보이는 사이드바 영역 */}
+      {/* 사이드바 */}
       <StyledDateSidebar>
-        <DateSidebar onToggleDetailForm={toggleDetailForm} />
+        <DateSidebar 
+        onToggleDetailForm={toggleDetailForm} 
+        onDaySelect={handleDaySelectFromSidebar}
+        onSubmit={handleSubmitProposal}
+        />
       </StyledDateSidebar>
 
       {/* 사이드바를 제외한 나머지 영역 */}
       <ContentArea>
         {showDetailForm ? (
-          // 상세 내용 버튼을 누른 경우: 기존의 일정/지도 영역은 감추고 DetailForm을 채움
+          // 상세 내용 버튼을 누르면면 기존의 일정/지도 영역은 감추고 DetailForm을 채움
           <DetailFormWrapper>
-            <DetailForm />
+            <DetailForm proposalData={proposalData} setProposalData={setProposalData}/>
           </DetailFormWrapper>
         ) : (
           <>
@@ -114,6 +174,7 @@ const MainLayout = () => {
             <StyledMapDisplay>
               <StyleMapContainer>
                 <MapDisplay 
+              
                   arrivalCity={arrivalCity.name}
                   selectedPlaces={currentDayPlaces}
                   day={selectedDayId}
