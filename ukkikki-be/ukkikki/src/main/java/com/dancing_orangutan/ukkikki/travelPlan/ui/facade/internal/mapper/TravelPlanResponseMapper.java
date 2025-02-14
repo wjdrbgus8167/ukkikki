@@ -108,6 +108,7 @@ public class TravelPlanResponseMapper {
 				.minPeople(entity.getMinPeople())
 				.maxPeople(entity.getMaxPeople())
 				.planningStatus(entity.getPlanningStatus())
+				.closeTime(entity.getCloseTime())
 				.currentParticipants(entity.getMemberTravelPlans().stream()
 						.mapToInt(MemberTravelPlanEntity::calTotalParticipants).sum());
 	}
