@@ -5,9 +5,10 @@ import {
   ButtonList,
   ScheduleButton,
   DetailButton,
+  SubmitButton,
 } from "./style/DateSidebarStyle";
 
-const DateSidebar = ({ onToggleDetailForm }) => {
+const DateSidebar = ({ onToggleDetailForm, onDaySelect, onSubmit }) => {
   const { proposal, setSelectedDay, selectedDayId } = useContext(ProposalDetailContext);
   const [detailActive, setDetailActive] = useState(false);
 
@@ -39,6 +40,7 @@ const DateSidebar = ({ onToggleDetailForm }) => {
 
   const handleDaySelect = (dayId) => {
     setSelectedDay(dayId);
+    if (onDaySelect) onDaySelect(dayId);
   };
 
   const handleDetailClick = () => {
@@ -62,6 +64,9 @@ const DateSidebar = ({ onToggleDetailForm }) => {
           상세내용
         </DetailButton>
       </ButtonList>
+      <SubmitButton onClick={onSubmit} >
+           제출
+      </SubmitButton>
     </SidebarContainer>
   );
 };

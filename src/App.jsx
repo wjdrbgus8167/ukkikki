@@ -41,7 +41,7 @@ const App = () => {
           path="/agency-detail/:travelPlanId"
           element={<ProposalDetail />}
         />
-        <Route path="/user-vote" element={<UserVotePage />} />
+        <Route path="/user-vote/:travelPlanId" element={<UserVotePage />} />
         <Route path="/oauth/success" element={<OAuthSuccessPage />} />
 
         <Route
