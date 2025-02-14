@@ -119,19 +119,33 @@ const SearchBar = () => {
       schArrvCityCode: departureAirport,
     };
   
+
+    /*
+    try {
+      const response = await publicRequest.get(endpoint, {
+        params: {
+          startDate: formatDate(startDate),
+          endDate: formatDate(endDate),
+          departureCityId, // ✅ 변경된 부분 (departureAirport → departureCityId)
+          arrivalCityId, // ✅ 변경된 부분 (arrivalAirport → arrivalCityId)
+        },
+      });
+      if (response.status === 200) {
+        console.log('🔍 검색 결과:', response.data);
+        navigate('/search-room', {
+          state: { rooms: response.data.data },
+        });
+      }
+    */
     console.log('🛫 출발 항공편 요청 파라미터:', departureParams);
     console.log('🛬 도착 항공편 요청 파라미터:', returnParams);
     try {
-      const departureResponse = await axios.get(
-        'http://openapi.airport.co.kr' + API_BASE_URL,
-        {
+      const departureResponse = await publicRequest.get(API_BASE_URL,{
           params: departureParams,
         },
       );
-      const returnResponse = await axios.get(
-        'http://openapi.airport.co.kr' + API_BASE_URL,
-        {
-          params: returnParams,
+      const returnResponse = await publicRequest.get(API_BASE_URL,{
+          params: departureParams,
         },
       );
   
