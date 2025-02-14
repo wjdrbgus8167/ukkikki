@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
+import { GoogleMap, InfoWindow, OverlayView } from '@react-google-maps/api';
 import FavoriteList from './FavoriteList';
 import Chat from './Chat';
 import { publicRequest } from '../../hooks/requestMethod';
@@ -65,27 +65,31 @@ const InteractiveSection = ({ selectedCard }) => {
   };
 
   const handleMarkerClick = async (marker) => {
-    const placeDetails = await fetchPlaceDetails(marker.placeId);
-    if (placeDetails) {
-      let photoUrl = null;
-      if (placeDetails.photos && placeDetails.photos.length > 0) {
-        const photoReference = placeDetails.photos[0].photo_reference;
-        photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${apiKey}`;
-        console.log('photoUrl:', photoUrl);
+    // marker나 marker.placeId가 유효하지 않으면 아무 작업도 하지 않습니다.
+    if (!marker || !marker.placeId) return;
+    try {
+      const placeDetails = await fetchPlaceDetails(marker.placeId);
+      if (placeDetails) {
+        let photoUrl = null;
+        if (placeDetails.photos && placeDetails.photos.length > 0) {
+          const photoReference = placeDetails.photos[0].photo_reference;
+          photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${apiKey}`;
+        }
+        setSelectedMarker({
+          ...marker,
+          name: placeDetails.name,
+          address: placeDetails.formatted_address,
+          photo: photoUrl,
+          // DB favorites에 저장된 tags, likeCount, liked 값을 그대로 사용
+        });
+        // 초기 태그 입력창 상태 초기화
+        setShowTagInput(false);
+        setNewTag('');
+      } else {
+        setSelectedMarker(marker);
       }
-      setSelectedMarker({
-        ...marker,
-        name: placeDetails.name,
-        address: placeDetails.formatted_address,
-        // rating은 필요시 추가,
-        photo: photoUrl,
-        // tags, likeCount, liked: DB favorites에 저장된 값을 그대로 사용
-      });
-      // 초기 태그 입력창 상태 초기화
-      setShowTagInput(false);
-      setNewTag('');
-    } else {
-      setSelectedMarker(marker);
+    } catch (error) {
+      console.error('🚨 fetchPlaceDetails 오류:', error);
     }
   };
 
@@ -182,24 +186,32 @@ const InteractiveSection = ({ selectedCard }) => {
             fullscreenControl: false,
           }}
         >
-          {/* 즐겨찾기 마커들 */}
+          {/* 즐겨찾기 마커들을 OverlayView를 이용해 커스텀 마커로 표시 */}
           {favorites.map((marker, index) => (
-            <Marker
+            <OverlayView
               key={index}
               position={{ lat: marker.latitude, lng: marker.longitude }}
-              icon={{
-                url: bananaIcon,
-                scaledSize: new window.google.maps.Size(40, 40),
-                labelOrigin: new window.google.maps.Point(30, 10),
-              }}
-              label={{
-                text: `${marker.liked ? '❤️' : '🤍'}${marker.likeCount || 0}`,
-                fontSize: '12px',
-                fontWeight: 'bold',
-                color: 'black',
-              }}
-              onClick={() => handleMarkerClick(marker)}
-            />
+              mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+            >
+              <div
+                className="relative cursor-pointer w-14 h-14 hover:animate-shake" // 크기 조정
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleMarkerClick(marker);
+                }}
+              >
+                {/* 바나나 아이콘 */}
+                <img src={bananaIcon} alt="marker" className="w-full h-full" />
+                {/* 오른쪽 상단 하트 아이콘 */}
+                <div className="absolute text-xl transform translate-x-1/2 -translate-y-1/2 right-2 top-6">
+                  {marker.liked ? '❤️' : '🤍'}
+                </div>
+                {/* 중앙 좋아요 수 */}
+                <div className="absolute inset-0 flex items-center justify-center font-bold transform translate-y-1/4">
+                  {marker.likeCount || 0}
+                </div>
+              </div>
+            </OverlayView>
           ))}
 
           {/* 선택된 마커의 InfoWindow */}
@@ -215,39 +227,54 @@ const InteractiveSection = ({ selectedCard }) => {
                 setNewTag('');
               }}
             >
-              <div className="p-4">
-                {selectedMarker.photo && (
-                  <img
-                    src={selectedMarker.photo}
-                    alt={selectedMarker.name}
-                    className="object-cover w-full h-32 mb-2 rounded-lg"
-                  />
-                )}
-                <h3 className="text-lg font-bold">{selectedMarker.name}</h3>
+              <div
+                className="relative p-4"
+                style={{ width: '300px', minHeight: '200px' }}
+              >
+                <h3 className="text-lg font-bold">{selectedMarker?.name}</h3>
                 {selectedMarker.address && (
                   <p className="text-sm text-gray-600">
                     {selectedMarker.address}
                   </p>
                 )}
-                {/* 좋아요 버튼: 원형 버튼 안에 하트 아이콘과 좋아요 수 오버레이 */}
-                <div className="flex items-center mt-2">
-                  <button
-                    onClick={() => handleLikePlace(selectedMarker)}
-                    className="relative flex items-center justify-center w-10 h-10 text-xs font-bold text-white bg-blue-500 rounded-full hover:bg-blue-600"
-                  >
-                    <span className="absolute inset-0 flex items-center justify-center text-2xl">
-                      {selectedMarker.liked ? '❤️' : '🤍'}
-                    </span>
-                    <span className="relative">
-                      {selectedMarker.likeCount || 0}
-                    </span>
-                  </button>
-                </div>
+                {/* 오른쪽 상단 좋아요 버튼 (하트 아이콘만 표시) */}
+                <button
+                  onClick={() => handleLikePlace(selectedMarker)}
+                  className="absolute p-2 text-xl rounded-full top-2 right-2"
+                >
+                  {selectedMarker.liked ? '❤️' : '🤍'}
+                </button>
                 {/* 태그 영역 */}
-                {selectedMarker.tags && selectedMarker.tags.length > 0 ? (
-                  <div className="mt-2">
+                <div className="mt-4">
+                  <div className="flex items-center justify-between">
                     <h4 className="text-sm font-semibold">태그:</h4>
-                    <div className="flex flex-wrap gap-1">
+                    <button
+                      onClick={() => setShowTagInput(true)}
+                      className="px-3 py-1 text-white bg-green-500 rounded hover:bg-green-600"
+                    >
+                      태그 추가
+                    </button>
+                  </div>
+                  {showTagInput && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <input
+                        type="text"
+                        value={newTag}
+                        onChange={(e) => setNewTag(e.target.value)}
+                        placeholder="태그 입력 (최대 20자)"
+                        maxLength={20}
+                        className="px-2 py-1 border rounded"
+                      />
+                      <button
+                        onClick={handleTagSubmit}
+                        className="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600"
+                      >
+                        확인
+                      </button>
+                    </div>
+                  )}
+                  {selectedMarker.tags && selectedMarker.tags.length > 0 ? (
+                    <div className="flex flex-wrap gap-1 mt-2">
                       {selectedMarker.tags.map((tag, idx) => (
                         <span
                           key={tag.placeTagId || idx}
@@ -257,46 +284,10 @@ const InteractiveSection = ({ selectedCard }) => {
                         </span>
                       ))}
                     </div>
-                  </div>
-                ) : (
-                  <p className="mt-2 text-sm text-gray-500">
-                    태그가 없습니다. 여행태그를 작성해보세요!
-                  </p>
-                )}
-                {/* 태그 추가 UI */}
-                <div className="mt-2">
-                  {showTagInput ? (
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={newTag}
-                        onChange={(e) =>
-                          e.stopPropagation() || setNewTag(e.target.value)
-                        }
-                        placeholder="태그 입력 (최대 20자)"
-                        maxLength={20}
-                        className="px-2 py-1 border rounded"
-                      />
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleTagSubmit();
-                        }}
-                        className="px-3 py-1 text-white bg-blue-500 rounded"
-                      >
-                        확인
-                      </button>
-                    </div>
                   ) : (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowTagInput(true);
-                      }}
-                      className="px-3 py-1 text-white bg-green-500 rounded"
-                    >
-                      +
-                    </button>
+                    <p className="mt-2 text-sm text-gray-500">
+                      태그가 없습니다. 여행태그를 작성해보세요!
+                    </p>
                   )}
                 </div>
               </div>
