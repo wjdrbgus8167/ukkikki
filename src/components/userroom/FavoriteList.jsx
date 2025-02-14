@@ -14,12 +14,15 @@ const FavoriteList = ({ selectedCard }) => {
 
   useEffect(() => {
     if (selectedCard && selectedCard.places) {
+      // 좋아요 상태는 place.likeYn를 사용하고, 태그 배열은 없으면 빈 배열로 설정
       const updatedPlaces = selectedCard.places.map((place) => ({
         ...place,
         tags: place.tags || [],
-        isLiked: place.likedUsers?.includes(user?.id) || false,
+        // 기존 likedUsers 로 체크하던 것 대신, API에서 전달된 likeYn 값을 사용
+        isLiked: place.likeYn,
       }));
       setFavorites(updatedPlaces);
+      console.log('📌 좋아요 목록 업데이트:', updatedPlaces);
     }
   }, [selectedCard, user]);
 
@@ -27,7 +30,10 @@ const FavoriteList = ({ selectedCard }) => {
   const handlePlaceSelected = (newPlace) => {
     setFavorites((prev) => {
       if (prev.some((fav) => fav.name === newPlace.name)) return prev;
-      return [...prev, { ...newPlace, likeCount: 0, isLiked: false, tags: [] }];
+      return [
+        ...prev,
+        { ...newPlace, likeCount: 0, isLiked: false, likeYn: false, tags: [] },
+      ];
     });
   };
 
@@ -51,10 +57,16 @@ const FavoriteList = ({ selectedCard }) => {
           setFavorites((prev) =>
             prev.map((fav) =>
               fav.placeId === placeId
-                ? { ...fav, likeCount: fav.likeCount + 1, isLiked: true }
+                ? {
+                    ...fav,
+                    likeCount: fav.likeCount + 1,
+                    isLiked: true,
+                    likeYn: true,
+                  }
                 : fav,
             ),
           );
+          console.log('👍 좋아요 처리 결과:', response.data);
         }
       } else {
         const response = await publicRequest.delete(
@@ -64,7 +76,12 @@ const FavoriteList = ({ selectedCard }) => {
           setFavorites((prev) =>
             prev.map((fav) =>
               fav.placeId === placeId
-                ? { ...fav, likeCount: fav.likeCount - 1, isLiked: false }
+                ? {
+                    ...fav,
+                    likeCount: fav.likeCount - 1,
+                    isLiked: false,
+                    likeYn: false,
+                  }
                 : fav,
             ),
           );
@@ -74,6 +91,44 @@ const FavoriteList = ({ selectedCard }) => {
       console.error('🚨 좋아요 처리 실패:', error);
       Swal.fire('알림', '🚨 좋아요 처리 중 오류가 발생했습니다.', 'error');
     }
+  };
+
+  // 태그 삭제 핸들러 (내가 쓴 태그 클릭 시)
+  const handleTagDelete = async (placeId, tagId) => {
+    Swal.fire({
+      title: '태그 삭제',
+      text: '정말로 이 태그를 삭제하시겠습니까?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: '삭제',
+      cancelButtonText: '취소',
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const travelPlanId = selectedCard.travelPlanId;
+          const response = await publicRequest.delete(
+            `/api/v1/travel-plans/${travelPlanId}/tags/${tagId}`,
+          );
+          if (response.status === 200) {
+            setFavorites((prev) =>
+              prev.map((fav) =>
+                fav.placeId === placeId
+                  ? {
+                      ...fav,
+                      tags: fav.tags.filter((tag) => tag.placeTagId !== tagId),
+                    }
+                  : fav,
+              ),
+            );
+            Swal.fire('성공', '태그가 삭제되었습니다.', 'success');
+          }
+        } catch (error) {
+          console.error('태그 삭제 실패:', error);
+          Swal.fire('알림', '태그 삭제에 실패했습니다.', 'error');
+        }
+      }
+    });
   };
 
   // 헤더 클릭 시 확장/축소 토글
@@ -122,7 +177,11 @@ const FavoriteList = ({ selectedCard }) => {
                   ...fav,
                   tags: [
                     ...fav.tags,
-                    { placeTagId: response.data.id, name: newTag.trim() },
+                    {
+                      placeTagId: response.data.id,
+                      name: newTag.trim(),
+                      isMyTag: true,
+                    },
                   ],
                 }
               : fav,
@@ -140,7 +199,6 @@ const FavoriteList = ({ selectedCard }) => {
   return (
     <div className="space-y-4">
       {/* MapSearchBar */}
-
       <MapSearchBar onPlaceSelected={handlePlaceSelected} />
 
       {/* 찜한 장소 목록 */}
@@ -182,7 +240,16 @@ const FavoriteList = ({ selectedCard }) => {
                   {item.tags.map((tag, idx) => (
                     <span
                       key={tag.placeTagId || idx}
-                      className="px-2 py-1 text-sm rounded-full bg-yellow text-brown"
+                      onClick={
+                        tag.isMyTag
+                          ? () => handleTagDelete(item.placeId, tag.placeTagId)
+                          : undefined
+                      }
+                      className={`px-2 py-1 text-sm rounded-full cursor-pointer ${
+                        tag.isMyTag
+                          ? 'bg-green-500 text-white'
+                          : 'bg-yellow-200 text-brown'
+                      }`}
                     >
                       {typeof tag === 'object' ? tag.name : tag}
                     </span>
@@ -210,7 +277,7 @@ const FavoriteList = ({ selectedCard }) => {
                         e.stopPropagation();
                         handleTagSubmit(e);
                       }}
-                      className="flex items-center justify-center px-2 py-1 text-white rounded" // flex 적용
+                      className="flex items-center justify-center px-2 py-1 text-white bg-blue-500 rounded hover:bg-blue-600"
                     >
                       <CiCirclePlus
                         size={35}

@@ -1,6 +1,7 @@
 // src/services/MapSearchBar.jsx
 import React, { useRef, useState } from 'react';
 import { Autocomplete } from '@react-google-maps/api';
+import { FaSearch } from 'react-icons/fa';
 
 const MapSearchBar = ({ onPlaceSelected }) => {
   const [searchedPlace, setSearchedPlace] = useState(null);
@@ -72,7 +73,7 @@ const MapSearchBar = ({ onPlaceSelected }) => {
           />
           {/* 오른쪽 끝에 돋보기 아이콘 */}
           <div className="absolute text-xl text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2">
-            🔍
+            <FaSearch />
           </div>
         </div>
       </Autocomplete>
