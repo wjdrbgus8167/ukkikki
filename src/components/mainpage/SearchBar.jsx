@@ -120,13 +120,27 @@ const SearchBar = () => {
   
     console.log('🛫 출발 항공편 요청 파라미터:', departureParams);
     console.log('🛬 도착 항공편 요청 파라미터:', returnParams);
+    
+    const headers = {
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+      'Accept-Encoding': 'gzip, deflate',
+      'Accept-Language': 'ko,en;q=0.9,en-US;q=0.8',
+      'Cache-Control': 'max-age=0',
+      'Connection': 'keep-alive',
+      'Host': 'openapi.airport.co.kr',
+      'Upgrade-Insecure-Requests': '1',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0'
+    };
+    
     try {
       const departureResponse = await publicRequest.get(API_BASE_URL,{
           params: departureParams,
+          headers: headers,
         },
       );
       const returnResponse = await publicRequest.get(API_BASE_URL,{
-          params: departureParams,
+          params: returnParams,
+          headers: headers,
         },
       );
   
