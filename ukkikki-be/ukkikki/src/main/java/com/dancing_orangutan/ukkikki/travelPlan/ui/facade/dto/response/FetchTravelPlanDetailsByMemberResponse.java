@@ -7,28 +7,26 @@ import com.dancing_orangutan.ukkikki.travelPlan.domain.constant.PlanningStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.keyword.KeywordEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravelPlan.MemberTravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
-import lombok.Builder;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.Builder;
 
-public record JoinTravelPlanResponse(List<MemberResponse> members, TravelPlanResponse travelPlan) {
+public record FetchTravelPlanDetailsByMemberResponse(TravelPlanResponse travelPlan) {
 
-	public static JoinTravelPlanResponse fromEntity(final TravelPlanEntity travelPlanEntity, final Integer memberId) {
-		return JoinTravelPlanResponse.builder()
-				.members(travelPlanEntity.getMemberTravelPlans().stream()
-						.map(MemberResponse::fromEntity)
-						.toList())
+
+	@Builder
+	public FetchTravelPlanDetailsByMemberResponse{
+
+	}
+
+	public static FetchTravelPlanDetailsByMemberResponse fromEntity(final TravelPlanEntity travelPlanEntity, final Integer memberId) {
+		return FetchTravelPlanDetailsByMemberResponse.builder()
 				.travelPlan(TravelPlanResponse.fromEntity(travelPlanEntity,memberId))
 				.build();
 	}
 
-	@Builder
-	public JoinTravelPlanResponse {}
-
-	// 🔒 내부 `record`: 여행 플랜 상세 정보
 	@Builder
 	private record TravelPlanResponse(
 			Integer travelPlanId,
@@ -68,11 +66,6 @@ public record JoinTravelPlanResponse(List<MemberResponse> members, TravelPlanRes
 		}
 	}
 
-	/**
-	 *
-	 * @param cityId
-	 * @param name
-	 */
 	@Builder
 	private record CityResponse(
 			Integer cityId,
@@ -86,11 +79,6 @@ public record JoinTravelPlanResponse(List<MemberResponse> members, TravelPlanRes
 		}
 	}
 
-	/**
-	 *
-	 * @param keywordId
-	 * @param name
-	 */
 	@Builder
 	private record KeywordResponse(
 			Integer keywordId,
@@ -100,27 +88,6 @@ public record JoinTravelPlanResponse(List<MemberResponse> members, TravelPlanRes
 			return KeywordResponse.builder()
 					.keywordId(entity.getKeywordId())
 					.name(entity.getName())
-					.build();
-		}
-	}
-
-	/**
-	 *
-	 * @param name
-	 * @param hostYn
-	 * @param totalPeopleCount
-	 */
-	@Builder
-	private record MemberResponse(
-			String name,
-			boolean hostYn,
-			int totalPeopleCount
-	) {
-		private static MemberResponse fromEntity(MemberTravelPlanEntity entity) {
-			return MemberResponse.builder()
-					.name(entity.getMember().getName())
-					.totalPeopleCount(entity.calTotalParticipants())
-					.hostYn(entity.isHostYn())
 					.build();
 		}
 	}
@@ -154,9 +121,9 @@ public record JoinTravelPlanResponse(List<MemberResponse> members, TravelPlanRes
 
 	@Builder
 	private record PlaceTagResponse(Integer placeTagId,
-								   String name,
+									String name,
 
-								   boolean isMyTag) {
+									boolean isMyTag) {
 
 		private static PlaceTagResponse fromEntity(PlaceTagEntity entity,Integer memberId) {
 			return PlaceTagResponse.builder()

@@ -105,9 +105,18 @@ public class TravelPlanController {
 	}
 
 	@GetMapping("/{travelPlanId}")
-	public ApiUtils.ApiResponse<FetchTravelPlanDetailsResponse> getTravelPlanDetails(
+	public ApiUtils.ApiResponse<FetchTravelPlanDetailsByCompanyResponse> getTravelPlanDetails(
 			@PathVariable(name = "travelPlanId") Integer travelPlanId) {
 		return ApiUtils.success(travelPlanServiceFacade.fetchTravelPlanDetails(travelPlanId));
+	}
+
+	@GetMapping("/{travelPlanId}/members")
+	public ApiUtils.ApiResponse<FetchTravelPlanDetailsByMemberResponse> fetchTravelPlanDetailsByMember(
+			@AuthenticationPrincipal MemberUserDetails memberUserDetails,
+			@PathVariable(name = "travelPlanId") Integer travelPlanId) {
+
+		return ApiUtils.success(travelPlanServiceFacade.fetchTravelPlanDetailsByMember(travelPlanId,
+				memberUserDetails.getMemberId()));
 	}
 
 	@GetMapping("/keywords")

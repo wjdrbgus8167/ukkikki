@@ -46,4 +46,8 @@ public class PlaceEntity {
 	public int countLikes() {
 		return likes.stream().mapToInt(LikeEntity::getLikesCnt).sum();
 	}
+
+	public boolean isLiked(Integer memberId) {
+		return likes.stream().anyMatch(likeEntity -> likeEntity.getMember().getMemberId().equals(memberId));
+	}
 }
