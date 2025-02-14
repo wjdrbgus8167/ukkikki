@@ -21,7 +21,6 @@ import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.JoinTravel
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.UpdateCloseTimeRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.UpdateCompanionCountRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.WriteCommentRequest;
-<<<<<<< ukkikki-be/ukkikki/src/main/java/com/dancing_orangutan/ukkikki/travelPlan/ui/facade/internal/TravelPlanServiceFacadeImpl.java
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.CreateTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchAvailableTravelPlansResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchKeywordsResponse;
@@ -109,7 +108,7 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 				.memberId(memberId)
 				.build();
 
-		return mapper.searchMyTravelPlanResponse(queryTravelPlanService.searchMyTravelPlans(query));
+		return mapper.searchMyTravelPlanResponse(queryTravelPlanService.searchMyTravelPlans(query),memberId);
 	}
 
 	@Override
