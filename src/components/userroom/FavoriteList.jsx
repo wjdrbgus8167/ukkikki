@@ -3,6 +3,7 @@ import { publicRequest } from '../../hooks/requestMethod';
 import useAuthStore from '../../stores/authStore';
 import Swal from 'sweetalert2';
 import MapSearchBar from '../../services/map/MapSearchBar';
+import { CiCirclePlus } from 'react-icons/ci';
 
 const FavoriteList = ({ selectedCard }) => {
   const { user } = useAuthStore(); // 현재 로그인한 유저 정보
@@ -181,7 +182,7 @@ const FavoriteList = ({ selectedCard }) => {
                   {item.tags.map((tag, idx) => (
                     <span
                       key={tag.placeTagId || idx}
-                      className="px-2 py-1 text-sm text-blue-700 bg-blue-100 rounded-full"
+                      className="px-2 py-1 text-sm rounded-full bg-yellow text-brown"
                     >
                       {typeof tag === 'object' ? tag.name : tag}
                     </span>
@@ -193,14 +194,14 @@ const FavoriteList = ({ selectedCard }) => {
               <div className="flex justify-center mt-2">
                 {showTagInput ? (
                   <div
-                    className="flex items-center gap-2 p-2 bg-white rounded shadow-md"
+                    className="flex items-center gap-2 p-2 rounded"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <input
                       type="text"
                       value={newTag}
                       onChange={handleTagInputChange}
-                      placeholder="태그 입력 (최대 20자)"
+                      placeholder="태그를 입력해주세요."
                       className="px-2 py-1 border rounded"
                       maxLength={20}
                     />
@@ -209,20 +210,23 @@ const FavoriteList = ({ selectedCard }) => {
                         e.stopPropagation();
                         handleTagSubmit(e);
                       }}
-                      className="px-3 py-1 text-white bg-blue-500 rounded"
+                      className="flex items-center justify-center px-2 py-1 text-white rounded" // flex 적용
                     >
-                      확인
+                      <CiCirclePlus
+                        size={35}
+                        style={{ color: 'black', fontWeight: 'bold' }}
+                      />
                     </button>
                   </div>
                 ) : (
                   <button
+                    className="px-3 py-1 text-white rounded"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleShowTagInput(e);
                     }}
-                    className="px-3 py-1 text-white bg-green-500 rounded"
                   >
-                    +
+                    <CiCirclePlus size={35} style={{ color: 'black' }} />
                   </button>
                 )}
               </div>

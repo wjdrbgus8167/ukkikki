@@ -9,7 +9,12 @@ const getMinDateTime = () => {
   return now.toISOString().slice(0, 16);
 };
 
-const ProposalButton = ({ travelPlanId, currentParticipants, minPeople }) => {
+const ProposalButton = ({
+  selectedCard,
+  travelPlanId,
+  currentParticipants,
+  minPeople,
+}) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isScheduled, setIsScheduled] = useState(false);
   const [showDateInput, setShowDateInput] = useState(false);
