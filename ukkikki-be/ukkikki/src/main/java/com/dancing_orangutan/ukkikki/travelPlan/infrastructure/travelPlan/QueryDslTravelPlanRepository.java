@@ -74,7 +74,6 @@ public class QueryDslTravelPlanRepository {
 
 		booleanBuilder.and(entity.memberTravelPlans.any().member.memberId.eq(query.memberId()));
 
-
 		return queryFactory
 				.selectFrom(entity)
 				.leftJoin(entity.travelPlanKeywords, keywordEntity).fetchJoin()
