@@ -100,12 +100,15 @@ public class ProposalService {
 
        log.info("Saved proposal {}", savedProposal.getProposalId());
 
-       List<Schedule> schedules = command.getSchedules().stream()
+       List<Schedule> schedules = command.getScheduleItems().stream()
                .map(scheduleCommand -> Schedule.builder()
                        .scheduleName(scheduleCommand.getScheduleName())
                        .startTime(scheduleCommand.getStartDate())
                        .endTime(scheduleCommand.getEndDate())
                        .imageUrl(scheduleCommand.getImageUrl())
+                       .longitude(scheduleCommand.getLongitude())
+                       .latitude(scheduleCommand.getLatitude())
+                       .dayNumber(scheduleCommand.getDayNumber())
                        .proposalId(savedProposal.getProposalId()) // 저장된 Proposal ID 설정
                        .build())
                .collect(Collectors.toList());
@@ -194,7 +197,20 @@ public class ProposalService {
                         schedule.getScheduleName(),
                         schedule.getStartTime(),
                         schedule.getEndTime(),
-                        schedule.getImageUrl()))
+                        schedule.getImageUrl(),
+                        schedule.getDayNumber(),
+                        schedule.getLatitude(),
+                        schedule.getLongitude()))
+                .collect(Collectors.toList());
+
+        List<ProposalDetailResponse.DayResponse> dayResponses = schedules.stream()
+                .collect(Collectors.groupingBy(ScheduleResponse::getDayNumber))
+                .entrySet().stream()
+                .map(entry -> ProposalDetailResponse.DayResponse.builder()
+                        .dayNumber(Integer.valueOf(entry.getKey()))
+                        .schedules(entry.getValue())
+                        .build())
+                .sorted(Comparator.comparing(ProposalDetailResponse.DayResponse::getDayNumber))
                 .collect(Collectors.toList());
 
         return ProposalDetailResponse.builder()
@@ -217,7 +233,7 @@ public class ProposalService {
                 .refundPolicy(proposal.getRefundPolicy())
                 .insuranceIncluded(proposal.isInsuranceIncluded())
                 .productInformation(proposal.getProductIntroduction())
-                .schedules(schedules)
+                .daySchedules(dayResponses)
                 .build();
     }
 
@@ -330,18 +346,36 @@ public class ProposalService {
     }
 
     //여행사 본인 제안서 상세 조회
-    public CompanyProposalDetailResponse getCompanyProposalDetail(Integer proposalId,Integer companyId) {
+    public CompanyProposalDetailResponse getCompanyProposalDetail(Integer proposalId, Integer companyId) {
 
+        // 1️⃣ 제안서 조회
         ProposalEntity proposal = proposalRepository.findByProposalIdAndCompany_CompanyId(proposalId, companyId);
 
+        // 2️⃣ 스케줄 조회 및 그룹핑 (dayNumber 기준)
         List<ScheduleResponse> schedules = scheduleFinder.findSchedulesByProposalId(proposal.getProposalId()).stream()
                 .map(schedule -> new ScheduleResponse(
                         schedule.getScheduleName(),
                         schedule.getStartTime(),
                         schedule.getEndTime(),
-                        schedule.getImageUrl()))
+                        schedule.getImageUrl(),
+                        schedule.getDayNumber(),
+                        schedule.getLatitude(),
+                        schedule.getLongitude()))
                 .collect(Collectors.toList());
 
+        // 3️⃣ dayNumber 기준으로 그룹핑
+        List<CompanyProposalDetailResponse.CompanyDayResponse> companyDayResponses = schedules.stream()
+                .filter(schedule -> schedule.getDayNumber() != null) // dayNumber가 null이 아닌 경우만 처리
+                .collect(Collectors.groupingBy(ScheduleResponse::getDayNumber))
+                .entrySet().stream()
+                .map(entry -> CompanyProposalDetailResponse.CompanyDayResponse.builder()
+                        .dayNumber(Integer.valueOf(entry.getKey())) // dayNumber
+                        .schedules(entry.getValue()) // 해당 일차의 스케줄 리스트
+                        .build())
+                .sorted(Comparator.comparing(CompanyProposalDetailResponse.CompanyDayResponse::getDayNumber))
+                .collect(Collectors.toList());
+
+        // 4️⃣ 최종 응답 반환
         return CompanyProposalDetailResponse.builder()
                 .proposalId(proposal.getProposalId())
                 .companyId(proposal.getCompany().getCompanyId())
@@ -362,9 +396,10 @@ public class ProposalService {
                 .refundPolicy(proposal.getRefundPolicy())
                 .insuranceIncluded(proposal.isInsuranceIncluded())
                 .productInformation(proposal.getProductIntroduction())
-                .schedules(schedules)
+                .companyDaySchedules(companyDayResponses) // day별 스케줄 추가
                 .build();
     }
+
 
     // 제안서 내 일정 등록
     public Schedule createSchedule(CreateScheduleCommand command,Integer proposalId) {
@@ -379,13 +414,16 @@ public class ProposalService {
         if (Schedule.hasOverlappingSchedules(existingSchedules,command.getStartDate(), command.getEndDate())) {
             throw new IllegalArgumentException("새로운 일정이 기존 일정과 겹칩니다.");
         }
-
+        log.info("일차:{}",command.getDayNumber());
         // 새 일정 추가 후 저장
         Schedule schedule = Schedule.builder()
                 .scheduleName(command.getScheduleName())
                 .startTime(command.getStartDate())
                 .endTime(command.getEndDate())
                 .imageUrl(command.getImageUrl())
+                .dayNumber(command.getDayNumber())
+                .latitude(command.getLatitude())
+                .longitude(command.getLongitude())
                 .proposalId(proposalId)
                 .build();
 
@@ -422,7 +460,8 @@ public class ProposalService {
         }
 
         // 새 일정 추가 후 저장
-        scheduleEntity.updateSchedule(command.getScheduleName(), command.getStartDate(), command.getEndDate(), command.getImageUrl());
+        scheduleEntity.updateSchedule(command.getScheduleName(), command.getStartDate(), command.getEndDate(), command.getImageUrl(),command.getDayNumber()
+                ,command.getLatitude(),command.getLongitude());
 
         jpaScheduleRepository.save(scheduleEntity);
     }

@@ -34,7 +34,7 @@ public class CreateProposalRequest {
     private String refundPolicy;
     private boolean insuranceIncluded;
     private ProposalStatus proposalStatus;
-    private List<CreateScheduleRequest> schedules;
+    private List<CreateScheduleRequest> scheduleItems;
 
     @Builder
     public CreateProposalRequest(String name, LocalDate startDate, LocalDate endDate, String airline,
@@ -42,7 +42,7 @@ public class CreateProposalRequest {
                                  LocalDateTime startDateArrivalTime, LocalDateTime endDateBoardingTime, LocalDateTime endDateArrivalTime,
                                  int deposit, int minPeople, boolean guideIncluded, String productIntroduction,
                                  String refundPolicy, boolean insuranceIncluded, ProposalStatus proposalStatus,
-                                 List<CreateScheduleRequest> schedules) {
+                                 List<CreateScheduleRequest> scheduleItems) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -60,11 +60,12 @@ public class CreateProposalRequest {
         this.refundPolicy = refundPolicy;
         this.insuranceIncluded = insuranceIncluded;
         this.proposalStatus = proposalStatus;
-        this.schedules = schedules;
+        this.scheduleItems = scheduleItems;
     }
 
     public CreateProposalCommand toCommand(Integer travelPlanId, Integer companyId) {
-        validate();
+        validate(name,startDate,endDate,airline,departureAirportCode,arrivalAirportCode,startDateBoardingTime,startDateArrivalTime
+        ,endDateArrivalTime,endDateBoardingTime,deposit,minPeople,productIntroduction,refundPolicy);
 
         return CreateProposalCommand.builder()
                 .name(name)
@@ -86,17 +87,23 @@ public class CreateProposalRequest {
                 .proposalStatus(proposalStatus)
                 .travelPlanId(travelPlanId)
                 .companyId(companyId)
-                .schedules(
-                        schedules != null
-                                ? schedules.stream()
+                .scheduleItems(
+                        scheduleItems != null
+                                ? scheduleItems.stream()
                                 .map(schedule -> schedule.toCommand())
                                 .collect(Collectors.toList())
                                 : Collections.emptyList()
                 )
                 .build();
+
+
     }
 
-    private void validate() {
+    private void validate(String name, LocalDate startDate, LocalDate endDate, String airline,
+                          String departureAirportCode, String arrivalAirportCode, LocalDateTime startDateBoardingTime,
+                          LocalDateTime startDateArrivalTime, LocalDateTime endDateArrivalTime, LocalDateTime endDateBoardingTime,
+                          int deposit, int minPeople, String productIntroduction, String refundPolicy) {
+
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("제안서 이름을 입력해주세요.");
         }
@@ -142,8 +149,7 @@ public class CreateProposalRequest {
         if (refundPolicy == null || refundPolicy.trim().isEmpty()) {
             throw new IllegalArgumentException("환불 정책을 입력해주세요.");
         }
-        if (proposalStatus == null) {
-            throw new IllegalArgumentException("제안서 상태를 입력해주세요.");
-        }
+
     }
+
 }

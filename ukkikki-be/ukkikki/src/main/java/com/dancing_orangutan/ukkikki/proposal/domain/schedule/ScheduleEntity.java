@@ -31,24 +31,39 @@ public class ScheduleEntity {
     @Column(name = "image_url", length = 2000)
     private String imageUrl;
 
+    @Column(nullable = false)
+    private double latitude;
+
+    @Column(nullable = false)
+    private double longitude;
+
+    @Column(nullable = false, name = "day_number")
+    private String dayNumber;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "proposal_id")
     private ProposalEntity proposal;
 
     @Builder
-    public ScheduleEntity(Integer scheduleId, String scheduleName, LocalDateTime startTime, LocalDateTime endTime, String imageUrl, ProposalEntity proposal) {
+    public ScheduleEntity(Integer scheduleId, String scheduleName, LocalDateTime startTime, LocalDateTime endTime, String imageUrl,double latitude,double longitude,String dayNumber,ProposalEntity proposal) {
         this.scheduleId = scheduleId;
         this.scheduleName = scheduleName;
         this.startTime = startTime;
         this.endTime = endTime;
         this.imageUrl = imageUrl;
         this.proposal = proposal;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.dayNumber = dayNumber;
     }
 
-    public void updateSchedule(String scheduleName, LocalDateTime startTime, LocalDateTime endTime,String imageUrl) {
+    public void updateSchedule(String scheduleName, LocalDateTime startTime, LocalDateTime endTime,String imageUrl,String dayNumber,double latitude,double longitude) {
         this.scheduleName = (scheduleName != null) ? scheduleName : this.scheduleName;
         this.startTime = (startTime != null) ? startTime : this.startTime;
         this.endTime = (endTime != null) ? endTime : this.endTime;
         this.imageUrl = (imageUrl != null) ? imageUrl : this.imageUrl;
+        this.dayNumber = (dayNumber != null) ? dayNumber : this.dayNumber;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 }
