@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuthStore from '../../stores/authStore';
 import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2'; 
@@ -11,7 +11,8 @@ const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
-  const [activeButton, setActiveButton] = useState(null);
+  const location = useLocation();
+  const [activeButton, setActiveButton] = useState(location.state?.activeButton || null);
 
   const handleLogout = async () => {
     // ✅ 먼저 확인 알림창 띄우기
@@ -41,7 +42,7 @@ const Header = () => {
       if (response.status === 200) {
         console.log('✅ 로그아웃 성공:', response.data);
         useAuthStore.getState().setUser(null);
-        // localStorage.removeItem('auth-store');
+        localStorage.removeItem('auth-store');
 
         logout();
         navigate('/');
@@ -71,7 +72,7 @@ const Header = () => {
 
   const handleCreateRoomClick = () => {
     setActiveButton('createRoom');
-    navigate('/', { state: { createRoom: true } });
+    navigate('/', { state: { createRoom: true, activeButton: 'createRoom' } });
   };
 
   return (

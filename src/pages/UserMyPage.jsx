@@ -1,24 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import Header from '../components/layout/Header';
-
+import logo from '../assets/loading-spinner.png';
+import { useNavigate } from 'react-router-dom';
+import { publicRequest } from '../hooks/requestMethod';
+import MyRoomCard from '../components/mypage/myroom/MyRoomCard';
 const MyPage = () => {
   const [rooms, setRooms] = useState([]);
   const [filteredRooms, setFilteredRooms] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState('전체보기');
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // ✅ 참여 중인 방 목록 가져오기 (API 요청)
     const fetchRooms = async () => {
       try {
-        const response = await axios.get('/api/v1/rooms/mypage');
-        console.log('📌 API 응답:', response.data); // ✅ 응답 확인 로그
+        const response = await publicRequest.get('/api/v1/travel-plans/my-search');
 
-        if (Array.isArray(response.data)) {
-          setRooms(response.data);
-          setFilteredRooms(response.data);
+        console.log('📌 API 응답:', response.data.data.travelPlans); // ✅ 응답 확인 로그
+
+        if(response.status === 200 && response.data?.data?.travelPlans) {
+          setRooms(response.data.data.travelPlans);
+          setFilteredRooms(response.data.data.travelPlans);
         } else {
-          console.error('❌ 응답 데이터가 배열이 아닙니다.', response.data);
+          console.error('❌ 응답 데이터가 배열이 아닙니다.', response.data.data.travelPlans);
         }
       } catch (error) {
         console.error('❌ 참여 중인 방 목록 불러오기 실패:', error);
@@ -42,10 +45,8 @@ const MyPage = () => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <div className="container px-6 py-10 mx-auto">
-        <h2 className="mb-6 text-2xl font-bold">마이페이지</h2>
 
         <div className="flex">
-          {/* ✅ 왼쪽 필터 사이드바 */}
           <div className="w-1/4 p-4 bg-gray-100 rounded-lg shadow">
             <h3 className="mb-4 text-lg font-semibold">필터</h3>
             {['전체보기', '진행중', '입찰중', '예약중', '여행 확정'].map(
@@ -69,19 +70,22 @@ const MyPage = () => {
           <div className="grid w-3/4 grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {(filteredRooms || []).length > 0 ? (
               filteredRooms.map((room) => (
-                <div
-                  key={room.id}
-                  className="p-4 bg-white rounded-lg shadow-md"
-                >
-                  <h3 className="text-lg font-semibold">{room.title}</h3>
-                  <p className="text-sm text-gray-600">{room.description}</p>
-                  <span className="inline-block px-3 py-1 mt-2 text-sm text-white bg-blue-500 rounded">
-                    {room.status}
-                  </span>
-                </div>
+                <MyRoomCard key={room.travelPlanId} room={room} />
               ))
-            ) : (
-              <p className="text-gray-500">참여 중인 방이 없습니다.</p>
+            ): (
+              <div className="flex flex-col items-center justify-center w-full h-full mt-16 space-y-4">
+                <img src={logo} alt="바나나 로고" className="w-16 h-16" />
+                <p className="text-center text-gray-500">
+                  검색 결과가 없습니다. <br />
+                  다른 조건으로 검색해보세요.
+                </p>
+                <button
+                  onClick={() => navigate('/')}
+                  className="px-4 py-2 mt-4 text-white rounded-md bg-brown hover:bg-yellow hover:text-brown hover:font-bold"
+                >
+                  메인페이지로 가기
+                </button>
+              </div>
             )}
           </div>
         </div>
