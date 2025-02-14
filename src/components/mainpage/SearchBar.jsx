@@ -26,8 +26,7 @@ const SearchBar = () => {
   const navigate = useNavigate();
 
   const API_KEY = import.meta.env.VITE_APP_AIRPORT_API_KEY;
-  const API_BASE_URL = '/service/rest/FlightScheduleList/getIflightScheduleList';
-
+  const API_BASE_URL = '/api/public/service/rest/FlightScheduleList/getIflightScheduleList';
   // ✅ 날짜 포맷 변환 함수
   const formatDate = (date) => {
     if (!date) return ''; // ✅ 날짜가 없을 경우 빈 문자열 반환
@@ -119,24 +118,6 @@ const SearchBar = () => {
       schArrvCityCode: departureAirport,
     };
   
-
-    /*
-    try {
-      const response = await publicRequest.get(endpoint, {
-        params: {
-          startDate: formatDate(startDate),
-          endDate: formatDate(endDate),
-          departureCityId, // ✅ 변경된 부분 (departureAirport → departureCityId)
-          arrivalCityId, // ✅ 변경된 부분 (arrivalAirport → arrivalCityId)
-        },
-      });
-      if (response.status === 200) {
-        console.log('🔍 검색 결과:', response.data);
-        navigate('/search-room', {
-          state: { rooms: response.data.data },
-        });
-      }
-    */
     console.log('🛫 출발 항공편 요청 파라미터:', departureParams);
     console.log('🛬 도착 항공편 요청 파라미터:', returnParams);
     try {
