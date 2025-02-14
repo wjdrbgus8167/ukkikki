@@ -19,7 +19,7 @@ const Chat = ({ travelPlanId }) => {
   }, [messages]);
 
   useEffect(() => {
-    const baseUrl = 'http://i12c204.p.ssafy.io:8080'; // HTTP 서버 주소
+    const baseUrl = 'https://i12c204.p.ssafy.io'; // HTTP 서버 주소
     const wsProtocol = baseUrl.startsWith('https') ? 'wss' : 'ws'; 
     const wsUrl = `${wsProtocol}://${baseUrl.split('//')[1]}/api/v1/ws`; 
     
