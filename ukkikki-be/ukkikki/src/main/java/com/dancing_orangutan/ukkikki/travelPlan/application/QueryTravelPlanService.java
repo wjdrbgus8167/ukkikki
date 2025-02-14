@@ -3,6 +3,7 @@ package com.dancing_orangutan.ukkikki.travelPlan.application;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchAvailableTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQueryByMember;
+import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchMyTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.keyword.KeywordEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
@@ -17,7 +18,6 @@ public interface QueryTravelPlanService {
 
 	List<TravelPlanEntity> fetchSuggestedTravelPlans();
 
-
 	Page<TravelPlanEntity> fetchAvailableTravelPlans(FetchAvailableTravelPlanQuery query);
 
 	TravelPlanEntity fetchTravelPlanDetails(FetchTravelPlanDetailsQuery query);
@@ -26,6 +26,5 @@ public interface QueryTravelPlanService {
 
 	List<KeywordEntity> fetchKeywords();
 
-
-
+	List<TravelPlanEntity> searchMyTravelPlans(SearchMyTravelPlanQuery query);
 }

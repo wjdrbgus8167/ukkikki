@@ -7,6 +7,7 @@ import com.dancing_orangutan.ukkikki.travelPlan.application.QueryTravelPlanServi
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchAvailableTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQueryByMember;
+import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchMyTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.constant.PlanningStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.keyword.KeywordRepository;
@@ -66,5 +67,11 @@ public class QueryTravelPlanServiceImpl implements QueryTravelPlanService {
 	@Override
 	public List<KeywordEntity> fetchKeywords() {
 		return keywordRepository.findAll();
+	}
+
+	@Override
+	public List<TravelPlanEntity> searchMyTravelPlans(SearchMyTravelPlanQuery query) {
+
+		return queryDslTravelPlanRepository.searchMyTravelPlan(query);
 	}
 }

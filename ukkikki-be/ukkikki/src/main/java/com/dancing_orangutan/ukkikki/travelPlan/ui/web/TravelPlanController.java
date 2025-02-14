@@ -133,4 +133,12 @@ public class TravelPlanController {
 		return ApiUtils.success("여행계획이 성공적으로 퇴장되었습니다.");
 	}
 
+	@GetMapping("/my-search")
+	public ApiUtils.ApiResponse<SearchMyTravelPlanResponse> searchMyTravelPlans(
+			@RequestParam(value = "status", required = false) PlanningStatus status,
+			@AuthenticationPrincipal MemberUserDetails memberUserDetails) {
+
+		return ApiUtils.success(
+				travelPlanServiceFacade.searchMyTravelPlans(status, memberUserDetails.getMemberId()));
+	}
 }

@@ -14,6 +14,7 @@ import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchSugg
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchKeywordsResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.JoinTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.SearchTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.*;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
@@ -49,4 +50,6 @@ public interface TravelPlanServiceFacade {
 	FetchKeywordsResponse fetchKeywords();
 
 	void exitTravelPlan(Integer travelPlanId, Integer memberId);
+
+	SearchMyTravelPlanResponse searchMyTravelPlans(PlanningStatus status, Integer memberId);
 }

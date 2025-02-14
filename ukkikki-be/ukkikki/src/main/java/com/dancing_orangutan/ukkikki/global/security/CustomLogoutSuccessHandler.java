@@ -30,6 +30,6 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
             refreshTokenRepository.findByEmail(email).ifPresent(refreshTokenRepository::delete);
         }
 
-        JsonResponseUtils.sendJsonResponse(response, HttpStatus.OK, ApiUtils.success("로그아웃을 완료했습니다"));
+        JsonResponseUtils.sendJsonResponse(request, response, HttpStatus.OK, ApiUtils.success("로그아웃을 완료했습니다"));
     }
 }

@@ -32,5 +32,5 @@ public class CreateProposalCommand {
     private String refundPolicy;
     private boolean insuranceIncluded;
     private ProposalStatus proposalStatus;
-    private List<CreateScheduleCommand> schedules;
+    private List<CreateScheduleCommand> scheduleItems;
 }

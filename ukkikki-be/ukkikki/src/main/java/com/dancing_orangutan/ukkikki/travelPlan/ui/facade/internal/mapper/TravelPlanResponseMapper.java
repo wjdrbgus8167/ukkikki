@@ -11,6 +11,13 @@ import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.CreateTra
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchSuggestedTravelPlansResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.JoinTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.SearchTravelPlanResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.*;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.common.CityResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.common.KeywordResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.common.MemberResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.common.PlaceResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.common.PlaceTagResponse;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.common.TravelPlanResponse;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -30,6 +37,16 @@ public class TravelPlanResponseMapper {
 			final List<TravelPlanEntity> entities, final Integer memberId) {
 		return SearchTravelPlanResponse.fromEntities(entities, memberId);
 	}
+
+	public SearchMyTravelPlanResponse searchMyTravelPlanResponse(final List<TravelPlanEntity> entities) {
+		return SearchMyTravelPlanResponse.builder()
+				.travelPlans(entities.stream()
+						.map(this::buildBaseTravelPlanResponse)
+						.map(TravelPlanResponse.TravelPlanResponseBuilder::build)
+						.toList())
+				.build();
+	}
+
 
 	public FetchSuggestedTravelPlansResponse fetchSuggestedTravelPlansResponse(
 			final List<TravelPlanEntity> entities) {
@@ -55,5 +72,6 @@ public class TravelPlanResponseMapper {
 	public FetchKeywordsResponse fetchKeywordsResponse(final List<KeywordEntity> entities) {
 		return FetchKeywordsResponse.fromEntities(entities);
 	}
+
 
 }

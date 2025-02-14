@@ -29,6 +29,9 @@ public class ScheduleRepository {
                 .startTime(schedule.getStartTime())
                 .endTime(schedule.getEndTime())
                 .imageUrl(schedule.getImageUrl())
+                .dayNumber(schedule.getDayNumber())
+                .latitude(schedule.getLatitude())
+                .longitude(schedule.getLongitude())
                 .proposal(proposalFinder.findByProposalId(schedule.getProposalId()))
                 .build();
 
@@ -40,6 +43,9 @@ public class ScheduleRepository {
                 .startTime(savedScheduleEntity.getStartTime())
                 .endTime(savedScheduleEntity.getEndTime())
                 .imageUrl(savedScheduleEntity.getImageUrl())
+                .dayNumber(savedScheduleEntity.getDayNumber())
+                .latitude(savedScheduleEntity.getLatitude())
+                .longitude(savedScheduleEntity.getLongitude())
                 .proposalId(savedScheduleEntity.getProposal().getProposalId())
                 .build();
     }
