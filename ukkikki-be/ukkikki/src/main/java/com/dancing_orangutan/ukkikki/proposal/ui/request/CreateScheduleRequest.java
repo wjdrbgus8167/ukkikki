@@ -15,28 +15,39 @@ public class CreateScheduleRequest {
     LocalDateTime startTime;
     LocalDateTime endTime;
     String imageUrl;
+    double latitude;
+    double longitude;
+    String dayNumber;
 
     @Builder
-    public CreateScheduleRequest(String scheduleName, LocalDateTime startTime, LocalDateTime endTime, String imageUrl) {
+    public CreateScheduleRequest(String scheduleName, LocalDateTime startTime, LocalDateTime endTime, String imageUrl
+    , double latitude, double longitude, String dayNumber) {
 
         this.scheduleName = scheduleName;
         this.startTime = startTime;
         this.endTime = endTime;
         this.imageUrl = imageUrl;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.dayNumber = dayNumber;
     }
 
     public CreateScheduleCommand toCommand() {
-        validate(scheduleName,startTime,endTime);
+        validate(scheduleName,startTime,endTime,dayNumber);
         return CreateScheduleCommand
                 .builder()
                 .scheduleName(scheduleName)
                 .startDate(startTime)
                 .endDate(endTime)
                 .imageUrl(imageUrl)
+                .dayNumber(dayNumber)
+                .latitude(latitude)
+                .longitude(longitude)
                 .build();
     }
 
-    private void validate(String scheduleName,LocalDateTime startTime,LocalDateTime endTime) {
+    private void validate(String scheduleName,LocalDateTime startTime,LocalDateTime endTime
+    ,String dayNumber) {
 
         if (scheduleName ==null ) {
             throw new IllegalArgumentException("일정 제목을 입력해주세요");
@@ -52,6 +63,10 @@ public class CreateScheduleRequest {
 
         if (!startTime.isBefore(endTime)) {
             throw new IllegalArgumentException("시작 시간은 종료 시간보다 이전이어야 합니다.");
+        }
+
+        if(dayNumber ==null || dayNumber.equals("")) {
+            throw new IllegalArgumentException("일차가 입력되지 않았습니다");
         }
 
     }

@@ -15,15 +15,22 @@ public class Schedule {
     private final LocalDateTime endTime;
     private final String imageUrl;
     private final Integer proposalId;
+    private final double latitude;
+    private final double longitude;
+    private final String dayNumber;
 
     @Builder
-    public Schedule(Integer scheduleId, String scheduleName, LocalDateTime startTime, LocalDateTime endTime, String imageUrl, Integer proposalId) {
+    public Schedule(Integer scheduleId, String scheduleName, LocalDateTime startTime, LocalDateTime endTime, String imageUrl, Integer proposalId
+    , double latitude, double longitude, String dayNumber) {
         this.scheduleId = scheduleId;
         this.scheduleName = scheduleName;
         this.startTime = startTime;
         this.endTime = endTime;
         this.imageUrl = imageUrl;
         this.proposalId = proposalId;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.dayNumber = dayNumber;
     }
 
     // 겹치는 일정 확인

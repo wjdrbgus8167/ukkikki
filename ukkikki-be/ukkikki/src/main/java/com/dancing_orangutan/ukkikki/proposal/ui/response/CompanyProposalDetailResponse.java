@@ -31,14 +31,14 @@ public class CompanyProposalDetailResponse {
     private String refundPolicy;
     private boolean insuranceIncluded;
     private ProposalStatus confirmStatus;
-    private List<ScheduleResponse> schedules;
+    private List<CompanyDayResponse> companyDaySchedules;
 
     @Builder
     public CompanyProposalDetailResponse(Integer proposalId,Integer companyId, String name, LocalDate startDate, LocalDate endDate
             ,String airLine,String departureAirport,String arrivalAirport,LocalDateTime startDateBoardingTime
             ,LocalDateTime startDateArrivalTime, LocalDateTime endDateBoardingTime, LocalDateTime endDateArrivalTime
     , int deposit, int minPeople, boolean guideIncluded, String productInformation, String refundPolicy
-    , boolean insuranceIncluded, ProposalStatus confirmStatus, List<ScheduleResponse> schedules) {
+    , boolean insuranceIncluded, ProposalStatus confirmStatus, List<CompanyDayResponse> companyDaySchedules) {
 
       this.proposalId = proposalId;
       this.companyId = companyId;
@@ -59,8 +59,20 @@ public class CompanyProposalDetailResponse {
       this.refundPolicy = refundPolicy;
       this.insuranceIncluded = insuranceIncluded;
       this.confirmStatus = confirmStatus;
-      this.schedules = schedules;
+      this.companyDaySchedules = companyDaySchedules;
 
     }
 
+    @Getter
+    public static class CompanyDayResponse {
+        private Integer dayNumber;
+        private List<ScheduleResponse> schedules;
+
+        @Builder
+        public CompanyDayResponse(Integer dayNumber, List<ScheduleResponse> schedules) {
+            this.dayNumber = dayNumber;
+            this.schedules = schedules;
+
+        }
+    }
 }
