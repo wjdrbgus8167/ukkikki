@@ -13,12 +13,12 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
         if (request.getAttribute("expiredTokenException") != null) {
-            JsonResponseUtils.sendJsonErrorResponse(response, ErrorCode.EXPIRED_TOKEN);
+            JsonResponseUtils.sendJsonErrorResponse(request, response, ErrorCode.EXPIRED_TOKEN);
         }
         else if(request.getAttribute("invalidTokenException") != null){
-            JsonResponseUtils.sendJsonErrorResponse(response, ErrorCode.INVALID_TOKEN);
+            JsonResponseUtils.sendJsonErrorResponse(request, response, ErrorCode.INVALID_TOKEN);
         }else{
-            JsonResponseUtils.sendJsonErrorResponse(response, ErrorCode.AUTHENTICATION_FAILED);
+            JsonResponseUtils.sendJsonErrorResponse(request, response, ErrorCode.AUTHENTICATION_FAILED);
         }
 
         response.getWriter().flush();
