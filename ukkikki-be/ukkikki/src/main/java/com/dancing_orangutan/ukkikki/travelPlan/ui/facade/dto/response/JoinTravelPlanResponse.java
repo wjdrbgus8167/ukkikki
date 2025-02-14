@@ -146,6 +146,7 @@ public record JoinTravelPlanResponse(List<MemberResponse> members, TravelPlanRes
 					.tags(entity.getPlaceTags().stream()
 							.map(placeTagEntity-> PlaceTagResponse.fromEntity(placeTagEntity,memberId))
 							.toList())
+					.likeYn(entity.isLiked(memberId))
 					.build();
 		}
 

@@ -113,6 +113,7 @@ public record FetchTravelPlanDetailsByMemberResponse(TravelPlanResponse travelPl
 					.tags(entity.getPlaceTags().stream()
 							.map(placeTagEntity-> PlaceTagResponse.fromEntity(placeTagEntity,memberId))
 							.toList())
+					.likeYn(entity.isLiked(memberId))
 					.build();
 		}
 
