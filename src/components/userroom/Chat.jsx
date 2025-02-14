@@ -21,7 +21,8 @@ const Chat = ({ travelPlanId }) => {
   useEffect(() => {
     const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
     const wsProtocol = baseUrl.startsWith('https') ? 'wss' : 'ws';
-    const wsUrl = baseUrl.replace(/^https?/, wsProtocol) + 'api/v1/ws';
+
+    const wsUrl = baseUrl + 'api/v1/ws';
     console.log('WebSocket 연결 시도:', wsUrl);
 
     const socket = new WebSocket(wsUrl);
