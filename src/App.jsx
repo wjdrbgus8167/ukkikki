@@ -8,7 +8,7 @@ import AgencyRoomList from './pages/AgencyRoomListPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import LoadingSpinner from './components/common/LoadingSpinner';
-// import MyPage from './pages/UserMyPage';
+import MyRoom from './pages/UserMyPage';
 import MyPage from './pages/TestMyPage';
 
 import TravelCreate from './pages/TravelCreatePage';
@@ -34,9 +34,10 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
+        <Route path="/myroom" element={<MyRoom />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<RegisterPage />} />
-        <Route path="/mypage" element={<MyPage />} />
+        <Route path="/mypage/*" element={<MyPage />} />
         <Route path="/user-room/:travelPlanId" element={<UserRoom />} />
         <Route path="/search-room" element={<SearchRooms />} />
         <Route path="/agency-room" element={<AgencyRoomList />} />
