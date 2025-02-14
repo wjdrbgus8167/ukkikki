@@ -26,11 +26,12 @@ const PartnerBrandSlider = () => {
   const settings = {
     dots: false,
     infinite: true,
-    speed: 500,
+    speed: 5000, // 슬라이드가 한 번 이동하는데 걸리는 시간
     slidesToShow: 4,
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 3000,
+    autoplaySpeed: 0, // 대기 시간 없이 바로 슬라이드 전환
+    cssEase: 'linear', // 선형 애니메이션
     responsive: [
       {
         breakpoint: 768, // 태블릿 크기 이하
@@ -40,16 +41,15 @@ const PartnerBrandSlider = () => {
       },
     ],
   };
-
   return (
-    <div className="partner-slider px-6 py-8 text-center">
+    <div className="px-6 py-8 text-center partner-slider">
       {/* ✅ 제휴업체 소개 제목 (둥근 직사각형을 중앙에 배치) */}
-      <div className="bg-brown text-white text-lg font-bold px-6 py-3 rounded-3xl shadow-md inline-block mx-auto mt-16">
+      <div className="inline-block px-6 py-3 mx-auto mt-16 text-lg font-bold text-white shadow-md bg-brown rounded-3xl">
         제휴업체 소개
       </div>
 
       {/* ✅ 추가 문구 */}
-      <h1 className="text-2xl font-bold text-gray-700 my-16 flex items-center justify-center">
+      <h1 className="flex items-center justify-center my-16 text-2xl font-bold text-gray-700">
         <img src={ukiki} /> 와 함께하는 사육사를 소개합니다.
       </h1>
 
@@ -58,12 +58,12 @@ const PartnerBrandSlider = () => {
         {brands.map((brand) => (
           <div
             key={brand.id}
-            className="flex justify-center items-center p-4 w-40 h-40 rounded-lg"
+            className="flex items-center justify-center w-40 h-40 p-4 rounded-lg"
           >
             <img
               src={brand.logo}
               alt={brand.name}
-              className="w-full h-full object-contain"
+              className="object-contain w-full h-full"
             />
           </div>
         ))}
