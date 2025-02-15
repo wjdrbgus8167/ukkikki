@@ -8,6 +8,8 @@ import WorldAirportModal from '../../services/airport/WorldAirportSelector';
 import CreateRoomModal from './CreateRoomModal';
 import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
+import { format } from 'date-fns';
+
 const SearchBar = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -27,10 +29,14 @@ const SearchBar = () => {
   const API_KEY = import.meta.env.VITE_APP_AIRPORT_API_KEY;
   const API_BASE_URL =
     '/api/public/service/rest/FlightScheduleList/getIflightScheduleList';
-  // ✅ 날짜 포맷 변환 함수
+  // ✅ 날짜 포맷 변환 함수(날짜 하루씩 일찍 나오는문제 해결)
   const formatDate = (date) => {
-    if (!date) return ''; // ✅ 날짜가 없을 경우 빈 문자열 반환
-    return date.toISOString().split('T')[0]; // ✅ yyyy-MM-dd 형식으로 변환
+    if (!date) return '';
+    // Date 객체를 로컬 타임존 기준으로 조정
+    const localDate = new Date(
+      date.getTime() - date.getTimezoneOffset() * 60000,
+    );
+    return format(localDate, 'yyyy-MM-dd'); // 로컬 날짜를 그대로 반환
   };
   // ✅ 방 찾기 버튼 클릭 시 검색 조건을 API에 전달 후 SearchRoom 페이지로 이동
   const handleFindRoom = async () => {

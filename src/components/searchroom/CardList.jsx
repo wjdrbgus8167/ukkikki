@@ -185,7 +185,18 @@ const CardList = ({ cards }) => {
             {/* 버튼: 자세히 보기 => 모달 열기 */}
             <button
               className="px-4 py-2 mt-4 text-white rounded-md bg-brown hover:bg-yellow hover:text-brown hover:font-bold"
-              onClick={() => openModal(card)}
+              onClick={() => {
+                console.log('선택된 카드:', card); // 카드 콘솔 출력
+                // 이미 참여 중인 방이라면 바로 입장 처리
+                if (card.hasJoined) {
+                  navigate(`/user-room/${card.travelPlanId}`, {
+                    state: { selectedCard: card },
+                  });
+                } else {
+                  // 참여 중이 아니라면 모달을 열어서 자세히 보기 진행
+                  openModal(card);
+                }
+              }}
             >
               자세히 보기
             </button>
