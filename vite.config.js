@@ -7,14 +7,16 @@ export default defineConfig({
   server: {
     open: true, // 서버 시작 시 브라우저 자동 열림
     proxy: {
-      '/api/flight': {
+      '/api/public': {
         target: 'http://openapi.airport.co.kr', // API의 base URL
         changeOrigin: true,
         secure: false,
         rewrite: (path) =>
-          path.replace(/^\/api\/flight/, '/service/rest/FlightScheduleList'),
+          path.replace(/^\/api\/public/, '/service/rest/FlightScheduleList'),
       },
     },
+    // host: 'openapi.airport.co.kr',
+
     host: 'fe.i12c204.p.ssafy.io',
   },
   define: {

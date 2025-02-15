@@ -2,7 +2,19 @@ import React, { useState } from 'react';
 import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
 
-const ProposalButton = ({ travelPlanId, currentParticipants, minPeople }) => {
+// 현재 시각으로부터 24시간 이후의 날짜-시간 문자열 (datetime-local 형식, 예: 2025-02-14T12:34)
+const getMinDateTime = () => {
+  const now = new Date();
+  now.setHours(now.getHours() + 24);
+  return now.toISOString().slice(0, 16);
+};
+
+const ProposalButton = ({
+  selectedCard,
+  travelPlanId,
+  currentParticipants,
+  minPeople,
+}) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isScheduled, setIsScheduled] = useState(false);
   const [showDateInput, setShowDateInput] = useState(false);
@@ -56,6 +68,19 @@ const ProposalButton = ({ travelPlanId, currentParticipants, minPeople }) => {
       Swal.fire({
         title: '❌ 잘못된 입력!',
         text: '올바른 날짜 형식을 입력해주세요.',
+        icon: 'error',
+        confirmButtonText: '확인',
+      });
+      return;
+    }
+
+    // 선택한 시간이 최소 24시간 이후인지 체크
+    const minDateTime = new Date();
+    minDateTime.setHours(minDateTime.getHours() + 24);
+    if (parsedDate.getTime() < minDateTime.getTime()) {
+      Swal.fire({
+        title: '❌ 잘못된 시간!',
+        text: '날짜와 시간은 현재로부터 최소 24시간 이후여야 합니다.',
         icon: 'error',
         confirmButtonText: '확인',
       });
@@ -129,7 +154,7 @@ const ProposalButton = ({ travelPlanId, currentParticipants, minPeople }) => {
   };
 
   return (
-    <div className="p-4 text-center bg-yellow-100 rounded-lg md:w-1/3">
+    <div className="relative p-4 text-center bg-yellow-100 rounded-lg md:w-1/3">
       <button
         className={`px-4 py-2 text-white rounded-md ${
           isEnabled
@@ -142,11 +167,16 @@ const ProposalButton = ({ travelPlanId, currentParticipants, minPeople }) => {
         {isSubmitting ? '설정 중...' : '여행사에 제안하기'}
       </button>
       {showDateInput && (
-        <div className="flex flex-col items-center mt-4">
+        // 절대 위치로 버튼 위에 표시되도록 설정 (필요에 따라 top 값을 조정하세요)
+        <div
+          className="absolute flex flex-col items-center p-4 transform -translate-x-1/2 bg-white rounded-lg shadow-lg left-1/2 -top-20"
+          style={{ zIndex: 1000 }}
+        >
           <input
             type="datetime-local"
             value={closeTime}
             onChange={handleDateTimeChange}
+            min={getMinDateTime()}
             className="p-2 border rounded-md"
           />
           <button

@@ -27,7 +27,7 @@ const LoginForm = ({ isCompany }) => {
         useAuthStore.getState().setUser(true);
 
         // 기업 로그인 시 마이페이지로 이동, 일반 로그인 시 홈으로 이동
-        navigate(isCompany ? '/mypage' : '/');
+        navigate(isCompany ? '/agency-room' : '/');
       } else {
         setErrorMessage('로그인 실패');
       }

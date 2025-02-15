@@ -1,17 +1,17 @@
-import React, { useState, useContext, useEffect, useMemo } from "react";
+import React, { useContext, useState, useMemo, useEffect } from "react";
 import ProposalDetailContext from "../../contexts/ProposalDetailContext";
 import {
   SidebarContainer,
   ButtonList,
   ScheduleButton,
   DetailButton,
+  SubmitButton,
 } from "./style/DateSidebarStyle";
 
-const DateSidebar = () => {
+const DateSidebar = ({ onToggleDetailForm, onDaySelect, onSubmit }) => {
   const { proposal, setSelectedDay, selectedDayId } = useContext(ProposalDetailContext);
   const [detailActive, setDetailActive] = useState(false);
 
-  // 훅은 항상 호출되어야 하므로 여기서 travelDays를 메모이제이션
   const travelDays = useMemo(() => {
     if (!proposal) return [];
     const { startDate, endDate } = proposal.data.travelPlan;
@@ -30,22 +30,22 @@ const DateSidebar = () => {
 
   useEffect(() => {
     if (proposal && selectedDayId === null && travelDays.length > 0) {
-      setSelectedDay(travelDays[0].id); // 첫 번째 일자(1일차)를 기본으로 설정
+      setSelectedDay(travelDays[0].id);
     }
   }, [proposal, selectedDayId, travelDays, setSelectedDay]);
 
-  // proposal이 없으면 여기서 로딩 상태를 반환
   if (!proposal) {
     return <div>Loading...</div>;
   }
 
-  // 나머지 렌더링
   const handleDaySelect = (dayId) => {
     setSelectedDay(dayId);
+    if (onDaySelect) onDaySelect(dayId);
   };
 
   const handleDetailClick = () => {
     setDetailActive((prev) => !prev);
+    if (onToggleDetailForm) onToggleDetailForm();
   };
 
   return (
@@ -64,6 +64,9 @@ const DateSidebar = () => {
           상세내용
         </DetailButton>
       </ButtonList>
+      <SubmitButton onClick={onSubmit} >
+           제출
+      </SubmitButton>
     </SidebarContainer>
   );
 };

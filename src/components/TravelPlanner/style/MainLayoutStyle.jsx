@@ -5,7 +5,7 @@ export const StyledMainLayout = styled.div`
   display: flex;
   width: 100%;
   flex-direction: row; /* 수평 배열, 기본값이므로 생략 가능 */
-
+  height: 100%;
 `;
 
 export const StyledDateSidebar = styled.div`
@@ -17,13 +17,13 @@ export const StyledDateSidebar = styled.div`
 
 export const StyledMapDisplay = styled.div`
   display: flex;
-  width: 72%;
+  width: 100%;
   margin: 10px 0px;
 `;
 
 export const StyleScheduleByDate = styled.div`
   display: flex;
-  width: 18%;
+  width: 25%;
 
 `;
 
@@ -40,23 +40,25 @@ export const StylePlaceSelection = styled.div`
   left: 0;
   z-index: 10; /* MapDisplay보다 높은 값으로 설정 */
   width: 30%;
-  height: 565px;
+  height: 100%;;
   /* 필요에 따라 배경색, 투명도 등 추가 스타일 적용 가능 */
   background-color: white;
-  
-  
+  opacity: 1;
 `;
 
-export const StyledOverlayButton = styled.button`
-  position: absolute;
-  top: 20px;   /* 지도 상단에서 20px 아래 */
-  right: 20px;   /* 지도 우측에서 20px 떨어짐 */
-  z-index: 20;   /* PlaceSelection보다 높은 z-index */
-  padding: 10px 20px;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: border-color 0.3s ease;
+export const DetailFormWrapper = styled.div`
+  height: 90%;
+  width: 90%;  /* 원하는 크기 설정 */
+  background-color: rgba(255, 255, 255, 0.95); /* 약간 투명한 배경 */
+  padding: 20px;
+
+`;
+
+export const ContentArea = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  padding-top:10px;
+  margin: 0;
 
 `;

@@ -20,13 +20,13 @@ import TravelProposal from './pages/TravelProposal';
 import AOS from 'aos';
 import 'aos/dist/aos.css'; // AOS 스타일 불러오기
 const App = () => {
-  // useEffect(() => {
-  //   // AOS 초기화
-  //   AOS.init({
-  //     duration: 1000, // 애니메이션 지속 시간 (기본값: 400ms)
-  //     once: true, // 애니메이션을 한 번만 실행 (기본값: false)
-  //   });
-  // }, []);
+  useEffect(() => {
+    // AOS 초기화
+    AOS.init({
+      duration: 1000, // 애니메이션 지속 시간 (기본값: 400ms)
+      once: true, // 애니메이션을 한 번만 실행 (기본값: false)
+    });
+  }, []);
 
   return (
     <Router>
@@ -45,7 +45,7 @@ const App = () => {
           path="/agency-detail/:travelPlanId"
           element={<ProposalDetail />}
         />
-        <Route path="/user-vote" element={<UserVotePage />} />
+        <Route path="/user-vote/:travelPlanId" element={<UserVotePage />} />
         <Route path="/oauth/success" element={<OAuthSuccessPage />} />
 
         <Route

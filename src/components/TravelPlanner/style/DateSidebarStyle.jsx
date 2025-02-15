@@ -1,8 +1,13 @@
 // style/DateSidebarStyle.jsx
 import styled from 'styled-components';
 
-// Sidebar 전체 컨테이너 (p-4)
+// Sidebar 전체 컨테이너
 export const SidebarContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* 전체 높이를 채우도록 설정 */
+  justify-content: space-between;
+  padding: 0px;
 
 `;
 
@@ -39,4 +44,17 @@ export const DetailButton = styled.button`
   height: 4rem;
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 
+`;
+
+export const SubmitButton = styled.button`
+  background-color: #412B2B;
+  color: #FFFFFF;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border: 2px solid #C9C9C9;
+  border-radius: 0.5rem;
+  width: 6.5rem;
+  height: 4rem;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 `;

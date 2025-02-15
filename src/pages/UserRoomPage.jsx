@@ -32,7 +32,9 @@ const UserRoom = () => {
   const fetchRoomData = async (id) => {
     console.log('📌 API 요청 ID:', id);
     try {
-      const response = await publicRequest.get(`/api/v1/travel-plans/${id}`);
+      const response = await publicRequest.get(
+        `/api/v1/travel-plans/${id}/members`,
+      );
       if (response.data?.data?.travelPlan) {
         setSelectedCard(response.data.data.travelPlan);
         console.log('✅ 여행방 데이터:', response.data.data.travelPlan);
@@ -75,7 +77,7 @@ const UserRoom = () => {
             }`}
             style={{ width: '320px', zIndex: 10 }}
           >
-            <div className="relative h-full bg-white shadow-lg">
+            <div className="relative h-full bg-white ">
               <FavoriteList selectedCard={selectedCard} />
               {/* ✅ 닫기 버튼 */}
               <button

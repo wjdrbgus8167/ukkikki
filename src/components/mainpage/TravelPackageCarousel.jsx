@@ -156,6 +156,7 @@ const TravelPackageCarousel = () => {
       {/* ✅ 컨텐츠 영역 */}
       <div className="relative flex flex-col items-center justify-between w-full px-8 py-16 md:flex-row">
         {/* 왼쪽 텍스트 */}
+
         <div className="w-full pl-16 text-center md:w-1/3 md:text-left text-brown">
           <h2 className="text-3xl font-bold leading-snug">
             색다른 여행을 떠날
@@ -171,34 +172,36 @@ const TravelPackageCarousel = () => {
 
         {/* 오른쪽 캐러셀 */}
         <div className="w-full mt-10 md:w-2/3 md:mt-0">
-          <Slider {...settings}>
-            {travelPlans.map((plan) => {
-              const cityName = plan.arrivalCity?.name;
-              const imageUrl =
-                imageUrls[cityName] || 'https://via.placeholder.com/400';
+          <div data-aos="fade-left" data-aos-delay="300">
+            <Slider {...settings}>
+              {travelPlans.map((plan) => {
+                const cityName = plan.arrivalCity?.name;
+                const imageUrl =
+                  imageUrls[cityName] || 'https://via.placeholder.com/400';
 
-              return (
-                <div key={plan.travelPlanId} className="p-4">
-                  <div className="overflow-hidden bg-white rounded-lg shadow-lg">
-                    {/* ✅ Unsplash에서 가져온 이미지 사용 */}
-                    <img
-                      src={imageUrl}
-                      alt={plan.name}
-                      className="object-cover w-full h-48"
-                    />
-                    <div className="p-4">
-                      <h3 className="text-lg font-semibold text-gray-800">
-                        {plan.name}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        {plan.departureCity?.name} → {plan.arrivalCity?.name}
-                      </p>
+                return (
+                  <div key={plan.travelPlanId} className="p-4">
+                    <div className="overflow-hidden bg-white rounded-lg shadow-lg">
+                      {/* ✅ Unsplash에서 가져온 이미지 사용 */}
+                      <img
+                        src={imageUrl}
+                        alt={plan.name}
+                        className="object-cover w-full h-48"
+                      />
+                      <div className="p-4">
+                        <h3 className="text-lg font-semibold text-gray-800">
+                          {plan.name}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {plan.departureCity?.name} → {plan.arrivalCity?.name}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </Slider>
+                );
+              })}
+            </Slider>
+          </div>
         </div>
       </div>
     </div>

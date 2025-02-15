@@ -2,7 +2,12 @@
 import styled from "styled-components";
 
 export const StyledContainer = styled.div`
-  margin: 5px;
+  margin-top: 14px;
+  padding: 0px 5px;
+
+  .place-list {
+   height:550px;
+   overflow-y:auto;
 `;
 
 
@@ -50,6 +55,8 @@ export const TabButton = styled.div`
   }
 `;
 
-export const StylePlaceList = styled.div`
-
+export const StylePlaceContainer = styled.div`
+  margin: 10px;
+ }
 `;
+
