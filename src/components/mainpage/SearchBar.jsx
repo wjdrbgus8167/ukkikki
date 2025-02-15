@@ -25,6 +25,12 @@ const SearchBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (location.state?.createGroup) {
+      setSearchType('createGroup');
+    }
+  }, [location.state]);
+
   const API_KEY = import.meta.env.VITE_APP_AIRPORT_API_KEY;
   const API_BASE_URL = '/api/public/service/rest/FlightScheduleList/getIflightScheduleList';
   // ✅ 날짜 포맷 변환 함수
@@ -90,7 +96,7 @@ const SearchBar = () => {
     console.log('🚀 최종 도착 도시 ID:', arrivalCityId);
     console.log('🚀 최종 출발일:', startDate);
     console.log('🚀 최종 도착일:', endDate);
-  
+
     if (!startDate || !endDate || !arrivalCityId || !departureCityId) {
       Swal.fire(
         '알림',
@@ -99,12 +105,12 @@ const SearchBar = () => {
       );
       return;
     }
-  
+
     const depDate = startDate.toISOString().split('T')[0].replace(/-/g, '');
     const arrDate = endDate.toISOString().split('T')[0].replace(/-/g, '');
-  
+
     const decodedApiKey = decodeURIComponent(API_KEY);
-  
+
     const departureParams = {
       serviceKey: decodedApiKey,
       schDate: depDate,
@@ -117,10 +123,10 @@ const SearchBar = () => {
       schDeptCityCode: arrivalAirport,
       schArrvCityCode: departureAirport,
     };
-  
+
     console.log('🛫 출발 항공편 요청 파라미터:', departureParams);
     console.log('🛬 도착 항공편 요청 파라미터:', returnParams);
-    
+
     const headers = {
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
       'Accept-Encoding': 'gzip, deflate',
@@ -131,23 +137,21 @@ const SearchBar = () => {
       'Upgrade-Insecure-Requests': '1',
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0'
     };
-    
+
     try {
-      const departureResponse = await publicRequest.get(API_BASE_URL,{
-          params: departureParams,
-          headers: headers,
-        },
-      );
-      const returnResponse = await publicRequest.get(API_BASE_URL,{
-          params: returnParams,
-          headers: headers,
-        },
-      );
-  
+      const departureResponse = await publicRequest.get(API_BASE_URL, {
+        params: departureParams,
+        headers: headers,
+      });
+      const returnResponse = await publicRequest.get(API_BASE_URL, {
+        params: returnParams,
+        headers: headers,
+      });
+
       // 디버깅: 전체 응답 객체 출력
       console.log('✈️ 출발 항공편 전체 응답:', departureResponse.data);
       console.log('✈️ 도착 항공편 전체 응답:', returnResponse.data);
-  
+
       // 항공편 데이터 추출 (항공편 데이터가 단일 객체로 반환될 수도 있으므로 배열 처리)
       let departureFlights =
         departureResponse.data.response?.body?.items?.item || [];
@@ -158,10 +162,10 @@ const SearchBar = () => {
       if (returnFlights && !Array.isArray(returnFlights)) {
         returnFlights = [returnFlights];
       }
-  
+
       console.log('🛫 출발 항공편 데이터:', departureFlights);
       console.log('🛬 도착 항공편 데이터:', returnFlights);
-  
+
       if (departureFlights.length > 0 && returnFlights.length > 0) {
         setIsModalOpen(true);
       } else {

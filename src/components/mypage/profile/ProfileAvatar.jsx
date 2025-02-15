@@ -1,24 +1,72 @@
-// ProfileAvatar.jsx
-import React from 'react';
+import React, { useRef, useState } from 'react';
+import { publicRequest } from '../../../hooks/requestMethod';
+import Swal from 'sweetalert2';
 
-const ProfileAvatar = () => {
-  // 보통 props나 전역 상태(예: userContext)에서 사용자 정보를 받아옵니다.
-  const userImage = null; // null이면 기본 아바타 이미지를 표시한다고 가정
+const ProfileAvatar = ({ profileImageUrl }) => {
+  const [imageUrl, setImageUrl] = useState(profileImageUrl);
+  const fileInputRef = useRef(null);
+
+  const handleAvatarClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await publicRequest.put(
+        '/api/v1/members/profile/image',
+        formData,
+        {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
+      if (response.status === 200) {
+        Swal.fire({
+          title: '업로드 성공',
+          icon: 'success',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: '확인',
+        });
+
+        const newUrl = response.data.data.profileImageUrl;
+        setImageUrl(newUrl);
+      }
+    } catch (error) {
+      console.error('프로필 이미지 업로드 실패:', error);
+      Swal.fire({
+        title: '업로드 실패',
+        text: '다시 시도해주세요.',
+        icon: 'error',
+        confirmButtonColor: '#d33',
+        confirmButtonText: '확인',
+      });
+    }
+  };
 
   return (
     <div className="flex flex-col items-center mb-8">
-      {/* 아바타 (원형) */}
-      <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center mb-2">
-        {userImage ? (
+      {/* 아바타 영역: 클릭하면 파일 선택창이 열림 */}
+      <div
+        onClick={handleAvatarClick}
+        className="w-36 h-36 rounded-full bg-gray-200 flex items-center justify-center mb-2 cursor-pointer shadow-lg"
+      >
+        {imageUrl ? (
           <img
-            src={userImage}
+            src={imageUrl}
             alt="User Avatar"
             className="w-full h-full object-cover rounded-full"
           />
         ) : (
-          // 사용자 이미지가 없을 때 아이콘이나 기본 이미지 표시
           <svg
-            className="w-12 h-12 text-gray-400"
+            className="w-16 h-16 text-gray-400"
             fill="currentColor"
             viewBox="0 0 24 24"
           >
@@ -27,6 +75,14 @@ const ProfileAvatar = () => {
         )}
       </div>
 
+      {/* 숨겨진 파일 input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        onChange={handleFileChange}
+        accept="image/*"
+      />
     </div>
   );
 };

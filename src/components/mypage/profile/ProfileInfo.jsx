@@ -1,14 +1,25 @@
-// ProfileInfo.jsx
 import React from 'react';
 import { FaEnvelope } from 'react-icons/fa';
+import { SiKakaotalk, SiGoogle } from 'react-icons/si';
 
-const ProfileInfo = ({user}) => {
-  const {name, email} = user;
+const ProfileInfo = ({ user }) => {
+  const { name, email, provider } = user;
+
+  let socialIcon;
+  if (!provider || provider === '') {
+    socialIcon = <FaEnvelope className="mr-2 text-xl no-margin" />;
+  } else if (provider.toLowerCase() === 'kakao') {
+    socialIcon = <SiKakaotalk className="mr-2 text-xl text-yellow no-margin" />;
+  } else if (provider.toLowerCase() === 'google') {
+    socialIcon = <SiGoogle className="mr-2 text-xl text-progress no-margin" />;
+  } else {
+    socialIcon = <FaEnvelope className="mr-2 text-xl" />;
+  }
 
   const details = [
     { label: '이름', value: name },
     { label: '이메일', value: email },
-    { label: '소셜계정', value: 'aaa.@naver.com', icon: <FaEnvelope className="mr-2 text-xl" /> },
+    { label: '소셜계정', value: provider, icon: socialIcon },
   ];
 
   return (
@@ -18,7 +29,10 @@ const ProfileInfo = ({user}) => {
           <div className="w-24 flex-none font-semibold text-gray-700">
             {detail.label}
           </div>
-          <div className="text-gray-500 flex items-center">
+          <div
+            className="text-gray-500 flex items-center"
+            style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.2)' }}
+          >
             {detail.icon && detail.icon}
             <span>{detail.value}</span>
           </div>
@@ -26,23 +40,6 @@ const ProfileInfo = ({user}) => {
       ))}
     </div>
   );
-
-  // return (
-  //   <div>
-  //     {/* <div className="justify-between flex items-center">
-  //       <h3 className="font-bold text-gray-700">연결된 소셜계정</h3>
-  //       <FaEnvelope className="mr-2 text-xl" />
-  //     </div> */}
-  //     <div className="justify-between flex mb-2">
-  //       <div className="font-semibold text-gray-700">이름</div>
-  //       <div className='text-gray-500'>{name}</div>
-  //     </div>
-  //     <div className="justify-between flex mb-2">
-  //       <div className="font-semibold text-gray-700">이메일</div>
-  //       <div className='text-gray-500'>{email}</div>
-  //     </div>
-  //   </div>
-  // );
 };
 
 export default ProfileInfo;

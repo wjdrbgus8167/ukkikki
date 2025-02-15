@@ -8,8 +8,8 @@ import AgencyRoomList from './pages/AgencyRoomListPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import LoadingSpinner from './components/common/LoadingSpinner';
-import MyRoom from './pages/UserMyPage';
-import MyPage from './pages/TestMyPage';
+import MyRoomsPage from './pages/MyRoomsPage';
+import MyPage from './pages/MyPage';
 
 import TravelCreate from './pages/TravelCreatePage';
 import ProposalDetail from './pages/ProposalDetailPage';
@@ -34,7 +34,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
-        <Route path="/myroom" element={<MyRoom />} />
+        <Route path="/myroom" element={<MyRoomsPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<RegisterPage />} />
         <Route path="/mypage/*" element={<MyPage />} />

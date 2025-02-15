@@ -80,3 +80,7 @@ body {
 .max-h-96.overflow-y-auto::-webkit-scrollbar {
   display: none;
 }
+
+.no-margin {
+  margin: 0 !important;
+}

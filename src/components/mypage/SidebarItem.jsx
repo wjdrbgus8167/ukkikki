@@ -1,11 +1,19 @@
 // SidebarItem.jsx
 import React from 'react';
 
-const SidebarItem = ({ icon, label, href, active }) => {
+const SidebarItem = ({ icon, label, href, active, onClick }) => {
+  const handleClick = (e) => {
+    if (onClick) {
+      e.preventDefault();
+      onClick(e);
+    }
+  };
+
   return (
     <li className="w-full">
       <a
-        href={href}
+        href={href || '#'}
+        onClick={handleClick}
         className={`flex w-full items-center px-4 py-2 rounded-md transition-colors text-lg 
           ${
             active
@@ -13,7 +21,6 @@ const SidebarItem = ({ icon, label, href, active }) => {
               : 'text-gray-600 hover:bg-gray-50'
           }`}
       >
-        {/* 아이콘이 있을 경우만 출력 */}
         {icon && <span className="mr-2">{icon}</span>}
         <span>{label}</span>
       </a>

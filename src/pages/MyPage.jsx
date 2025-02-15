@@ -1,11 +1,10 @@
-// UserMyPage.jsx
 import React from 'react';
 import Header from '../components/layout/Header';
 import Sidebar from '../components/mypage/Sidebar';
 import { Routes, Route } from 'react-router-dom';
 import UserProfile from '../components/mypage/profile/UserProfile';
 import MyRooms from '../components/mypage/myroom/MyRooms';
-const UserMyPage = () => {
+const MyPage = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -32,4 +31,4 @@ const UserMyPage = () => {
   );
 };
 
-export default UserMyPage;
+export default MyPage;
