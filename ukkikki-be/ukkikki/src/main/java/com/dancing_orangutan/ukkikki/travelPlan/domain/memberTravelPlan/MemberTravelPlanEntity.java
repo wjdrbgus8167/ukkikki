@@ -1,5 +1,7 @@
 package com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravelPlan;
 
+import com.dancing_orangutan.ukkikki.global.error.ApiException;
+import com.dancing_orangutan.ukkikki.global.error.ErrorCode;
 import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import jakarta.persistence.Column;
@@ -105,6 +107,7 @@ public class MemberTravelPlanEntity {
 	public boolean hasJoined(Integer memberId) {
 		return member.getMemberId().equals(memberId);
 	}
+
 }
 
 

@@ -32,6 +32,7 @@ public enum ErrorCode {
     TRAVEL_PLAN_NOT_FOUND(HttpStatus.NOT_FOUND,"TP001", "해당 여행 계획을 찾을 수 없습니다."),
     MINIMUM_PARTICIPANTS_NOT_FULFILLED(HttpStatus.BAD_REQUEST, "TP002", "최소 인원을 충족하지 못하여 제출할 수 없습니다."),
 	TRAVEL_PLAN_NOT_AUTHORIZED(HttpStatus.FORBIDDEN,"TP003","해당 작업을 수행할 권한이 없습니다."),
+	TRAVEL_PLAN_NOT_JOINED(HttpStatus.NOT_FOUND,"TP004", "해당 여행 계획에 참여 중이지 않습니다."),
 
 	//MEMBER_TRAVEL_PLAN
 	MEMBER_TRAVEL_PLAN_NOT_FOUND(HttpStatus.NOT_FOUND,"MTP001","해당 멤버-여행계획을 찾을 수 없습니다."),

@@ -41,7 +41,8 @@ public record FetchTravelPlanDetailsByMemberResponse(TravelPlanResponse travelPl
 			int currentParticipants,
 			List<KeywordResponse> keywords,
 			List<PlaceResponse> places,
-			LocalDateTime closeTime
+			LocalDateTime closeTime,
+			MyInfo member
 	) {
 		private static TravelPlanResponse fromEntity(TravelPlanEntity entity, Integer memberId) {
 			return TravelPlanResponse.builder()
@@ -62,6 +63,11 @@ public record FetchTravelPlanDetailsByMemberResponse(TravelPlanResponse travelPl
 					.places(entity.getPlaces().stream()
 							.map(placeEntity-> PlaceResponse.fromEntity(placeEntity,memberId))
 							.toList())
+					.member(entity.getMemberTravelPlans().stream()
+							.filter(memberTravelPlan -> memberTravelPlan.hasJoined(memberId))
+							.findFirst()
+							.map(MyInfo::fromEntity)
+							.orElse(null))
 					.build();
 		}
 	}
@@ -134,5 +140,16 @@ public record FetchTravelPlanDetailsByMemberResponse(TravelPlanResponse travelPl
 					.build();
 		}
 
+	}
+
+	@Builder
+	private record MyInfo(
+			int totalParticipants
+	) {
+		private static MyInfo fromEntity(MemberTravelPlanEntity entity) {
+			return MyInfo.builder()
+					.totalParticipants(entity.calTotalParticipants())
+					.build();
+		}
 	}
 }
