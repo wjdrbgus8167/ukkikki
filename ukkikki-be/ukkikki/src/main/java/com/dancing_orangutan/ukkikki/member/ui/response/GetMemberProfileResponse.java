@@ -9,4 +9,5 @@ public class GetMemberProfileResponse {
     private final String email;
     private final String name;
     private final String profileImageUrl;
+    private final String provider;
 }

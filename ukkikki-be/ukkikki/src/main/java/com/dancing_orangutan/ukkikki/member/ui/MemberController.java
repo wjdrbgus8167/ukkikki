@@ -28,9 +28,9 @@ public class MemberController {
                                 .email(memberUserDetails.getEmail())
                                 .name(memberUserDetails.getName())
                                 .profileImageUrl(memberUserDetails.getProfileImageUrl())
+                                .provider(memberUserDetails.getProvider())
                                 .build()
                 );
-
     }
 
 
