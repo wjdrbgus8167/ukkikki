@@ -57,6 +57,9 @@ dependencies {
 
     // MongoDb 의존성 추가
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+    // Openvidu 의존성 추가
+    implementation group: 'io.openvidu', name: 'openvidu-java-client', version: '2.29.0'
 }
 
 // 1. Q-Class를 생성할 디렉토리 경로 설정
