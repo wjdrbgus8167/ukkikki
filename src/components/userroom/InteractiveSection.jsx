@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GoogleMap, InfoWindow, OverlayView } from '@react-google-maps/api';
-import FavoriteList from './FavoriteList';
 import Chat from './Chat';
 import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
@@ -8,26 +7,15 @@ import bananaIcon from '../../assets/loading-spinner.png';
 
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
-const InteractiveSection = ({ selectedCard }) => {
-  console.log('InteractiveSection-selectedCard:', selectedCard);
-  const [favorites, setFavorites] = useState([]);
+const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [coordinates, setCoordinates] = useState({
     lat: 35.6895,
     lng: 139.6917,
   });
   const [selectedMarker, setSelectedMarker] = useState(null);
-
-  // 태그 추가 관련 상태
   const [showTagInput, setShowTagInput] = useState(false);
   const [newTag, setNewTag] = useState('');
-
-  // DB에 저장된 favorites (selectedCard.places)에 태그 배열, likeCount, liked 등이 포함되어 있다고 가정
-  useEffect(() => {
-    if (selectedCard && Array.isArray(selectedCard.places)) {
-      setFavorites(selectedCard.places);
-    }
-  }, [selectedCard]);
 
   useEffect(() => {
     if (!selectedCard || !selectedCard.arrivalCity?.name) return;
@@ -46,51 +34,13 @@ const InteractiveSection = ({ selectedCard }) => {
       }
     };
     getCoordinates();
-  }, [selectedCard, apiKey]);
-
-  const fetchPlaceDetails = async (placeId) => {
-    const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,rating,photos,formatted_address&key=${apiKey}`;
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      if (data.status === 'OK') {
-        return data.result;
-      } else {
-        console.error('Place Details API error:', data.status);
-      }
-    } catch (error) {
-      console.error('🚨 Places API 요청 실패:', error);
-    }
-    return null;
-  };
+  }, [selectedCard]);
 
   const handleMarkerClick = async (marker) => {
-    // marker나 marker.placeId가 유효하지 않으면 아무 작업도 하지 않습니다.
-    if (!marker || !marker.placeId) return;
-    try {
-      const placeDetails = await fetchPlaceDetails(marker.placeId);
-      if (placeDetails) {
-        let photoUrl = null;
-        if (placeDetails.photos && placeDetails.photos.length > 0) {
-          const photoReference = placeDetails.photos[0].photo_reference;
-          photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${apiKey}`;
-        }
-        setSelectedMarker({
-          ...marker,
-          name: placeDetails.name,
-          address: placeDetails.formatted_address,
-          photo: photoUrl,
-          // DB favorites에 저장된 tags, likeCount, liked 값을 그대로 사용
-        });
-        // 초기 태그 입력창 상태 초기화
-        setShowTagInput(false);
-        setNewTag('');
-      } else {
-        setSelectedMarker(marker);
-      }
-    } catch (error) {
-      console.error('🚨 fetchPlaceDetails 오류:', error);
-    }
+    setSelectedMarker({
+      ...marker,
+      likeYn: marker.likeYn,
+    });
   };
 
   const handleLikePlace = async (place) => {
@@ -98,46 +48,41 @@ const InteractiveSection = ({ selectedCard }) => {
       console.error('🚨 장소 정보 또는 여행방 ID가 없습니다.');
       return;
     }
+
     const travelPlanId = selectedCard.travelPlanId;
     const placeId = place.placeId;
+    const isLiked = place.likeYn;
+    const totalMember = selectedCard.member.totalParticipants;
+
     try {
-      if (place.liked) {
+      let updatedMarker;
+      if (isLiked) {
         await publicRequest.delete(
           `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
         );
-        setFavorites((prev) =>
-          prev.map((fav) =>
-            fav.placeId === placeId
-              ? { ...fav, liked: false, likeCount: fav.likeCount - 1 }
-              : fav,
-          ),
-        );
-        if (selectedMarker && selectedMarker.placeId === placeId) {
-          setSelectedMarker((prev) => ({
-            ...prev,
-            liked: false,
-            likeCount: prev.likeCount - 1,
-          }));
-        }
+        updatedMarker = {
+          ...place,
+          likeYn: false,
+          isLiked: false,
+
+          likeCount: place.likeCount - totalMember,
+        };
       } else {
         await publicRequest.post(
           `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
         );
-        setFavorites((prev) =>
-          prev.map((fav) =>
-            fav.placeId === placeId
-              ? { ...fav, liked: true, likeCount: fav.likeCount + 1 }
-              : fav,
-          ),
-        );
-        if (selectedMarker && selectedMarker.placeId === placeId) {
-          setSelectedMarker((prev) => ({
-            ...prev,
-            liked: true,
-            likeCount: prev.likeCount + 1,
-          }));
-        }
+        updatedMarker = {
+          ...place,
+          likeYn: true,
+          isLiked: true,
+          likeCount: place.likeCount + totalMember,
+        };
       }
+      // 부모 상태 업데이트: favorites 리스트 내 해당 장소의 상태를 변경
+      setFavorites((prev) =>
+        prev.map((fav) => (fav.placeId === placeId ? updatedMarker : fav)),
+      );
+      setSelectedMarker(updatedMarker);
     } catch (error) {
       console.error('🚨 좋아요 처리 실패:', error);
       Swal.fire('알림', '🚨 좋아요 처리 중 오류가 발생했습니다.', 'error');
@@ -194,27 +139,19 @@ const InteractiveSection = ({ selectedCard }) => {
               mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
             >
               <div
-                className="relative cursor-pointer w-14 h-14 hover:animate-shake" // 크기 조정
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleMarkerClick(marker);
-                }}
+                className="relative cursor-pointer w-14 h-14 hover:animate-shake"
+                onClick={() => handleMarkerClick(marker)}
               >
-                {/* 바나나 아이콘 */}
                 <img src={bananaIcon} alt="marker" className="w-full h-full" />
-                {/* 오른쪽 상단 하트 아이콘 */}
                 <div className="absolute text-xl transform translate-x-1/2 -translate-y-1/2 right-2 top-6">
-                  {marker.liked ? '❤️' : '🤍'}
+                  {marker.likeYn ? '❤️' : '🤍'}
                 </div>
-                {/* 중앙 좋아요 수 */}
                 <div className="absolute inset-0 flex items-center justify-center font-bold transform translate-y-1/4">
                   {marker.likeCount || 0}
                 </div>
               </div>
             </OverlayView>
           ))}
-
-          {/* 선택된 마커의 InfoWindow */}
           {selectedMarker && (
             <InfoWindow
               position={{
@@ -237,12 +174,11 @@ const InteractiveSection = ({ selectedCard }) => {
                     {selectedMarker.address}
                   </p>
                 )}
-                {/* 오른쪽 상단 좋아요 버튼 (하트 아이콘만 표시) */}
                 <button
                   onClick={() => handleLikePlace(selectedMarker)}
-                  className="absolute p-2 text-xl rounded-full top-2 right-2"
+                  className="absolute p-2 text-xl rounded-full top-2 right-2 focus:outline-none"
                 >
-                  {selectedMarker.liked ? '❤️' : '🤍'}
+                  {selectedMarker.likeYn ? '❤️' : '🤍'}
                 </button>
                 {/* 태그 영역 */}
                 <div className="mt-4">
