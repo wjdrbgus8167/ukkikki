@@ -47,6 +47,7 @@ const FavoriteList = ({ selectedCard }) => {
     const travelPlanId = selectedCard.travelPlanId;
     const placeId = place.placeId;
     const isLiked = place.isLiked;
+    const totalMember = selectedCard.member.totalParticipants;
 
     try {
       if (!isLiked) {
@@ -59,7 +60,7 @@ const FavoriteList = ({ selectedCard }) => {
               fav.placeId === placeId
                 ? {
                     ...fav,
-                    likeCount: fav.likeCount + 1,
+                    likeCount: fav.likeCount + totalMember,
                     isLiked: true,
                     likeYn: true,
                   }
@@ -78,7 +79,7 @@ const FavoriteList = ({ selectedCard }) => {
               fav.placeId === placeId
                 ? {
                     ...fav,
-                    likeCount: fav.likeCount - 1,
+                    likeCount: fav.likeCount - totalMember,
                     isLiked: false,
                     likeYn: false,
                   }

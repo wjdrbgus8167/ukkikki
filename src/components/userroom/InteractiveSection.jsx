@@ -65,32 +65,10 @@ const InteractiveSection = ({ selectedCard }) => {
   };
 
   const handleMarkerClick = async (marker) => {
-    // marker나 marker.placeId가 유효하지 않으면 아무 작업도 하지 않습니다.
-    if (!marker || !marker.placeId) return;
-    try {
-      const placeDetails = await fetchPlaceDetails(marker.placeId);
-      if (placeDetails) {
-        let photoUrl = null;
-        if (placeDetails.photos && placeDetails.photos.length > 0) {
-          const photoReference = placeDetails.photos[0].photo_reference;
-          photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${apiKey}`;
-        }
-        setSelectedMarker({
-          ...marker,
-          name: placeDetails.name,
-          address: placeDetails.formatted_address,
-          photo: photoUrl,
-          // DB favorites에 저장된 tags, likeCount, liked 값을 그대로 사용
-        });
-        // 초기 태그 입력창 상태 초기화
-        setShowTagInput(false);
-        setNewTag('');
-      } else {
-        setSelectedMarker(marker);
-      }
-    } catch (error) {
-      console.error('🚨 fetchPlaceDetails 오류:', error);
-    }
+    setSelectedMarker({
+      ...marker,
+      likeYn: marker.likeYn, // ✅ 기존 좋아요 상태 유지
+    });
   };
 
   const handleLikePlace = async (place) => {
@@ -98,52 +76,53 @@ const InteractiveSection = ({ selectedCard }) => {
       console.error('🚨 장소 정보 또는 여행방 ID가 없습니다.');
       return;
     }
+
     const travelPlanId = selectedCard.travelPlanId;
     const placeId = place.placeId;
+    const isLiked = place.likeYn;
+    const totalMember = selectedCard.member.totalParticipants;
+
     try {
-      if (place.liked) {
+      let updatedFavorites;
+      let updatedMarker;
+
+      if (isLiked) {
         await publicRequest.delete(
           `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
         );
-        setFavorites((prev) =>
-          prev.map((fav) =>
-            fav.placeId === placeId
-              ? { ...fav, liked: false, likeCount: fav.likeCount - 1 }
-              : fav,
-          ),
+        updatedFavorites = favorites.map((fav) =>
+          fav.placeId === placeId
+            ? { ...fav, likeYn: false, likeCount: fav.likeCount - totalMember }
+            : fav,
         );
-        if (selectedMarker && selectedMarker.placeId === placeId) {
-          setSelectedMarker((prev) => ({
-            ...prev,
-            liked: false,
-            likeCount: prev.likeCount - 1,
-          }));
-        }
+        updatedMarker = {
+          ...place,
+          likeYn: false, // ✅ 좋아요 취소 반영
+          likeCount: place.likeCount - totalMember,
+        };
       } else {
         await publicRequest.post(
           `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
         );
-        setFavorites((prev) =>
-          prev.map((fav) =>
-            fav.placeId === placeId
-              ? { ...fav, liked: true, likeCount: fav.likeCount + 1 }
-              : fav,
-          ),
+        updatedFavorites = favorites.map((fav) =>
+          fav.placeId === placeId
+            ? { ...fav, likeYn: true, likeCount: fav.likeCount + totalMember }
+            : fav,
         );
-        if (selectedMarker && selectedMarker.placeId === placeId) {
-          setSelectedMarker((prev) => ({
-            ...prev,
-            liked: true,
-            likeCount: prev.likeCount + 1,
-          }));
-        }
+        updatedMarker = {
+          ...place,
+          likeYn: true, // ✅ 좋아요 반영
+          likeCount: place.likeCount + totalMember,
+        };
       }
+
+      setFavorites(updatedFavorites);
+      setSelectedMarker(updatedMarker); // ✅ 마커 업데이트하여 리렌더링
     } catch (error) {
       console.error('🚨 좋아요 처리 실패:', error);
       Swal.fire('알림', '🚨 좋아요 처리 중 오류가 발생했습니다.', 'error');
     }
   };
-
   // InfoWindow 내 태그 추가 핸들러
   const handleTagSubmit = async () => {
     if (newTag.trim() === '') return;
@@ -194,19 +173,18 @@ const InteractiveSection = ({ selectedCard }) => {
               mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
             >
               <div
-                className="relative cursor-pointer w-14 h-14 hover:animate-shake" // 크기 조정
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleMarkerClick(marker);
-                }}
+                className="relative cursor-pointer w-14 h-14 hover:animate-shake"
+                onClick={() => handleMarkerClick(marker)}
               >
                 {/* 바나나 아이콘 */}
                 <img src={bananaIcon} alt="marker" className="w-full h-full" />
-                {/* 오른쪽 상단 하트 아이콘 */}
+
+                {/* ❤️ 좋아요 하트 아이콘 */}
                 <div className="absolute text-xl transform translate-x-1/2 -translate-y-1/2 right-2 top-6">
-                  {marker.liked ? '❤️' : '🤍'}
+                  {marker.likeYn ? '❤️' : '🤍'}
                 </div>
-                {/* 중앙 좋아요 수 */}
+
+                {/* 좋아요 수 */}
                 <div className="absolute inset-0 flex items-center justify-center font-bold transform translate-y-1/4">
                   {marker.likeCount || 0}
                 </div>
@@ -240,9 +218,9 @@ const InteractiveSection = ({ selectedCard }) => {
                 {/* 오른쪽 상단 좋아요 버튼 (하트 아이콘만 표시) */}
                 <button
                   onClick={() => handleLikePlace(selectedMarker)}
-                  className="absolute p-2 text-xl rounded-full top-2 right-2"
+                  className="absolute p-2 text-xl rounded-full top-2 right-2 focus:outline-none"
                 >
-                  {selectedMarker.liked ? '❤️' : '🤍'}
+                  {selectedMarker.likeYn ? '❤️' : '🤍'}
                 </button>
                 {/* 태그 영역 */}
                 <div className="mt-4">
