@@ -63,6 +63,8 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
         updatedMarker = {
           ...place,
           likeYn: false,
+          isLiked: false,
+
           likeCount: place.likeCount - totalMember,
         };
       } else {
@@ -72,6 +74,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
         updatedMarker = {
           ...place,
           likeYn: true,
+          isLiked: true,
           likeCount: place.likeCount + totalMember,
         };
       }

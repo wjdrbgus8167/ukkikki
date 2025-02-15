@@ -2,8 +2,9 @@
 import React, { useRef, useState } from 'react';
 import { Autocomplete } from '@react-google-maps/api';
 import { FaSearch } from 'react-icons/fa';
+import { publicRequest } from '../../hooks/requestMethod';
 
-const MapSearchBar = ({ onPlaceSelected }) => {
+const MapSearchBar = ({ onPlaceSelected, selectedTravelPlanId }) => {
   const [searchedPlace, setSearchedPlace] = useState(null);
   const [isBookmarked, setIsBookmarked] = useState(false); // ★ 찜 토글 상태
 
@@ -19,7 +20,7 @@ const MapSearchBar = ({ onPlaceSelected }) => {
       console.warn('유효한 장소가 선택되지 않았습니다.');
       return;
     }
-
+    console.log('place:', place);
     // 사진 URL 추출
     const photoUrl =
       place.photos && place.photos.length > 0
@@ -36,21 +37,36 @@ const MapSearchBar = ({ onPlaceSelected }) => {
       longitude: place.geometry.location.lng(),
       photoUrl,
       rating,
+      placeId: place.place_id || Date.now().toString(), // place_id가 없으면 고유값으로 Date.now()를 사용
     };
     setSearchedPlace(newPlace);
     setIsBookmarked(false); // 새 검색 시 찜상태 초기화
   };
 
-  // "찜하기"/"찜 취소" 버튼
-  const handleToggleBookmark = () => {
+  // "좋아요"/"좋아요 취소" 버튼
+  const handleToggleBookmark = async () => {
     if (!searchedPlace) return;
+    try {
+      if (!isBookmarked) {
+        // 부모의 onPlaceSelected 호출하여 favorites 상태 업데이트
+        onPlaceSelected(searchedPlace);
+        setIsBookmarked(true);
 
-    if (!isBookmarked) {
-      onPlaceSelected(searchedPlace); // onPlaceSelected를 호출하도록 수정
-      setIsBookmarked(true);
-    } else {
-      // "찜 취소" 시 로직 추가 (필요한 경우)
-      setIsBookmarked(false);
+        // DB 저장 (API 호출 예시)
+        const response = await publicRequest.post(
+          `/api/v1/travel-plans/${selectedTravelPlanId}/places`,
+          searchedPlace,
+        );
+        if (response.status === 200) {
+          console.log('새 장소가 DB에 저장되었습니다.');
+        }
+      } else {
+        // "좋아요 취소" 처리 (예시로 상태만 업데이트)
+        setIsBookmarked(false);
+      }
+    } catch (error) {
+      console.error('새 장소 저장/삭제 실패:', error);
+      Swal.fire('알림', '🚨 장소 좋아요 처리 중 오류가 발생했습니다.', 'error');
     }
   };
 

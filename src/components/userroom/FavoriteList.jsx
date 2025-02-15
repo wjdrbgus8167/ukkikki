@@ -10,6 +10,7 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
   const [expandedPlaceId, setExpandedPlaceId] = useState(null);
   const [showTagInput, setShowTagInput] = useState(false);
   const [newTag, setNewTag] = useState('');
+  const travelPlanId = selectedCard.travelPlanId;
 
   // MapSearchBar에서 선택 시 부모의 favorites에 추가
   const handlePlaceSelected = (newPlace) => {
@@ -27,9 +28,8 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
   }, [favorites]);
 
   const handleLikeToggle = async (place) => {
-    const travelPlanId = selectedCard.travelPlanId;
     const placeId = place.placeId;
-    const isLiked = place.isLiked; // ★ 일관되게 isLiked 사용
+    const isLiked = place.isLiked;
     const totalMember = selectedCard.member.totalParticipants;
 
     try {
@@ -182,7 +182,10 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
   return (
     <div className="space-y-4">
       {/* MapSearchBar */}
-      <MapSearchBar onPlaceSelected={handlePlaceSelected} />
+      <MapSearchBar
+        onPlaceSelected={handlePlaceSelected}
+        selectedTravelPlanId={travelPlanId}
+      />
 
       {/* 찜한 장소 목록 */}
       {sortedWishlists.map((item, index) => (
