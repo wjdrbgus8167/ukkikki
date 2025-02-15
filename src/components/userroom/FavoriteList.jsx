@@ -1,32 +1,18 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { publicRequest } from '../../hooks/requestMethod';
 import useAuthStore from '../../stores/authStore';
 import Swal from 'sweetalert2';
 import MapSearchBar from '../../services/map/MapSearchBar';
 import { CiCirclePlus } from 'react-icons/ci';
 
-const FavoriteList = ({ selectedCard }) => {
-  const { user } = useAuthStore(); // 현재 로그인한 유저 정보
-  const [favorites, setFavorites] = useState([]);
+const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
+  const { user } = useAuthStore();
   const [expandedPlaceId, setExpandedPlaceId] = useState(null);
   const [showTagInput, setShowTagInput] = useState(false);
   const [newTag, setNewTag] = useState('');
+  const travelPlanId = selectedCard.travelPlanId;
 
-  useEffect(() => {
-    if (selectedCard && selectedCard.places) {
-      // 좋아요 상태는 place.likeYn를 사용하고, 태그 배열은 없으면 빈 배열로 설정
-      const updatedPlaces = selectedCard.places.map((place) => ({
-        ...place,
-        tags: place.tags || [],
-        // 기존 likedUsers 로 체크하던 것 대신, API에서 전달된 likeYn 값을 사용
-        isLiked: place.likeYn,
-      }));
-      setFavorites(updatedPlaces);
-      console.log('📌 좋아요 목록 업데이트:', updatedPlaces);
-    }
-  }, [selectedCard, user]);
-
-  // MapSearchBar에서 장소 선택 시 호출
+  // MapSearchBar에서 선택 시 부모의 favorites에 추가
   const handlePlaceSelected = (newPlace) => {
     setFavorites((prev) => {
       if (prev.some((fav) => fav.name === newPlace.name)) return prev;
@@ -37,16 +23,14 @@ const FavoriteList = ({ selectedCard }) => {
     });
   };
 
-  // 좋아요 순 정렬
   const sortedWishlists = useMemo(() => {
     return [...favorites].sort((a, b) => b.likeCount - a.likeCount);
   }, [favorites]);
 
-  // 좋아요 토글 핸들러
   const handleLikeToggle = async (place) => {
-    const travelPlanId = selectedCard.travelPlanId;
     const placeId = place.placeId;
     const isLiked = place.isLiked;
+    const totalMember = selectedCard.member.totalParticipants;
 
     try {
       if (!isLiked) {
@@ -59,14 +43,13 @@ const FavoriteList = ({ selectedCard }) => {
               fav.placeId === placeId
                 ? {
                     ...fav,
-                    likeCount: fav.likeCount + 1,
+                    likeCount: fav.likeCount + totalMember,
                     isLiked: true,
                     likeYn: true,
                   }
                 : fav,
             ),
           );
-          console.log('👍 좋아요 처리 결과:', response.data);
         }
       } else {
         const response = await publicRequest.delete(
@@ -78,7 +61,7 @@ const FavoriteList = ({ selectedCard }) => {
               fav.placeId === placeId
                 ? {
                     ...fav,
-                    likeCount: fav.likeCount - 1,
+                    likeCount: fav.likeCount - totalMember,
                     isLiked: false,
                     likeYn: false,
                   }
@@ -199,7 +182,10 @@ const FavoriteList = ({ selectedCard }) => {
   return (
     <div className="space-y-4">
       {/* MapSearchBar */}
-      <MapSearchBar onPlaceSelected={handlePlaceSelected} />
+      <MapSearchBar
+        onPlaceSelected={handlePlaceSelected}
+        selectedTravelPlanId={travelPlanId}
+      />
 
       {/* 찜한 장소 목록 */}
       {sortedWishlists.map((item, index) => (
@@ -247,11 +233,16 @@ const FavoriteList = ({ selectedCard }) => {
                       }
                       className={`px-2 py-1 text-sm rounded-full cursor-pointer ${
                         tag.isMyTag
-                          ? 'bg-green-500 text-white'
-                          : 'bg-yellow-200 text-brown'
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-yellow text-brown'
                       }`}
                     >
                       {typeof tag === 'object' ? tag.name : tag}
+                      {tag.isMyTag && (
+                        <span className="inline-flex items-center justify-center w-5 h-5 ml-1 text-xs text-white bg-red-500 rounded-full">
+                          ×
+                        </span>
+                      )}{' '}
                     </span>
                   ))}
                 </div>
@@ -279,10 +270,7 @@ const FavoriteList = ({ selectedCard }) => {
                       }}
                       className="flex items-center justify-center px-2 py-1 text-white bg-blue-500 rounded hover:bg-blue-600"
                     >
-                      <CiCirclePlus
-                        size={35}
-                        style={{ color: 'black', fontWeight: 'bold' }}
-                      />
+                      입력
                     </button>
                   </div>
                 ) : (

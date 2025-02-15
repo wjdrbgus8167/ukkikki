@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { ko } from 'date-fns/locale';
-import axios from 'axios';
 import KoreaAirportModal from '../../services/airport/KoreaAirportSelector';
 import WorldAirportModal from '../../services/airport/WorldAirportSelector';
 import CreateRoomModal from './CreateRoomModal';
@@ -32,7 +31,8 @@ const SearchBar = () => {
   }, [location.state]);
 
   const API_KEY = import.meta.env.VITE_APP_AIRPORT_API_KEY;
-  const API_BASE_URL = '/api/public/service/rest/FlightScheduleList/getIflightScheduleList';
+  const API_BASE_URL =
+    '/api/public/service/rest/FlightScheduleList/getIflightScheduleList';
   // ✅ 날짜 포맷 변환 함수
   const formatDate = (date) => {
     if (!date) return ''; // ✅ 날짜가 없을 경우 빈 문자열 반환
@@ -128,14 +128,16 @@ const SearchBar = () => {
     console.log('🛬 도착 항공편 요청 파라미터:', returnParams);
 
     const headers = {
-      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+      Accept:
+        'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
       'Accept-Encoding': 'gzip, deflate',
       'Accept-Language': 'ko,en;q=0.9,en-US;q=0.8',
       'Cache-Control': 'max-age=0',
-      'Connection': 'keep-alive',
-      'Host': 'openapi.airport.co.kr',
+      Connection: 'keep-alive',
+      Host: 'openapi.airport.co.kr',
       'Upgrade-Insecure-Requests': '1',
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0'
+      'User-Agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0',
     };
 
     try {
