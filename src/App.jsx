@@ -11,7 +11,7 @@ import LoadingSpinner from './components/common/LoadingSpinner';
 import MyRoomsPage from './pages/MyRoomsPage';
 import MyPage from './pages/MyPage';
 
-import TravelCreate from './pages/TravelCreatePage';
+// import TravelCreate from './pages/TravelCreatePage';
 import ProposalDetail from './pages/ProposalDetailPage';
 import UserVotePage from './pages/UserVotePage';
 import OAuthSuccessPage from './components/auth/OAuthSuccessPage';
