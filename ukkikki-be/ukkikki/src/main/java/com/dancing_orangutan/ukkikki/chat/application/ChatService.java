@@ -27,11 +27,22 @@ public class ChatService {
 	public EnterMessageResponse saveEnterMessage(final SaveMessageCommand command) {
 		MemberEntity memberEntity = memberFinder.findNameByEmail(command.email());
 
-		return EnterMessageResponse.builder()
-				.content(memberEntity.getName() + " 님이 입장하셨습니다.")
+		MessageEntity messageEntity = MessageEntity.builder()
+				.memberId(memberEntity.getMemberId())
+				.memberName(memberEntity.getName())
 				.travelPlanId(command.travelPlanId())
+				.content(memberEntity.getName() + " 님이 입장하셨습니다.")
+				.build();
+
+		messageRepository.save(messageEntity);
+
+		return EnterMessageResponse.builder()
+				.content(messageEntity.getContent())
+				.travelPlanId(messageEntity.getTravelPlanId())
 				.memberName(memberEntity.getName())
 				.memberId(memberEntity.getMemberId())
+				.createdAt(messageEntity.getCreatedAt())
+				.profileImageUrl(memberEntity.getProfileImageUrl())
 				.build();
 	}
 
