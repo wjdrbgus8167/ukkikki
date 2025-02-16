@@ -3,8 +3,7 @@ import React, { useRef, useState } from 'react';
 import { Autocomplete } from '@react-google-maps/api';
 import { FaSearch } from 'react-icons/fa';
 import { publicRequest } from '../../hooks/requestMethod';
-import { stompClient } from "../../components/userroom/WebSocketComponent";
-
+import { stompClient } from '../../components/userroom/WebSocketComponent';
 
 const MapSearchBar = ({ onPlaceSelected, selectedTravelPlanId }) => {
   const [searchedPlace, setSearchedPlace] = useState(null);
@@ -48,53 +47,55 @@ const MapSearchBar = ({ onPlaceSelected, selectedTravelPlanId }) => {
   // "좋아요"/"좋아요 취소" 버튼
   const handleToggleBookmark = async () => {
     if (!searchedPlace) return;
-    console.log("handleToggleBookmark 실행됨");
-  
+    console.log('handleToggleBookmark 실행됨');
+
     try {
       if (!isBookmarked) {
         // 부모의 onPlaceSelected 호출하여 favorites 상태 업데이트
         onPlaceSelected(searchedPlace);
         setIsBookmarked(true);
-        
-        const message = { ...searchedPlace, travelPlanId: selectedTravelPlanId };
+
+        const message = {
+          ...searchedPlace,
+          travelPlanId: selectedTravelPlanId,
+        };
         console.log(message); // travelPlanId가 추가된 객체 확인
-        
+
         if (stompClient && stompClient.connected) {
           stompClient.publish({
-            destination: "/pub/likes",
+            destination: '/pub/likes',
             body: JSON.stringify(message),
           });
-          console.log("✅ 웹소켓 이벤트 발행됨:", message);
+          console.log('✅ 웹소켓 이벤트 발행됨:', message);
         } else {
-          console.warn("⚠️ 웹소켓 연결이 끊어져 있어 이벤트를 발행하지 못함.");
+          console.warn('⚠️ 웹소켓 연결이 끊어져 있어 이벤트를 발행하지 못함.');
         }
-  
+
         // DB 저장 (API 호출)
         const response = await publicRequest.post(
           `/api/v1/travel-plans/${selectedTravelPlanId}/places`,
-          searchedPlace
+          searchedPlace,
         );
         if (response.status === 200) {
-          console.log("✅ 새 장소가 DB에 저장되었습니다.");
+          console.log('✅ 새 장소가 DB에 저장되었습니다.');
         }
       } else {
         // 북마크 해제 처리
         setIsBookmarked(false);
-  
+
         // DB에서 장소 삭제
         const response = await publicRequest.delete(
-          `/api/v1/travel-plans/${selectedTravelPlanId}/places/${placeId}`
+          `/api/v1/travel-plans/${selectedTravelPlanId}/places/${placeId}`,
         );
         if (response.status === 200) {
-          console.log("✅ 장소가 DB에서 삭제되었습니다.");
+          console.log('✅ 장소가 DB에서 삭제되었습니다.');
         }
       }
     } catch (error) {
-      console.error("❌ 장소 저장/삭제 실패:", error);
-      Swal.fire("알림", "🚨 장소 좋아요 처리 중 오류가 발생했습니다.", "error");
+      console.error('❌ 장소 저장/삭제 실패:', error);
+      Swal.fire('알림', '🚨 장소 좋아요 처리 중 오류가 발생했습니다.', 'error');
     }
   };
-  
 
   return (
     <div>
