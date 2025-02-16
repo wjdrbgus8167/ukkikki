@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ListCard from "../common/ListCard";
 import { AgencyProposalslist } from "../../apis/agency";
+import AgencyListCard from "../common/AgencyListCard";
 
 const AgencyProposals = () => {
   const [proposals, setProposals] = useState([]);
@@ -26,11 +27,18 @@ const AgencyProposals = () => {
     <div className="flex flex-wrap justify-center">
       {proposals && proposals.length > 0 ? (
         proposals.map((proposal) => (
-          <ListCard 
+          <AgencyListCard 
             key={proposal.proposalId}
             trip_name={proposal.name}
             start_date={proposal.startDate}
             end_date={proposal.endDate}
+            airline={proposal.airline}
+            departureAirportName ={proposal.departureAirportName}
+            arrivalAirportName={proposal.arrivalAirportName}
+            deposit={proposal.deposit}
+            min_people={proposal.minPeople}
+            proposalStatus = {proposal.proposalStatus}
+            createTime = {proposal.createTime}
             proposal={proposal}
             navigateType="travel"  // travel-proposal 경로로 이동
           />
