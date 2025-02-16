@@ -31,44 +31,39 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
     const placeId = place.placeId;
     const isLiked = place.isLiked;
     const totalMember = selectedCard.member.totalParticipants;
-
+  
     try {
+      let updatedPlace;
       if (!isLiked) {
-        const response = await publicRequest.post(
-          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
+        await publicRequest.post(
+          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`
         );
-        if (response.status === 200) {
-          setFavorites((prev) =>
-            prev.map((fav) =>
-              fav.placeId === placeId
-                ? {
-                    ...fav,
-                    likeCount: fav.likeCount + totalMember,
-                    isLiked: true,
-                    likeYn: true,
-                  }
-                : fav,
-            ),
-          );
-        }
+        updatedPlace = {
+          ...place,
+          likeYn: true,
+          isLiked: true,
+          likeCount: place.likeCount + totalMember,
+        };
       } else {
-        const response = await publicRequest.delete(
-          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
+        await publicRequest.delete(
+          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`
         );
-        if (response.status === 200) {
-          setFavorites((prev) =>
-            prev.map((fav) =>
-              fav.placeId === placeId
-                ? {
-                    ...fav,
-                    likeCount: fav.likeCount - totalMember,
-                    isLiked: false,
-                    likeYn: false,
-                  }
-                : fav,
-            ),
-          );
-        }
+        updatedPlace = {
+          ...place,
+          likeYn: false,
+          isLiked: false,
+          likeCount: Math.max(place.likeCount - totalMember, 0),
+        };
+      }
+
+      console.info(likeCount);
+  
+      // WebSocket 이벤트 발행
+      if (stompClient && stompClient.connected) {
+        stompClient.publish({
+          destination: "/pub/likes",
+          body: JSON.stringify(updatedPlace),
+        });
       }
     } catch (error) {
       console.error('🚨 좋아요 처리 실패:', error);
