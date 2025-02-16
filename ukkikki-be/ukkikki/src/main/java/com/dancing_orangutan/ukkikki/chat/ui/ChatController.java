@@ -3,8 +3,10 @@ package com.dancing_orangutan.ukkikki.chat.ui;
 import com.dancing_orangutan.ukkikki.chat.application.ChatService;
 import com.dancing_orangutan.ukkikki.chat.application.command.SaveMessageCommand;
 import com.dancing_orangutan.ukkikki.chat.ui.request.EnterMessageRequest;
+import com.dancing_orangutan.ukkikki.chat.ui.request.FetchHistoryMessagesRequest;
 import com.dancing_orangutan.ukkikki.chat.ui.request.MessageRequest;
 import com.dancing_orangutan.ukkikki.chat.ui.response.EnterMessageResponse;
+import com.dancing_orangutan.ukkikki.chat.ui.response.FetchHistoryMessagesResponse;
 import com.dancing_orangutan.ukkikki.chat.ui.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -46,4 +48,19 @@ public class ChatController {
                 "/sub/chat/travel-plan/" + messageResponse.travelPlanId(),
                 messageResponse);
     }
+
+    /**
+     *  이전 채팅 메시지 가져오기
+     */
+    @MessageMapping("/chat/history")
+    public void fetchHistoryMessages(FetchHistoryMessagesRequest request) {
+        FetchHistoryMessagesResponse response = chatService.fetchHistoryMessages(
+                request.travelPlanId(), request.createdAtBefore(), 20
+        );
+
+        simpMessagingTemplate.convertAndSend(
+                "/sub/chat/travel-plan/" + request.travelPlanId() + "/history",
+                response);
+    }
 }
+

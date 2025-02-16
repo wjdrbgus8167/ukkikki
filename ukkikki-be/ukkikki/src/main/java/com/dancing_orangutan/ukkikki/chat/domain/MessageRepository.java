@@ -1,12 +1,15 @@
 package com.dancing_orangutan.ukkikki.chat.domain;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDateTime;
-import java.util.List;
 
 public interface MessageRepository {
 
     MessageEntity save(MessageEntity message);
 
-    List<MessageEntity> findAllByTravelPlanIdAndCreatedAtBefore(Integer travelPlanId, LocalDateTime createdAtBefore);
+    Page<MessageEntity> findByTravelPlanIdAndCreatedAtBeforeOrderByCreatedAtDesc(
+            Integer travelPlanId, LocalDateTime createdAtBefore, Pageable pageable);
 
 }
