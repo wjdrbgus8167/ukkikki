@@ -4,11 +4,13 @@ import com.dancing_orangutan.ukkikki.chat.application.ChatService;
 import com.dancing_orangutan.ukkikki.chat.application.command.SaveMessageCommand;
 import com.dancing_orangutan.ukkikki.chat.ui.request.EnterMessageRequest;
 import com.dancing_orangutan.ukkikki.chat.ui.request.FetchHistoryMessagesRequest;
+import com.dancing_orangutan.ukkikki.chat.ui.request.LikeRequest;
 import com.dancing_orangutan.ukkikki.chat.ui.request.MessageRequest;
 import com.dancing_orangutan.ukkikki.chat.ui.response.EnterMessageResponse;
 import com.dancing_orangutan.ukkikki.chat.ui.response.FetchHistoryMessagesResponse;
 import com.dancing_orangutan.ukkikki.chat.ui.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +18,7 @@ import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class ChatController {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
@@ -50,6 +53,19 @@ public class ChatController {
     }
 
     /**
+     * /pub/likes
+     */
+    @MessageMapping("/likes")
+    public void like(LikeRequest request) {
+        log.info(request.toString());
+
+        simpMessagingTemplate.convertAndSend(
+                "/sub/likes/travel-plan/"+ request.travelPlanId(),
+                request
+        );
+    }
+
+    /**
      *  이전 채팅 메시지 가져오기
      */
     @MessageMapping("/chat/history")
@@ -63,4 +79,3 @@ public class ChatController {
                 response);
     }
 }
-
