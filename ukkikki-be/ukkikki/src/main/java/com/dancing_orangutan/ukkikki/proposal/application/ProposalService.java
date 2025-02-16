@@ -492,6 +492,14 @@ public class ProposalService {
         // 투표 설문 저장
         VoteSurvey voteSurvey = voteSurveyMapper.entityToDomain(voteSurveyRepository.save(savedVoteSurvey));
 
+        //투표 진행 중으로 상태 업데이트
+        List<ProposalEntity> proposals = proposalRepository.findByTravelPlanId(command.getTravelPlanId());
+
+        proposals.forEach(proposal -> proposal.updateVotingStatus());
+
+        // 배치 업데이트
+        jpaProposalRepository.saveAll(proposals);
+
         return CreateVoteSurveyResponse.builder()
                 .surveyStartTime(voteSurvey.getSurveyStartTime())
                 .surveyEndTime(voteSurvey.getSurveyEndTime())
