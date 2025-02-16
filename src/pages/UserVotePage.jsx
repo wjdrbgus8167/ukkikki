@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Footer from '../components/layout/Footer';
 import Header from '../components/layout/Header';
 import AgencyList from '../components/vote/AgencyList';
 import { publicRequest } from '../hooks/requestMethod';
 import Swal from 'sweetalert2';
-import logo from '../assets/loading-spinner.png';
 
 const UserVotePage = () => {
   const { travelPlanId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { selectedCard } = location.state || {};
   const [agencies, setAgencies] = useState([]);
 
-  // 제안 목록(API 호출)
+  // 제안 목록(API 호출) - 투표 시작 후 이 페이지에서 조회
   useEffect(() => {
     const fetchProposals = async () => {
       try {
@@ -20,7 +21,6 @@ const UserVotePage = () => {
           `/api/v1/travel-plans/${travelPlanId}/proposals`,
         );
         if (response.status === 200) {
-          // 응답 구조에 맞게 agencies 배열을 설정합니다.
           setAgencies(response.data.data);
           console.log('📦 제안 목록:', response.data.data);
         }
@@ -29,7 +29,6 @@ const UserVotePage = () => {
           error.response?.data?.error?.code === 'BAD_REQUEST' &&
           error.response.data.error.message === '등록된 제안서가 없습니다'
         ) {
-          // 제안서가 없는 경우 빈 배열 처리
           setAgencies([]);
         } else {
           console.error('제안 조회 오류:', error);
@@ -45,7 +44,6 @@ const UserVotePage = () => {
 
   // 투표 처리 함수 (투표는 한 번만 가능)
   const handleVote = async (agency) => {
-    // 이미 투표한 경우
     if (agency.votedYn) {
       Swal.fire(
         '알림',
@@ -54,8 +52,6 @@ const UserVotePage = () => {
       );
       return;
     }
-
-    // 투표 확인 팝업
     const result = await Swal.fire({
       title: '투표 확인',
       text: '투표는 한 번 하면 변경할 수 없습니다. 정말 투표하시겠습니까?',
@@ -67,27 +63,25 @@ const UserVotePage = () => {
     if (!result.isConfirmed) return;
 
     try {
-      // 투표시작 API 호출
-      const voteStartResponse = await publicRequest.post(
-        `/api/v1/travel-plans/${travelPlanId}/proposals/${agency.proposalId}/vote-survey`,
+      const voteSurveyId = voteStartResponse.data.data.voteSurveyId;
+      // 투표하기 API 호출
+      const voteResponse = await publicRequest.post(
+        `/api/v1/travel-plans/${travelPlanId}/proposals/${agency.proposalId}/vote-survey/${voteSurveyId}`,
       );
-      if (voteStartResponse.status === 200) {
-        const voteSurveyId = voteStartResponse.data.data.voteSurveyId;
-        // 투표하기 API 호출
-        const voteResponse = await publicRequest.post(
-          `/api/v1/travel-plans/${travelPlanId}/proposals/${agency.proposalId}/vote-survey/${voteSurveyId}`,
+      if (voteResponse.status === 200) {
+        Swal.fire('투표 완료', '투표가 완료되었습니다.', 'success');
+        setAgencies((prev) =>
+          prev.map((a) =>
+            a.proposalId === agency.proposalId
+              ? {
+                  ...a,
+                  votedYn: true,
+                  voteCount:
+                    a.voteCount + selectedCard.member.totalParticipants,
+                }
+              : a,
+          ),
         );
-        if (voteResponse.status === 200) {
-          Swal.fire('투표 완료', '투표가 완료되었습니다.', 'success');
-          // 해당 제안의 투표수 갱신 및 투표 완료 상태 업데이트
-          setAgencies((prev) =>
-            prev.map((a) =>
-              a.proposalId === agency.proposalId
-                ? { ...a, votedYn: true, voteCount: a.voteCount + 1 }
-                : a,
-            ),
-          );
-        }
       }
     } catch (error) {
       console.error('투표 실패:', error);
@@ -95,13 +89,14 @@ const UserVotePage = () => {
     }
   };
 
-  // 상세보기 함수 (Swal로 간단히 표시)
+  // 상세보기 함수: navigate를 사용해 상세 페이지로 이동
   const handleDetail = (agency) => {
-    Swal.fire({
-      title: agency.companyName,
-      html: `플랜명: ${agency.name}</br>금액: ${agency.deposit}원<br/>투표수: ${agency.voteCount}`,
-      icon: 'info',
-    });
+    navigate(
+      `/travel-proposal/${travelPlanId}/proposals/${agency.proposalId}`,
+      {
+        state: { agency, selectedCard },
+      },
+    );
   };
 
   return (
