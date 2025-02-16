@@ -23,10 +23,10 @@ const Chat = ({ travelPlanId }) => {
 
   useEffect(() => {
     const baseUrl = 'https://i12c204.p.ssafy.io'; // HTTP 서버 주소
-    const wsProtocol = baseUrl.startsWith('https') ? 'wss' : 'ws'; 
-    const wsUrl = `${wsProtocol}://${baseUrl.split('//')[1]}/api/v1/ws`; 
+    const wsProtocol = baseUrl.startsWith('https') ? 'wss' : 'ws';
+    const wsUrl = `${wsProtocol}://${baseUrl.split('//')[1]}/api/v1/ws`;
 
-    const testUrl = 'https://i12c204.p.ssafy.io/api/v1/ws';
+    const testUrl = 'http://i12c204.p.ssafy.io:8080/api/v1/ws';
 
     console.log('WebSocket 연결 시도:', testUrl);
     const socket = new WebSocket(testUrl);
