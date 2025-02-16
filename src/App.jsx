@@ -15,6 +15,7 @@ import ProposalDetail from './pages/ProposalDetailPage';
 import UserVotePage from './pages/UserVotePage';
 import OAuthSuccessPage from './components/auth/OAuthSuccessPage';
 import CreateTravel from './pages/CreateTravelPage';
+import OpenViduPage from './pages/OpenViduPage';
 import TravelProposal from './pages/TravelProposal';
 import AOS from 'aos';
 import 'aos/dist/aos.css'; // AOS 스타일 불러오기
@@ -38,7 +39,6 @@ const App = () => {
         <Route path="/myroom" element={<MyRoomsPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<RegisterPage />} />
-        <Route path="/mypage/*" element={<MyPage />} />
         <Route path="/user-room/:travelPlanId" element={<UserRoom />} />
         <Route path="/search-room" element={<SearchRooms />} />
         <Route path="/agency-room" element={<AgencyRoomList />} />
@@ -59,6 +59,7 @@ const App = () => {
         <Route path="/myprofile" element={<MyProfile />}/>
         {/* 여행사 본인이 제시한 제안서 상세 조회 */}
         <Route path="/agency-proposal-detail/:proposalId" element={<AgencyProposalDetailPage />} />
+        <Route path="/openvidu" element={<OpenViduPage />} />
       </Routes>
     </Router>
   );
