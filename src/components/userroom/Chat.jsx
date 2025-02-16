@@ -235,9 +235,9 @@ const Chat = ({ travelPlanId }) => {
                   isMyMessage ? 'justify-end' : 'justify-start'
                 }`}
               >
-                {/* 상대방 메시지 */}
+                {/* 프로필 이미지 및 이름 */}
                 {!isMyMessage && (
-                  <div className="mr-2">
+                  <div className="mr-2 flex flex-col items-center">
                     {msg.profileImageUrl ? (
                       <img
                         src={msg.profileImageUrl}
@@ -253,6 +253,9 @@ const Chat = ({ travelPlanId }) => {
                         <path d="M12 12c2.667 0 8 1.333 8 4v2H4v-2c0-2.667 5.333-4 8-4zm0-2c-1.06 0-2.08-.421-2.828-1.172C8.421 8.08 8 7.06 8 6s.421-2.08 1.172-2.828C9.92 2.421 10.94 2 12 2s2.08.421 2.828 1.172C15.579 3.92 16 4.94 16 6s-.421 2.08-1.172 2.828C14.08 9.579 13.06 10 12 10z" />
                       </svg>
                     )}
+                    <span className="text-xs mt-1 text-gray-500">
+                      {msg.memberName || '익명'}
+                    </span>
                   </div>
                 )}
 
@@ -280,9 +283,9 @@ const Chat = ({ travelPlanId }) => {
                   </p>
                 </div>
 
-                {/* 내 메시지 */}
+                {/* 내 프로필 이미지 및 이름 */}
                 {isMyMessage && (
-                  <div className="ml-2">
+                  <div className="ml-2 flex flex-col items-center">
                     {msg.profileImageUrl ? (
                       <img
                         src={msg.profileImageUrl}
@@ -298,6 +301,9 @@ const Chat = ({ travelPlanId }) => {
                         <path d="M12 12c2.667 0 8 1.333 8 4v2H4v-2c0-2.667 5.333-4 8-4zm0-2c-1.06 0-2.08-.421-2.828-1.172C8.421 8.08 8 7.06 8 6s.421-2.08 1.172-2.828C9.92 2.421 10.94 2 12 2s2.08.421 2.828 1.172C15.579 3.92 16 4.94 16 6s-.421 2.08-1.172 2.828C14.08 9.579 13.06 10 12 10z" />
                       </svg>
                     )}
+                    <span className="text-xs mt-1 text-gray-500">
+                      {msg.memberName || '나'}
+                    </span>
                   </div>
                 )}
               </div>
