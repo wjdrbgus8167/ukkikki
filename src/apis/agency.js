@@ -28,6 +28,16 @@ export const AgencyProposalslist = async() => {
   };
 };
 
+export const AgencyProposalListDetail = async(proposalId)=>{
+  try{
+      const response = await publicRequest.get(`api/v1/proposals/${proposalId}`);
+      console.log(`제안서 세부 내용 조회 `,response.data)
+      return response.data
+  }catch(error){
+    console.log(`Error`,error)
+  }
+};
+
 //여행계획 세부 조회
 
 export const AgencyProposalDetail =  async(travelPlanId) => {
