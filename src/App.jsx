@@ -9,6 +9,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import MyRoomsPage from './pages/MyRoomsPage';
+import MyPage from './pages/MyPage';
+import MyProfile from './pages/MyProfilePage';
 
 // import TravelCreate from './pages/TravelCreatePage';
 import ProposalDetail from './pages/ProposalDetailPage';
@@ -56,6 +58,8 @@ const App = () => {
           element={<TravelProposal />}
         />
         //여행사 본인이 제시한 제안서 상세 조회
+        <Route path="/myprofile" element={<MyProfile />}/>
+        <Route />
         <Route path="/agency-proposal-detail/:proposalId" element={<AgencyProposalDetailPage />} />
         <Route path="/openvidu" element={<OpenViduPage />} />
       </Routes>

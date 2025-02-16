@@ -6,7 +6,7 @@ import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
 import useAuthStore from '../../stores/authStore';
 
-const Sidebar = () => {
+const Sidebar = ({ onMenuClick }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { userRole } = useAuthStore();
@@ -46,18 +46,17 @@ const Sidebar = () => {
     // 여행사인 경우
     userRole === 'company'
       ? [
-          { label: '내 여행', href: '/mypage/myroom', icon: <FaHistory /> },
-          {
-            label: '제시받은 목록',
-            href: '/mypage/myroom',
-            icon: <FaHistory />,
-          },
-          {
-            label: '진행중인 목록',
-            href: '/mypage/myroom',
-            icon: <FaHistory />,
-          },
-          { label: '프로필', href: '/mypage/profile', icon: <FaUser /> },
+        {
+          label: '제시받은 목록',
+          onClick: () => onMenuClick('ReceivedProposals'),
+          icon: <FaHistory />,
+        },
+        {
+          label: '진행중인 목록',
+          onClick: () => onMenuClick('OngoingProposals'),
+          icon: <FaHistory />,
+        },
+        { label: '프로필', onClick: () => onMenuClick('profile'), icon: <FaUser /> },
           {
             label: '로그아웃',
             href: '/',

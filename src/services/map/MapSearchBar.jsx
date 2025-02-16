@@ -141,7 +141,7 @@ const MapSearchBar = ({ onPlaceSelected, selectedTravelPlanId }) => {
             onClick={handleToggleBookmark}
             className="self-end px-3 mt-2 text-white bg-orange-400 border-none rounded cursor-pointer h-9"
           >
-            {isBookmarked ? '좋아요 취소' : '좋아요'}
+            {isBookmarked ? '장소 취소' : '장소 저장'}
           </button>
         </div>
       )}

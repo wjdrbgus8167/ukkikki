@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { 
   CardContainer, 
   CardWrapper, 
-  CardImage, 
   CardContent, 
   CardTitle, 
   CardText, 

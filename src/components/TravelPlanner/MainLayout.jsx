@@ -16,8 +16,10 @@ import {
   DetailFormWrapper, 
   ContentArea,
 } from "./style/MainLayoutStyle";
+import Swal from 'sweetalert2';
 
-// 간단한 고유 ID 생성 함수 (필요에 따라 uuid 라이브러리 사용 가능)
+
+// 간단한 고유 ID 생성 함수
 const generateUniqueId = () => {
   return '_' + Math.random().toString(36).substr(2, 9);
 };
@@ -47,7 +49,7 @@ const MainLayout = () => {
     proposalStatus: 'V',
   });
 
-  // 날짜별 선택된 장소들을 저장하는 상태 (객체: key는 day id)
+  // 날짜별 선택된 장소들을 저장
   const [selectedPlacesByDay, setSelectedPlacesByDay] = useState({});
   console.log('ScheduleItems:', selectedPlacesByDay);
   
@@ -62,7 +64,7 @@ const MainLayout = () => {
 
   const { arrivalCity } = proposal.data.travelPlan;
 
-  // "장소 추가" 버튼 토글 함수
+  // 장소 추가 버튼 토글 함수
   const togglePlaceSelection = () => {
     setShowPlaceSelection((prev) => !prev);
   };
@@ -92,7 +94,6 @@ const MainLayout = () => {
 
   // 장소 삭제 
   const handleDeletePlace = (placeId) => {
-    console.log("삭제하려는 id:", placeId);
     console.log("현재 장소 목록:", currentDayPlaces);
     const updatedPlaces = currentDayPlaces.filter(place => place.placeId !== placeId);
     console.log("삭제 후 장소 목록:", updatedPlaces);
@@ -121,12 +122,73 @@ const MainLayout = () => {
   };
 
   const handleSubmitProposal = async () => {
-    // 1. 모든 day의 장소들을 평탄화하고, 각 객체에서 placeId를 제거
+    const requireFields = {
+      name: '여행 이름',
+      startDate: '여행 시작일',
+      endDate: '여행 종료일',
+      airline:'항공사',
+      departureAirportCode: '출발 공항 코드',
+      departureAirportName: '출발 공항 이름',
+      arrivalAirportCode: '도착 공항 코드',
+      arrivalAirportName: '도착 공항 이름',
+      startDateBoardingTime: '출발일 비행기 탑승 시간',
+      startDateArrivalTime: '여행지 도착 시간',
+      endDateBoardingTime: '도착일 비행기 탑승 시간',
+      endDateArrivalTime: '한국 도착 시간',
+      deposit: '예약금',
+      minPeople:'최소인원',
+      guideIncluded: '가이드 포함 여부',
+      productIntroduction: '상품 소개',
+      refundPolicy: '취소/환불 정책',
+      insuranceIncluded: '여행자 보험 포함 여부',
+    };
+
+    const MissingFields = Object.keys(requireFields).filter((field) => {
+      const value = proposalData[field];
+      if (typeof value === 'string') {
+        return value.trim() === "";
+      }
+      if (typeof value === 'number') {
+        return value === 0;
+      }
+      return !value;
+    });
+
+    if (MissingFields.length >0 ) {
+      const MissingFielsNames = MissingFields.map((field) => requireFields[field]);
+      Swal.fire({
+        icon: 'warning',
+        title: '필수 항목이 누락되었습니다.',
+        text: `다음 항목을 채워주세요 => ${MissingFielsNames.join(",")}`,
+        confirmButtonText: '확인',
+        confirmButtonColor: '#412B2B',
+      });
+      return ;
+    }
+
     const scheduleItems = Object.values(selectedPlacesByDay)
       .flat()
       .map(({ placeId, ...rest }) => rest);
+    
+    const invalidScheduleItem = scheduleItems.find(item => {
+      return (
+        !item.startTime ||
+        (typeof item.startTime === 'string' && item.startTime.trim() === "") ||
+        !item.endTime ||
+        (typeof item.endTime === 'string' && item.endTime.trim() === "")
+      );
+    });
+
+    if (invalidScheduleItem) {
+      Swal.fire({
+        icon: 'warning',
+        title: '모든 일정 항목에 시작 시간과 종료 시간을 입력해주세요,',
+        confirmButtonText: '확인',
+        confirmButtonColor: '#412B2B',
+      });
+      return;
+    }
   
-    // 2. 최종 payload 구성
     const payload = {
       ...proposalData,
       scheduleItems,
@@ -135,7 +197,6 @@ const MainLayout = () => {
     console.log("POST할 데이터:", payload);
   
     try {
-      // 여행계획 제안서를 전송할 때 travelPlanId와 payload를 함께 전달
       const data = await CreateTravelProposal(proposal.data.travelPlan.travelPlanId, payload);
       console.log("제출 성공:", data);
     } catch (error) {
@@ -157,9 +218,12 @@ const MainLayout = () => {
       {/* 사이드바를 제외한 나머지 영역 */}
       <ContentArea>
         {showDetailForm ? (
-          // 상세 내용 버튼을 누르면면 기존의 일정/지도 영역은 감추고 DetailForm을 채움
+          // 상세 내용 버튼을 누르면 기존의 일정/지도 영역은 감추고 DetailForm을 채움
           <DetailFormWrapper>
-            <DetailForm proposalData={proposalData} setProposalData={setProposalData}/>
+            <DetailForm
+             proposalData={proposalData} 
+             setProposalData={setProposalData}
+             />
           </DetailFormWrapper>
         ) : (
           <>
@@ -174,7 +238,6 @@ const MainLayout = () => {
             <StyledMapDisplay>
               <StyleMapContainer>
                 <MapDisplay 
-              
                   arrivalCity={arrivalCity.name}
                   selectedPlaces={currentDayPlaces}
                   day={selectedDayId}

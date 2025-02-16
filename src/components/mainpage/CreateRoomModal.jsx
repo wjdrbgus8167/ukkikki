@@ -70,19 +70,22 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
   const handleKeywordToggle = (keyword) => {
     setRoomData((prev) => {
       const exists = prev.selectedKeywords.find(
-        (item) => item.id === keyword.id,
+        (item) => item.keywordId === keyword.keywordId,
       );
       if (exists) {
         return {
           ...prev,
           selectedKeywords: prev.selectedKeywords.filter(
-            (item) => item.id !== keyword.id,
+            (item) => item.keywordId !== keyword.keywordId,
           ),
         };
       } else {
         return {
           ...prev,
-          selectedKeywords: [...prev.selectedKeywords, { id: keyword.id }],
+          selectedKeywords: [
+            ...prev.selectedKeywords,
+            { keywordId: keyword.keywordId },
+          ],
         };
       }
     });
@@ -265,11 +268,11 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
                   {keywordList && keywordList.length > 0 ? (
                     keywordList.map((keyword) => (
                       <button
-                        key={keyword.id}
+                        key={keyword.keywordId}
                         onClick={() => handleKeywordToggle(keyword)}
                         className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
                           roomData.selectedKeywords.some(
-                            (item) => item.id === keyword.id,
+                            (item) => item.keywordId === keyword.keywordId,
                           )
                             ? 'bg-dark-green text-white'
                             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
