@@ -3,6 +3,7 @@ package com.dancing_orangutan.ukkikki.travelPlan.application.impl;
 
 import com.dancing_orangutan.ukkikki.global.error.ApiException;
 import com.dancing_orangutan.ukkikki.global.error.ErrorCode;
+import com.dancing_orangutan.ukkikki.proposal.infrastructure.voteSurvey.JpaVoteSurveyRepository;
 import com.dancing_orangutan.ukkikki.travelPlan.application.QueryTravelPlanService;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchAvailableTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQuery;
@@ -27,6 +28,7 @@ public class QueryTravelPlanServiceImpl implements QueryTravelPlanService {
 	private final TravelPlanRepository travelPlanRepository;
 	private final QueryDslTravelPlanRepository queryDslTravelPlanRepository;
 	private final KeywordRepository keywordRepository;
+	private final JpaVoteSurveyRepository voteSurveyRepository;
 
 	@Override
 	public TravelPlanEntity findWithRelationsByTravelPlanId(final Integer travelPlanId) {
@@ -71,7 +73,11 @@ public class QueryTravelPlanServiceImpl implements QueryTravelPlanService {
 
 	@Override
 	public List<TravelPlanEntity> searchMyTravelPlans(SearchMyTravelPlanQuery query) {
-
 		return queryDslTravelPlanRepository.searchMyTravelPlan(query);
+	}
+
+	@Override
+	public boolean fetchCanVote(Integer travelPlanId) {
+		return voteSurveyRepository.existsByTravelPlan_TravelPlanId(travelPlanId);
 	}
 }

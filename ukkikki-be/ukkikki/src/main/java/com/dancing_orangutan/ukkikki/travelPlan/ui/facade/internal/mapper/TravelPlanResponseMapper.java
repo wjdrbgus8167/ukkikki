@@ -53,8 +53,8 @@ public class TravelPlanResponseMapper {
 	}
 
 	public FetchTravelPlanDetailsByMemberResponse fetchTravelPlanDetailsByMemberResponse(
-			final TravelPlanEntity entity, final Integer memberId) {
-		return FetchTravelPlanDetailsByMemberResponse.fromEntity(entity,memberId);
+			final TravelPlanEntity entity, final Integer memberId,final boolean isVoted) {
+		return FetchTravelPlanDetailsByMemberResponse.fromEntity(entity,memberId,isVoted);
 	}
 
 
