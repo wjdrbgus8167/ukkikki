@@ -41,7 +41,7 @@ const UserProfile = () => {
   }
 
   return (
-    <section className="max-w-4xl mx-auto px-20 pt-2 flex flex-col space-y-12">
+    <section className="max-w-4xl mx-auto px-20 pt-2 flex flex-col items-center space-y-12">
       {/* 상단 아바타 영역 */}
       <ProfileAvatar profileImageUrl={user.profileImageUrl} />
       {/* 사용자 상세 정보 */}
