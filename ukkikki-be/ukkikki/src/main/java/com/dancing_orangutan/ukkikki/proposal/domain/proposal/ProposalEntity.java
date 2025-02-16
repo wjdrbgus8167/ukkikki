@@ -132,4 +132,8 @@ public class ProposalEntity {
 		this.proposalStatus = isTopProposal ? ProposalStatus.A : ProposalStatus.D;
 	}
 
+	public void updateVotingStatus() {
+		this.proposalStatus = ProposalStatus.V;
+	}
+
 }
