@@ -55,7 +55,7 @@ export const AgencyProposalDetail =  async(travelPlanId) => {
 export const CreateTravelProposal = async(travelPlanId, payload) => {
   try {
     const response = await publicRequest.post(`api/v1/travel-plans/${travelPlanId}/proposals`, payload );
-    console.log('여행 계계획 제안서 보내기 성공:', response.data)
+    console.log('여행 계획 제안서 보내기 성공:', response.data)
     return response.data;
   } catch(error) {
     console.log('error:',error)

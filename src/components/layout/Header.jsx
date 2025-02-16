@@ -86,7 +86,7 @@ const Header = () => {
           <>
             <div className="relative">
               <Link
-                to="/mypage"
+                to="/myprofile"
                 className="flex items-center space-x-2 focus:outline-none"
               >
                 <img
