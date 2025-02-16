@@ -21,9 +21,9 @@ public record FetchTravelPlanDetailsByMemberResponse(TravelPlanResponse travelPl
 
 	}
 
-	public static FetchTravelPlanDetailsByMemberResponse fromEntity(final TravelPlanEntity travelPlanEntity, final Integer memberId) {
+	public static FetchTravelPlanDetailsByMemberResponse fromEntity(final TravelPlanEntity travelPlanEntity, final Integer memberId, final boolean canVote) {
 		return FetchTravelPlanDetailsByMemberResponse.builder()
-				.travelPlan(TravelPlanResponse.fromEntity(travelPlanEntity,memberId))
+				.travelPlan(TravelPlanResponse.fromEntity(travelPlanEntity,memberId,canVote))
 				.build();
 	}
 
@@ -42,9 +42,10 @@ public record FetchTravelPlanDetailsByMemberResponse(TravelPlanResponse travelPl
 			List<KeywordResponse> keywords,
 			List<PlaceResponse> places,
 			LocalDateTime closeTime,
-			MyInfo member
+			MyInfo member,
+			boolean canVote
 	) {
-		private static TravelPlanResponse fromEntity(TravelPlanEntity entity, Integer memberId) {
+		private static TravelPlanResponse fromEntity(TravelPlanEntity entity, Integer memberId,boolean canVote) {
 			return TravelPlanResponse.builder()
 					.travelPlanId(entity.getTravelPlanId())
 					.name(entity.getName())
@@ -57,17 +58,19 @@ public record FetchTravelPlanDetailsByMemberResponse(TravelPlanResponse travelPl
 					.maxPeople(entity.getMaxPeople())
 					.currentParticipants(entity.calCurrentParticipants())
 					.keywords(entity.getTravelPlanKeywords().stream()
-							.map(travelPlanKeywordEntity -> KeywordResponse.fromEntity(travelPlanKeywordEntity.getKeyword()))
+							.map(travelPlanKeywordEntity -> KeywordResponse.fromEntity(
+									travelPlanKeywordEntity.getKeyword()))
 							.collect(Collectors.toList()))
 					.closeTime(entity.getCloseTime())
 					.places(entity.getPlaces().stream()
-							.map(placeEntity-> PlaceResponse.fromEntity(placeEntity,memberId))
+							.map(placeEntity -> PlaceResponse.fromEntity(placeEntity, memberId))
 							.toList())
 					.member(entity.getMemberTravelPlans().stream()
 							.filter(memberTravelPlan -> memberTravelPlan.hasJoined(memberId))
 							.findFirst()
 							.map(MyInfo::fromEntity)
 							.orElse(null))
+					.canVote(canVote)
 					.build();
 		}
 	}
@@ -144,11 +147,13 @@ public record FetchTravelPlanDetailsByMemberResponse(TravelPlanResponse travelPl
 
 	@Builder
 	private record MyInfo(
-			int totalParticipants
+			int totalParticipants,
+			boolean isHost
 	) {
 		private static MyInfo fromEntity(MemberTravelPlanEntity entity) {
 			return MyInfo.builder()
 					.totalParticipants(entity.calTotalParticipants())
+					.isHost(entity.isHost())
 					.build();
 		}
 	}

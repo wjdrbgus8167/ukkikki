@@ -27,4 +27,6 @@ public interface QueryTravelPlanService {
 	List<KeywordEntity> fetchKeywords();
 
 	List<TravelPlanEntity> searchMyTravelPlans(SearchMyTravelPlanQuery query);
+
+	boolean fetchCanVote(Integer travelPlanId);
 }

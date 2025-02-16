@@ -62,7 +62,8 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 	}
 
 	@Override
-	public JoinTravelPlanResponse joinTravelPlan(final JoinTravelPlanRequest request, final Integer memberId,
+	public JoinTravelPlanResponse joinTravelPlan(final JoinTravelPlanRequest request,
+			final Integer memberId,
 			final Integer travelPlanId) {
 
 		Integer joinedTravelPlanId = joinTravelPlanService.joinTravelPlan(
@@ -70,7 +71,7 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 		TravelPlanEntity entity = queryTravelPlanService.findWithRelationsByTravelPlanId(
 				joinedTravelPlanId);
 
-		return mapper.joinTravelPlanResponse(entity,memberId);
+		return mapper.joinTravelPlanResponse(entity, memberId);
 	}
 
 	@Override
@@ -102,13 +103,15 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 	}
 
 	@Override
-	public SearchMyTravelPlanResponse searchMyTravelPlans(final PlanningStatus status, final Integer memberId) {
+	public SearchMyTravelPlanResponse searchMyTravelPlans(final PlanningStatus status,
+			final Integer memberId) {
 		final SearchMyTravelPlanQuery query = SearchMyTravelPlanQuery.builder()
 				.status(status)
 				.memberId(memberId)
 				.build();
 
-		return mapper.searchMyTravelPlanResponse(queryTravelPlanService.searchMyTravelPlans(query),memberId);
+		return mapper.searchMyTravelPlanResponse(queryTravelPlanService.searchMyTravelPlans(query),
+				memberId);
 	}
 
 	@Override
@@ -121,7 +124,8 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 	}
 
 	@Override
-	public FetchTravelPlanDetailsByCompanyResponse fetchTravelPlanDetails(final Integer travelPlanId) {
+	public FetchTravelPlanDetailsByCompanyResponse fetchTravelPlanDetails(
+			final Integer travelPlanId) {
 		return mapper.fetchTravelPlanDetailsResponse(
 				queryTravelPlanService.fetchTravelPlanDetails(FetchTravelPlanDetailsQuery.builder()
 						.travelPlanId(travelPlanId)
@@ -136,8 +140,9 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 						.memberId(memberId)
 						.travelPlanId(travelPlanId)
 						.build());
+		boolean canVote = queryTravelPlanService.fetchCanVote(travelPlanId);
 
-		return mapper.fetchTravelPlanDetailsByMemberResponse(entity, memberId);
+		return mapper.fetchTravelPlanDetailsByMemberResponse(entity, memberId, canVote);
 	}
 
 	@Override
@@ -156,7 +161,8 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 				.keywords(keywords)
 				.build();
 
-		return mapper.searchTravelPlanResponse(queryTravelPlanService.searchTravelPlans(query),memberId);
+		return mapper.searchTravelPlanResponse(queryTravelPlanService.searchTravelPlans(query),
+				memberId);
 	}
 
 	@Override
