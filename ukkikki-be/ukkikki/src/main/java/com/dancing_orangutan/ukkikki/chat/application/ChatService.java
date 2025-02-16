@@ -59,7 +59,7 @@ public class ChatService {
 
 
 	public FetchHistoryMessagesResponse fetchHistoryMessages(Integer travelPlanId, LocalDateTime createdAtBefore, int pageSize) {
-		Pageable pageable = PageRequest.of(0, pageSize);
+		Pageable pageable = PageRequest.of(0, pageSize+1);
 
 		Page<MessageEntity> messagePage = messageRepository.findByTravelPlanIdAndCreatedAtBeforeOrderByCreatedAtDesc(
 				travelPlanId, createdAtBefore, pageable
@@ -67,6 +67,7 @@ public class ChatService {
 
 		return FetchHistoryMessagesResponse.builder()
 				.messages(messagePage.getContent().stream()
+						.limit(pageSize)
 						.map(message -> MessageResponse.builder()
 						.content(message.getContent())
 						.memberName(message.getMemberName())
