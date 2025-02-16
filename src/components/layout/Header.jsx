@@ -9,7 +9,7 @@ import NavLink from '../common/NavLink';
 
 const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { user, logout } = useAuthStore();
+  const { user, userRole, logout } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
   const [activeButton, setActiveButton] = useState(null);
@@ -81,6 +81,21 @@ const Header = () => {
           <>
             <NavLink to="/about">서비스 소개</NavLink>
             <NavLink to="/login">회원가입 | 로그인</NavLink>
+          </>
+        ) : userRole === 'company' ? (
+          <>
+            <div className="relative">
+              <Link
+                to="/mypage"
+                className="flex items-center space-x-2 focus:outline-none"
+              >
+                <img
+                  src={defaultProfile}
+                  alt="프로필"
+                  className="w-10 h-10 border border-gray-300 rounded-full"
+                />
+              </Link>
+            </div>
           </>
         ) : (
           <>

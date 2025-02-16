@@ -9,6 +9,7 @@ import useAuthStore from '../../stores/authStore';
 const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { userRole } = useAuthStore();
 
   const handleLogout = async () => {
     try {
@@ -20,7 +21,6 @@ const Sidebar = () => {
       if (response.status === 200) {
         useAuthStore.getState().logout();
         await useAuthStore.persist.clearStorage();
-        // Swal.fire의 완료를 기다린 후 navigate 호출
         await Swal.fire({
           title: '로그아웃 되었습니다!',
           text: '메인 페이지로 이동합니다.',
@@ -42,16 +42,40 @@ const Sidebar = () => {
     }
   };
 
-  const menuItems = [
-    { label: '내 여행', href: '/mypage/myroom', icon: <FaHistory /> },
-    { label: '프로필', href: '/mypage/profile', icon: <FaUser /> },
-    {
-      label: '로그아웃',
-      href: '/',
-      icon: <FaSignOutAlt />,
-      onClick: handleLogout,
-    },
-  ];
+  const menuItems =
+    // 여행사인 경우
+    userRole === 'company'
+      ? [
+          { label: '내 여행', href: '/mypage/myroom', icon: <FaHistory /> },
+          {
+            label: '제시받은 목록',
+            href: '/mypage/myroom',
+            icon: <FaHistory />,
+          },
+          {
+            label: '진행중인 목록',
+            href: '/mypage/myroom',
+            icon: <FaHistory />,
+          },
+          { label: '프로필', href: '/mypage/profile', icon: <FaUser /> },
+          {
+            label: '로그아웃',
+            href: '/',
+            icon: <FaSignOutAlt />,
+            onClick: handleLogout,
+          },
+        ]
+      : [
+          // 일반 사용자인 경우
+          { label: '내 여행', href: '/mypage/myroom', icon: <FaHistory /> },
+          { label: '프로필', href: '/mypage/profile', icon: <FaUser /> },
+          {
+            label: '로그아웃',
+            href: '/',
+            icon: <FaSignOutAlt />,
+            onClick: handleLogout,
+          },
+        ];
 
   return (
     <aside className="w-full md:w-64 bg-white border-b md:border-b-0 md:border-r p-4">
