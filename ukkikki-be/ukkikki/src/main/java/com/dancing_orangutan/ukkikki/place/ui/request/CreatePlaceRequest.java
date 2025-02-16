@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 public class CreatePlaceRequest {
-    @ValidPassword
+
     private String name;
     @ValidPlaceAddress
     private String address;
