@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import ProposalDetailContext from "../../contexts/ProposalDetailContext";
-import Swal from 'sweetalert2';
 import {
   PlaceContainer,
   PlaceCard,
@@ -10,7 +9,6 @@ import {
   NoTagsMessage,
   TagContainer
 } from './style/PlaceListStyle'; 
-
 
 const PlaceList = ({ handlePlaceClick }) => {
   const { proposal } = useContext(ProposalDetailContext);
@@ -29,45 +27,33 @@ const PlaceList = ({ handlePlaceClick }) => {
   // likeCount를 기준으로 내림차순으로 정렬
   const sortedPlaces = places.sort((a, b) => b.likeCount - a.likeCount);
 
-  // 장소에 대한 디테일 모달창
-  const handleMouseEnter = (place) => {
-    Swal.fire({
-      title: place.name,
-      text: `👍 ${place.likeCount} Likes`,
-      html: `
-        <p>${place.description || "No description available"}</p>
-        ${place.tags && place.tags.length > 0 ? place.tags.map(tag => `<span>#${tag.name} </span>`).join("") : "<span>No tags available</span>"}
-      `,
-      showCloseButton: true,
-      showConfirmButton: false,
-      focusConfirm: false,
-      width: "400px",
-      background: "#f9f9f9",
-      padding: "20px",
-      customClass: {
-        popup: 'popup-style',
-      },
-    });
-  };
-
   return (
     <PlaceContainer>
       {sortedPlaces.map((place, idx) => {
+
+        const visibleTags = place.tags && place.tags.length > 5 ? place.tags.slice(0, 5) : place.tags;
+        const showMoreText = place.tags && place.tags.length > 5; 
+        
         return (
-          <PlaceCard key={idx} onClick={() => { handlePlaceClick(place) }} onMouseEnter={() => handleMouseEnter(place)}>
+          <PlaceCard key={idx} onClick={() => { handlePlaceClick(place) }}>
             <PlaceName>{place.name}</PlaceName>
             <LikeCount>👍 {place.likeCount}</LikeCount>
 
             {/* 태그들이 수평으로 나열되도록 */}
             <TagContainer>
-              {place.tags && place.tags.length > 0 ? (
-                place.tags.map((tag, index) => (
+              {visibleTags && visibleTags.length > 0 ? (
+                visibleTags.map((tag, index) => (
                   <PlaceTag key={index}>
                     # {tag.name}
                   </PlaceTag>
                 ))
               ) : (
                 <NoTagsMessage>태그가 없습니다.</NoTagsMessage>
+              )}
+              {showMoreText && (
+                <PlaceTag>
+                  # 더보기...
+                </PlaceTag>
               )}
             </TagContainer>
           </PlaceCard>

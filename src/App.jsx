@@ -10,6 +10,7 @@ import RegisterPage from './pages/RegisterPage';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import MyRoomsPage from './pages/MyRoomsPage';
 import MyPage from './pages/MyPage';
+import MyProfile from './pages/MyProfilePage';
 
 // import TravelCreate from './pages/TravelCreatePage';
 import ProposalDetail from './pages/ProposalDetailPage';
@@ -47,7 +48,6 @@ const App = () => {
         />
         <Route path="/user-vote/:travelPlanId" element={<UserVotePage />} />
         <Route path="/oauth/success" element={<OAuthSuccessPage />} />
-
         <Route
           path="/travel-plans/:travelPlanId/proposals"
           element={<CreateTravel />}
@@ -56,6 +56,7 @@ const App = () => {
           path="/travel-proposal/:travelPlanId/proposals/:proposalId"
           element={<TravelProposal />}
         />
+        <Route path="/myprofile" element={<MyProfile />}/>
         <Route />
       </Routes>
     </Router>

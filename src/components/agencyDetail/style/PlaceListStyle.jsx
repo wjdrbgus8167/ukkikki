@@ -25,6 +25,7 @@ export const PlaceCard = styled.div`
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
   position: relative;
   overflow: hidden;
+  
 `;
 
 // 장소 이름 스타일
