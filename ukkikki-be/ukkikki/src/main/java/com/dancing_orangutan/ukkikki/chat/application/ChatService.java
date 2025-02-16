@@ -12,10 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 
 @Service
 @RequiredArgsConstructor
@@ -27,17 +27,9 @@ public class ChatService {
 	public EnterMessageResponse saveEnterMessage(final SaveMessageCommand command) {
 		MemberEntity memberEntity = memberFinder.findNameByEmail(command.email());
 
-		MessageEntity messageEntity = MessageEntity.builder()
-				.memberId(memberEntity.getMemberId())
-				.memberName(memberEntity.getName())
-				.travelPlanId(command.travelPlanId())
-				.build();
-
-		messageRepository.save(messageEntity);
-
 		return EnterMessageResponse.builder()
 				.content(memberEntity.getName() + " 님이 입장하셨습니다.")
-				.travelPlanId(messageEntity.getTravelPlanId())
+				.travelPlanId(command.travelPlanId())
 				.memberName(memberEntity.getName())
 				.memberId(memberEntity.getMemberId())
 				.build();
@@ -83,6 +75,7 @@ public class ChatService {
 						.memberId(message.getMemberId())
 						.createdAt(message.getCreatedAt())
 						.build())
+						.sorted(Comparator.comparing(MessageResponse::createdAt))
 						.toList())
 				.hasMore(messagePage.getContent().size() > pageSize)
 				.build();
