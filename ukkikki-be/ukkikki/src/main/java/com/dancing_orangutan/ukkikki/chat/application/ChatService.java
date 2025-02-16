@@ -31,6 +31,7 @@ public class ChatService {
 		return EnterMessageResponse.builder()
 				.content(memberEntity.getName() + " 님이 입장하셨습니다.")
 				.travelPlanId(messageEntity.getTravelPlanId())
+				.memberName(memberEntity.getName())
 				.memberId(memberEntity.getMemberId())
 				.build();
 	}
