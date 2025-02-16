@@ -67,7 +67,7 @@ public class ChatService {
 
 
 	public FetchHistoryMessagesResponse fetchHistoryMessages(Integer travelPlanId, LocalDateTime createdAtBefore, int pageSize) {
-		Pageable pageable = PageRequest.of(0, pageSize, Sort.by(Sort.Direction.ASC, "createdAt"));
+		Pageable pageable = PageRequest.of(0, pageSize);
 
 		Page<MessageEntity> messagePage = messageRepository.findByTravelPlanIdAndCreatedAtBeforeOrderByCreatedAtDesc(
 				travelPlanId, createdAtBefore, pageable
