@@ -3,6 +3,7 @@ package com.dancing_orangutan.ukkikki.travelPlan.application.impl;
 
 import com.dancing_orangutan.ukkikki.global.error.ApiException;
 import com.dancing_orangutan.ukkikki.global.error.ErrorCode;
+import com.dancing_orangutan.ukkikki.proposal.domain.voteSurvey.VoteSurveyEntity;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.voteSurvey.JpaVoteSurveyRepository;
 import com.dancing_orangutan.ukkikki.travelPlan.application.QueryTravelPlanService;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchAvailableTravelPlanQuery;
@@ -79,5 +80,10 @@ public class QueryTravelPlanServiceImpl implements QueryTravelPlanService {
 	@Override
 	public boolean fetchCanVote(Integer travelPlanId) {
 		return voteSurveyRepository.existsByTravelPlan_TravelPlanId(travelPlanId);
+	}
+
+	@Override
+	public VoteSurveyEntity fetchVoteSurveyEntity(Integer travelPlanId) {
+		return voteSurveyRepository.findByTravelPlan_TravelPlanId(travelPlanId);
 	}
 }

@@ -1,5 +1,6 @@
 package com.dancing_orangutan.ukkikki.travelPlan.ui.facade.internal;
 
+import com.dancing_orangutan.ukkikki.proposal.domain.voteSurvey.VoteSurveyEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.application.CreateTravelPlanService;
 import com.dancing_orangutan.ukkikki.travelPlan.application.ExitTravelPlanService;
 import com.dancing_orangutan.ukkikki.travelPlan.application.JoinTravelPlanService;
@@ -141,8 +142,10 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 						.travelPlanId(travelPlanId)
 						.build());
 		boolean canVote = queryTravelPlanService.fetchCanVote(travelPlanId);
-
-		return mapper.fetchTravelPlanDetailsByMemberResponse(entity, memberId, canVote);
+		VoteSurveyEntity voteSurveyEntity = queryTravelPlanService.fetchVoteSurveyEntity(
+				travelPlanId);
+		return mapper.fetchTravelPlanDetailsByMemberResponse(entity, memberId, canVote,
+				voteSurveyEntity);
 	}
 
 	@Override

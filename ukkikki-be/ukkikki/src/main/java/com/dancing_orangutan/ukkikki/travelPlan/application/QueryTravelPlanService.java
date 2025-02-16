@@ -1,5 +1,6 @@
 package com.dancing_orangutan.ukkikki.travelPlan.application;
 
+import com.dancing_orangutan.ukkikki.proposal.domain.voteSurvey.VoteSurveyEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchAvailableTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQueryByMember;
@@ -29,4 +30,7 @@ public interface QueryTravelPlanService {
 	List<TravelPlanEntity> searchMyTravelPlans(SearchMyTravelPlanQuery query);
 
 	boolean fetchCanVote(Integer travelPlanId);
+
+	VoteSurveyEntity fetchVoteSurveyEntity(Integer travelPlanId);
+
 }

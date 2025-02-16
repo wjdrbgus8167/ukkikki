@@ -3,6 +3,7 @@ package com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response;
 import com.dancing_orangutan.ukkikki.geography.domain.city.CityEntity;
 import com.dancing_orangutan.ukkikki.place.domain.place.PlaceEntity;
 import com.dancing_orangutan.ukkikki.place.domain.placeTag.PlaceTagEntity;
+import com.dancing_orangutan.ukkikki.proposal.domain.voteSurvey.VoteSurveyEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.constant.PlanningStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.keyword.KeywordEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravelPlan.MemberTravelPlanEntity;
@@ -17,13 +18,15 @@ public record FetchTravelPlanDetailsByMemberResponse(TravelPlanResponse travelPl
 
 
 	@Builder
-	public FetchTravelPlanDetailsByMemberResponse{
+	public FetchTravelPlanDetailsByMemberResponse {
 
 	}
 
-	public static FetchTravelPlanDetailsByMemberResponse fromEntity(final TravelPlanEntity travelPlanEntity, final Integer memberId, final boolean canVote) {
+	public static FetchTravelPlanDetailsByMemberResponse fromEntity(
+			final TravelPlanEntity travelPlanEntity, final Integer memberId,
+			final boolean canVote,final VoteSurveyEntity voteSurveyEntity) {
 		return FetchTravelPlanDetailsByMemberResponse.builder()
-				.travelPlan(TravelPlanResponse.fromEntity(travelPlanEntity,memberId,canVote))
+				.travelPlan(TravelPlanResponse.fromEntity(travelPlanEntity, memberId, canVote,voteSurveyEntity))
 				.build();
 	}
 
@@ -43,9 +46,11 @@ public record FetchTravelPlanDetailsByMemberResponse(TravelPlanResponse travelPl
 			List<PlaceResponse> places,
 			LocalDateTime closeTime,
 			MyInfo member,
-			boolean canVote
+			VoteSurveyInfo voteSurveyInfo
 	) {
-		private static TravelPlanResponse fromEntity(TravelPlanEntity entity, Integer memberId,boolean canVote) {
+
+		private static TravelPlanResponse fromEntity(TravelPlanEntity entity, Integer memberId,
+				boolean canVote, VoteSurveyEntity voteSurveyEntity) {
 			return TravelPlanResponse.builder()
 					.travelPlanId(entity.getTravelPlanId())
 					.name(entity.getName())
@@ -70,7 +75,7 @@ public record FetchTravelPlanDetailsByMemberResponse(TravelPlanResponse travelPl
 							.findFirst()
 							.map(MyInfo::fromEntity)
 							.orElse(null))
-					.canVote(canVote)
+					.voteSurveyInfo(VoteSurveyInfo.fromEntity(voteSurveyEntity, canVote))
 					.build();
 		}
 	}
@@ -80,6 +85,7 @@ public record FetchTravelPlanDetailsByMemberResponse(TravelPlanResponse travelPl
 			Integer cityId,
 			String name
 	) {
+
 		private static CityResponse fromEntity(CityEntity entity) {
 			return CityResponse.builder()
 					.cityId(entity.getCityId())
@@ -93,6 +99,7 @@ public record FetchTravelPlanDetailsByMemberResponse(TravelPlanResponse travelPl
 			Integer keywordId,
 			String name
 	) {
+
 		private static KeywordResponse fromEntity(KeywordEntity entity) {
 			return KeywordResponse.builder()
 					.keywordId(entity.getKeywordId())
@@ -120,7 +127,8 @@ public record FetchTravelPlanDetailsByMemberResponse(TravelPlanResponse travelPl
 					.latitude(entity.getLatitude())
 					.longitude(entity.getLongitude())
 					.tags(entity.getPlaceTags().stream()
-							.map(placeTagEntity-> PlaceTagResponse.fromEntity(placeTagEntity,memberId))
+							.map(placeTagEntity -> PlaceTagResponse.fromEntity(placeTagEntity,
+									memberId))
 							.toList())
 					.likeYn(entity.isLiked(memberId))
 					.build();
@@ -135,7 +143,7 @@ public record FetchTravelPlanDetailsByMemberResponse(TravelPlanResponse travelPl
 
 									boolean isMyTag) {
 
-		private static PlaceTagResponse fromEntity(PlaceTagEntity entity,Integer memberId) {
+		private static PlaceTagResponse fromEntity(PlaceTagEntity entity, Integer memberId) {
 			return PlaceTagResponse.builder()
 					.name(entity.getPlaceTagName())
 					.placeTagId(entity.getPlaceTagId())
@@ -150,11 +158,25 @@ public record FetchTravelPlanDetailsByMemberResponse(TravelPlanResponse travelPl
 			int totalParticipants,
 			boolean isHost
 	) {
+
 		private static MyInfo fromEntity(MemberTravelPlanEntity entity) {
 			return MyInfo.builder()
 					.totalParticipants(entity.calTotalParticipants())
 					.isHost(entity.isHost())
 					.build();
 		}
+	}
+
+	@Builder
+	private record VoteSurveyInfo(Integer voteSurveyId, boolean canVote) {
+
+
+		private static VoteSurveyInfo fromEntity(VoteSurveyEntity entity, boolean canVote) {
+			return VoteSurveyInfo.builder()
+					.canVote(canVote)
+					.voteSurveyId(entity.getVoteSurveyId())
+					.build();
+		}
+
 	}
 }
