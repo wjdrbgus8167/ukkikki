@@ -51,29 +51,18 @@ const TravelPackageCarousel = () => {
           console.log(`✅ [스킵] 이미 불러온 이미지: ${cityName}`);
           return null;
         }
-
         try {
-          console.log(`🚀 [API 요청] Unsplash에서 이미지 요청: ${cityName}`);
-          const response = await axios.get(
-            `https://api.unsplash.com/photos/random`,
-            {
-              params: {
-                query: cityName,
-                client_id: apiKey,
-              },
-            },
-          );
-
-          console.log(
-            `🎉 [응답] Unsplash 이미지 URL: ${response.data?.urls?.regular}`,
-          );
-
-          return {
-            [cityName]:
-              response.data?.urls?.regular || 'https://via.placeholder.com/400',
-          };
+          // ✅ S3 버킷에서 해당 도시에 맞는 이미지 URL 생성
+          const s3Url = `https://ukkikki-bucket.s3.ap-northeast-2.amazonaws.com/city/tokyo.jpg`;
+          
+          // ✅ 이미지가 존재하는지 확인
+          const response = await axios.head(s3Url);
+          if (response.status === 200) {
+            console.log(`🎉 [응답] S3 이미지 URL 사용: ${s3Url}`);
+            return { [cityName]: s3Url };
+          }
         } catch (error) {
-          console.error(`🚨 [에러] ${cityName} 이미지 불러오기 실패:`, error);
+          console.warn(`⚠️ [경고] S3에서 이미지 없음, 기본 이미지 사용: ${cityName}`);
           return { [cityName]: 'https://via.placeholder.com/400' }; // 기본 이미지
         }
       });

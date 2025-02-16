@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { ko } from 'date-fns/locale';
@@ -23,8 +23,14 @@ const SearchBar = () => {
   const [isWorldModalOpen, setIsWorldModalOpen] = useState(false);
   const [arrivalCityName, setArrivalCityName] = useState('');
   const [departureCityName, setDepartureCityName] = useState('');
-
+  const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location.state?.createGroup) {
+      setSearchType('createGroup');
+    }
+  }, [location.state]);
 
   const API_KEY = import.meta.env.VITE_APP_AIRPORT_API_KEY;
   const API_BASE_URL =
