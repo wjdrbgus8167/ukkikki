@@ -4,6 +4,7 @@ import Chat from './Chat';
 import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
 import bananaIcon from '../../assets/loading-spinner.png';
+import { RiChatSmileAiLine } from 'react-icons/ri';
 
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
@@ -234,10 +235,10 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
 
       {/* 채팅창 */}
       <div
-        className={`absolute transition-all duration-300 ${
+        className={`absolute transition-all duration-300 overflow-hidden ${
           isChatOpen
-            ? 'top-4 right-4 w-96 h-[500px]'
-            : 'bottom-4 right-4 w-12 h-12'
+            ? 'top-4 right-4 w-96 h-[500px] rounded-lg overflow-hidden'
+            : 'bottom-4 right-4 w-12 h-12 rounded-lg  overflow-visible'
         }`}
       >
         {isChatOpen ? (
@@ -256,9 +257,9 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
               console.log('채팅 열기 클릭됨');
               setIsChatOpen(true);
             }}
-            className="flex items-center justify-center w-full h-full text-white transition-all duration-300 bg-gray-800 rounded-full shadow-lg hover:scale-110"
+            className="flex items-center justify-center w-full h-full text-white bg-gray-800 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
           >
-            💬
+            <RiChatSmileAiLine size={24} />
           </button>
         )}
       </div>
