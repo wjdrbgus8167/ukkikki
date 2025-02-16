@@ -6,4 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface JpaVoteSurveyRepository extends JpaRepository<VoteSurveyEntity, Integer>{
 
 	boolean existsByTravelPlan_TravelPlanId(Integer travelPlanId);
+
+	VoteSurveyEntity findByTravelPlan_TravelPlanId(Integer travelPlanId);
+
 }
