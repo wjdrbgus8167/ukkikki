@@ -10,6 +10,7 @@ import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEnti
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +20,7 @@ public class UpdateCloseTimeServiceImpl implements UpdateCloseTimeService {
 	private final SpringEventPublisher eventPublisher;
 
 	@Override
+	@Transactional
 	public void updateCloseTIme(final UpdateCloseTimeCommand command) {
 		TravelPlanEntity entity = travelPlanRepository.findById(command.travelPlanId())
 				.orElseThrow(() -> new ApiException(
