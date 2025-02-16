@@ -9,6 +9,7 @@ import {
     DayDate,
     TabButton,
 } from "./style/PlaceSelectionStyle";
+import { v4 as uuidv4 } from 'uuid';
 
 const libraries = ['places'];
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
@@ -19,6 +20,8 @@ const PlaceSelection = ({ onSelectPlace }) => {
     const [searchedPlace, setSearchedPlace] = useState(null);
     const [enhancedPlaceList, setEnhancedPlaceList] = useState([]);
     const autocompleteRef = useRef(null);
+    // ref를 사용하여 enhancedPlaceList를 한 번만 생성하도록 함
+    const enhancedPlacesRef = useRef(null);
     
     // Google Map API 로드
     const { isLoaded } = useJsApiLoader({
@@ -31,17 +34,21 @@ const PlaceSelection = ({ onSelectPlace }) => {
     }
     const { travelPlan } = proposal.data;
     const { places } = travelPlan;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
     useEffect(() => {
-        if (!isLoaded) return;
-        if (!places || places.length === 0) return;
+        if (!isLoaded || !places || places.length === 0) return;
+        // 이미 enhancedPlaceList가 생성되어 있다면 재생성하지 않음
+        if (enhancedPlacesRef.current) {
+            setEnhancedPlaceList(enhancedPlacesRef.current);
+            return;
+        }
     
         const service = new window.google.maps.places.PlacesService(
-          document.createElement('div'),
+          document.createElement('div')
         );
     
         Promise.all(
-          places.map((p) => {
+          places.map((p, idx) => {
             return new Promise((resolve) => {
               const query = `${p.name} ${p.address}`;
               const request = {
@@ -57,37 +64,35 @@ const PlaceSelection = ({ onSelectPlace }) => {
               };
     
               service.findPlaceFromQuery(request, (results, status) => {
+                let photoUrl = null;
+                let rating = null;
                 if (
                   status === window.google.maps.places.PlacesServiceStatus.OK &&
                   results &&
                   results.length > 0
                 ) {
                   const placeResult = results[0];
-                  const photoUrl =
+                  photoUrl =
                     placeResult.photos && placeResult.photos.length > 0
                       ? placeResult.photos[0].getUrl({
                           maxWidth: 400,
                           maxHeight: 400,
                         })
                       : null;
-                  const rating = placeResult.rating || null;
-    
-                  resolve({
-                    ...p,
-                    photoUrl,
-                    rating,
-                  });
-                } else {
-                  resolve({
-                    ...p,
-                    photoUrl: null,
-                    rating: null,
-                  });
+                  rating = placeResult.rating || null;
                 }
+                resolve({
+                  // p.id가 없다면 한 번만 uuidv4()로 id를 생성합니다.
+                  id: p.id || uuidv4(),
+                  ...p,
+                  photoUrl,
+                  rating,
+                });
               });
             });
-          }),
+          })
         ).then((enhanced) => {
+          enhancedPlacesRef.current = enhanced;
           setEnhancedPlaceList(enhanced);
         });
     }, [isLoaded, places]);
@@ -133,6 +138,8 @@ const PlaceSelection = ({ onSelectPlace }) => {
     const travelDays = getTravelDays(travelPlan.startDate, travelPlan.endDate);
     const selectedDay = travelDays.find((day) => day.id === selectedDayId);
 
+    console.log("onSelectDay prop 전달 값:", selectedDay.date);
+    
     return (
         <StyledContainer>
             {selectedDay && (
@@ -146,13 +153,13 @@ const PlaceSelection = ({ onSelectPlace }) => {
                     onClick={() => setIsSearchMode(false)}
                     className={!isSearchMode ? "active" : "inactive"}
                 >
-                제안 장소 목록
+                    제안 장소 목록
                 </button>
                 <button
                     onClick={() => setIsSearchMode(true)}
                     className={isSearchMode ? "active" : "inactive"}
                 >
-                새로운 장소 검색
+                    새로운 장소 검색
                 </button>
             </TabButton>
             <div className="place-list">
@@ -160,8 +167,8 @@ const PlaceSelection = ({ onSelectPlace }) => {
                     <SuggestedPlaceList 
                       places={enhancedPlaceList} 
                       onSelectPlace={onSelectPlace}
-                      onSelectDay={selectedDay.date}
-                      />
+                      onSelectDay={selectedDay.date} 
+                    />
                 ) : (
                     <SearchPlace 
                       isLoaded={isLoaded}
@@ -169,8 +176,8 @@ const PlaceSelection = ({ onSelectPlace }) => {
                       onPlaceChanged={onPlaceChanged}
                       searchedPlace={searchedPlace}
                       onSelectPlace={(place) => {
-                      console.log('onSelectPlace called with:', place);
-                      onSelectPlace(place); 
+                          console.log('onSelectPlace called with:', place);
+                          onSelectPlace(place); 
                       }}
                     />
                 )}

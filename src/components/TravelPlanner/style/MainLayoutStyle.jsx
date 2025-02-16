@@ -44,6 +44,10 @@ export const StylePlaceSelection = styled.div`
   /* 필요에 따라 배경색, 투명도 등 추가 스타일 적용 가능 */
   background-color: white;
   opacity: 1;
+
+  @media (max-width: 1700px) {
+    display: none;
+  }
 `;
 
 export const DetailFormWrapper = styled.div`

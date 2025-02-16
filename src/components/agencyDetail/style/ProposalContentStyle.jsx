@@ -4,7 +4,6 @@ export const PorposalContentContainer = styled.div`
   display: flex;
   justify-content: flex-start;
   column-gap: 10rem; /* space-x-40: 10rem (160px) */
-  font-family: '여기어때 잘난체', sans-serif; /* 여기어때 잘난체 폰트 적용 */
 
   .proposal-title {
     flex: 1.5;
