@@ -47,6 +47,16 @@ const Sidebar = () => {
     userRole === 'company'
       ? [
           { label: '내 여행', href: '/mypage/myroom', icon: <FaHistory /> },
+          {
+            label: '제시받은 목록',
+            href: '/mypage/myroom',
+            icon: <FaHistory />,
+          },
+          {
+            label: '진행중인 목록',
+            href: '/mypage/myroom',
+            icon: <FaHistory />,
+          },
           { label: '프로필', href: '/mypage/profile', icon: <FaUser /> },
           {
             label: '로그아웃',
