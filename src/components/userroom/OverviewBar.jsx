@@ -33,9 +33,6 @@ const getThemeColor = (theme) => {
 
 const OverviewBar = ({ selectedCard }) => {
   const [imageUrl, setImageUrl] = useState('');
-  const [deadlineDate, setDeadlineDate] = useState('');
-  const [deadlineTime, setDeadlineTime] = useState('');
-  const [showDeadlineInput, setShowDeadlineInput] = useState(false);
   const hasFetched = useRef(false);
   const navigate = useNavigate();
 
@@ -46,7 +43,6 @@ const OverviewBar = ({ selectedCard }) => {
   useEffect(() => {
     if (hasFetched.current) return;
     hasFetched.current = true;
-
     const fetchImage = async () => {
       try {
         const response = await fetch(
@@ -58,47 +54,8 @@ const OverviewBar = ({ selectedCard }) => {
         console.error('이미지 불러오기 실패:', error);
       }
     };
-
     fetchImage();
   }, [selectedCard.arrivalCity.name]);
-
-  // 동적으로 버튼을 렌더링하는 함수 (마감시간이 설정된 이후 동작)
-  const renderDynamicButton = () => {
-    const now = new Date();
-    const deadline = new Date(selectedCard.closeTime);
-    if (now < deadline) {
-      // 마감시간 전: "여행사에 제출하기까지 XX일 남았습니다."
-      const diffDays = Math.ceil((deadline - now) / (1000 * 3600 * 24));
-      return (
-        <button disabled className="px-4 py-2 text-white bg-gray-400 rounded">
-          여행사에 제출하기까지 {diffDays}일 남았습니다.
-        </button>
-      );
-    } else {
-      const deadlinePlus7 = new Date(deadline.getTime() + 7 * 24 * 3600 * 1000);
-      if (now < deadlinePlus7) {
-        // 마감시간 지난 후 7일 이내: "여행사 제안을 받기까지 XX일 남았습니다."
-        const diffDays = Math.ceil(
-          (deadlinePlus7.getTime() - now.getTime()) / (1000 * 3600 * 24),
-        );
-        return (
-          <button disabled className="px-4 py-2 text-white bg-gray-400 rounded">
-            여행사 제안을 받기까지 {diffDays}일 남았습니다.
-          </button>
-        );
-      } else {
-        // 마감시간 + 7일 경과: "여행사 제안 보러가기" 버튼
-        return (
-          <button
-            onClick={() => navigate(`/user-vote/${selectedCard.travelPlanId}`)}
-            className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
-          >
-            여행사 제안 보러가기
-          </button>
-        );
-      }
-    }
-  };
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-2 p-4 bg-gray-100 rounded-lg shadow-md">
@@ -119,13 +76,10 @@ const OverviewBar = ({ selectedCard }) => {
           {statusMap[selectedCard.planningStatus]}
         </span>
       </div>
-
       {/* 방 제목 */}
       <h2 className="text-lg font-bold">{selectedCard?.name || '기본 이름'}</h2>
-
       {/* 여행지 */}
       <p className="text-gray-700">{selectedCard.arrivalCity.name}</p>
-
       {/* 여행 테마 */}
       {selectedCard.keywords && selectedCard.keywords.length > 0 && (
         <div className="flex flex-wrap gap-2">
@@ -141,26 +95,17 @@ const OverviewBar = ({ selectedCard }) => {
           ))}
         </div>
       )}
-
       {/* 여행 일정 */}
       <p className="text-right text-gray-700">
         {selectedCard.startDate} ~ {selectedCard.endDate}
       </p>
-
-      {/* 마감시간 관련 버튼 */}
-      {selectedCard.closeTime ? (
-        renderDynamicButton()
-      ) : (
-        // 마감시간이 없으면 ProposalButton을 렌더링 (이곳에서 closeTime 제출 및 에러 핸들링 처리)
-        <ProposalButton
-          selectedCard={selectedCard}
-          travelPlanId={selectedCard.travelPlanId}
-          currentParticipants={selectedCard.currentParticipants}
-          minPeople={selectedCard.minPeople}
-        />
-      )}
-
-      {/* (선택사항) 마감시간 입력 버튼/영역은 ProposalButton에 포함되어 있으므로 OverviewBar에는 별도 불필요 */}
+      {/* 마감시간 관련 버튼: ProposalButton에서 모든 분기 처리 */}
+      <ProposalButton
+        selectedCard={selectedCard}
+        travelPlanId={selectedCard.travelPlanId}
+        currentParticipants={selectedCard.currentParticipants}
+        minPeople={selectedCard.minPeople}
+      />
     </div>
   );
 };

@@ -45,6 +45,7 @@ const UserVotePage = () => {
 
   // 투표 처리 함수 (투표는 한 번만 가능)
   const handleVote = async (agency) => {
+    // 이미 투표한 경우
     if (agency.votedYn) {
       Swal.fire(
         '알림',
@@ -53,6 +54,8 @@ const UserVotePage = () => {
       );
       return;
     }
+
+    // 투표 확인 팝업
     const result = await Swal.fire({
       title: '투표 확인',
       text: '투표는 한 번 하면 변경할 수 없습니다. 정말 투표하시겠습니까?',
@@ -61,16 +64,22 @@ const UserVotePage = () => {
       confirmButtonText: '네, 투표합니다!',
       cancelButtonText: '취소',
     });
-    if (result.isConfirmed) {
-      try {
-        // vote API 호출
-        // URL: /api/v1/travel-plans/{travelPlanId}/proposals/{proposalId}/vote-survey/{voteSurveyId}
+    if (!result.isConfirmed) return;
+
+    try {
+      // 투표시작 API 호출
+      const voteStartResponse = await publicRequest.post(
+        `/api/v1/travel-plans/${travelPlanId}/proposals/${agency.proposalId}/vote-survey`,
+      );
+      if (voteStartResponse.status === 200) {
+        const voteSurveyId = voteStartResponse.data.data.voteSurveyId;
+        // 투표하기 API 호출
         const voteResponse = await publicRequest.post(
-          `/api/v1/travel-plans/${travelPlanId}/proposals/${agency.proposalId}/vote-survey/${agency.voteSurveyId}`,
+          `/api/v1/travel-plans/${travelPlanId}/proposals/${agency.proposalId}/vote-survey/${voteSurveyId}`,
         );
         if (voteResponse.status === 200) {
           Swal.fire('투표 완료', '투표가 완료되었습니다.', 'success');
-          // 해당 제안의 투표수 갱신 및 투표 완료 상태 표시
+          // 해당 제안의 투표수 갱신 및 투표 완료 상태 업데이트
           setAgencies((prev) =>
             prev.map((a) =>
               a.proposalId === agency.proposalId
@@ -79,18 +88,18 @@ const UserVotePage = () => {
             ),
           );
         }
-      } catch (error) {
-        console.error('투표 실패:', error);
-        Swal.fire('투표 실패', '투표 도중 오류가 발생했습니다.', 'error');
       }
+    } catch (error) {
+      console.error('투표 실패:', error);
+      Swal.fire('투표 실패', '투표 도중 오류가 발생했습니다.', 'error');
     }
   };
 
   // 상세보기 함수 (Swal로 간단히 표시)
   const handleDetail = (agency) => {
     Swal.fire({
-      title: agency.name,
-      html: `금액: ${agency.deposit}원<br/>투표수: ${agency.voteCount}`,
+      title: agency.companyName,
+      html: `플랜명: ${agency.name}</br>금액: ${agency.deposit}원<br/>투표수: ${agency.voteCount}`,
       icon: 'info',
     });
   };
