@@ -17,6 +17,7 @@ import CreateTravel from './pages/CreateTravelPage';
 import TravelProposal from './pages/TravelProposal';
 import AOS from 'aos';
 import 'aos/dist/aos.css'; // AOS 스타일 불러오기
+import AgencyProposalDetailPage from './pages/AgencyProposalDetailPage';
 const App = () => {
   useEffect(() => {
     // AOS 초기화
@@ -58,7 +59,9 @@ const App = () => {
           path="/travel-proposal/:travelPlanId/proposals/:proposalId"
           element={<TravelProposal />}
         />
+        //여행사 본인이 제시한 제안서 상세 조회
         <Route />
+        <Route path="/agency-proposal-detail/:proposalId" element={<AgencyProposalDetailPage />} />
       </Routes>
     </Router>
   );
