@@ -2,15 +2,21 @@ import React, { useState, useEffect } from 'react';
 import ProfileAvatar from './ProfileAvatar';
 import ProfileInfo from './ProfileInfo';
 import { publicRequest } from '../../../hooks/requestMethod';
+import useAuthStore from '../../../stores/authStore';
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { userRole } = useAuthStore(); 
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await publicRequest.get('/api/v1/members/profile', {
+        const endpoint =
+          userRole === 'company'
+            ? '/api/v1/companies/profile'
+            : '/api/v1/members/profile';
+        const response = await publicRequest.get(endpoint, {
           withCredentials: true,
         });
         if (response.status === 200 && response.data.data) {
@@ -24,7 +30,7 @@ const UserProfile = () => {
     };
 
     fetchProfile();
-  }, []);
+  }, [userRole]);
 
   if (loading) {
     return <div>Loading...</div>;
