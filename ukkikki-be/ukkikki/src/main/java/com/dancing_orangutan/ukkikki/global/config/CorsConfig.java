@@ -19,7 +19,8 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:5173", "http://fe.i12c204.p.ssafy.io:5173", "http://"+appConfig.getDomain(),
-                "https://localhost:5173", "https://fe.i12c204.p.ssafy.io:5173", "https://"+appConfig.getDomain()));
+                "https://localhost:5173", "https://fe.i12c204.p.ssafy.io:5173", "https://"+appConfig.getDomain(),
+                "http://localhost:3000"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setAllowCredentials(true);  // 쿠키 전송 허용

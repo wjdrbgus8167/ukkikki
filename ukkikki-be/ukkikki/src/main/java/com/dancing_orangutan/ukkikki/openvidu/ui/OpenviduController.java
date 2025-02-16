@@ -11,7 +11,6 @@ import java.util.Map;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api") // Openvidu 공식 문서에 따라 contextPath 제외
 public class OpenviduController {
 
     @Value("${OPENVIDU_URL}")
