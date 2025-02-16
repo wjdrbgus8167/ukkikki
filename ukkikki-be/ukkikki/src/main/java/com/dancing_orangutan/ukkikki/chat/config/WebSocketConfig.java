@@ -13,7 +13,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint("/ws")
-				.setAllowedOriginPatterns("https://i12c204.p.ssafy.io");
+				.setAllowedOrigins(
+						"https://i12c204.p.ssafy.io",
+						"http://fe.i12c204.p.ssafy.io:5173",
+						"http://localhost:*"
+				);
 	}
 
 	@Override
