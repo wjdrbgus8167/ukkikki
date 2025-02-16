@@ -15,6 +15,7 @@
     "date-fns": "^4.1.0",
     "framer-motion": "^12.0.6",
     "js-cookie": "^3.0.5",
+    "openvidu-browser": "^2.31.0",
     "react": "^19.0.0",
     "react-beautiful-dnd": "^13.1.1",
     "react-calendar": "^5.1.0",
@@ -37,6 +38,7 @@
     "sweetalert2": "^11.16.0",
     "tailwind-scrollbar-hide": "^2.0.0",
     "three.js": "^0.77.1",
+    "uuid": "^11.0.5",
     "web-vitals": "^2.1.0",
     "zustand": "^5.0.3"
   },

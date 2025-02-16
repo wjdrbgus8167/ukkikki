@@ -10,15 +10,18 @@ import RegisterPage from './pages/RegisterPage';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import MyRoomsPage from './pages/MyRoomsPage';
 import MyPage from './pages/MyPage';
+import MyProfile from './pages/MyProfilePage';
 
 // import TravelCreate from './pages/TravelCreatePage';
 import ProposalDetail from './pages/ProposalDetailPage';
 import UserVotePage from './pages/UserVotePage';
 import OAuthSuccessPage from './components/auth/OAuthSuccessPage';
 import CreateTravel from './pages/CreateTravelPage';
+import OpenViduPage from './pages/OpenViduPage';
 import TravelProposal from './pages/TravelProposal';
 import AOS from 'aos';
 import 'aos/dist/aos.css'; // AOS 스타일 불러오기
+import AgencyProposalDetailPage from './pages/AgencyProposalDetailPage';
 const App = () => {
   useEffect(() => {
     // AOS 초기화
@@ -37,7 +40,6 @@ const App = () => {
         <Route path="/myroom" element={<MyRoomsPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<RegisterPage />} />
-        <Route path="/mypage/*" element={<MyPage />} />
         <Route path="/user-room/:travelPlanId" element={<UserRoom />} />
         <Route path="/search-room" element={<SearchRooms />} />
         <Route path="/agency-room" element={<AgencyRoomList />} />
@@ -47,21 +49,19 @@ const App = () => {
         />
         <Route path="/user-vote/:travelPlanId" element={<UserVotePage />} />
         <Route path="/oauth/success" element={<OAuthSuccessPage />} />
-
         <Route
           path="/travel-plans/:travelPlanId/proposals"
           element={<CreateTravel />}
         />
-        {/* <Route
-          path="/travel-plans/:travelPlanId/proposals"
-          element={<TravelCreate />}
-        /> */}
-
         <Route
           path="/travel-proposal/:travelPlanId/proposals/:proposalId"
           element={<TravelProposal />}
         />
+        //여행사 본인이 제시한 제안서 상세 조회
+        <Route path="/myprofile" element={<MyProfile />}/>
         <Route />
+        <Route path="/agency-proposal-detail/:proposalId" element={<AgencyProposalDetailPage />} />
+        <Route path="/openvidu" element={<OpenViduPage />} />
       </Routes>
     </Router>
   );

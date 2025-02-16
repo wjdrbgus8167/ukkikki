@@ -35,8 +35,15 @@ export const MapWrapper = styled.div`
 export const PlaceListWrapper = styled.div`
   width: 440px;
   margin: 1rem;
-  height: 400px;
+  height: 500px;
   overflow-y: auto; /* 세로 스크롤 */
+
+  /* 스크롤바 숨기기 */
+  ::-webkit-scrollbar {
+    // display: none;
+  }
+
+  // scrollbar-width: none;
 `;
 
 // 수락 버튼 스타일

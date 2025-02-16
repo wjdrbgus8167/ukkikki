@@ -1,58 +1,123 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import Footer from '../components/layout/Footer';
 import Header from '../components/layout/Header';
-import KakaoPayTest from '../services/KakaoPayTest';
 import AgencyList from '../components/vote/AgencyList';
-import CustomCalendar from '../utils/CustomCalendar';
+import { publicRequest } from '../hooks/requestMethod';
+import Swal from 'sweetalert2';
+import logo from '../assets/loading-spinner.png';
 
 const UserVotePage = () => {
-  const [agencies, setAgencies] = useState([
-    { id: 1, name: 'AAA 여행사', price: 120000, votes: 0 },
-    { id: 2, name: 'BBB 투어', price: 150000, votes: 0 },
-    { id: 3, name: 'CCC 트래블', price: 130000, votes: 0 },
-  ]);
+  const { travelPlanId } = useParams();
+  const navigate = useNavigate();
+  const [agencies, setAgencies] = useState([]);
 
-  // ✅ 투표 처리 함수
-  const handleVote = (id, isVoting) => {
-    setAgencies((prev) =>
-      prev.map((agency) =>
-        agency.id === id
-          ? { ...agency, votes: isVoting ? agency.votes + 1 : agency.votes - 1 }
-          : agency,
-      ),
-    );
+  // 제안 목록(API 호출)
+  useEffect(() => {
+    const fetchProposals = async () => {
+      try {
+        const response = await publicRequest.get(
+          `/api/v1/travel-plans/${travelPlanId}/proposals`,
+        );
+        if (response.status === 200) {
+          // 응답 구조에 맞게 agencies 배열을 설정합니다.
+          setAgencies(response.data.data);
+          console.log('📦 제안 목록:', response.data.data);
+        }
+      } catch (error) {
+        if (
+          error.response?.data?.error?.code === 'BAD_REQUEST' &&
+          error.response.data.error.message === '등록된 제안서가 없습니다'
+        ) {
+          // 제안서가 없는 경우 빈 배열 처리
+          setAgencies([]);
+        } else {
+          console.error('제안 조회 오류:', error);
+          Swal.fire('오류', '제안 목록을 불러오는데 실패했습니다.', 'error');
+        }
+      }
+    };
+
+    if (travelPlanId) {
+      fetchProposals();
+    }
+  }, [travelPlanId]);
+
+  // 투표 처리 함수 (투표는 한 번만 가능)
+  const handleVote = async (agency) => {
+    // 이미 투표한 경우
+    if (agency.votedYn) {
+      Swal.fire(
+        '알림',
+        '이미 투표하셨습니다. 투표는 한 번만 가능합니다.',
+        'info',
+      );
+      return;
+    }
+
+    // 투표 확인 팝업
+    const result = await Swal.fire({
+      title: '투표 확인',
+      text: '투표는 한 번 하면 변경할 수 없습니다. 정말 투표하시겠습니까?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: '네, 투표합니다!',
+      cancelButtonText: '취소',
+    });
+    if (!result.isConfirmed) return;
+
+    try {
+      // 투표시작 API 호출
+      const voteStartResponse = await publicRequest.post(
+        `/api/v1/travel-plans/${travelPlanId}/proposals/${agency.proposalId}/vote-survey`,
+      );
+      if (voteStartResponse.status === 200) {
+        const voteSurveyId = voteStartResponse.data.data.voteSurveyId;
+        // 투표하기 API 호출
+        const voteResponse = await publicRequest.post(
+          `/api/v1/travel-plans/${travelPlanId}/proposals/${agency.proposalId}/vote-survey/${voteSurveyId}`,
+        );
+        if (voteResponse.status === 200) {
+          Swal.fire('투표 완료', '투표가 완료되었습니다.', 'success');
+          // 해당 제안의 투표수 갱신 및 투표 완료 상태 업데이트
+          setAgencies((prev) =>
+            prev.map((a) =>
+              a.proposalId === agency.proposalId
+                ? { ...a, votedYn: true, voteCount: a.voteCount + 1 }
+                : a,
+            ),
+          );
+        }
+      }
+    } catch (error) {
+      console.error('투표 실패:', error);
+      Swal.fire('투표 실패', '투표 도중 오류가 발생했습니다.', 'error');
+    }
   };
 
+  // 상세보기 함수 (Swal로 간단히 표시)
   const handleDetail = (agency) => {
-    alert(
-      `${agency.name} 상세보기\n금액: ${agency.price}원\n투표수: ${agency.votes}`,
-    );
+    Swal.fire({
+      title: agency.companyName,
+      html: `플랜명: ${agency.name}</br>금액: ${agency.deposit}원<br/>투표수: ${agency.voteCount}`,
+      icon: 'info',
+    });
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       <Header />
 
-      <div className="max-w-4xl mx-auto p-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+      <div className="max-w-4xl p-6 mx-auto">
+        <h1 className="mb-6 text-2xl font-bold text-center text-gray-800">
           제안받은 여행사
         </h1>
 
-        {/* 가로 정렬된 여행사 카드 리스트 */}
         <AgencyList
           agencies={agencies}
           onVote={handleVote}
           onDetail={handleDetail}
         />
-
-        {/* 카카오페이 결제 박스 */}
-        <div className="mt-8 p-6 bg-white shadow-lg rounded-lg">
-          <h2 className="text-lg font-semibold mb-2">예약금 결제</h2>
-          <KakaoPayTest />
-        </div>
-      </div>
-      <div>
-        <CustomCalendar />
       </div>
 
       <Footer />

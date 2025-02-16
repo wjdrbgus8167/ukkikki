@@ -141,7 +141,7 @@ const TravelPackageCarousel = () => {
     } catch (error) {
       console.error('🚨 여행방 전체 조회 실패:', error);
       Swal.fire(
-        '알림림',
+        '알림',
         '🚨 여행방 데이터를 불러오는 중 오류가 발생했습니다.',
         'error',
       );

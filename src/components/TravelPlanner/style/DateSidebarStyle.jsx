@@ -21,13 +21,13 @@ export const ButtonList = styled.div`
 export const ScheduleButton = styled.button`
   background-color: ${({ active }) => (active ? '#FFD21C' : 'white')};
   color: black;
-  font-size: 1rem; /* text-x: 필요에 따라 조정 */
+  font-size: 1rem;
   font-weight: 600;
   padding: 0.5rem 1rem;
   border: 2px solid #C9C9C9; 
   border-radius: 0.5rem; /* rounded-lg */
-  width: 6.5rem; /* 원래 Tailwind w-[26] 값 (필요에 따라 단위 조정) */
-  height: 4rem;  /* h-16 (4rem) */
+  width: 6.5rem; 
+  height: 4rem; 
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 `;
 
