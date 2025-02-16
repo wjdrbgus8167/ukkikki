@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface PlaceService {
 
-    void createPlace(CreatePlaceCommand command);
+    Integer createPlace(CreatePlaceCommand command);
 
     void creatPlaceTag(CreatePlaceTagCommand command);
 

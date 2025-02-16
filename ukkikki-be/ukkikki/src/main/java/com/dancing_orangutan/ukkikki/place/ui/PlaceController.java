@@ -7,6 +7,7 @@ import com.dancing_orangutan.ukkikki.place.application.PlaceService;
 import com.dancing_orangutan.ukkikki.place.application.command.*;
 import com.dancing_orangutan.ukkikki.place.domain.like.LikeEntity;
 import com.dancing_orangutan.ukkikki.place.ui.reponse.CreatePlaceLikeResponse;
+import com.dancing_orangutan.ukkikki.place.ui.reponse.CreatePlaceResponse;
 import com.dancing_orangutan.ukkikki.place.ui.request.CreatePlaceRequest;
 import com.dancing_orangutan.ukkikki.place.ui.request.CreatePlaceTagRequest;
 import jakarta.validation.Valid;
@@ -44,11 +45,13 @@ public class PlaceController {
         try {
             // PlaceService 호출 로깅
             log.info("PlaceService의 createPlace 호출 - {}", command);
-            placeService.createPlace(command);
+            Integer placeId = placeService.createPlace(command);
 
             // 성공 응답 로깅
             log.info("여행 계획 장소 등록 성공 - travelPlanId: {}, 장소 이름: {}", travelPlanId, createPlaceRequest.getName());
-            return ApiUtils.success("여행 계획 장소를 등록하였습니다.");
+            return ApiUtils.success(CreatePlaceResponse.builder()
+                    .placeId(placeId)
+                    .build());
 
         } catch (Exception e) {
             // 에러 발생 로깅

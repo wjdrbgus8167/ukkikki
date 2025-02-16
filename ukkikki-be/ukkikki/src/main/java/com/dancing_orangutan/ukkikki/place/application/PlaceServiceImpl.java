@@ -37,7 +37,7 @@ public class PlaceServiceImpl implements PlaceService {
     private final MemberFinder memberFinder;
 
     @Override
-    public void createPlace(CreatePlaceCommand command) {
+    public Integer createPlace(CreatePlaceCommand command) {
 
         Place place = Place.builder()
                 .name(command.getName())
@@ -72,7 +72,8 @@ public class PlaceServiceImpl implements PlaceService {
 
 
             PlaceEntity placeEntity = PlaceMapper.mapToEntity(place, travelPlanEntity);
-            placeRepository.save(placeEntity);
+            PlaceEntity save = placeRepository.save(placeEntity);
+            return placeEntity.getPlaceId();
         }
     }
 
