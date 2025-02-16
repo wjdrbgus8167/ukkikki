@@ -132,57 +132,58 @@ const SearchBar = () => {
 
     console.log('🛫 출발 항공편 요청 파라미터:', departureParams);
     console.log('🛬 도착 항공편 요청 파라미터:', returnParams);
+    setIsModalOpen(true);
 
-    const headers = {
-      Accept:
-        'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-      'Accept-Encoding': 'gzip, deflate',
-      'Accept-Language': 'ko,en;q=0.9,en-US;q=0.8',
-      'Cache-Control': 'max-age=0',
-      Connection: 'keep-alive',
-      Host: 'openapi.airport.co.kr',
-      'Upgrade-Insecure-Requests': '1',
-      'User-Agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0',
-    };
+    // const headers = {
+    //   Accept:
+    //     'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+    //   'Accept-Encoding': 'gzip, deflate',
+    //   'Accept-Language': 'ko,en;q=0.9,en-US;q=0.8',
+    //   'Cache-Control': 'max-age=0',
+    //   Connection: 'keep-alive',
+    //   Host: 'openapi.airport.co.kr',
+    //   'Upgrade-Insecure-Requests': '1',
+    //   'User-Agent':
+    //     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0',
+    // };
 
-    try {
-      const departureResponse = await publicRequest.get(API_BASE_URL, {
-        params: departureParams,
-        headers: headers,
-      });
-      const returnResponse = await publicRequest.get(API_BASE_URL, {
-        params: returnParams,
-        headers: headers,
-      });
+    // try {
+    //   const departureResponse = await publicRequest.get(API_BASE_URL, {
+    //     params: departureParams,
+    //     headers: headers,
+    //   });
+    //   const returnResponse = await publicRequest.get(API_BASE_URL, {
+    //     params: returnParams,
+    //     headers: headers,
+    //   });
 
-      // 디버깅: 전체 응답 객체 출력
-      console.log('✈️ 출발 항공편 전체 응답:', departureResponse.data);
-      console.log('✈️ 도착 항공편 전체 응답:', returnResponse.data);
+    //   // 디버깅: 전체 응답 객체 출력
+    //   console.log('✈️ 출발 항공편 전체 응답:', departureResponse.data);
+    //   console.log('✈️ 도착 항공편 전체 응답:', returnResponse.data);
 
-      // 항공편 데이터 추출 (항공편 데이터가 단일 객체로 반환될 수도 있으므로 배열 처리)
-      let departureFlights =
-        departureResponse.data.response?.body?.items?.item || [];
-      if (departureFlights && !Array.isArray(departureFlights)) {
-        departureFlights = [departureFlights];
-      }
-      let returnFlights = returnResponse.data.response?.body?.items?.item || [];
-      if (returnFlights && !Array.isArray(returnFlights)) {
-        returnFlights = [returnFlights];
-      }
+    //   // 항공편 데이터 추출 (항공편 데이터가 단일 객체로 반환될 수도 있으므로 배열 처리)
+    //   let departureFlights =
+    //     departureResponse.data.response?.body?.items?.item || [];
+    //   if (departureFlights && !Array.isArray(departureFlights)) {
+    //     departureFlights = [departureFlights];
+    //   }
+    //   let returnFlights = returnResponse.data.response?.body?.items?.item || [];
+    //   if (returnFlights && !Array.isArray(returnFlights)) {
+    //     returnFlights = [returnFlights];
+    //   }
 
-      console.log('🛫 출발 항공편 데이터:', departureFlights);
-      console.log('🛬 도착 항공편 데이터:', returnFlights);
+    //   console.log('🛫 출발 항공편 데이터:', departureFlights);
+    //   console.log('🛬 도착 항공편 데이터:', returnFlights);
 
-      if (departureFlights.length > 0 && returnFlights.length > 0) {
-        setIsModalOpen(true);
-      } else {
-        Swal.fire('알림', '❌ 해당 날짜에 왕복 항공편이 없습니다.', 'warning');
-      }
-    } catch (error) {
-      console.error('🚨 항공권 조회 실패:', error);
-      Swal.fire('알림', '🚨 항공권 조회 중 오류가 발생했습니다.', 'warning');
-    }
+    //   if (departureFlights.length > 0 && returnFlights.length > 0) {
+    //     setIsModalOpen(true);
+    //   } else {
+    //     Swal.fire('알림', '❌ 해당 날짜에 왕복 항공편이 없습니다.', 'warning');
+    //   }
+    // } catch (error) {
+    //   console.error('🚨 항공권 조회 실패:', error);
+    //   Swal.fire('알림', '🚨 항공권 조회 중 오류가 발생했습니다.', 'warning');
+    // }
   };
 
   return (

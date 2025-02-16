@@ -76,7 +76,7 @@ const Header = () => {
       <Link to="/">
         <img src={logo} alt="Logo" className="object-contain w-32 h-32 ml-10" />
       </Link>
-      <nav className="block mr-10 space-x-6 md:flex">
+      <nav className="flex items-center mr-10 space-x-6">
         {!user ? (
           <>
             <NavLink to="/about">서비스 소개</NavLink>
@@ -84,18 +84,22 @@ const Header = () => {
           </>
         ) : (
           <>
-            <NavLink to="/search-room">전체여행방</NavLink>
-            <NavLink to="/myroom">내여행방</NavLink>
-            <button
-              onClick={handleCreateRoomClick}
-              className={`flex items-center justify-center text-center transition px-2 py-1 rounded-md ${
-                activeButton === 'createGroup'
-                  ? 'text-yellow'
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              방만들기
-            </button>
+            {/* 데스크탑 네비게이션: md 이상에서만 보임 */}
+            <div className="items-center hidden space-x-6 md:flex">
+              <NavLink to="/search-room">전체여행방</NavLink>
+              <NavLink to="/myroom">내여행방</NavLink>
+              <button
+                onClick={handleCreateRoomClick}
+                className={`flex items-center justify-center transition px-2 py-1 rounded-md ${
+                  activeButton === 'createGroup'
+                    ? 'text-yellow'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                방만들기
+              </button>
+            </div>
+            {/* 공통: 프로필 드롭다운 */}
             <div className="relative">
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -109,14 +113,37 @@ const Header = () => {
               </button>
               {isDropdownOpen && (
                 <div className="absolute right-0 z-50 w-40 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg">
+                  {/* 모바일 전용 메뉴: md 미만에서 보임 */}
+                  <div className="md:hidden">
+                    <Link
+                      to="/myroom"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      내여행방
+                    </Link>
+                    <button
+                      onClick={() => {
+                        handleCreateRoomClick();
+                        setIsDropdownOpen(false);
+                      }}
+                      className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
+                    >
+                      방만들기
+                    </button>
+                  </div>
                   <Link
                     to="/mypage"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    onClick={() => setIsDropdownOpen(false)}
                   >
                     마이페이지
                   </Link>
                   <button
-                    onClick={handleLogout}
+                    onClick={() => {
+                      handleLogout();
+                      setIsDropdownOpen(false);
+                    }}
                     className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
                   >
                     로그아웃
