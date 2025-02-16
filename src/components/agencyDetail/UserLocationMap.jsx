@@ -1,32 +1,47 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { LoadScript } from "@react-google-maps/api";
-import ProposalDetailContext from "../../contexts/ProposalDetailContext";
 import PlaceMap from "../../services/map/PlaceMap";
 import { MapContainer } from "./style/UserLocationMap";
+import ProposalDetailContext from "../../contexts/ProposalDetailContext";
 
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
-const UserLocationMap = () => {
+const UserLocationMap = ({ latitude, longitude }) => {
   const { proposal } = useContext(ProposalDetailContext);
+  const [centerCoordinates, setCenterCoordinates] = useState({ lat: 37.5665, lng: 126.9780 }); // 서울 기본 좌표 설정
+  const [zoomLevel, setZoomLevel] = useState(12);
 
-  if (!proposal || !proposal.data || !proposal.data.travelPlan) {
-    return <div>데이터 불러오기 실패</div>;
+  useEffect(() => {
+    if (proposal && proposal.data && proposal.data.travelPlan && proposal.data.travelPlan.places) {
+      const places = proposal.data.travelPlan.places;
+      // 첫 번째 장소의 위도와 경도로 지도 초기화
+      const firstPlace = places[0];
+      if (firstPlace) {
+        setCenterCoordinates({ lat: firstPlace.latitude, lng: firstPlace.longitude });
+        setZoomLevel(16);  // 첫 번째 장소에 맞춰 줌 레벨 설정
+      }
+    }
+  }, [proposal]);  // proposal이 변경될 때마다 실행
+
+  useEffect(() => {
+    // 만약 latitude와 longitude가 제공되면 해당 좌표로 지도 설정
+    if (latitude && longitude) {
+      setCenterCoordinates({ lat: latitude, lng: longitude });
+      setZoomLevel(16);  // 장소에 따라 줌 레벨 조정
+    }
+  }, [latitude, longitude]);
+
+  if (!centerCoordinates) {
+    return <div>지도 로딩 중...</div>;
   }
-
-  const { travelPlanId, places } = proposal.data.travelPlan;
-  console.log("Travel Plan ID:", travelPlanId);
-
-  const centerCoordinates =
-    Array.isArray(places) && places.length > 0
-      ? { lat: places[0].latitude, lng: places[0].longitude }
-      : { lat: 37.5665, lng: 126.9780 };
 
   return (
     <MapContainer>
       <LoadScript googleMapsApiKey={apiKey} libraries={['places']}>
         <PlaceMap
           coordinates={centerCoordinates}
-          markers={places}
+          markers={[{ lat: centerCoordinates.lat, lng: centerCoordinates.lng }]}  // 선택된 장소만 표시
+          zoom={zoomLevel}
         />
       </LoadScript>
     </MapContainer>

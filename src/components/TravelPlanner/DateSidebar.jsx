@@ -39,6 +39,7 @@ const DateSidebar = ({ onToggleDetailForm, onDaySelect, onSubmit }) => {
   }
 
   const handleDaySelect = (dayId) => {
+    setDetailActive(false)
     setSelectedDay(dayId);
     if (onDaySelect) onDaySelect(dayId);
   };
@@ -54,13 +55,16 @@ const DateSidebar = ({ onToggleDetailForm, onDaySelect, onSubmit }) => {
         {travelDays.map((day) => (
           <ScheduleButton
             key={day.id}
-            active={day.id === selectedDayId}
+            active={!detailActive && day.id === selectedDayId}
             onClick={() => handleDaySelect(day.id)}
           >
             {day.label}
           </ScheduleButton>
         ))}
-        <DetailButton onClick={handleDetailClick}>
+        <DetailButton 
+          onClick={handleDetailClick}
+          active={detailActive}
+          >
           상세내용
         </DetailButton>
       </ButtonList>

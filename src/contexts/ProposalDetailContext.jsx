@@ -7,6 +7,7 @@ const ProposalDetailContext = createContext();
 export const ProposalDetailProvider = ({children, travelPlanId}) => {
   const [proposal, setProposals ] = useState(null);
   const [selectedDayId, setSelectedDayId] = useState(null);
+  
 
   useEffect(() => {
     const fetchProposalData = async() => {

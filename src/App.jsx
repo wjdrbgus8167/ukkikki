@@ -48,11 +48,6 @@ const App = () => {
           path="/travel-plans/:travelPlanId/proposals"
           element={<CreateTravel />}
         />
-        {/* <Route
-          path="/travel-plans/:travelPlanId/proposals"
-          element={<TravelCreate />}
-        /> */}
-
         <Route
           path="/travel-proposal/:travelPlanId/proposals/:proposalId"
           element={<TravelProposal />}
