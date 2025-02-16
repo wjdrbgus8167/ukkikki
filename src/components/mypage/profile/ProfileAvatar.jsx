@@ -1,8 +1,11 @@
 import React, { useRef, useState } from 'react';
 import { publicRequest } from '../../../hooks/requestMethod';
 import Swal from 'sweetalert2';
+import useAuthStore from '../../../stores/authStore';
 
 const ProfileAvatar = ({ profileImageUrl }) => {
+  const { userRole } = useAuthStore();
+  const isCompany = userRole === 'company';
   const [imageUrl, setImageUrl] = useState(profileImageUrl);
   const fileInputRef = useRef(null);
 
@@ -17,17 +20,18 @@ const ProfileAvatar = ({ profileImageUrl }) => {
     const formData = new FormData();
     formData.append('file', file);
 
+    const endpoint = isCompany
+      ? '/api/v1/companies/profile/image'
+      : '/api/v1/members/profile/image';
+
     try {
-      const response = await publicRequest.put(
-        '/api/v1/members/profile/image',
-        formData,
-        {
-          withCredentials: true,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+      const response = await publicRequest.put(endpoint, formData, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'multipart/form-data',
         },
-      );
+      });
+
       if (response.status === 200) {
         Swal.fire({
           title: '업로드 성공',
@@ -35,7 +39,6 @@ const ProfileAvatar = ({ profileImageUrl }) => {
           confirmButtonColor: '#3085d6',
           confirmButtonText: '확인',
         });
-
         const newUrl = response.data.data.profileImageUrl;
         setImageUrl(newUrl);
       }
