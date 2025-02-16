@@ -133,7 +133,7 @@ const ProposalButton = ({
       );
     }
     // 3. 마감 후 7일 경과: 투표 시작/제안 조회 분기
-    if (!selectedCard.canVote) {
+    if (!selectedCard.voteSurveyInfo.canVote) {
       // 아직 투표가 시작되지 않은 경우
       if (selectedCard.member?.isHost) {
         // 방장: 투표 시작하기 버튼
@@ -155,7 +155,7 @@ const ProposalButton = ({
                     confirmButtonText: '확인',
                   });
                   // 업데이트된 투표 시작 여부는 부모에서 갱신하도록(또는 Context/전역상태 활용)
-                  selectedCard.canVote = true;
+                  selectedCard.voteSurveyInfo.canVote = true;
                 }
               } catch (error) {
                 if (

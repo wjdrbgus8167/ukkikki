@@ -10,6 +10,7 @@ const UserVotePage = () => {
   const { travelPlanId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  // location.state에서 전달받은 selectedCard를 사용
   const { selectedCard } = location.state || {};
   const [agencies, setAgencies] = useState([]);
 
@@ -52,6 +53,7 @@ const UserVotePage = () => {
       );
       return;
     }
+
     const result = await Swal.fire({
       title: '투표 확인',
       text: '투표는 한 번 하면 변경할 수 없습니다. 정말 투표하시겠습니까?',
@@ -63,7 +65,16 @@ const UserVotePage = () => {
     if (!result.isConfirmed) return;
 
     try {
-      const voteSurveyId = voteStartResponse.data.data.voteSurveyId;
+      // selectedCard.voteSurveyInfo가 존재하고, 투표가 시작된 상태라면 그 voteSurveyId를 사용
+      const voteSurveyId = selectedCard.voteSurveyInfo.voteSurveyId;
+      if (!voteSurveyId) {
+        Swal.fire(
+          '오류',
+          '투표 시작 정보가 없습니다. 투표를 진행할 수 없습니다.',
+          'error',
+        );
+        return;
+      }
       // 투표하기 API 호출
       const voteResponse = await publicRequest.post(
         `/api/v1/travel-plans/${travelPlanId}/proposals/${agency.proposalId}/vote-survey/${voteSurveyId}`,
@@ -89,7 +100,7 @@ const UserVotePage = () => {
     }
   };
 
-  // 상세보기 함수: navigate를 사용해 상세 페이지로 이동
+  // 상세보기 함수: 상세보기 페이지로 navigate
   const handleDetail = (agency) => {
     navigate(
       `/travel-proposal/${travelPlanId}/proposals/${agency.proposalId}`,
