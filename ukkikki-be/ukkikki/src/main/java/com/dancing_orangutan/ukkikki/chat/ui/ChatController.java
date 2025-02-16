@@ -71,7 +71,7 @@ public class ChatController {
     @MessageMapping("/chat/history")
     public void fetchHistoryMessages(FetchHistoryMessagesRequest request) {
         FetchHistoryMessagesResponse response = chatService.fetchHistoryMessages(
-                request.travelPlanId(), request.createdAtBefore(), 20
+                request.travelPlanId(), request.createdAtBefore(), 50
         );
 
         simpMessagingTemplate.convertAndSend(
