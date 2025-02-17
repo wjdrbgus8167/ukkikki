@@ -50,6 +50,25 @@ const WebSocketComponent = ({ travelPlanId, setFavorites, favorites, fetchRoomDa
     }
   }, [travelPlanId, fetchRoomData]);
 
+  const getActionText = (action) => {
+    switch (action) {
+      case "LIKE":
+        return "❤️ 좋아요를 눌렀습니다!";
+      case "UNLIKE":
+        return "💔 좋아요를 취소했습니다!";
+      case "ADD_TAG":
+        return "🏷️ 태그를 추가했습니다!";
+      case "REMOVE_TAG":
+        return "🚫 태그를 삭제했습니다!";
+      case "ADD_PLACE":
+        return "📍 장소를 등록했습니다!";
+      case "REMOVE_PLACE":
+        return "🗑️ 장소를 삭제했습니다!";
+      default:
+        return "🤔 알 수 없는 행동을 했습니다!";
+    }
+  };
+
   useEffect(() => {
     if (!travelPlanId || typeof fetchRoomData !== 'function') {
       console.error('Required props missing:', { travelPlanId, fetchRoomData });
