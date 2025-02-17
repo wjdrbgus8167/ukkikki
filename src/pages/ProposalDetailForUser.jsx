@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { AgencyProposalListDetail } from '../apis/agency';
+import { AgencyProposalListDetail } from '../apis/agency.js';
 import Header from '../components/layout/Header.jsx';
 import Footer from '../components/layout/Footer.jsx';
 import 'tailwindcss/tailwind.css';
-import { MainContent } from './style/AgencyRoomListPageStyle';
+import { MainContent } from './style/AgencyRoomListPageStyle.jsx';
 
 const AgencyProposalDetail = () => {
   const { proposalId } = useParams();
