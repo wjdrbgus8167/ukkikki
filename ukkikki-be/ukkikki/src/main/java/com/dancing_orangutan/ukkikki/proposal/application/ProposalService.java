@@ -326,9 +326,13 @@ public class ProposalService {
     }
 
     //여행사 본인 제안서 목록 조회
-    public List<CompanyProposalListResponse> getCompanyProposalList(Integer companyId) {
+    public List<CompanyProposalListResponse> getCompanyProposalList(ProposalStatus status, Integer companyId) {
 
-        List<CompanyProposalListResponse> proposals = proposalRepository.findByCompanyId(companyId).stream()
+        List<ProposalEntity> proposals = (status == null) ?
+                proposalRepository.findByCompanyId(companyId) :
+                proposalRepository.findByCompanyIdAndProposalStatus(companyId, status);
+
+        return  proposals.stream()
                 .map(proposal -> CompanyProposalListResponse.builder()
                         .proposalId(proposal.getProposalId())
                         .travelPlanId(proposal.getTravelPlan().getTravelPlanId())
@@ -344,8 +348,6 @@ public class ProposalService {
                         .createTime(proposal.getCreateTime())
                         .build())
                 .collect(Collectors.toList());
-
-        return proposals;
     }
 
     //여행사 본인 제안서 상세 조회

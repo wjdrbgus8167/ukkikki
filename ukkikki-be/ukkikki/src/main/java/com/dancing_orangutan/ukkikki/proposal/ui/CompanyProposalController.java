@@ -3,6 +3,7 @@ package com.dancing_orangutan.ukkikki.proposal.ui;
 import com.dancing_orangutan.ukkikki.global.security.CompanyUserDetails;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.proposal.application.ProposalService;
+import com.dancing_orangutan.ukkikki.proposal.constant.ProposalStatus;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.CompanyProposalDetailResponse;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.CompanyProposalListResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +24,10 @@ public class CompanyProposalController {
     //여행사 제안서 리스트 조회
     @GetMapping
     public ApiUtils.ApiResponse<List<CompanyProposalListResponse>> getCompanyProposalList(
+            @RequestParam(value = "status", required = false) ProposalStatus status,
             @AuthenticationPrincipal CompanyUserDetails companyUserDetails){
 
-       List<CompanyProposalListResponse> response  = proposalService.getCompanyProposalList(companyUserDetails.getCompanyId());
+       List<CompanyProposalListResponse> response  = proposalService.getCompanyProposalList(status, companyUserDetails.getCompanyId());
 
         return ApiUtils.success(response);
     }
