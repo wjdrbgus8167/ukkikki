@@ -25,7 +25,7 @@ const LoginForm = ({ isCompany }) => {
 
       if (response.status === 200) {
         useAuthStore.getState().setUser(true, isCompany ? 'company' : 'member');
-        navigate(isCompany ? '/agency-room' : '/');
+        navigate(isCompany ? '/myprofile' : '/');
       }
       else {
         setErrorMessage('로그인 실패');
