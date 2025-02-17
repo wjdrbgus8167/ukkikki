@@ -59,7 +59,7 @@ const App = () => {
         <Route path="/myprofile" element={<MyProfile />}/>
         {/* 여행사 본인이 제시한 제안서 상세 조회 */}
         <Route path="/agency-proposal-detail/:proposalId" element={<AgencyProposalDetailPage />} />
-        <Route path="/openvidu" element={<OpenViduPage />} />
+        <Route path="/meeting" element={<OpenViduPage />} />
       </Routes>
     </Router>
   );
