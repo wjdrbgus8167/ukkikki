@@ -113,7 +113,7 @@ const UserVotePage = () => {
 
   // 상세보기 함수: 상세보기 페이지로 navigate
   const handleDetail = (agency) => {
-    navigate(`/travel-plans/${travelPlanId}/proposals/${agency.proposalId}`, {
+    navigate(`/proposal-detail/${travelPlanId}/${agency.proposalId}`, {
       state: { agency, selectedCard },
     });
   };
