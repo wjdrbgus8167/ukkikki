@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { publicRequest } from '../hooks/requestMethod';
 import InteractiveSection from '../components/userroom/InteractiveSection';
@@ -7,6 +7,8 @@ import Footer from '../components/layout/Footer';
 import OverviewBar from '../components/userroom/OverviewBar';
 import FavoriteList from '../components/userroom/FavoriteList';
 import { LoadScript } from '@react-google-maps/api';
+import WebSocketComponent, { stompClient } from '../components/userroom/WebSocketComponent';
+
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
 const UserRoom = () => {
@@ -15,25 +17,19 @@ const UserRoom = () => {
   const initialSelectedCard = location.state?.selectedCard;
   const [selectedCard, setSelectedCard] = useState(initialSelectedCard);
   const [isLikeListOpen, setIsLikeListOpen] = useState(true);
-  // ★ 부모에서 좋아요 리스트 상태를 관리
   const [favorites, setFavorites] = useState([]);
   const libraries = ['places'];
 
-  // travelPlanId 결정
   const travelPlanId = initialSelectedCard?.travelPlanId || travelPlanIdFromUrl;
 
-  useEffect(() => {
-    if (travelPlanId) {
-      fetchRoomData(travelPlanId);
-    } else {
-      console.error(
-        '🚨 travelPlanId가 없습니다. 올바른 ID를 전달했는지 확인하세요.',
-      );
-    }
-  }, [travelPlanId]);
-
-  const fetchRoomData = async (id) => {
+  // fetchRoomData를 useCallback으로 메모이제이션
+  const fetchRoomData = useCallback(async (id) => {
     console.log('📌 API 요청 ID:', id);
+    if (!id) {
+      console.error('🚨 ID가 없습니다');
+      return;
+    }
+
     try {
       const response = await publicRequest.get(
         `/api/v1/travel-plans/${id}/members`,
@@ -45,7 +41,6 @@ const UserRoom = () => {
           ...place,
           isLiked: place.likeYn,
         }));
-        setSelectedCard(travelPlan);
         setFavorites(mappedPlaces);
 
         console.log('✅ 여행방 데이터:', travelPlan);
@@ -53,7 +48,17 @@ const UserRoom = () => {
     } catch (error) {
       console.error('🚨 여행방 데이터 가져오기 실패:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (travelPlanId) {
+      fetchRoomData(travelPlanId);
+    } else {
+      console.error(
+        '🚨 travelPlanId가 없습니다. 올바른 ID를 전달했는지 확인하세요.',
+      );
+    }
+  }, [travelPlanId, fetchRoomData]);
 
   if (!selectedCard) {
     return (
@@ -66,24 +71,30 @@ const UserRoom = () => {
   return (
     <LoadScript
       googleMapsApiKey={apiKey}
-      libraries={libraries} // 상수 사용
+      libraries={libraries}
       onLoad={() => console.log('Google Maps API script loaded!')}
       onError={(error) =>
         console.error('🚨 Google Maps API script failed to load:', error)
       }
     >
+      {/* WebSocketComponent 추가 */}
+      <WebSocketComponent
+        travelPlanId={travelPlanId}
+        fetchRoomData={fetchRoomData}
+        setFavorites={setFavorites}
+        favorites={favorites}
+      />
+
       <div className="flex flex-col min-h-screen">
         <Header />
         <OverviewBar selectedCard={selectedCard} />
         <div className="relative flex flex-1">
           <div
-            className={`absolute left-0 top-0 h-full transition-transform duration-300 ${
-              isLikeListOpen ? 'translate-x-0' : '-translate-x-full'
-            }`}
+            className={`absolute left-0 top-0 h-full transition-transform duration-300 ${isLikeListOpen ? 'translate-x-0' : '-translate-x-full'
+              }`}
             style={{ width: '320px', zIndex: 10 }}
           >
-            <div className="relative h-full bg-white ">
-              {/* ★ FavoriteList 에 부모 상태 전달 */}
+            <div className="relative h-full bg-white">
               <FavoriteList
                 selectedCard={selectedCard}
                 favorites={favorites}
@@ -106,7 +117,6 @@ const UserRoom = () => {
                 ❯
               </button>
             )}
-            {/* ★ InteractiveSection 에도 부모 상태 전달 */}
             <div className="flex-1">
               <InteractiveSection
                 selectedCard={selectedCard}

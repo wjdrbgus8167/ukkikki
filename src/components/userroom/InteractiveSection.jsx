@@ -49,48 +49,80 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
   const handleMarkerClick = (marker) => {
     setSelectedMarker({ ...marker });
   };
-  
+
   const handleLikePlace = async (place) => {
     if (!place || !selectedCard || !selectedCard.travelPlanId) {
       console.error("🚨 장소 정보 또는 여행방 ID가 없습니다.");
       return;
     }
-  
+
     const travelPlanId = selectedCard.travelPlanId;
     const placeId = place.placeId;
-    const isLiked = place.likeYn;
-    const totalMember = selectedCard.member.totalParticipants;
-  
+    const isLiked = place.likeYn; // 기존 좋아요 상태
+    const totalMember = selectedCard?.member?.totalParticipants || 0;
+
+    const placeName = place.name;
+    let actionType;
+
+
     try {
       let updatedMarker;
+
       if (isLiked) {
+        console.log("좋아요 삭제");
         await publicRequest.delete(`/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`);
-        updatedMarker = { ...place, likeYn: false, isLiked: false, likeCount: Math.max(place.likeCount - totalMember, 0) };
+        updatedMarker = {
+          ...place,
+          likeYn: false,
+          isLiked: false,
+          likeCount: Math.max(place.likeCount - totalMember, 0)
+        };
+        actionType = "UNLIKE"
       } else {
+        console.log("좋아요 추가");
         await publicRequest.post(`/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`);
-        updatedMarker = { ...place, likeYn: true, isLiked: true, likeCount: place.likeCount + totalMember };
+        updatedMarker = {
+          ...place,
+          likeYn: true,
+          isLiked: true,
+          likeCount: place.likeCount + totalMember
+        };
+        actionType = "LIKE"
       }
-  
-          // ✅ WebSocket을 통해 실시간으로 마커 상태 변경 전송 (travelPlanId 포함)
+
+      // ✅ 상태 업데이트 - 새로운 배열을 반환하여 리렌더링 유도
+      setFavorites((prev) => {
+        const newFavorites = prev.map((fav) =>
+          fav.placeId === placeId ? { ...updatedMarker } : fav
+        );
+        return [...newFavorites]; // 새로운 배열을 반환해 참조 변경
+      });
+
+      // ✅ 현재 선택된 마커도 업데이트 (UI 즉시 반영)
+      setSelectedMarker((prev) =>
+        prev && prev.placeId === placeId ? { ...updatedMarker } : prev
+      );
+      // ✅ WebSocket을 통해 실시간으로 마커 상태 변경 전송
       if (stompClient && stompClient.connected) {
-      const wsData = { ...updatedMarker, travelPlanId }; // 웹소켓 전송용 데이터
+        const wsData = {
+          action: actionType, // ✅ Action Enum 값 전송
+          placeName,
+          travelPlanId
+        };
         stompClient.publish({
-          destination: "/pub/likes",
+          destination: "/pub/actions",
           body: JSON.stringify(wsData),
         });
-        console.log("✅ 웹소켓 좋아요 이벤트 발행됨:", wsData);
+        console.log("✅ InteractiveSection 좋아요 이벤트:", wsData);
       }
-  
-      setFavorites((prev) =>
-        prev.map((fav) => (fav.placeId === placeId ? updatedMarker : fav))
-      );      
-  
+
     } catch (error) {
       console.error("🚨 좋아요 처리 실패:", error);
       Swal.fire("알림", "🚨 좋아요 처리 중 오류가 발생했습니다.", "error");
     }
   };
-  
+
+
 
   return (
     <div className="relative w-full h-screen">
@@ -99,125 +131,124 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
 
       {/* 지도 영역 */}
       <div className="w-full h-full">
-     <GoogleMap
-       mapContainerStyle={{ width: '100%', height: '100%' }}
-       center={coordinates}
-       zoom={12}
-       options={{
-         mapTypeControl: false,
-         streetViewControl: false,
-         rotateControl: false,
-         fullscreenControl: false,
-       }}
-     >
-       {/* 즐겨찾기 마커들을 OverlayView를 이용해 커스텀 마커로 표시 */}
-       {favorites.map((marker, index) => (
-         <OverlayView
-           key={index}
-           position={{ lat: marker.latitude, lng: marker.longitude }}
-           mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-         >
-           <div
-             className="relative cursor-pointer w-14 h-14 hover:animate-shake"
-             onClick={() => handleMarkerClick(marker)}
-           >
-             <img src={bananaIcon} alt="marker" className="w-full h-full" />
-             <div className="absolute text-xl transform translate-x-1/2 -translate-y-1/2 right-2 top-6">
-               {marker.likeYn ? '❤️' : '🤍'}
-             </div>
-             <div className="absolute inset-0 flex items-center justify-center font-bold transform translate-y-1/4">
-               {marker.likeCount || 0}
-             </div>
-           </div>
-         </OverlayView>
-       ))}
-       {selectedMarker && (
-         <InfoWindow
-           position={{
-             lat: selectedMarker.latitude,
-             lng: selectedMarker.longitude,
-           }}
-           onCloseClick={() => {
-             setSelectedMarker(null);
-             setShowTagInput(false);
-             setNewTag('');
-           }}
-         >
-           <div
-             className="relative p-4"
-             style={{ width: '300px', minHeight: '200px' }}
-           >
-             <h3 className="text-lg font-bold">{selectedMarker?.name}</h3>
-             {selectedMarker.address && (
-               <p className="text-sm text-gray-600">
-                 {selectedMarker.address}
-               </p>
-             )}
-             <button
-               onClick={() => handleLikePlace(selectedMarker)}
-               className="absolute p-2 text-xl rounded-full top-2 right-2 focus:outline-none"
-             >
-               {selectedMarker.likeYn ? '❤️' : '🤍'}
-             </button>
-             {/* 태그 영역 */}
-             <div className="mt-4">
-               <div className="flex items-center justify-between">
-                 <h4 className="text-sm font-semibold">태그:</h4>
-                 <button
-                   onClick={() => setShowTagInput(true)}
-                   className="px-3 py-1 text-white bg-green-500 rounded hover:bg-green-600"
-                 >
-                   태그 추가
-                 </button>
-               </div>
-               {showTagInput && (
-                 <div className="flex items-center gap-2 mt-2">
-                   <input
-                     type="text"
-                     value={newTag}
-                     onChange={(e) => setNewTag(e.target.value)}
-                     placeholder="태그 입력 (최대 20자)"
-                     maxLength={20}
-                     className="px-2 py-1 border rounded"
-                   />
-                   <button
-                     onClick={handleTagSubmit}
-                     className="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600"
-                   >
-                     확인
-                   </button>
-                 </div>
-               )}
-               {selectedMarker.tags && selectedMarker.tags.length > 0 ? (
-                 <div className="flex flex-wrap gap-1 mt-2">
-                   {selectedMarker.tags.map((tag, idx) => (
-                     <span
-                       key={tag.placeTagId || idx}
-                       className="text-xs bg-gray-200 px-1 py-0.5 rounded"
-                     >
-                       {typeof tag === 'object' ? tag.name : tag}
-                     </span>
-                   ))}
-                 </div>
-               ) : (
-                 <p className="mt-2 text-sm text-gray-500">
-                   태그가 없습니다. 여행태그를 작성해보세요!
-                 </p>
-               )}
-             </div>
-           </div>
-         </InfoWindow>
-       )}
-     </GoogleMap>
-   </div>
+        <GoogleMap
+          mapContainerStyle={{ width: '100%', height: '100%' }}
+          center={coordinates}
+          zoom={12}
+          options={{
+            mapTypeControl: false,
+            streetViewControl: false,
+            rotateControl: false,
+            fullscreenControl: false,
+          }}
+        >
+          {/* 즐겨찾기 마커들을 OverlayView를 이용해 커스텀 마커로 표시 */}
+          {favorites.map((marker, index) => (
+            <OverlayView
+              key={index}
+              position={{ lat: marker.latitude, lng: marker.longitude }}
+              mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+            >
+              <div
+                className="relative cursor-pointer w-14 h-14 hover:animate-shake"
+                onClick={() => handleMarkerClick(marker)}
+              >
+                <img src={bananaIcon} alt="marker" className="w-full h-full" />
+                <div className="absolute text-xl transform translate-x-1/2 -translate-y-1/2 right-2 top-6">
+                  {marker.likeYn ? '❤️' : '🤍'}
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center font-bold transform translate-y-1/4">
+                  {marker.likeCount || 0}
+                </div>
+              </div>
+            </OverlayView>
+          ))}
+          {selectedMarker && (
+            <InfoWindow
+              position={{
+                lat: selectedMarker.latitude,
+                lng: selectedMarker.longitude,
+              }}
+              onCloseClick={() => {
+                setSelectedMarker(null);
+                setShowTagInput(false);
+                setNewTag('');
+              }}
+            >
+              <div
+                className="relative p-4"
+                style={{ width: '300px', minHeight: '200px' }}
+              >
+                <h3 className="text-lg font-bold">{selectedMarker?.name}</h3>
+                {selectedMarker.address && (
+                  <p className="text-sm text-gray-600">
+                    {selectedMarker.address}
+                  </p>
+                )}
+                <button
+                  onClick={() => handleLikePlace(selectedMarker)}
+                  className="absolute p-2 text-xl rounded-full top-2 right-2 focus:outline-none"
+                >
+                  {selectedMarker.likeYn ? '❤️' : '🤍'}
+                </button>
+                {/* 태그 영역 */}
+                <div className="mt-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-semibold">태그:</h4>
+                    <button
+                      onClick={() => setShowTagInput(true)}
+                      className="px-3 py-1 text-white bg-green-500 rounded hover:bg-green-600"
+                    >
+                      태그 추가
+                    </button>
+                  </div>
+                  {showTagInput && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <input
+                        type="text"
+                        value={newTag}
+                        onChange={(e) => setNewTag(e.target.value)}
+                        placeholder="태그 입력 (최대 20자)"
+                        maxLength={20}
+                        className="px-2 py-1 border rounded"
+                      />
+                      <button
+                        onClick={handleTagSubmit}
+                        className="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600"
+                      >
+                        확인
+                      </button>
+                    </div>
+                  )}
+                  {selectedMarker.tags && selectedMarker.tags.length > 0 ? (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {selectedMarker.tags.map((tag, idx) => (
+                        <span
+                          key={tag.placeTagId || idx}
+                          className="text-xs bg-gray-200 px-1 py-0.5 rounded"
+                        >
+                          {typeof tag === 'object' ? tag.name : tag}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="mt-2 text-sm text-gray-500">
+                      태그가 없습니다. 여행태그를 작성해보세요!
+                    </p>
+                  )}
+                </div>
+              </div>
+            </InfoWindow>
+          )}
+        </GoogleMap>
+      </div>
 
       {/* 채팅창 */}
       <div
-        className={`absolute transition-all duration-300 overflow-hidden ${
-          isChatOpen
-            ? 'top-4 right-4 w-96 h-[500px] rounded-lg overflow-hidden'
-            : 'bottom-4 right-4 w-12 h-12 rounded-lg  overflow-visible'
-        }`}
+        className={`absolute transition-all duration-300 overflow-hidden ${isChatOpen
+          ? 'top-4 right-4 w-96 h-[500px] rounded-lg overflow-hidden'
+          : 'bottom-4 right-4 w-12 h-12 rounded-lg  overflow-visible'
+          }`}
       >
         {isChatOpen ? (
           <div className="relative w-full h-full bg-white rounded-lg shadow-lg">
@@ -250,4 +281,3 @@ export default InteractiveSection;
 
 
 
-    
