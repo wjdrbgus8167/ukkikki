@@ -93,7 +93,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
   return (
     <div className="relative w-full h-screen">
       {/* ✅ 웹소켓 구독을 위한 WebSocketComponent 추가 */}
-      <WebSocketComponent travelPlanId={selectedCard.travelPlanId} setFavorites={setFavorites} />
+      <WebSocketComponent travelPlanId={selectedCard.travelPlanId} setFavorites={setFavorites} favorites={favorites} />
 
       {/* 지도 영역 */}
       <div className="w-full h-full">
