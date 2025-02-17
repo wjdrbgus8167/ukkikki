@@ -83,8 +83,18 @@ const MapSearchBar = ({
         // 구글의 placeId 대신 DB에서 생성된 ID로 업데이트
         const updatedPlace = { ...searchedPlace, placeId: dbPlaceId };
         // 부모의 onPlaceSelected를 통해 favorites 상태 업데이트
-        onPlaceSelected(updatedPlace);
-        // 로컬 상태도 업데이트하여 이후 좋아요 API 호출 시 올바른 ID 사용
+        // 📌 중복 체크 후 추가 (favorites에 존재하는지 확인)
+        if (
+          !favorites.some(
+            (fav) =>
+              fav.placeId === updatedPlace.placeId ||
+              (fav.latitude === updatedPlace.latitude &&
+                fav.longitude === updatedPlace.longitude),
+          )
+        ) {
+          onPlaceSelected(updatedPlace);
+        }
+
         setSearchedPlace(updatedPlace);
         setIsRegistered(true);
 

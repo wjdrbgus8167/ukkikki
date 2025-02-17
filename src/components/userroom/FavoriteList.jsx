@@ -65,7 +65,7 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
       let updatedPlace;
       if (!isLiked) {
         await publicRequest.post(
-          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`
+          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
         );
         updatedPlace = {
           ...place,
@@ -73,10 +73,10 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
           isLiked: true,
           likeCount: place.likeCount + totalMember,
         };
-        actionType = "LIKE"
+        actionType = 'LIKE';
       } else {
         await publicRequest.delete(
-          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`
+          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
         );
         updatedPlace = {
           ...place,
@@ -84,31 +84,30 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
           isLiked: false,
           likeCount: Math.max(place.likeCount - totalMember, 0),
         };
-        actionType = "UNLIKE"
+        actionType = 'UNLIKE';
       }
 
       if (stompClient && stompClient.connected) {
         const wsData = {
           action: actionType, // ✅ Action Enum 값 전송
           placeName,
-          travelPlanId
+          travelPlanId,
         };
         // 웹소켓 전송용 데이터
         stompClient.publish({
-          destination: "/pub/actions",
+          destination: '/pub/actions',
           body: JSON.stringify(wsData),
         });
-        console.log("✅ FavoriteList-좋아요 이벤트:", wsData);
+        console.log('✅ FavoriteList-좋아요 이벤트:', wsData);
       }
       setFavorites((prev) =>
-        prev.map((fav) => (fav.placeId === placeId ? updatedPlace : fav))
+        prev.map((fav) => (fav.placeId === placeId ? updatedPlace : fav)),
       );
     } catch (error) {
-      console.error("🚨 좋아요 처리 실패:", error);
-      Swal.fire("알림", "🚨 좋아요 처리 중 오류가 발생했습니다.", "error");
+      console.error('🚨 좋아요 처리 실패:', error);
+      Swal.fire('알림', '🚨 좋아요 처리 중 오류가 발생했습니다.', 'error');
     }
   };
-
 
   const handleTagDelete = async (placeId, tagId) => {
     Swal.fire({
@@ -130,9 +129,9 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
               prev.map((fav) =>
                 fav.placeId === placeId
                   ? {
-                    ...fav,
-                    tags: fav.tags.filter((tag) => tag.placeTagId !== tagId),
-                  }
+                      ...fav,
+                      tags: fav.tags.filter((tag) => tag.placeTagId !== tagId),
+                    }
                   : fav,
               ),
             );
@@ -182,16 +181,16 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
           prev.map((fav) =>
             fav.placeId === expandedPlaceId
               ? {
-                ...fav,
-                tags: [
-                  ...fav.tags,
-                  {
-                    placeTagId: response.data.id,
-                    name: newTag.trim(),
-                    isMyTag: true,
-                  },
-                ],
-              }
+                  ...fav,
+                  tags: [
+                    ...fav.tags,
+                    {
+                      placeTagId: response.data.id,
+                      name: newTag.trim(),
+                      isMyTag: true,
+                    },
+                  ],
+                }
               : fav,
           ),
         );
@@ -229,10 +228,11 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
               </h3>
             </div>
             <button
-              className={`px-2 py-1 text-sm rounded-md ${item.isLiked
-                ? 'text-red-500 bg-gray-300'
-                : 'text-gray-500 bg-gray-200'
-                }`}
+              className={`px-2 py-1 text-sm rounded-md ${
+                item.isLiked
+                  ? 'text-red-500 bg-gray-300'
+                  : 'text-gray-500 bg-gray-200'
+              }`}
               onClick={(e) => {
                 e.stopPropagation();
                 handleLikeToggle(item);
@@ -254,10 +254,11 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
                           ? () => handleTagDelete(item.placeId, tag.placeTagId)
                           : undefined
                       }
-                      className={`px-2 py-1 text-sm rounded-full cursor-pointer ${tag.isMyTag
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-yellow text-brown'
-                        }`}
+                      className={`px-2 py-1 text-sm rounded-full cursor-pointer ${
+                        tag.isMyTag
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-yellow text-brown'
+                      }`}
                     >
                       {typeof tag === 'object' ? tag.name : tag}
                       {tag.isMyTag && (
