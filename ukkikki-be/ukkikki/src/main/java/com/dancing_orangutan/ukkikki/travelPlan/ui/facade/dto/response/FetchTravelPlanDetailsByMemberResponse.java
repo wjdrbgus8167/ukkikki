@@ -172,10 +172,13 @@ public record FetchTravelPlanDetailsByMemberResponse(TravelPlanResponse travelPl
 
 
 		private static VoteSurveyInfo fromEntity(VoteSurveyEntity entity, boolean canVote) {
-			return VoteSurveyInfo.builder()
-					.canVote(canVote)
-					.voteSurveyId(entity.getVoteSurveyId())
-					.build();
+			if (entity != null) {
+				return VoteSurveyInfo.builder()
+						.canVote(canVote)
+						.voteSurveyId(entity.getVoteSurveyId())
+						.build();
+			}
+			return null;
 		}
 
 	}
