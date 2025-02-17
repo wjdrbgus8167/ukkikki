@@ -13,7 +13,7 @@ export const stompClient = new Client({
   heartbeatOutgoing: 4000,
 });
 
-const WebSocketComponent = ({ travelPlanId, setFavorites }) => {
+const WebSocketComponent = ({ travelPlanId, setFavorites,favorites }) => {
   useEffect(() => {
     stompClient.onConnect = () => {
       console.log('✅ STOMP WebSocket 연결됨');
@@ -28,15 +28,18 @@ const WebSocketComponent = ({ travelPlanId, setFavorites }) => {
           // ✅ 기존 favorites는 그대로 두고, 웹소켓으로 받은 데이터만 업데이트
           setFavorites((prev) => {
             const existingMarker = prev.find(
-              (fav) => fav.placeId === updatedPlace.placeId,
+              (fav) => fav.placeId === updatedPlace.placeId
             );
             if (existingMarker) {
               return prev.map((fav) =>
-                fav.placeId === updatedPlace.placeId ? updatedPlace : fav,
+                fav.placeId === updatedPlace.placeId
+                  ? { ...fav, likeCount: updatedPlace.likeCount }
+                  : fav
               );
             }
             return [...prev, updatedPlace]; // 새로운 장소라면 추가
           });
+          
         },
       );
     };
@@ -58,7 +61,7 @@ const WebSocketComponent = ({ travelPlanId, setFavorites }) => {
         console.log('🛑 STOMP WebSocket 종료');
       }
     };
-  }, [travelPlanId, setFavorites]);
+  }, [travelPlanId, setFavorites,favorites]);
 
   return null;
 };
