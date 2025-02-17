@@ -1,6 +1,5 @@
 package com.dancing_orangutan.ukkikki.global.oauth;
 
-import com.dancing_orangutan.ukkikki.global.error.ApiException;
 import com.dancing_orangutan.ukkikki.global.error.ErrorCode;
 import com.dancing_orangutan.ukkikki.member.domain.member.MemberEntity;
 import com.dancing_orangutan.ukkikki.member.infrastructure.member.JpaMemberRepository;
@@ -36,7 +35,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         MemberEntity member = jpaMemberRepository.findByEmail(email)
                 .map(memberEntity -> {
                     if(!memberEntity.getProvider().equals(registrationId)){
-                        throw new ApiException(ErrorCode.EMAIL_ALREADY_IN_USE);
+                        ErrorCode errorCode = ErrorCode.EMAIL_ALREADY_IN_USE;
+                        throw new OAuth2AuthenticationException(errorCode.name() + ":" + errorCode.getMessage());
                     }
                     return memberEntity;
                 })

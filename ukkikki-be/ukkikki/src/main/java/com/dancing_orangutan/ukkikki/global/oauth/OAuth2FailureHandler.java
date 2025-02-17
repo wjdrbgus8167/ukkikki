@@ -1,14 +1,13 @@
 package com.dancing_orangutan.ukkikki.global.oauth;
 
 import com.dancing_orangutan.ukkikki.global.config.AppConfig;
-import com.dancing_orangutan.ukkikki.global.error.ApiException;
 import com.dancing_orangutan.ukkikki.global.error.ErrorCode;
-import com.dancing_orangutan.ukkikki.global.util.JsonResponseUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
 import java.io.IOException;
@@ -24,10 +23,12 @@ public class OAuth2FailureHandler implements AuthenticationFailureHandler {
         String errorMessage = ErrorCode.AUTHENTICATION_FAILED.getMessage();
         String errorCode = ErrorCode.AUTHENTICATION_FAILED.getCode();
 
-        if (exception.getCause() instanceof ApiException apiException) {
-            ErrorCode error = apiException.getErrorCode();
-            errorMessage = error.getMessage();
-            errorCode = error.name();
+        if (exception instanceof OAuth2AuthenticationException authEx) {
+            String[] errorParts = authEx.getMessage().split(":", 2);
+            if (errorParts.length == 2) {
+                errorCode = errorParts[0];
+                errorMessage = errorParts[1];
+            }
         }
 
         String encodedMessage = URLEncoder.encode(errorMessage, StandardCharsets.UTF_8);
