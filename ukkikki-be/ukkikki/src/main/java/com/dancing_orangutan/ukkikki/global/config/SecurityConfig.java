@@ -32,8 +32,6 @@ public class SecurityConfig {
     private final JpaMemberRepository jpaMemberRepository;
     private final CorsFilter corsFilter;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
-    private final OAuth2FailureHandler oAuth2FailureHandler;
-
     /**
      * 비밀번호 암호화 설정
      */
@@ -53,6 +51,11 @@ public class SecurityConfig {
     @Bean
     public OAuth2SuccessHandler oAuth2SuccessHandler() {
         return new OAuth2SuccessHandler(jwtTokenProvider, jpaMemberRepository, appConfig);
+    }
+
+    @Bean
+    public OAuth2FailureHandler oAuth2FailureHandler() {
+        return new OAuth2FailureHandler();
     }
 
     @Bean
@@ -89,7 +92,7 @@ public class SecurityConfig {
                 .oauth2Login(oauth -> oauth
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler())
-                        .failureHandler(oAuth2FailureHandler)
+                        .failureHandler(oAuth2FailureHandler())
                 )
                 .logout(logout -> logout
                         .logoutUrl("/auth/logout")
