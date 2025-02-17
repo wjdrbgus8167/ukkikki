@@ -1,5 +1,6 @@
 package com.dancing_orangutan.ukkikki.proposal.ui;
 
+import com.dancing_orangutan.ukkikki.event.eventPublisher.SpringEventPublisher;
 import com.dancing_orangutan.ukkikki.global.security.CompanyUserDetails;
 import com.dancing_orangutan.ukkikki.global.security.MemberUserDetails;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 public class ProposalController {
 
     private final ProposalService proposalService;
+    private final SpringEventPublisher eventPublisher;
 
     // 제안서 작성
     @PostMapping
@@ -157,22 +159,22 @@ public class ProposalController {
 
     // 투표 시작하기
     @PostMapping("/{proposalId}/vote-survey")
-    public ApiUtils.ApiResponse<CreateVoteSurveyResponse> voteSurvey(
+    public ApiUtils.ApiResponse<?> voteSurvey(
             @PathVariable Integer travelPlanId,
             @PathVariable Integer proposalId,
             @AuthenticationPrincipal MemberUserDetails memberUserDetails
     ){
-        CreateVoteSurveyCommand command =CreateVoteSurveyCommand.builder()
-                .surveyStartTime(LocalDateTime.now())
-                .surveyEndTime(LocalDateTime.now().plusHours(72))
-                .travelPlanId(travelPlanId)
-                .proposalId(proposalId)
-                .memberId(memberUserDetails.getMemberId())
-                .build();
+//        CreateVoteSurveyCommand command =CreateVoteSurveyCommand.builder()
+//                .surveyStartTime(LocalDateTime.now())
+//                .surveyEndTime(LocalDateTime.now().plusHours(72))
+//                .travelPlanId(travelPlanId)
+//                .proposalId(proposalId)
+//                .memberId(memberUserDetails.getMemberId())
+//                .build();
 
-        CreateVoteSurveyResponse response = proposalService.createVoteSurvey(command);
+        //CreateVoteSurveyResponse response = proposalService.createVoteSurvey(command);
 
-        return ApiUtils.success(response);
+        return ApiUtils.success("투표시작 ");
     }
 
     // 투표하기
