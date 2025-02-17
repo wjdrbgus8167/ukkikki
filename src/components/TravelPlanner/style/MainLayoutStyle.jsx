@@ -45,7 +45,7 @@ export const StylePlaceSelection = styled.div`
   background-color: white;
   opacity: 1;
 
-  @media (max-width: 1700px) {
+  @media (max-width: 1500px) {
     display: none;
   }
 `;

@@ -61,3 +61,15 @@ export const CreateTravelProposal = async(travelPlanId, payload) => {
     console.log('error:',error)
   };
 };
+
+//확정된 제안서의 여권 조회
+export const getPassport = async(proposalId) => {
+  try {
+    const response = await publicRequest.get(`api/v1/proposals/${proposalId}/passports`);
+    console.log(' 확정된 제안서의 여권 조회회:', response.data)
+    return response.data;
+  } catch(error) {
+    console.log('error:',error)
+  };
+};
+
