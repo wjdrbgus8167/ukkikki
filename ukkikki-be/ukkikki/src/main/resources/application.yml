@@ -1,6 +1,12 @@
 server:
+  port: 9443
   servlet:
     contextPath: /api/v1
+  ssl:
+    key-store: ${KEY_STORE_PATH}
+    key-store-password: ${KEY_STORE_PASSWORD}
+    key-alias: i12c204_ssl
+    enabled: true
 
 spring:
   h2:
