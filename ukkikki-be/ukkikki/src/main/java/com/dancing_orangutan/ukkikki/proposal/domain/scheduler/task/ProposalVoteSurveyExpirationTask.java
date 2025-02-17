@@ -21,5 +21,6 @@ public class ProposalVoteSurveyExpirationTask implements Runnable {
 
         // Vote 종료시간 다됐다
         eventPublisher.publish(VoteSurveyCloseTimeReachedEvent.builder().travelPlanId(travelPlanId).build());
+        log.info("Vote 종료시간 도달");
     }
 }

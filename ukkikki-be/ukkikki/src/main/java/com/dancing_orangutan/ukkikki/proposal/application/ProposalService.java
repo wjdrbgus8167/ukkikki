@@ -475,20 +475,7 @@ public class ProposalService {
     @Transactional
     public void createVoteSurvey(CreateVoteSurveyCommand command) {
 
-//        // 여행 계획(travelPlanId) 존재 여부 확인
-//        MemberTravelPlanEntity memberTravelPlan = memberTravelPlanFinder
-//                .findByTravelPlanIdAndMemberId(command.getTravelPlanId(), command.getMemberId());
-//
-//        if(memberTravelPlan==null){
-//            throw new EntityNotFoundException("해당 일정을 찾을 수 없습니다.");
-//        }
-
-
-//        // memberId가 해당 여행 계획의 호스트인지 확인
-//        if (!memberTravelPlan.isHostYn()) {
-//            throw new IllegalArgumentException("투표를 시작할 권한이 없습니다 방장만 투표를 시작할 수 있습니다.");
-//        }
-
+        // 제안서 불러오기
         List<ProposalEntity> proposals = proposalRepository.findByTravelPlanId(command.getTravelPlanId());
 
         // 투표 설문 생성 (현재 시간 기준 +72시간 설정)
@@ -501,9 +488,6 @@ public class ProposalService {
         // 투표 설문 저장
         VoteSurvey voteSurvey = voteSurveyMapper.entityToDomain(voteSurveyRepository.save(savedVoteSurvey));
 
-        //투표 진행 중으로 상태 업데이트
-        //List<ProposalEntity> proposals = proposalRepository.findByTravelPlanId(command.getTravelPlanId());
-
         proposals.forEach(proposal -> proposal.updateVotingStatus());
 
         // 배치 업데이트
@@ -515,9 +499,6 @@ public class ProposalService {
                 .build();
 
         eventPublisher.publish(event);
-
-        return ;
-
     }
 
     // 제안서 투표

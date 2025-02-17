@@ -8,6 +8,7 @@ import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEnti
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -16,6 +17,7 @@ public class SubmitTravelPlanServiceImpl implements SubmitTravelPlanService {
 	private final TravelPlanRepository travelPlanRepository;
 
 	@Override
+	@Transactional
 	public void submitTravelPlan(final SubmitTravelPlanCommand command) {
 		TravelPlanEntity entity = travelPlanRepository.findById(command.travelPlanId())
 				.orElseThrow(() -> new ApiException(
