@@ -203,7 +203,8 @@ public class ProposalService {
                         schedule.getImageUrl(),
                         schedule.getDayNumber(),
                         schedule.getLatitude(),
-                        schedule.getLongitude()))
+                        schedule.getLongitude(),
+                        schedule.getScheduleId()))
                 .collect(Collectors.toList());
 
         List<ProposalDetailResponse.DayResponse> dayResponses = schedules.stream()
@@ -365,7 +366,8 @@ public class ProposalService {
                         schedule.getImageUrl(),
                         schedule.getDayNumber(),
                         schedule.getLatitude(),
-                        schedule.getLongitude()))
+                        schedule.getLongitude(),
+                        schedule.getScheduleId()))
                 .collect(Collectors.toList());
 
         // 3️⃣ dayNumber 기준으로 그룹핑
@@ -470,6 +472,119 @@ public class ProposalService {
 
         jpaScheduleRepository.save(scheduleEntity);
     }
+
+    public void updateProposal(UpdateProposalCommand command) {
+
+        log.info("command:{}", command);
+
+        // Proposal 조회
+        ProposalEntity proposal = proposalRepository.findById(command.getProposalId());
+        if (proposal == null) {
+            throw new EntityNotFoundException("해당 제안서를 찾을 수 없습니다.");
+        }
+
+        if (ProposalStatus.D.equals(proposal.getProposalStatus()) || ProposalStatus.V.equals(proposal.getProposalStatus())) {
+            throw new IllegalArgumentException("제안서가 거절 또는 진행 상태일 때 수정이 불가합니다.");
+        }
+
+        // Proposal 기본 정보 업데이트
+        proposal.updateProposal(
+                proposal.getProposalId(),
+                command.getName(),
+                command.getStartDate(),
+                command.getEndDate(),
+                command.getAirline(),
+                command.getStartDateBoardingTime(),
+                command.getStartDateArrivalTime(),
+                command.getEndDateBoardingTime(),
+                command.getEndDateArrivalTime(),
+                command.getDeposit(),
+                command.getMinPeople(),
+                command.isGuideIncluded(),
+                command.getProductIntroduction(),
+                command.getRefundPolicy(),
+                command.isInsuranceIncluded(),
+                command.getProposalStatus(),
+                proposal.getCreateTime(),
+                LocalDateTime.now(),
+                proposal.getCompany(),
+                proposal.getTravelPlan(),
+                proposal.getDepartureAirport(),
+                proposal.getArrivalAirport()
+        );
+
+        log.info("proposal:{}", proposal);
+
+        // Step 1: 요청된 scheduleItems 내에서 겹치는지 검사
+        // 요청된 일정들 중에서 겹치는지 확인
+        if (Schedule.hasOverlappingSchedules(
+                command.getScheduleItems().stream()
+                        .map(scheduleCommand -> Schedule.builder()
+                                .scheduleName(scheduleCommand.getScheduleName())
+                                .startTime(scheduleCommand.getStartDate())
+                                .endTime(scheduleCommand.getEndDate())
+                                .imageUrl(scheduleCommand.getImageUrl())
+                                .dayNumber(scheduleCommand.getDayNumber())
+                                .latitude(scheduleCommand.getLatitude())
+                                .longitude(scheduleCommand.getLongitude())
+                                .build())
+                        .collect(Collectors.toList()))
+        ) {
+            throw new IllegalArgumentException("요청된 일정들 중 겹치는 일정이 있습니다.");
+        }
+
+
+        // Step 2: 기존 스케줄 조회 및 Map 변환
+        List<ScheduleEntity> existingSchedules = jpaScheduleRepository.findByProposal_ProposalId(command.getProposalId());
+        Map<Integer, ScheduleEntity> existingScheduleMap = existingSchedules.stream()
+                .collect(Collectors.toMap(ScheduleEntity::getScheduleId, schedule -> schedule));
+
+        // 요청된 일정 ID 추적
+        Set<Integer> incomingScheduleIds = new HashSet<>();
+
+        // Step 3: 요청된 일정 처리
+        for (UpdateScheduleCommand scheduleCommand : command.getScheduleItems()) {
+            Integer currentScheduleId = scheduleCommand.getScheduleId();
+
+            if (currentScheduleId != null && existingScheduleMap.containsKey(currentScheduleId)) {
+                // 기존 일정 업데이트
+                ScheduleEntity existingSchedule = existingScheduleMap.get(currentScheduleId);
+                existingSchedule.updateSchedule(
+                        scheduleCommand.getScheduleName(),
+                        scheduleCommand.getStartDate(),
+                        scheduleCommand.getEndDate(),
+                        scheduleCommand.getImageUrl(),
+                        scheduleCommand.getDayNumber(),
+                        scheduleCommand.getLatitude(),
+                        scheduleCommand.getLongitude()
+                );
+                incomingScheduleIds.add(currentScheduleId);
+            } else {
+                // 새로운 일정 생성
+                ScheduleEntity newSchedule = ScheduleEntity.builder()
+                        .scheduleName(scheduleCommand.getScheduleName())
+                        .startTime(scheduleCommand.getStartDate())
+                        .endTime(scheduleCommand.getEndDate())
+                        .imageUrl(scheduleCommand.getImageUrl())
+                        .dayNumber(scheduleCommand.getDayNumber())
+                        .latitude(scheduleCommand.getLatitude())
+                        .longitude(scheduleCommand.getLongitude())
+                        .proposal(proposal)
+                        .build();
+                jpaScheduleRepository.save(newSchedule);
+            }
+        }
+
+        // Step 4: 기존 스케줄 중 요청에 없는 일정 삭제
+        existingSchedules.stream()
+                .filter(schedule -> !incomingScheduleIds.contains(schedule.getScheduleId()))
+                .forEach(jpaScheduleRepository::delete);
+
+        log.info("✅ 일정 업데이트 완료!");
+    }
+
+
+
 
     // 제안서 투표 시작
     @Transactional
