@@ -100,7 +100,7 @@ const MapSearchBar = ({
             travelPlanId: selectedTravelPlanId
           };
           stompClient.publish({
-            destination: '/pub/likes',
+            destination: '/pub/actions',
             body: JSON.stringify(wsData),
           });
           console.log('✅ MapSearchBar 장소 등록 이벤트 발행:', wsData);
