@@ -7,6 +7,7 @@ import { CiCirclePlus } from 'react-icons/ci';
 import { stompClient } from '../../components/userroom/WebSocketComponent';
 
 const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
+  const { user } = useAuthStore();
   const [expandedPlaceId, setExpandedPlaceId] = useState(null);
   const [showTagInput, setShowTagInput] = useState(false);
   const [newTag, setNewTag] = useState('');
@@ -19,14 +20,11 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
         try {
           const updatedMarker = JSON.parse(message.body);
           console.log('웹소켓 수신, 업데이트된 마커:', updatedMarker);
-          setFavorites((prev) => {
-            // 📌 중복 체크 후 추가
-            if (!prev.some((fav) => fav.placeId === updatedMarker.placeId)) {
-              console.log('디버깅:', fav.placeId, updatedMarker.placeId);
-              return [...prev, updatedMarker];
-            }
-            return prev;
-          });
+          setFavorites((prev) =>
+            prev.map((fav) =>
+              fav.placeId === updatedMarker.placeId ? updatedMarker : fav,
+            ),
+          );
         } catch (e) {
           console.error('웹소켓 메시지 처리 실패:', e);
         }
@@ -40,9 +38,7 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
   // MapSearchBar에서 선택 시 부모의 favorites에 추가
   const handlePlaceSelected = (newPlace) => {
     setFavorites((prev) => {
-      if (prev.some((fav) => fav.placeId === newPlace.placeId)) {
-        return prev;
-      }
+      if (prev.some((fav) => fav.name === newPlace.name)) return prev;
       return [
         ...prev,
         { ...newPlace, likeCount: 0, isLiked: false, likeYn: false, tags: [] },

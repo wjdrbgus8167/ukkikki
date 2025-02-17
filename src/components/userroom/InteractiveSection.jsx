@@ -22,16 +22,17 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
   const [newTag, setNewTag] = useState('');
   const [renderKey, setRenderKey] = useState(0); // GoogleMap 강제 리렌더링용
 
-  // WebSocket을 활용한 실시간 마커 업데이트
+  // ✅ WebSocket을 활용한 실시간 마커 업데이트
   useEffect(() => {
     console.log('✅ favorites 상태 변경됨:', favorites);
     setRenderKey((prev) => prev + 1); // Google Map 강제 리렌더링
   }, [favorites]);
 
-  // Google Geocoding API로 도시 좌표 가져오기
+  // ✅ 도시 좌표 가져오기 (Google Geocoding API)
   useEffect(() => {
     if (!selectedCard || !selectedCard.arrivalCity?.name) return;
     const city = selectedCard.arrivalCity.name;
+
     const getCoordinates = async () => {
       const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${city}&key=${apiKey}`;
       try {
@@ -45,10 +46,11 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
         console.error('🚨 Geocoding 요청 실패:', error);
       }
     };
+
     getCoordinates();
   }, [selectedCard]);
 
-  // 마커 클릭 시 상태 업데이트
+  // ✅ 마커 클릭 시 상태 업데이트
   const handleMarkerClick = (marker) => {
     setSelectedMarker({ ...marker });
   };
@@ -61,14 +63,17 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
 
     const travelPlanId = selectedCard.travelPlanId;
     const placeId = place.placeId;
-    const isLiked = place.likeYn;
-    const totalMember = selectedCard.member?.totalParticipants || 0;
+    const isLiked = place.likeYn; // 기존 좋아요 상태
+    const totalMember = selectedCard?.member?.totalParticipants || 0;
+
     const placeName = place.name;
     let actionType;
 
     try {
       let updatedMarker;
+
       if (isLiked) {
+        console.log('좋아요 삭제');
         await publicRequest.delete(
           `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
         );
@@ -80,6 +85,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
         };
         actionType = 'UNLIKE';
       } else {
+        console.log('좋아요 추가');
         await publicRequest.post(
           `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
         );
@@ -92,23 +98,22 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
         actionType = 'LIKE';
       }
 
-      // 상태 업데이트: 새로운 배열로 리렌더링 유도
+      // ✅ 상태 업데이트 - 새로운 배열을 반환하여 리렌더링 유도
       setFavorites((prev) => {
         const newFavorites = prev.map((fav) =>
           fav.placeId === placeId ? { ...updatedMarker } : fav,
         );
-        return [...newFavorites];
+        return [...newFavorites]; // 새로운 배열을 반환해 참조 변경
       });
 
-      // 현재 선택된 마커 업데이트
+      // ✅ 현재 선택된 마커도 업데이트 (UI 즉시 반영)
       setSelectedMarker((prev) =>
         prev && prev.placeId === placeId ? { ...updatedMarker } : prev,
       );
-
-      // WebSocket 이벤트 전송
+      // ✅ WebSocket을 통해 실시간으로 마커 상태 변경 전송
       if (stompClient && stompClient.connected) {
         const wsData = {
-          action: actionType,
+          action: actionType, // ✅ Action Enum 값 전송
           placeName,
           travelPlanId,
         };
@@ -159,7 +164,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
 
   return (
     <div className="relative w-full h-screen">
-      {/* 웹소켓 구독을 위한 WebSocketComponent */}
+      {/* ✅ 웹소켓 구독을 위한 WebSocketComponent 추가 */}
       <WebSocketComponent
         travelPlanId={selectedCard.travelPlanId}
         setFavorites={setFavorites}
@@ -179,6 +184,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
             fullscreenControl: false,
           }}
         >
+          {/* 즐겨찾기 마커들을 OverlayView를 이용해 커스텀 마커로 표시 */}
           {favorites.map((marker, index) => (
             <OverlayView
               key={index}
@@ -281,10 +287,10 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
 
       {/* 채팅창 */}
       <div
-        className={`absolute transition-all duration-300 ${
+        className={`absolute transition-all duration-300 overflow-hidden ${
           isChatOpen
             ? 'top-4 right-4 w-96 h-[500px] rounded-lg overflow-hidden'
-            : 'bottom-4 right-4 w-12 h-12 rounded-lg overflow-visible'
+            : 'bottom-4 right-4 w-12 h-12 rounded-lg  overflow-visible'
         }`}
       >
         {isChatOpen ? (
