@@ -24,24 +24,22 @@ const WebSocketComponent = ({ travelPlanId, setFavorites,favorites }) => {
         (message) => {
           const updatedPlace = JSON.parse(message.body);
           console.log('🔥 받은 마커 업데이트 데이터:', updatedPlace);
-
-          // ✅ 기존 favorites는 그대로 두고, 웹소켓으로 받은 데이터만 업데이트
+      
           setFavorites((prev) => {
-            const existingMarker = prev.find(
-              (fav) => fav.placeId === updatedPlace.placeId
-            );
+            const existingMarker = prev.find((fav) => fav.placeId === updatedPlace.placeId);
             if (existingMarker) {
               return prev.map((fav) =>
                 fav.placeId === updatedPlace.placeId
-                  ? { ...fav, likeCount: updatedPlace.likeCount }
+                  ? { ...fav, likeCount: updatedPlace.likeCount } // <-- 좋아요 수를 업데이트하는지 확인
                   : fav
               );
             }
-            return [...prev, updatedPlace]; // 새로운 장소라면 추가
+            return [...prev, updatedPlace];
           });
-          
-        },
+        }
       );
+    
+
     };
 
     stompClient.onDisconnect = () => {
@@ -61,7 +59,7 @@ const WebSocketComponent = ({ travelPlanId, setFavorites,favorites }) => {
         console.log('🛑 STOMP WebSocket 종료');
       }
     };
-  }, [travelPlanId, setFavorites,favorites]);
+  }, [travelPlanId]);
 
   return null;
 };
