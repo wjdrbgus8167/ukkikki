@@ -49,6 +49,7 @@ export const Title = styled.h6`
 
 // 테이블 스타일
 export const TableWrapper = styled.div`
+  width: 870px;
   padding: 0;
   overflow-x: auto;
   overflow-x: hidden;
@@ -111,10 +112,33 @@ export const Status = styled.span`
   font-weight: bold;
   text-transform: uppercase;
   border-radius: 0.25rem;
-  color: white;
-  background-color: ${(props) => (props.status === 'BIDDING' 
-    ? 'green' 
-    : props.status === 'D'
-    ? 'red'
-    : 'gray')};
+  color: ${(props) => {
+    switch (props.status) {
+      case 'D':
+        return '#991B33';
+      case 'A':
+        return '#3053B4';
+      case 'W':
+        return '#1C6534';
+      case 'V':
+        return '#995E1B';
+      default:
+        return '#FFFFFF';
+    }
+  }};
+
+  background-color: ${(props) => {
+    switch (props.status) {
+      case 'D':
+        return '#FEE2E2';
+      case 'A':
+        return '#DBEAFE';
+      case 'W':
+        return '#DCFCE7';
+      case 'V':
+        return '#FEEDDB';
+      default:
+        return 'gray';
+    }
+  }};
 `;
