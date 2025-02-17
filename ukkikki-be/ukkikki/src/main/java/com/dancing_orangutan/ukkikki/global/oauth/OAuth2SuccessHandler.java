@@ -34,6 +34,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         CookieUtils.addRefreshTokenCookie(response, refreshToken);
         CookieUtils.addAccessTokenCookie(response, accessToken);
 
-        response.sendRedirect("https://"+appConfig.getDomain());
+        response.sendRedirect("https://" + appConfig.getDomain() +"/oauth/success");
     }
 }
