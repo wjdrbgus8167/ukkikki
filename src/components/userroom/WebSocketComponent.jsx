@@ -1,35 +1,32 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { Client } from "@stomp/stompjs";
 
-const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
+const baseUrl = import.meta.env.VITE_APP_API_BASE_URL
+
+export const stompClient = new Client({
+  brokerURL: `ws://${baseUrl}/ws`,
+  reconnectDelay: 5000,
+  heartbeatIncoming: 4000,
+  heartbeatOutgoing: 4000,
+});
 
 const WebSocketComponent = ({ travelPlanId, setFavorites }) => {
-  const stompClientRef = useRef(null);
-
   useEffect(() => {
-    if (stompClientRef.current) {
-      stompClientRef.current.deactivate(); // 기존 연결 해제
-    }
-
-    const stompClient = new Client({
-      brokerURL: `ws://${baseUrl}/ws`,
-      reconnectDelay: 5000,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
-    });
-
     stompClient.onConnect = () => {
       console.log("✅ STOMP WebSocket 연결됨");
 
+      // ✅ 실시간 마커 업데이트 구독 (웹소켓에서 변경된 데이터만 반영)
       stompClient.subscribe(`/sub/likes/travel-plan/${travelPlanId}`, (message) => {
         const updatedPlace = JSON.parse(message.body);
         console.log("🔥 받은 마커 업데이트 데이터:", updatedPlace);
 
-        setFavorites((prev) => {
-          const existingMarker = prev.find((fav) => fav.placeId === updatedPlace.placeId);
-          return existingMarker
-            ? prev.map((fav) => (fav.placeId === updatedPlace.placeId ? updatedPlace : fav))
-            : [...prev, updatedPlace];
+        // ✅ 기존 favorites는 그대로 두고, 웹소켓으로 받은 데이터만 업데이트
+        setFavorites(prev => {
+          const existingMarker = prev.find(fav => fav.placeId === updatedPlace.placeId);
+          if (existingMarker) {
+            return prev.map(fav => (fav.placeId === updatedPlace.placeId ? updatedPlace : fav));
+          }
+          return [...prev, updatedPlace]; // 새로운 장소라면 추가
         });
       });
     };
@@ -42,12 +39,14 @@ const WebSocketComponent = ({ travelPlanId, setFavorites }) => {
       console.error("🚨 STOMP WebSocket 에러 발생:", frame.headers["message"]);
     };
 
+    // ✅ WebSocket 연결 실행
     stompClient.activate();
-    stompClientRef.current = stompClient; // 참조 저장
 
     return () => {
-      stompClient.deactivate();
-      console.log("🛑 STOMP WebSocket 종료");
+      if (stompClient.connected) {
+        stompClient.deactivate();
+        console.log("🛑 STOMP WebSocket 종료");
+      }
     };
   }, [travelPlanId, setFavorites]);
 
