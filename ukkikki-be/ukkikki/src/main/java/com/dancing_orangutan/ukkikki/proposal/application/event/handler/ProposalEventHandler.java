@@ -41,7 +41,6 @@ public class ProposalEventHandler {
     public ConfirmProposalResponse handleProposalVoteSurveyEnd(VoteSurveyCloseTimeReachedEvent event){
 
         ConfirmProposalResponse response =proposalService.confirmProposal(event.travelPlanId());
-
         log.info(" 투표 마감:{} ",event.travelPlanId());
         log.info("확정된 투표 : {}",response);
 

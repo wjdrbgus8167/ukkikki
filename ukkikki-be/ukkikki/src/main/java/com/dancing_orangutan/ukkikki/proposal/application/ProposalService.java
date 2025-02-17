@@ -473,6 +473,7 @@ public class ProposalService {
     @Transactional
     public void createVoteSurvey(CreateVoteSurveyCommand command) {
 
+        // 제안서 불러오기
         List<ProposalEntity> proposals = proposalRepository.findByTravelPlanId(command.getTravelPlanId());
 
         // 투표 설문 생성 (현재 시간 기준 +72시간 설정)
