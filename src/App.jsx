@@ -9,7 +9,6 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import MyRoomsPage from './pages/MyRoomsPage';
-import MyPage from './pages/MyPage';
 import MyProfile from './pages/MyProfilePage';
 import ProposalDetail from './pages/ProposalDetailPage';
 import UserVotePage from './pages/UserVotePage';

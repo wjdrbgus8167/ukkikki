@@ -112,5 +112,9 @@ export const Status = styled.span`
   text-transform: uppercase;
   border-radius: 0.25rem;
   color: white;
-  background-color: ${(props) => (props.status === 'BIDDING' ? 'green' : 'gray')};
+  background-color: ${(props) => (props.status === 'BIDDING' 
+    ? 'green' 
+    : props.status === 'D'
+    ? 'red'
+    : 'gray')};
 `;

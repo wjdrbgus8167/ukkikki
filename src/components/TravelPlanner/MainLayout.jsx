@@ -46,7 +46,7 @@ const MainLayout = () => {
     productIntroduction: '',
     refundPolicy: '',
     insuranceIncluded: '',
-    proposalStatus: 'V',
+    proposalStatus: 'W',
   });
 
   // 날짜별 선택된 장소들을 저장
