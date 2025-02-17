@@ -4,30 +4,34 @@ import Chat from './Chat';
 import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
 import bananaIcon from '../../assets/loading-spinner.png';
-import WebSocketComponent, { stompClient } from '../../components/userroom/WebSocketComponent';
+import WebSocketComponent, {
+  stompClient,
+} from '../../components/userroom/WebSocketComponent';
 import { RiChatSmileAiLine } from 'react-icons/ri';
 
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
 const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [coordinates, setCoordinates] = useState({ lat: 35.6895, lng: 139.6917 });
+  const [coordinates, setCoordinates] = useState({
+    lat: 35.6895,
+    lng: 139.6917,
+  });
   const [selectedMarker, setSelectedMarker] = useState(null);
   const [showTagInput, setShowTagInput] = useState(false);
   const [newTag, setNewTag] = useState('');
   const [renderKey, setRenderKey] = useState(0); // GoogleMap 강제 리렌더링용
 
-  // ✅ WebSocket을 활용한 실시간 마커 업데이트
+  // WebSocket을 활용한 실시간 마커 업데이트
   useEffect(() => {
-    console.log("✅ favorites 상태 변경됨:", favorites);
-    setRenderKey(prev => prev + 1); // Google Map 강제 리렌더링
+    console.log('✅ favorites 상태 변경됨:', favorites);
+    setRenderKey((prev) => prev + 1); // Google Map 강제 리렌더링
   }, [favorites]);
 
-  // ✅ 도시 좌표 가져오기 (Google Geocoding API)
+  // Google Geocoding API로 도시 좌표 가져오기
   useEffect(() => {
     if (!selectedCard || !selectedCard.arrivalCity?.name) return;
     const city = selectedCard.arrivalCity.name;
-
     const getCoordinates = async () => {
       const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${city}&key=${apiKey}`;
       try {
@@ -41,93 +45,126 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
         console.error('🚨 Geocoding 요청 실패:', error);
       }
     };
-
     getCoordinates();
   }, [selectedCard]);
 
-  // ✅ 마커 클릭 시 상태 업데이트
+  // 마커 클릭 시 상태 업데이트
   const handleMarkerClick = (marker) => {
     setSelectedMarker({ ...marker });
   };
 
   const handleLikePlace = async (place) => {
     if (!place || !selectedCard || !selectedCard.travelPlanId) {
-      console.error("🚨 장소 정보 또는 여행방 ID가 없습니다.");
+      console.error('🚨 장소 정보 또는 여행방 ID가 없습니다.');
       return;
     }
 
     const travelPlanId = selectedCard.travelPlanId;
     const placeId = place.placeId;
-    const isLiked = place.likeYn; // 기존 좋아요 상태
-    const totalMember = selectedCard?.member?.totalParticipants || 0;
-
+    const isLiked = place.likeYn;
+    const totalMember = selectedCard.member?.totalParticipants || 0;
     const placeName = place.name;
     let actionType;
 
-
     try {
       let updatedMarker;
-
       if (isLiked) {
-        console.log("좋아요 삭제");
-        await publicRequest.delete(`/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`);
+        await publicRequest.delete(
+          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
+        );
         updatedMarker = {
           ...place,
           likeYn: false,
           isLiked: false,
-          likeCount: Math.max(place.likeCount - totalMember, 0)
+          likeCount: Math.max(place.likeCount - totalMember, 0),
         };
-        actionType = "UNLIKE"
+        actionType = 'UNLIKE';
       } else {
-        console.log("좋아요 추가");
-        await publicRequest.post(`/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`);
+        await publicRequest.post(
+          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
+        );
         updatedMarker = {
           ...place,
           likeYn: true,
           isLiked: true,
-          likeCount: place.likeCount + totalMember
+          likeCount: place.likeCount + totalMember,
         };
-        actionType = "LIKE"
+        actionType = 'LIKE';
       }
 
-      // ✅ 상태 업데이트 - 새로운 배열을 반환하여 리렌더링 유도
+      // 상태 업데이트: 새로운 배열로 리렌더링 유도
       setFavorites((prev) => {
         const newFavorites = prev.map((fav) =>
-          fav.placeId === placeId ? { ...updatedMarker } : fav
+          fav.placeId === placeId ? { ...updatedMarker } : fav,
         );
-        return [...newFavorites]; // 새로운 배열을 반환해 참조 변경
+        return [...newFavorites];
       });
 
-      // ✅ 현재 선택된 마커도 업데이트 (UI 즉시 반영)
+      // 현재 선택된 마커 업데이트
       setSelectedMarker((prev) =>
-        prev && prev.placeId === placeId ? { ...updatedMarker } : prev
+        prev && prev.placeId === placeId ? { ...updatedMarker } : prev,
       );
-      // ✅ WebSocket을 통해 실시간으로 마커 상태 변경 전송
+
+      // WebSocket 이벤트 전송
       if (stompClient && stompClient.connected) {
         const wsData = {
-          action: actionType, // ✅ Action Enum 값 전송
+          action: actionType,
           placeName,
-          travelPlanId
+          travelPlanId,
         };
         stompClient.publish({
-          destination: "/pub/actions",
+          destination: '/pub/actions',
           body: JSON.stringify(wsData),
         });
-        console.log("✅ InteractiveSection 좋아요 이벤트:", wsData);
+        console.log('✅ InteractiveSection 좋아요 이벤트:', wsData);
       }
-
     } catch (error) {
-      console.error("🚨 좋아요 처리 실패:", error);
-      Swal.fire("알림", "🚨 좋아요 처리 중 오류가 발생했습니다.", "error");
+      console.error('🚨 좋아요 처리 실패:', error);
+      Swal.fire('알림', '🚨 좋아요 처리 중 오류가 발생했습니다.', 'error');
     }
   };
 
-
+  // handleTagSubmit 함수 정의 (태그 추가)
+  const handleTagSubmit = async () => {
+    if (newTag.trim() === '') return;
+    try {
+      const response = await publicRequest.post(
+        `/api/v1/travel-plans/${selectedCard.travelPlanId}/places/${selectedMarker.placeId}/tags`,
+        { placeTagName: newTag.trim() },
+      );
+      if (response.status === 200) {
+        // 새 태그 객체 생성 (예: response.data.data 에서 태그 ID 추출)
+        const newTagObj = { placeTagId: response.data.id, name: newTag.trim() };
+        // 선택된 마커의 태그 업데이트
+        setSelectedMarker((prev) => ({
+          ...prev,
+          tags: [...(prev.tags || []), newTagObj],
+        }));
+        // favorites 배열 내 해당 마커의 태그도 업데이트
+        setFavorites((prev) =>
+          prev.map((marker) =>
+            marker.placeId === selectedMarker.placeId
+              ? { ...marker, tags: [...(marker.tags || []), newTagObj] }
+              : marker,
+          ),
+        );
+        setNewTag('');
+        setShowTagInput(false);
+      }
+    } catch (error) {
+      console.error('태그 추가 실패:', error);
+      Swal.fire('알림', '태그 추가에 실패했습니다.', 'error');
+    }
+  };
 
   return (
     <div className="relative w-full h-screen">
-      {/* ✅ 웹소켓 구독을 위한 WebSocketComponent 추가 */}
-      <WebSocketComponent travelPlanId={selectedCard.travelPlanId} setFavorites={setFavorites} favorites={favorites} />
+      {/* 웹소켓 구독을 위한 WebSocketComponent */}
+      <WebSocketComponent
+        travelPlanId={selectedCard.travelPlanId}
+        setFavorites={setFavorites}
+        favorites={favorites}
+      />
 
       {/* 지도 영역 */}
       <div className="w-full h-full">
@@ -142,7 +179,6 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
             fullscreenControl: false,
           }}
         >
-          {/* 즐겨찾기 마커들을 OverlayView를 이용해 커스텀 마커로 표시 */}
           {favorites.map((marker, index) => (
             <OverlayView
               key={index}
@@ -245,10 +281,11 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
 
       {/* 채팅창 */}
       <div
-        className={`absolute transition-all duration-300 overflow-hidden ${isChatOpen
-          ? 'top-4 right-4 w-96 h-[500px] rounded-lg overflow-hidden'
-          : 'bottom-4 right-4 w-12 h-12 rounded-lg  overflow-visible'
-          }`}
+        className={`absolute transition-all duration-300 ${
+          isChatOpen
+            ? 'top-4 right-4 w-96 h-[500px] rounded-lg overflow-hidden'
+            : 'bottom-4 right-4 w-12 h-12 rounded-lg overflow-visible'
+        }`}
       >
         {isChatOpen ? (
           <div className="relative w-full h-full bg-white rounded-lg shadow-lg">
@@ -266,7 +303,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
               console.log('채팅 열기 클릭됨');
               setIsChatOpen(true);
             }}
-            className="flex items-center justify-center w-full h-full text-white bg-gray-800 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+            className="flex items-center justify-center w-full h-full text-white transition-all duration-300 bg-gray-800 rounded-full shadow-lg hover:scale-110"
           >
             <RiChatSmileAiLine size={24} />
           </button>
@@ -277,7 +314,3 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
 };
 
 export default InteractiveSection;
-
-
-
-
