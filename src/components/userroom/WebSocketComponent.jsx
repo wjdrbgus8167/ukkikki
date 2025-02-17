@@ -1,10 +1,16 @@
 import { useEffect } from "react";
 import { Client } from "@stomp/stompjs";
 
-const baseUrl = import.meta.env.VITE_APP_API_BASE_URL
+
+const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
+const wsProtocol = baseUrl.startsWith('https') ? 'wss' : 'ws';
+const trimmedBaseUrl = baseUrl.endsWith('/')
+  ? baseUrl.slice(0, -1)
+  : baseUrl;
+const wsUrl = `${wsProtocol}://${trimmedBaseUrl.split('//')[1]}/api/v1/ws`;
 
 export const stompClient = new Client({
-  brokerURL: `ws://${baseUrl}/ws`,
+  brokerURL: wsUrl,
   reconnectDelay: 5000,
   heartbeatIncoming: 4000,
   heartbeatOutgoing: 4000,
