@@ -72,14 +72,14 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
       }
   
           // ✅ WebSocket을 통해 실시간으로 마커 상태 변경 전송 (travelPlanId 포함)
-      if (stompClient && stompClient.connected) {
+    if (stompClient && stompClient.connected) {
       const wsData = { ...updatedMarker, travelPlanId }; // 웹소켓 전송용 데이터
-        stompClient.publish({
-          destination: "/pub/likes",
-          body: JSON.stringify(wsData),
-        });
-        console.log("✅ 웹소켓 좋아요 이벤트 발행됨:", wsData);
-      }
+      stompClient.publish({
+        destination: "/pub/likes",
+        body: JSON.stringify(wsData),
+      });
+      console.log("✅ 웹소켓 좋아요 이벤트 발행됨:", wsData);
+    }
   
       setFavorites((prev) =>
         prev.map((fav) => (fav.placeId === placeId ? updatedMarker : fav))
