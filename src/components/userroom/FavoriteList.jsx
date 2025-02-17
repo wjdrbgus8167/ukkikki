@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { publicRequest } from '../../hooks/requestMethod';
 import useAuthStore from '../../stores/authStore';
 import Swal from 'sweetalert2';
@@ -12,6 +12,28 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
   const [showTagInput, setShowTagInput] = useState(false);
   const [newTag, setNewTag] = useState('');
   const travelPlanId = selectedCard.travelPlanId;
+
+  // WebSocket 구독: /sub/likes 채널로부터 좋아요 업데이트 메시지를 받아 favorites 업데이트
+  useEffect(() => {
+    if (stompClient && stompClient.connected) {
+      const subscription = stompClient.subscribe('/sub/likes', (message) => {
+        try {
+          const updatedMarker = JSON.parse(message.body);
+          console.log('웹소켓 수신, 업데이트된 마커:', updatedMarker);
+          setFavorites((prev) =>
+            prev.map((fav) =>
+              fav.placeId === updatedMarker.placeId ? updatedMarker : fav,
+            ),
+          );
+        } catch (e) {
+          console.error('웹소켓 메시지 처리 실패:', e);
+        }
+      });
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, [setFavorites]);
 
   // MapSearchBar에서 선택 시 부모의 favorites에 추가
   const handlePlaceSelected = (newPlace) => {
@@ -57,14 +79,15 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
         };
       }
 
-      // WebSocket 이벤트 발행
+      // WebSocket 이벤트 발행: 다른 클라이언트와 현재 클라이언트에 실시간으로 반영
       if (stompClient && stompClient.connected) {
         stompClient.publish({
           destination: '/pub/likes',
           body: JSON.stringify(updatedPlace),
         });
+        console.log('웹소켓 이벤트 발행됨:', updatedPlace);
       }
-      // favorites 상태 업데이트
+      // 로컬 상태 업데이트
       setFavorites((prev) =>
         prev.map((fav) => (fav.placeId === placeId ? updatedPlace : fav)),
       );
@@ -136,17 +159,15 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
   const handleTagSubmit = async (e) => {
     e.stopPropagation();
     if (newTag.trim() === '') return;
-    const travelPlanId = selectedCard.travelPlanId;
-    const placeId = expandedPlaceId;
     try {
       const response = await publicRequest.post(
-        `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/tags`,
+        `/api/v1/travel-plans/${travelPlanId}/places/${expandedPlaceId}/tags`,
         { placeTagName: newTag.trim() },
       );
       if (response.status === 200) {
         setFavorites((prev) =>
           prev.map((fav) =>
-            fav.placeId === placeId
+            fav.placeId === expandedPlaceId
               ? {
                   ...fav,
                   tags: [
