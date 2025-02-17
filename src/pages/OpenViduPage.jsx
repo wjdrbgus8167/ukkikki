@@ -3,7 +3,11 @@ import { OpenVidu } from 'openvidu-browser';
 import axios from 'axios';
 import UserVideoComponent from '../components/userVideo/UserVideoComponent';
 
+<<<<<<< HEAD
 const APPLICATION_SERVER_URL = 'http://i12c204.p.ssafy.io:8081/api/v1';
+=======
+const APPLICATION_SERVER_URL = 'https://i12c204.p.ssafy.io:9443/api/v1';
+>>>>>>> 66ddc749af5341651f6785ee3d8083e9609f6076
 
 class OpenViduPage extends Component {
   constructor(props) {
