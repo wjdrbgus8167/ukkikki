@@ -185,8 +185,86 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
     }
   };
 
+  // 태그 삭제 함수 (내가 쓴 태그인 경우 클릭하면 삭제)
+  const handleTagDelete = async (placeId, tagId) => {
+    Swal.fire({
+      title: '태그 삭제',
+      text: '정말 이 태그를 삭제하시겠습니까?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: '삭제',
+      cancelButtonText: '취소',
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await publicRequest.delete(
+            `/api/v1/travel-plans/${selectedCard.travelPlanId}/tags/${tagId}`,
+          );
+          if (response.status === 200) {
+            // 선택된 마커의 태그 업데이트
+            setSelectedMarker((prev) => ({
+              ...prev,
+              tags: prev.tags.filter((tag) => tag.placeTagId !== tagId),
+            }));
+            // favorites 배열 내 해당 마커의 태그 업데이트
+            setFavorites((prev) =>
+              prev.map((marker) =>
+                marker.placeId === placeId
+                  ? {
+                      ...marker,
+                      tags: marker.tags.filter(
+                        (tag) => tag.placeTagId !== tagId,
+                      ),
+                    }
+                  : marker,
+              ),
+            );
+            Swal.fire('성공', '태그가 삭제되었습니다.', 'success');
+          }
+        } catch (error) {
+          console.error('태그 삭제 실패:', error);
+          Swal.fire('알림', '태그 삭제에 실패했습니다.', 'error');
+        }
+      }
+    });
+  };
 
-
+  // 태그 추가 함수
+  const handleTagSubmit = async () => {
+    if (newTag.trim() === '') return;
+    try {
+      const response = await publicRequest.post(
+        `/api/v1/travel-plans/${selectedCard.travelPlanId}/places/${selectedMarker.placeId}/tags`,
+        { placeTagName: newTag.trim() },
+      );
+      if (response.status === 200) {
+        const newTagObj = {
+          placeTagId: response.data.id,
+          name: newTag.trim(),
+          isMyTag: true,
+        };
+        // 선택된 마커의 태그 업데이트
+        setSelectedMarker((prev) => ({
+          ...prev,
+          tags: [...(prev.tags || []), newTagObj],
+        }));
+        // favorites 배열 내 해당 마커의 태그 업데이트
+        setFavorites((prev) =>
+          prev.map((marker) =>
+            marker.placeId === selectedMarker.placeId
+              ? { ...marker, tags: [...(marker.tags || []), newTagObj] }
+              : marker,
+          ),
+        );
+        setNewTag('');
+        setShowTagInput(false);
+      }
+    } catch (error) {
+      console.error('태그 추가 실패:', error);
+      Swal.fire('알림', '태그 추가에 실패했습니다.', 'error');
+    }
+  };
   return (
     <div className="relative w-full h-screen">
       {/* ✅ 웹소켓 구독을 위한 WebSocketComponent 추가 */}
