@@ -93,4 +93,8 @@ public class ChatService {
 				.build();
 	}
 
+	public String fetchMemberName(String email) {
+		return memberFinder.findNameByEmail(email).getName();
+	}
+
 }
