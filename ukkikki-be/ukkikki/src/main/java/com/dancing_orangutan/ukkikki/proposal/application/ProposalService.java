@@ -706,4 +706,18 @@ public class ProposalService {
                 .map(travelerMapper::entityToDomain)
                 .collect(Collectors.toList());
     }
+
+    public List<TravelerPassportResponse> getTravelerPassportList(Integer proposalId) {
+        return jpaTravelerRepository.findByProposal_ProposalId(proposalId).stream()
+                .map(traveler -> TravelerPassportResponse.builder()
+                        .travelerId(traveler.getTravelerId())
+                        .koreanName(traveler.getKoreanName())
+                        .englishName(traveler.getEnglishName())
+                        .passportNumber(traveler.getPassportNumber())
+                        .expirationDate(traveler.getExpirationDate())
+                        .birthDate(traveler.getBirthDate())
+                        .phoneNumber(traveler.getPhoneNumber())
+                        .build())
+                .collect(Collectors.toList());
+    }
 }
