@@ -79,13 +79,14 @@ const MapSearchBar = ({ onPlaceSelected, selectedTravelPlanId, favorites }) => {
 
         if (stompClient && stompClient.connected) {
           stompClient.publish({
-            destination: '/pub/likes',
+            destination: '/pub/actions',
             body: JSON.stringify(message),
           });
-          console.log('✅ 웹소켓 이벤트 발행됨:', message);
+          console.log('✅ MapSearchBar Event 발행됨:', message);
         } else {
           console.warn('⚠️ 웹소켓 연결이 끊어져 있어 이벤트를 발행하지 못함.');
         }
+
         const response = await publicRequest.post(
           `/api/v1/travel-plans/${selectedTravelPlanId}/places`,
           searchedPlace,

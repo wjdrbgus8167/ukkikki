@@ -66,6 +66,10 @@ const MapSearchBar = ({
       Swal.fire('알림', '이미 등록된 장소입니다.', 'info');
       return;
     }
+
+    const place = autocompleteRef.current.getPlace();
+    const placeName = place.name;
+
     try {
       // DB 저장 (API 호출)
       const response = await publicRequest.post(
@@ -90,11 +94,16 @@ const MapSearchBar = ({
         };
 
         if (stompClient && stompClient.connected) {
+          const wsData = {
+            action: "ADD_PLACE", // ✅ Action Enum 값 전송
+            placeName,
+            travelPlanId: selectedTravelPlanId
+          };
           stompClient.publish({
             destination: '/pub/likes',
-            body: JSON.stringify(message),
+            body: JSON.stringify(wsData),
           });
-          console.log('✅ 웹소켓 이벤트 발행됨:', message);
+          console.log('✅ MapSearchBar 장소 등록 이벤트 발행:', wsData);
         } else {
           console.warn('⚠️ 웹소켓 연결이 끊어져 있어 이벤트를 발행하지 못함.');
         }
