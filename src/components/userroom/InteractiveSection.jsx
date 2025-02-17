@@ -1,34 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { LoadScript } from '@react-google-maps/api';
-import LikeList from './LikeList';
-import Map from '../../services/map/Map';
+import React, { useEffect, useState } from 'react';
+import { GoogleMap, InfoWindow, OverlayView } from '@react-google-maps/api';
 import Chat from './Chat';
 import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
+import bananaIcon from '../../assets/loading-spinner.png';
+import WebSocketComponent, { stompClient } from '../../components/userroom/WebSocketComponent';
+import { RiChatSmileAiLine } from 'react-icons/ri';
 
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
-const InteractiveSection = ({ selectedCard }) => {
-  const [isLikeList, setIsLikeList] = useState(true);
+const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [coordinates, setCoordinates] = useState({ lat: 35.6895, lng: 139.6917 });
+  const [selectedMarker, setSelectedMarker] = useState(null);
+  const [showTagInput, setShowTagInput] = useState(false);
+  const [newTag, setNewTag] = useState('');
+  const [renderKey, setRenderKey] = useState(0); // GoogleMap 강제 리렌더링용
 
-  // 즐겨찾기 목록을 state로 관리 (검색한 장소도 여기에 추가)
-  const [favorites, setFavorites] = useState([]);
-
-  const [coordinates, setCoordinates] = useState({
-    lat: 35.6895,
-    lng: 139.6917,
-  }); // 기본 위치: 도쿄
-
-  // 초기 렌더링 시 selectedCard.places가 있으면 favorites에 저장
+  // ✅ WebSocket을 활용한 실시간 마커 업데이트
   useEffect(() => {
-    if (selectedCard && Array.isArray(selectedCard.places)) {
-      setFavorites(selectedCard.places);
-    }
-  }, [selectedCard]);
-  // 예시: 지도 중심 좌표 업데이트 (도착 도시 기반)
+    console.log("✅ favorites 상태 변경됨:", favorites);
+    setRenderKey(prev => prev + 1); // Google Map 강제 리렌더링
+  }, [favorites]);
+
+  // ✅ 도시 좌표 가져오기 (Google Geocoding API)
   useEffect(() => {
     if (!selectedCard || !selectedCard.arrivalCity?.name) return;
     const city = selectedCard.arrivalCity.name;
+
     const getCoordinates = async () => {
       const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${city}&key=${apiKey}`;
       try {
@@ -39,112 +38,214 @@ const InteractiveSection = ({ selectedCard }) => {
           setCoordinates({ lat, lng });
         }
       } catch (error) {
-        console.error('Geocoding 요청 실패:', error);
+        console.error('🚨 Geocoding 요청 실패:', error);
       }
     };
+
     getCoordinates();
-  }, [selectedCard, apiKey]);
+  }, [selectedCard]);
 
-  // Map 컴포넌트로부터 호출되어 새로운 즐겨찾기를 추가
-  const handlePlaceSelected = (place) => {
-    setFavorites((prev) => [...prev, place]);
+  // ✅ 마커 클릭 시 상태 업데이트
+  const handleMarkerClick = (marker) => {
+    setSelectedMarker({ ...marker });
   };
-
-  //장소에 찜하기 누를 때 호출되는 함수
+  
   const handleLikePlace = async (place) => {
     if (!place || !selectedCard || !selectedCard.travelPlanId) {
-      console.error('🚨 장소 정보 또는 여행방 ID가 없습니다.');
+      console.error("🚨 장소 정보 또는 여행방 ID가 없습니다.");
       return;
     }
-
+  
     const travelPlanId = selectedCard.travelPlanId;
-    // API 요청 시 요청 본문에 필요한 데이터 전달
-    const payload = {
-      name: place.name,
-      address: place.address,
-      latitude: place.latitude,
-      longitude: place.longitude,
-    };
-
+    const placeId = place.placeId;
+    const isLiked = place.likeYn;
+    const totalMember = selectedCard.member.totalParticipants;
+  
     try {
-      await publicRequest.post(
-        `/api/v1/travel-plans/${travelPlanId}/places`,
-        payload,
-      );
-
-      // ✅ 찜한 장소를 `favorites` 목록에 추가
-      setFavorites((prev) => {
-        // 중복 체크 (같은 장소를 여러 번 찜하지 않도록)
-        if (prev.some((fav) => fav.name === place.name)) return prev;
-        return [...prev, { ...place, likes: 1 }]; // 기본 좋아요 1로 설정
-      });
-
-      console.log('✅ 장소 찜 성공:', place);
+      let updatedMarker;
+      if (isLiked) {
+        await publicRequest.delete(`/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`);
+        updatedMarker = { ...place, likeYn: false, isLiked: false, likeCount: Math.max(place.likeCount - totalMember, 0) };
+      } else {
+        await publicRequest.post(`/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`);
+        updatedMarker = { ...place, likeYn: true, isLiked: true, likeCount: place.likeCount + totalMember };
+      }
+  
+      // ✅ WebSocket을 통해 실시간으로 마커 상태 변경 전송
+      if (stompClient && stompClient.connected) {
+        stompClient.publish({
+          destination: "/pub/likes",
+          body: JSON.stringify(updatedMarker),
+        });
+        console.log("✅ 웹소켓 좋아요 이벤트 발행됨:", updatedMarker);
+      }
+  
+      // ✅ 여기서는 상태를 변경하지 않고, 웹소켓에서 받은 데이터만 `setFavorites`에 반영
+      setSelectedMarker(updatedMarker);
+  
     } catch (error) {
-      console.error('🚨 장소 찜 실패:', error);
-      console.log('payload:', payload);
-      Swal.fire('알림', '🚨 장소를 찜하는 중 오류가 발생했습니다.', 'error');
+      console.error("🚨 좋아요 처리 실패:", error);
+      Swal.fire("알림", "🚨 좋아요 처리 중 오류가 발생했습니다.", "error");
     }
   };
+  
 
   return (
-    <div className="relative flex flex-col h-screen p-8 md:flex-row">
-      {/* LoadScript는 한 번만 로드합니다 */}
-      <LoadScript googleMapsApiKey={apiKey} libraries={['places']}>
-        {/* 상단의 버튼 섹션 */}
-        <div className="absolute w-full max-w-xs mb-4 transform -translate-x-1/2 top-8 left-1/2">
-          <div className="flex justify-center space-x-4">
-            <div
-              className={`flex-1 text-center py-2 font-semibold cursor-pointer ${
-                isLikeList ? 'text-brown' : 'text-gray-500'
-              }`}
-              onClick={() => setIsLikeList(true)}
-            >
-              찜하기
-            </div>
-            <div
-              className={`flex-1 text-center py-2 font-semibold cursor-pointer ${
-                !isLikeList ? 'text-brown' : 'text-gray-500'
-              }`}
-              onClick={() => setIsLikeList(false)}
-            >
-              리스트
-            </div>
-          </div>
-          <div
-            className={`absolute bottom-0 left-0 w-1/2 h-1 bg-yellow transition-all duration-300 ${
-              isLikeList ? 'left-0' : 'left-1/2'
-            }`}
-          ></div>
-        </div>
+    <div className="relative w-full h-screen">
+      {/* ✅ 웹소켓 구독을 위한 WebSocketComponent 추가 */}
+      <WebSocketComponent travelPlanId={selectedCard.travelPlanId} setFavorites={setFavorites} />
 
-        {/* 메인 컨텐츠 영역 */}
-        <div className="flex flex-1 mt-16">
-          {/* 왼쪽: 지도 또는 리스트 */}
-          <div className="w-full h-full p-4 overflow-y-auto border rounded-lg shadow-md md:w-2/3">
-            {isLikeList ? (
-              <Map
-                coordinates={coordinates}
-                markers={favorites}
-                onPlaceSelected={handlePlaceSelected}
-              />
-            ) : (
-              <LikeList
-                wishlists={favorites}
-                selectedCard={selectedCard}
-                setFavorites={setFavorites}
-              />
-            )}
-          </div>
+      {/* 지도 영역 */}
+      <div className="w-full h-full">
+     <GoogleMap
+       mapContainerStyle={{ width: '100%', height: '100%' }}
+       center={coordinates}
+       zoom={12}
+       options={{
+         mapTypeControl: false,
+         streetViewControl: false,
+         rotateControl: false,
+         fullscreenControl: false,
+       }}
+     >
+       {/* 즐겨찾기 마커들을 OverlayView를 이용해 커스텀 마커로 표시 */}
+       {favorites.map((marker, index) => (
+         <OverlayView
+           key={index}
+           position={{ lat: marker.latitude, lng: marker.longitude }}
+           mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+         >
+           <div
+             className="relative cursor-pointer w-14 h-14 hover:animate-shake"
+             onClick={() => handleMarkerClick(marker)}
+           >
+             <img src={bananaIcon} alt="marker" className="w-full h-full" />
+             <div className="absolute text-xl transform translate-x-1/2 -translate-y-1/2 right-2 top-6">
+               {marker.likeYn ? '❤️' : '🤍'}
+             </div>
+             <div className="absolute inset-0 flex items-center justify-center font-bold transform translate-y-1/4">
+               {marker.likeCount || 0}
+             </div>
+           </div>
+         </OverlayView>
+       ))}
+       {selectedMarker && (
+         <InfoWindow
+           position={{
+             lat: selectedMarker.latitude,
+             lng: selectedMarker.longitude,
+           }}
+           onCloseClick={() => {
+             setSelectedMarker(null);
+             setShowTagInput(false);
+             setNewTag('');
+           }}
+         >
+           <div
+             className="relative p-4"
+             style={{ width: '300px', minHeight: '200px' }}
+           >
+             <h3 className="text-lg font-bold">{selectedMarker?.name}</h3>
+             {selectedMarker.address && (
+               <p className="text-sm text-gray-600">
+                 {selectedMarker.address}
+               </p>
+             )}
+             <button
+               onClick={() => handleLikePlace(selectedMarker)}
+               className="absolute p-2 text-xl rounded-full top-2 right-2 focus:outline-none"
+             >
+               {selectedMarker.likeYn ? '❤️' : '🤍'}
+             </button>
+             {/* 태그 영역 */}
+             <div className="mt-4">
+               <div className="flex items-center justify-between">
+                 <h4 className="text-sm font-semibold">태그:</h4>
+                 <button
+                   onClick={() => setShowTagInput(true)}
+                   className="px-3 py-1 text-white bg-green-500 rounded hover:bg-green-600"
+                 >
+                   태그 추가
+                 </button>
+               </div>
+               {showTagInput && (
+                 <div className="flex items-center gap-2 mt-2">
+                   <input
+                     type="text"
+                     value={newTag}
+                     onChange={(e) => setNewTag(e.target.value)}
+                     placeholder="태그 입력 (최대 20자)"
+                     maxLength={20}
+                     className="px-2 py-1 border rounded"
+                   />
+                   <button
+                     onClick={handleTagSubmit}
+                     className="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600"
+                   >
+                     확인
+                   </button>
+                 </div>
+               )}
+               {selectedMarker.tags && selectedMarker.tags.length > 0 ? (
+                 <div className="flex flex-wrap gap-1 mt-2">
+                   {selectedMarker.tags.map((tag, idx) => (
+                     <span
+                       key={tag.placeTagId || idx}
+                       className="text-xs bg-gray-200 px-1 py-0.5 rounded"
+                     >
+                       {typeof tag === 'object' ? tag.name : tag}
+                     </span>
+                   ))}
+                 </div>
+               ) : (
+                 <p className="mt-2 text-sm text-gray-500">
+                   태그가 없습니다. 여행태그를 작성해보세요!
+                 </p>
+               )}
+             </div>
+           </div>
+         </InfoWindow>
+       )}
+     </GoogleMap>
+   </div>
 
-          {/* 오른쪽: 채팅방 */}
-          <div className="w-full h-full p-4 overflow-y-auto md:w-1/3">
+      {/* 채팅창 */}
+      <div
+        className={`absolute transition-all duration-300 overflow-hidden ${
+          isChatOpen
+            ? 'top-4 right-4 w-96 h-[500px] rounded-lg overflow-hidden'
+            : 'bottom-4 right-4 w-12 h-12 rounded-lg  overflow-visible'
+        }`}
+      >
+        {isChatOpen ? (
+          <div className="relative w-full h-full bg-white rounded-lg shadow-lg">
             <Chat travelPlanId={selectedCard.travelPlanId} />
+            <button
+              onClick={() => setIsChatOpen(false)}
+              className="absolute p-2 text-white bg-gray-800 rounded-full top-2 right-2"
+            >
+              ✕
+            </button>
           </div>
-        </div>
-      </LoadScript>
+        ) : (
+          <button
+            onClick={() => {
+              console.log('채팅 열기 클릭됨');
+              setIsChatOpen(true);
+            }}
+            className="flex items-center justify-center w-full h-full text-white bg-gray-800 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+          >
+            <RiChatSmileAiLine size={24} />
+          </button>
+        )}
+      </div>
     </div>
   );
 };
 
 export default InteractiveSection;
+
+
+
+
+    

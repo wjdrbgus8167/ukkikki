@@ -1,8 +1,11 @@
 // src/services/MapSearchBar.jsx
 import React, { useRef, useState } from 'react';
 import { Autocomplete } from '@react-google-maps/api';
+import { FaSearch } from 'react-icons/fa';
+import { publicRequest } from '../../hooks/requestMethod';
+import { stompClient } from '../../components/userroom/WebSocketComponent';
 
-const MapSearchBar = ({ onPlaceSelected }) => {
+const MapSearchBar = ({ onPlaceSelected, selectedTravelPlanId }) => {
   const [searchedPlace, setSearchedPlace] = useState(null);
   const [isBookmarked, setIsBookmarked] = useState(false); // ★ 찜 토글 상태
 
@@ -18,7 +21,7 @@ const MapSearchBar = ({ onPlaceSelected }) => {
       console.warn('유효한 장소가 선택되지 않았습니다.');
       return;
     }
-
+    console.log('place:', place);
     // 사진 URL 추출
     const photoUrl =
       place.photos && place.photos.length > 0
@@ -35,21 +38,62 @@ const MapSearchBar = ({ onPlaceSelected }) => {
       longitude: place.geometry.location.lng(),
       photoUrl,
       rating,
+      placeId: place.place_id || Date.now().toString(), // place_id가 없으면 고유값으로 Date.now()를 사용
     };
     setSearchedPlace(newPlace);
     setIsBookmarked(false); // 새 검색 시 찜상태 초기화
   };
 
-  // "찜하기"/"찜 취소" 버튼
-  const handleToggleBookmark = () => {
+  // "좋아요"/"좋아요 취소" 버튼
+  const handleToggleBookmark = async () => {
     if (!searchedPlace) return;
+    console.log('handleToggleBookmark 실행됨');
 
-    if (!isBookmarked) {
-      onPlaceSelected(searchedPlace); // onPlaceSelected를 호출하도록 수정
-      setIsBookmarked(true);
-    } else {
-      // "찜 취소" 시 로직 추가 (필요한 경우)
-      setIsBookmarked(false);
+    try {
+      if (!isBookmarked) {
+        // 부모의 onPlaceSelected 호출하여 favorites 상태 업데이트
+        onPlaceSelected(searchedPlace);
+        setIsBookmarked(true);
+
+        const message = {
+          ...searchedPlace,
+          travelPlanId: selectedTravelPlanId,
+        };
+        console.log(message); // travelPlanId가 추가된 객체 확인
+
+        if (stompClient && stompClient.connected) {
+          stompClient.publish({
+            destination: '/pub/likes',
+            body: JSON.stringify(message),
+          });
+          console.log('✅ 웹소켓 이벤트 발행됨:', message);
+        } else {
+          console.warn('⚠️ 웹소켓 연결이 끊어져 있어 이벤트를 발행하지 못함.');
+        }
+
+        // DB 저장 (API 호출)
+        const response = await publicRequest.post(
+          `/api/v1/travel-plans/${selectedTravelPlanId}/places`,
+          searchedPlace,
+        );
+        if (response.status === 200) {
+          console.log('✅ 새 장소가 DB에 저장되었습니다.');
+        }
+      } else {
+        // 북마크 해제 처리
+        setIsBookmarked(false);
+
+        // DB에서 장소 삭제
+        const response = await publicRequest.delete(
+          `/api/v1/travel-plans/${selectedTravelPlanId}/places/${placeId}`,
+        );
+        if (response.status === 200) {
+          console.log('✅ 장소가 DB에서 삭제되었습니다.');
+        }
+      }
+    } catch (error) {
+      console.error('❌ 장소 저장/삭제 실패:', error);
+      Swal.fire('알림', '🚨 장소 좋아요 처리 중 오류가 발생했습니다.', 'error');
     }
   };
 
@@ -66,13 +110,13 @@ const MapSearchBar = ({ onPlaceSelected }) => {
             placeholder=""
             className="
               w-full h-[44px] pl-4 pr-[48px]
-              text-sm rounded-full border border-gray-300
+              text-sm  border border-gray-300
               focus:outline-none
             "
           />
           {/* 오른쪽 끝에 돋보기 아이콘 */}
           <div className="absolute text-xl text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2">
-            🔍
+            <FaSearch />
           </div>
         </div>
       </Autocomplete>
@@ -124,7 +168,7 @@ const MapSearchBar = ({ onPlaceSelected }) => {
             onClick={handleToggleBookmark}
             className="self-end px-3 mt-2 text-white bg-orange-400 border-none rounded cursor-pointer h-9"
           >
-            {isBookmarked ? '찜 취소' : '찜하기'}
+            {isBookmarked ? '장소 취소' : '장소 저장'}
           </button>
         </div>
       )}

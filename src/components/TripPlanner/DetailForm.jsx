@@ -6,7 +6,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ko } from "date-fns/locale";
 import { format } from "date-fns";
-import { DetailFormContainer,TravelWrapper, TravelTitle,FlexWrapper,InputWrapper} from "./style/DetailFormStyle";
+import { DetailFormContainer,TravelWrapper, TravelTitle,FlexWrapper,InputWrapper} from "../TravelPlanner/style/DetailFormStyle";
 
 
 

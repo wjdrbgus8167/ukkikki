@@ -1,11 +1,27 @@
 /** @type {import('tailwindcss').Config} */
-export default {
-  content: ['./src/**/*.{js,ts,jsx,tsx}'],
+module.exports = {
+  content: [
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
   theme: {
     extend: {
       fontFamily: {
         pretendard: ['Pretendard-Regular'],
         jalnan: ['JalnanGothic'],
+      },
+      keyframes: {
+        shake: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '25%': { transform: 'translateX(-3px)' },
+          '50%': { transform: 'translateX(3px)' },
+          '75%': { transform: 'translateX(-3px)' },
+        },
+      },
+      animation: {
+        shake: 'shake 0.5s ease-in-out infinite', // 무한 반복
       },
       colors: {
         yellow: '#FFCF0E',
@@ -17,13 +33,12 @@ export default {
         confirmed: '#a855f7', // purple-500
 
         // 추가한 여행 테마 색상들
-        golf: '#4CAF50', // 골프
+        golf: '#E91E63', // 골프 (중복된 색상은 하나로 정리)
         'tourism-relaxation': '#2196F3', // 관광+휴양
         relaxation: '#009688', // 휴양
         tourism: '#FFEB3B', // 관광
         luxury: '#9C27B0', // 럭셔리
         food: '#FF5722', // 식도락
-        golf: '#E91E63', //  골프
         soccer: '#F44336', // 축구
         'local-culture': '#3F51B5', // 현지문화체험
         'marine-sports': '#00BCD4', // 해양스포츠
@@ -37,6 +52,7 @@ export default {
         start: '#10b981', // 출발일 색상
         end: '#ef4444', // 도착일 색상
         range: '#bbf7d0', // 범위 색상
+
         // 좋아요 리스트 메달 색깔
         gold: '#FFD700',
         silver: '#C0C0C0',
@@ -45,5 +61,5 @@ export default {
       width: {},
     },
   },
-  plugins: [],
+  plugins: [require('tailwind-scrollbar-hide')],
 };

@@ -11,7 +11,7 @@ const statusMap = {
   BOOKING: '예약중',
   CONFIRMED: '확정됨',
 };
-// 테마에 따른 색상 반환 함수 (원래 있던 함수, 필요에 따라 사용)
+
 const getThemeColor = (theme) => {
   const themeColors = {
     골프: 'bg-golf text-white',
@@ -61,6 +61,22 @@ const CardList = ({ cards }) => {
     fetchImages();
   }, [cards]); // ✅ `apiKey` 제거 (변경되지 않는 값이므로)
 
+  // ➁ useRoomModal 훅 사용
+  const {
+    isModalOpen,
+    currentStep,
+    selectedCard,
+    people,
+    openModal,
+    closeModal,
+    nextStep,
+    prevStep,
+    handlePeopleChange,
+    handleIncrement,
+    handleDecrement,
+    handleComplete,
+  } = useRoomModal();
+
   // ✅ 조기 return을 useEffect 이후로 이동
   if (!Array.isArray(cards) || cards.length === 0) {
     return (
@@ -79,26 +95,6 @@ const CardList = ({ cards }) => {
       </div>
     );
   }
-
-  // ➁ useRoomModal 훅 사용
-  const {
-    isModalOpen,
-    currentStep,
-    selectedCard,
-    people,
-    openModal,
-    closeModal,
-    nextStep,
-    prevStep,
-    handlePeopleChange,
-    handleIncrement,
-    handleDecrement,
-    handleComplete,
-  } = useRoomModal();
-
-  // ------------------------------
-  // 이미지 불러오기 (Unsplash)
-  // ------------------------------
 
   return (
     <>
@@ -189,7 +185,18 @@ const CardList = ({ cards }) => {
             {/* 버튼: 자세히 보기 => 모달 열기 */}
             <button
               className="px-4 py-2 mt-4 text-white rounded-md bg-brown hover:bg-yellow hover:text-brown hover:font-bold"
-              onClick={() => openModal(card)}
+              onClick={() => {
+                console.log('선택된 카드:', card); // 카드 콘솔 출력
+                // 이미 참여 중인 방이라면 바로 입장 처리
+                if (card.hasJoined) {
+                  navigate(`/user-room/${card.travelPlanId}`, {
+                    state: { selectedCard: card },
+                  });
+                } else {
+                  // 참여 중이 아니라면 모달을 열어서 자세히 보기 진행
+                  openModal(card);
+                }
+              }}
             >
               자세히 보기
             </button>

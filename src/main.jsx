@@ -11,9 +11,9 @@ if (typeof globalThis.global === 'undefined') {
   globalThis.global = globalThis;
 }
 root.render(
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <App />
-    </QueryClientProvider>
-  </React.StrictMode>,
+  // <React.StrictMode>
+  <QueryClientProvider client={queryClient}>
+    <App />
+  </QueryClientProvider>,
+  // </React.StrictMode>,
 );

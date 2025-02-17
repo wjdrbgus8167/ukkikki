@@ -4,6 +4,7 @@ import Footer from "../components/layout/Footer";
 import UserProposals from "../components/agencyPlanList/UserProposals";
 import AgencyProposals from "../components/agencyPlanList/AgencyProposals";
 import { TravelPlanProvider } from "../contexts/travelPlanContext";
+import { ProposalDetailProvider } from "../contexts/ProposalDetailContext";
 import { 
   AgencyRoomListPageContainer,
   MainContent, 
@@ -30,7 +31,9 @@ const AgencyRoomList = () => {
               </TravelPlanProvider>
               
             ) : (
-              <AgencyProposals />
+              <ProposalDetailProvider>
+                <AgencyProposals />
+              </ProposalDetailProvider>
             )}
           </TabContent>
       </MainContent>

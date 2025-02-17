@@ -28,6 +28,16 @@ export const AgencyProposalslist = async() => {
   };
 };
 
+export const AgencyProposalListDetail = async(proposalId)=>{
+  try{
+      const response = await publicRequest.get(`api/v1/proposals/${proposalId}`);
+      console.log(`제안서 세부 내용 조회 `,response.data)
+      return response.data
+  }catch(error){
+    console.log(`Error`,error)
+  }
+};
+
 //여행계획 세부 조회
 
 export const AgencyProposalDetail =  async(travelPlanId) => {
@@ -42,10 +52,10 @@ export const AgencyProposalDetail =  async(travelPlanId) => {
 
 //여행계획 제안서 (상세내용)
 
-export const CreateTravelProposal = async(travelPlanId) => {
+export const CreateTravelProposal = async(travelPlanId, payload) => {
   try {
-    const response = await publicRequest.get(`api/v1/travel-plans/${travelPlanId}/proposals`);
-    console.log('여행 게획 제안서 보내기 성공:', response.data)
+    const response = await publicRequest.post(`api/v1/travel-plans/${travelPlanId}/proposals`, payload );
+    console.log('여행 계획 제안서 보내기 성공:', response.data)
     return response.data;
   } catch(error) {
     console.log('error:',error)

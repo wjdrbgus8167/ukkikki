@@ -8,12 +8,11 @@ import {
   PlaceTag,
   NoTagsMessage,
   TagContainer
-} from './style/PlaceListStyle'; // 스타일 컴포넌트 import
+} from './style/PlaceListStyle'; 
 
-const PlaceList = () => {
+const PlaceList = ({ handlePlaceClick }) => {
   const { proposal } = useContext(ProposalDetailContext);
 
-  // proposal이 없거나 proposal.data가 없을 경우 처리
   if (!proposal || !proposal.data || !proposal.data.travelPlan) {
     return <div>장소를 불러오지 못했습니다.</div>;
   }
@@ -25,24 +24,36 @@ const PlaceList = () => {
     return <div>장소가 없습니다.</div>;
   };
 
+  // likeCount를 기준으로 내림차순으로 정렬
+  const sortedPlaces = places.sort((a, b) => b.likeCount - a.likeCount);
+
   return (
     <PlaceContainer>
-      {places.map((place, idx) => {
+      {sortedPlaces.map((place, idx) => {
+
+        const visibleTags = place.tags && place.tags.length > 5 ? place.tags.slice(0, 5) : place.tags;
+        const showMoreText = place.tags && place.tags.length > 5; 
+        
         return (
-          <PlaceCard key={idx}>
+          <PlaceCard key={idx} onClick={() => { handlePlaceClick(place) }}>
             <PlaceName>{place.name}</PlaceName>
             <LikeCount>👍 {place.likeCount}</LikeCount>
 
             {/* 태그들이 수평으로 나열되도록 */}
             <TagContainer>
-              {place.tags && place.tags.length > 0 ? (
-                place.tags.map((tag, index) => (
+              {visibleTags && visibleTags.length > 0 ? (
+                visibleTags.map((tag, index) => (
                   <PlaceTag key={index}>
                     # {tag.name}
                   </PlaceTag>
                 ))
               ) : (
                 <NoTagsMessage>태그가 없습니다.</NoTagsMessage>
+              )}
+              {showMoreText && (
+                <PlaceTag>
+                  # 더보기...
+                </PlaceTag>
               )}
             </TagContainer>
           </PlaceCard>

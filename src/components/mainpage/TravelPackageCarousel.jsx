@@ -51,29 +51,18 @@ const TravelPackageCarousel = () => {
           console.log(`✅ [스킵] 이미 불러온 이미지: ${cityName}`);
           return null;
         }
-
         try {
-          console.log(`🚀 [API 요청] Unsplash에서 이미지 요청: ${cityName}`);
-          const response = await axios.get(
-            `https://api.unsplash.com/photos/random`,
-            {
-              params: {
-                query: cityName,
-                client_id: apiKey,
-              },
-            },
-          );
-
-          console.log(
-            `🎉 [응답] Unsplash 이미지 URL: ${response.data?.urls?.regular}`,
-          );
-
-          return {
-            [cityName]:
-              response.data?.urls?.regular || 'https://via.placeholder.com/400',
-          };
+          // ✅ S3 버킷에서 해당 도시에 맞는 이미지 URL 생성
+          const s3Url = `https://ukkikki-bucket.s3.ap-northeast-2.amazonaws.com/city/tokyo.jpg`;
+          
+          // ✅ 이미지가 존재하는지 확인
+          const response = await axios.head(s3Url);
+          if (response.status === 200) {
+            console.log(`🎉 [응답] S3 이미지 URL 사용: ${s3Url}`);
+            return { [cityName]: s3Url };
+          }
         } catch (error) {
-          console.error(`🚨 [에러] ${cityName} 이미지 불러오기 실패:`, error);
+          console.warn(`⚠️ [경고] S3에서 이미지 없음, 기본 이미지 사용: ${cityName}`);
           return { [cityName]: 'https://via.placeholder.com/400' }; // 기본 이미지
         }
       });
@@ -152,7 +141,7 @@ const TravelPackageCarousel = () => {
     } catch (error) {
       console.error('🚨 여행방 전체 조회 실패:', error);
       Swal.fire(
-        '알림림',
+        '알림',
         '🚨 여행방 데이터를 불러오는 중 오류가 발생했습니다.',
         'error',
       );
@@ -167,6 +156,7 @@ const TravelPackageCarousel = () => {
       {/* ✅ 컨텐츠 영역 */}
       <div className="relative flex flex-col items-center justify-between w-full px-8 py-16 md:flex-row">
         {/* 왼쪽 텍스트 */}
+
         <div className="w-full pl-16 text-center md:w-1/3 md:text-left text-brown">
           <h2 className="text-3xl font-bold leading-snug">
             색다른 여행을 떠날
@@ -182,34 +172,36 @@ const TravelPackageCarousel = () => {
 
         {/* 오른쪽 캐러셀 */}
         <div className="w-full mt-10 md:w-2/3 md:mt-0">
-          <Slider {...settings}>
-            {travelPlans.map((plan) => {
-              const cityName = plan.arrivalCity?.name;
-              const imageUrl =
-                imageUrls[cityName] || 'https://via.placeholder.com/400';
+          <div data-aos="fade-left" data-aos-delay="300">
+            <Slider {...settings}>
+              {travelPlans.map((plan) => {
+                const cityName = plan.arrivalCity?.name;
+                const imageUrl =
+                  imageUrls[cityName] || 'https://via.placeholder.com/400';
 
-              return (
-                <div key={plan.travelPlanId} className="p-4">
-                  <div className="overflow-hidden bg-white rounded-lg shadow-lg">
-                    {/* ✅ Unsplash에서 가져온 이미지 사용 */}
-                    <img
-                      src={imageUrl}
-                      alt={plan.name}
-                      className="object-cover w-full h-48"
-                    />
-                    <div className="p-4">
-                      <h3 className="text-lg font-semibold text-gray-800">
-                        {plan.name}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        {plan.departureCity?.name} → {plan.arrivalCity?.name}
-                      </p>
+                return (
+                  <div key={plan.travelPlanId} className="p-4">
+                    <div className="overflow-hidden bg-white rounded-lg shadow-lg">
+                      {/* ✅ Unsplash에서 가져온 이미지 사용 */}
+                      <img
+                        src={imageUrl}
+                        alt={plan.name}
+                        className="object-cover w-full h-48"
+                      />
+                      <div className="p-4">
+                        <h3 className="text-lg font-semibold text-gray-800">
+                          {plan.name}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {plan.departureCity?.name} → {plan.arrivalCity?.name}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </Slider>
+                );
+              })}
+            </Slider>
+          </div>
         </div>
       </div>
     </div>
