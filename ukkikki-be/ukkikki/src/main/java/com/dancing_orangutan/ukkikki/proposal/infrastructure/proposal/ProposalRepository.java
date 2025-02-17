@@ -82,9 +82,9 @@ public class ProposalRepository  {
 
     }
 
-    public ProposalEntity findByProposalIdAndCompany_CompanyId(Integer proposalId,Integer companyId) {
+    public ProposalEntity findByProposalId(Integer proposalId) {
 
-        ProposalEntity entity = jpaProposalRepository.findByProposalIdAndCompany_CompanyId(proposalId,companyId)
+        ProposalEntity entity = jpaProposalRepository.findByProposalId(proposalId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 제안서를 찾을 수 없습니다."));
 
         return entity;

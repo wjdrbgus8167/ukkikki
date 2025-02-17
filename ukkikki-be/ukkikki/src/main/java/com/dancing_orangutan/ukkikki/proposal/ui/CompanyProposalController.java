@@ -36,10 +36,9 @@ public class CompanyProposalController {
     //여행사 제안서 상세내용 조회
     @GetMapping("/{proposalId}")
     public ApiUtils.ApiResponse<CompanyProposalDetailResponse> getCompanyProposalDetail(
-            @PathVariable Integer proposalId,
-            @AuthenticationPrincipal CompanyUserDetails companyUserDetails){
-
-        CompanyProposalDetailResponse response = proposalService.getCompanyProposalDetail(proposalId,companyUserDetails.getCompanyId());
+            @PathVariable Integer proposalId
+    ) {
+        CompanyProposalDetailResponse response = proposalService.getCompanyProposalDetail(proposalId);
 
         return ApiUtils.success(response);
     }
