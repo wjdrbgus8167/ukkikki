@@ -1,7 +1,6 @@
 package com.dancing_orangutan.ukkikki.global.config;
 
 import com.dancing_orangutan.ukkikki.global.oauth.CustomOAuth2UserService;
-import com.dancing_orangutan.ukkikki.global.oauth.OAuth2FailureHandler;
 import com.dancing_orangutan.ukkikki.global.oauth.OAuth2SuccessHandler;
 import com.dancing_orangutan.ukkikki.global.security.*;
 import com.dancing_orangutan.ukkikki.global.jwt.JwtTokenProvider;
@@ -54,13 +53,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public OAuth2FailureHandler oAuth2FailureHandler() {
-        return new OAuth2FailureHandler(appConfig);
-    }
-
-    @Bean
     public JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint() {
-        return new JwtAuthenticationEntryPoint();
+        return new JwtAuthenticationEntryPoint(appConfig);
     }
 
     @Bean
@@ -92,7 +86,6 @@ public class SecurityConfig {
                 .oauth2Login(oauth -> oauth
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler())
-                        .failureHandler(oAuth2FailureHandler())
                 )
                 .logout(logout -> logout
                         .logoutUrl("/auth/logout")

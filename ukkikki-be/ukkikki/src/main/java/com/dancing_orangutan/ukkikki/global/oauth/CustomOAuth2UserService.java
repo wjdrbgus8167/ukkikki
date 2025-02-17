@@ -35,8 +35,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         MemberEntity member = jpaMemberRepository.findByEmail(email)
                 .map(memberEntity -> {
                     if(!memberEntity.getProvider().equals(registrationId)){
-                        ErrorCode errorCode = ErrorCode.EMAIL_ALREADY_IN_USE;
-                        throw new OAuth2AuthenticationException(errorCode.name() + ":" + errorCode.getMessage());
+                         throw new OAuth2AuthenticationException(ErrorCode.EMAIL_ALREADY_IN_USE.name());
                     }
                     return memberEntity;
                 })
