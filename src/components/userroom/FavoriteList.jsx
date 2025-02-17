@@ -1,10 +1,10 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { publicRequest } from '../../hooks/requestMethod';
-import useAuthStore from '../../stores/authStore';
-import Swal from 'sweetalert2';
-import MapSearchBar from '../../services/map/MapSearchBar';
+import React, { useEffect, useMemo, useState } from 'react';
 import { CiCirclePlus } from 'react-icons/ci';
+import Swal from 'sweetalert2';
 import { stompClient } from '../../components/userroom/WebSocketComponent';
+import { publicRequest } from '../../hooks/requestMethod';
+import MapSearchBar from '../../services/map/MapSearchBar';
+import useAuthStore from '../../stores/authStore';
 
 const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
   const { user } = useAuthStore();
@@ -110,40 +110,72 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
   };
 
   const handleTagDelete = async (placeId, tagId) => {
+    if (!tagId) {
+        console.error('🚨 handleTagDelete: tagId가 undefined입니다.');
+        return;
+    }
+
     Swal.fire({
-      title: '태그 삭제',
-      text: '정말로 이 태그를 삭제하시겠습니까?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: '삭제',
-      cancelButtonText: '취소',
-      reverseButtons: true,
+        title: '태그 삭제',
+        text: '정말로 이 태그를 삭제하시겠습니까?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: '삭제',
+        cancelButtonText: '취소',
+        reverseButtons: true,
     }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const response = await publicRequest.delete(
-            `/api/v1/travel-plans/${travelPlanId}/tags/${tagId}`,
-          );
-          if (response.status === 200) {
-            setFavorites((prev) =>
-              prev.map((fav) =>
-                fav.placeId === placeId
-                  ? {
-                      ...fav,
-                      tags: fav.tags.filter((tag) => tag.placeTagId !== tagId),
-                    }
-                  : fav,
-              ),
-            );
-            Swal.fire('성공', '태그가 삭제되었습니다.', 'success');
-          }
-        } catch (error) {
-          console.error('태그 삭제 실패:', error);
-          Swal.fire('알림', '태그 삭제에 실패했습니다.', 'error');
+        if (result.isConfirmed) {
+            try {
+                const response = await publicRequest.delete(
+                    `/api/v1/travel-plans/${travelPlanId}/tags/${tagId}`
+                );
+
+                if (response.status === 200) {
+                    setFavorites((prev) =>
+                        prev.map((fav) =>
+                            fav.placeId === placeId
+                                ? {
+                                    ...fav,
+                                    tags: fav.tags.filter((tag) => tag.placeTagId !== tagId),
+                                }
+                                : fav
+                        )
+                    );
+                    Swal.fire('성공', '태그가 삭제되었습니다.', 'success');
+                }
+
+                // ✅ placeId를 기반으로 placeName 가져오기
+                const place = favorites.find((fav) => fav.placeId === placeId);
+                if (!place) {
+                    console.error('🚨 태그 삭제 실패: 해당 장소를 찾을 수 없습니다.');
+                    return;
+                }
+
+                const placeName = place.name; // ✅ placeName 가져오기
+
+                // ✅ WebSocket 메시지 전송
+                if (stompClient && stompClient.connected) {
+                    const wsData = {
+                        action: "REMOVE_TAG", // ✅ Action Enum 값 전송
+                        placeName, // ✅ placeName 추가
+                        travelPlanId,
+                    };
+
+                    stompClient.publish({
+                        destination: '/pub/actions',
+                        body: JSON.stringify(wsData),
+                    });
+                    console.log('✅ FavoriteList- 태그 삭제 이벤트:', wsData);
+                }
+
+            } catch (error) {
+                console.error('태그 삭제 실패:', error);
+                Swal.fire('알림', '태그 삭제에 실패했습니다.', 'error');
+            }
         }
-      }
     });
-  };
+};
+
 
   const handleToggleExpand = (place) => {
     if (expandedPlaceId === place.placeId) {
@@ -171,26 +203,51 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
   const handleTagSubmit = async (e) => {
     e.stopPropagation();
     if (newTag.trim() === '') return;
+
+    // expandedPlaceId를 기반으로 placeName 가져오기
+    const place = favorites.find((fav) => fav.placeId === expandedPlaceId);
+    if (!place) {
+      console.error('🚨 태그 추가 실패: 해당 장소를 찾을 수 없습니다.');
+      return;
+    }
+
+    const placeName = place.name; // ✅ placeName 가져오기
+
     try {
       const response = await publicRequest.post(
         `/api/v1/travel-plans/${travelPlanId}/places/${expandedPlaceId}/tags`,
         { placeTagName: newTag.trim() },
       );
+
+      if (stompClient && stompClient.connected) {
+        const wsData = {
+          action: "ADD_TAG", // ✅ Action Enum 값 전송
+          placeName, // ✅ placeName 추가
+          travelPlanId,
+        };
+
+        stompClient.publish({
+          destination: '/pub/actions',
+          body: JSON.stringify(wsData),
+        });
+        console.log('✅ FavoriteList- 태그 등록 이벤트:', wsData);
+      }
+
       if (response.status === 200) {
         setFavorites((prev) =>
           prev.map((fav) =>
             fav.placeId === expandedPlaceId
               ? {
-                  ...fav,
-                  tags: [
-                    ...fav.tags,
-                    {
-                      placeTagId: response.data.id,
-                      name: newTag.trim(),
-                      isMyTag: true,
-                    },
-                  ],
-                }
+                ...fav,
+                tags: [
+                  ...fav.tags,
+                  {
+                    placeTagId: response.data.id,
+                    name: newTag.trim(),
+                    isMyTag: true,
+                  },
+                ],
+              }
               : fav,
           ),
         );
@@ -202,6 +259,7 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
       Swal.fire('알림', '태그 추가에 실패했습니다.', 'error');
     }
   };
+
 
   return (
     <div className="space-y-4">
@@ -228,11 +286,10 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
               </h3>
             </div>
             <button
-              className={`px-2 py-1 text-sm rounded-md ${
-                item.isLiked
-                  ? 'text-red-500 bg-gray-300'
-                  : 'text-gray-500 bg-gray-200'
-              }`}
+              className={`px-2 py-1 text-sm rounded-md ${item.isLiked
+                ? 'text-red-500 bg-gray-300'
+                : 'text-gray-500 bg-gray-200'
+                }`}
               onClick={(e) => {
                 e.stopPropagation();
                 handleLikeToggle(item);
@@ -248,25 +305,20 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
                 <div className="flex flex-wrap gap-2">
                   {item.tags.map((tag, idx) => (
                     <span
-                      key={tag.placeTagId || idx}
-                      onClick={
-                        tag.isMyTag
-                          ? () => handleTagDelete(item.placeId, tag.placeTagId)
-                          : undefined
-                      }
-                      className={`px-2 py-1 text-sm rounded-full cursor-pointer ${
-                        tag.isMyTag
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-yellow text-brown'
-                      }`}
-                    >
-                      {typeof tag === 'object' ? tag.name : tag}
-                      {tag.isMyTag && (
-                        <span className="inline-flex items-center justify-center w-5 h-5 ml-1 text-xs text-white bg-red-500 rounded-full">
-                          ×
-                        </span>
-                      )}
-                    </span>
+                    key={tag.placeTagId || idx}
+                    onClick={() => handleTagDelete(item.placeId, tag.placeTagId)}
+                    className={`px-2 py-1 text-sm rounded-full cursor-pointer ${
+                      tag.isMyTag ? 'bg-blue-500 text-white' : 'bg-yellow text-brown'
+                    }`}
+                  >
+                    {typeof tag === 'object' ? tag.name : tag}
+                    {tag.isMyTag && (
+                      <span className="inline-flex items-center justify-center w-5 h-5 ml-1 text-xs text-white bg-red-500 rounded-full">
+                        ×
+                      </span>
+                    )}
+                  </span>
+                  
                   ))}
                 </div>
               ) : (
