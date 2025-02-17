@@ -7,7 +7,9 @@ import Footer from '../components/layout/Footer';
 import OverviewBar from '../components/userroom/OverviewBar';
 import FavoriteList from '../components/userroom/FavoriteList';
 import { LoadScript } from '@react-google-maps/api';
-import WebSocketComponent, { stompClient } from '../components/userroom/WebSocketComponent';
+import WebSocketComponent, {
+  stompClient,
+} from '../components/userroom/WebSocketComponent';
 
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
@@ -15,9 +17,10 @@ const UserRoom = () => {
   const { travelPlanId: travelPlanIdFromUrl } = useParams();
   const location = useLocation();
   const initialSelectedCard = location.state?.selectedCard;
+
   const [selectedCard, setSelectedCard] = useState(initialSelectedCard);
-  const [isLikeListOpen, setIsLikeListOpen] = useState(true);
   const [favorites, setFavorites] = useState([]);
+  const [isLikeListOpen, setIsLikeListOpen] = useState(true); // 추가
   const libraries = ['places'];
 
   const travelPlanId = initialSelectedCard?.travelPlanId || travelPlanIdFromUrl;
@@ -36,7 +39,6 @@ const UserRoom = () => {
       );
       if (response.data?.data?.travelPlan) {
         const travelPlan = response.data.data.travelPlan;
-
         const mappedPlaces = (travelPlan.places || []).map((place) => ({
           ...place,
           isLiked: place.likeYn,
@@ -44,6 +46,7 @@ const UserRoom = () => {
         setFavorites(mappedPlaces);
 
         console.log('✅ 여행방 데이터:', travelPlan);
+        // 필요한 경우 setSelectedCard(travelPlan)도 호출할 수 있음
       }
     } catch (error) {
       console.error('🚨 여행방 데이터 가져오기 실패:', error);
@@ -87,37 +90,37 @@ const UserRoom = () => {
 
       <div className="flex flex-col h-screen overflow-hidden">
         <Header />
-        <OverviewBar selectedCard={selectedCard} />
-        <div className="relative flex flex-1 overflow-hidden">
+
+        <div className="flex flex-1 overflow-hidden relative">
+          {/* 사이드바 (FavoriteList) */}
           <div
-            className={`absolute left-0 top-0 h-full transition-transform duration-300 ${
-              isLikeListOpen ? 'translate-x-0' : '-translate-x-full'
+            className={`h-full bg-white overflow-y-auto transition-all duration-300 ${
+              isLikeListOpen ? 'w-80' : 'w-0'
             }`}
-            style={{ width: '320px', zIndex: 10 }}
+            style={{ minWidth: isLikeListOpen ? '320px' : '0' }}
           >
-            <div className="relative h-full bg-white overflow-y-auto">
+            {isLikeListOpen && (
               <FavoriteList
                 selectedCard={selectedCard}
                 favorites={favorites}
                 setFavorites={setFavorites}
               />
-              <button
-                onClick={() => setIsLikeListOpen(false)}
-                className="absolute top-1/2 right-[-40px] transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-r-lg"
-              >
-                ❮
-              </button>
-            </div>
-          </div>
-          <div className="flex flex-1 h-full relative">
-            {!isLikeListOpen && (
-              <button
-                onClick={() => setIsLikeListOpen(true)}
-                className="absolute z-20 p-2 text-white transform -translate-y-1/2 bg-gray-800 rounded-lg top-1/2 left-2"
-              >
-                ❯
-              </button>
             )}
+          </div>
+
+          {/* 토글 버튼 - 사이드바와 메인 콘텐츠 사이에 위치 */}
+          <button
+            onClick={() => setIsLikeListOpen((prev) => !prev)}
+            className="absolute top-1/2 -right-3 transform -translate-y-1/2 p-2 text-white bg-gray-800 rounded-full z-10"
+          >
+            {isLikeListOpen ? '❮' : '❯'}
+          </button>
+
+          {/* 우측 영역: OverviewBar와 InteractiveSection */}
+          <div className="flex flex-col flex-1 overflow-hidden">
+            <div className="flex-none">
+              <OverviewBar selectedCard={selectedCard} />
+            </div>
             <div className="flex-1">
               <InteractiveSection
                 selectedCard={selectedCard}
@@ -127,6 +130,7 @@ const UserRoom = () => {
             </div>
           </div>
         </div>
+
         {/* <Footer /> */}
       </div>
     </LoadScript>
