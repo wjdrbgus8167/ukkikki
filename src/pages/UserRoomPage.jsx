@@ -85,16 +85,17 @@ const UserRoom = () => {
         favorites={favorites}
       />
 
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col h-screen overflow-hidden">
         <Header />
         <OverviewBar selectedCard={selectedCard} />
-        <div className="relative flex flex-1">
+        <div className="relative flex flex-1 overflow-hidden">
           <div
-            className={`absolute left-0 top-0 h-full transition-transform duration-300 ${isLikeListOpen ? 'translate-x-0' : '-translate-x-full'
-              }`}
+            className={`absolute left-0 top-0 h-full transition-transform duration-300 ${
+              isLikeListOpen ? 'translate-x-0' : '-translate-x-full'
+            }`}
             style={{ width: '320px', zIndex: 10 }}
           >
-            <div className="relative h-full bg-white">
+            <div className="relative h-full bg-white overflow-y-auto">
               <FavoriteList
                 selectedCard={selectedCard}
                 favorites={favorites}
@@ -108,7 +109,7 @@ const UserRoom = () => {
               </button>
             </div>
           </div>
-          <div className="flex flex-1 h-full">
+          <div className="flex flex-1 h-full relative">
             {!isLikeListOpen && (
               <button
                 onClick={() => setIsLikeListOpen(true)}
@@ -126,7 +127,7 @@ const UserRoom = () => {
             </div>
           </div>
         </div>
-        <Footer />
+        {/* <Footer /> */}
       </div>
     </LoadScript>
   );

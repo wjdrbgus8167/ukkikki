@@ -27,3 +27,10 @@ export const STATUS_PROPOSAL = {
   W: "투표전",
   V: "투표중",
 };
+
+export const STATUS_STYLES = {
+  IN_PROGRESS: "bg-progress text-white",
+  BIDDING: "bg-proposal text-white",
+  BOOKING: "bg-reservation text-white",
+  CONFIRMED: "bg-confirmed text-white",
+};
