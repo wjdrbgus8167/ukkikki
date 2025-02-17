@@ -31,7 +31,6 @@ public class SecurityConfig {
     private final JpaMemberRepository jpaMemberRepository;
     private final CorsFilter corsFilter;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
-
     /**
      * 비밀번호 암호화 설정
      */
@@ -55,7 +54,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint() {
-        return new JwtAuthenticationEntryPoint();
+        return new JwtAuthenticationEntryPoint(appConfig);
     }
 
     @Bean

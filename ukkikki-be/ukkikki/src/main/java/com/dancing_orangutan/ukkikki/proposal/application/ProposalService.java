@@ -1,9 +1,11 @@
 package com.dancing_orangutan.ukkikki.proposal.application;
 
+import com.dancing_orangutan.ukkikki.event.eventPublisher.SpringEventPublisher;
 import com.dancing_orangutan.ukkikki.proposal.application.command.*;
 import com.dancing_orangutan.ukkikki.proposal.constant.ProposalStatus;
 import com.dancing_orangutan.ukkikki.proposal.domain.Inquiry.Inquiry;
 import com.dancing_orangutan.ukkikki.proposal.domain.Inquiry.InquiryEntity;
+import com.dancing_orangutan.ukkikki.proposal.domain.event.ProposalVoteSurveyStartEvent;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.ProposalEntity;
 import com.dancing_orangutan.ukkikki.proposal.domain.schedule.Schedule;
@@ -67,6 +69,7 @@ public class ProposalService {
     private final JpaVoteRepository voteRepository;
     private final CompanyFinder companyFinder;
     private final AirportFinder airportFinder;
+    private final SpringEventPublisher eventPublisher;
 
     // 제안서 작성
     @Transactional
@@ -324,9 +327,13 @@ public class ProposalService {
     }
 
     //여행사 본인 제안서 목록 조회
-    public List<CompanyProposalListResponse> getCompanyProposalList(Integer companyId) {
+    public List<CompanyProposalListResponse> getCompanyProposalList(ProposalStatus status, Integer companyId) {
 
-        List<CompanyProposalListResponse> proposals = proposalRepository.findByCompanyId(companyId).stream()
+        List<ProposalEntity> proposals = (status == null) ?
+                proposalRepository.findByCompanyId(companyId) :
+                proposalRepository.findByCompanyIdAndProposalStatus(companyId, status);
+
+        return  proposals.stream()
                 .map(proposal -> CompanyProposalListResponse.builder()
                         .proposalId(proposal.getProposalId())
                         .travelPlanId(proposal.getTravelPlan().getTravelPlanId())
@@ -342,15 +349,13 @@ public class ProposalService {
                         .createTime(proposal.getCreateTime())
                         .build())
                 .collect(Collectors.toList());
-
-        return proposals;
     }
 
     //여행사 본인 제안서 상세 조회
-    public CompanyProposalDetailResponse getCompanyProposalDetail(Integer proposalId, Integer companyId) {
+    public CompanyProposalDetailResponse getCompanyProposalDetail(Integer proposalId) {
 
         // 1️⃣ 제안서 조회
-        ProposalEntity proposal = proposalRepository.findByProposalIdAndCompany_CompanyId(proposalId, companyId);
+        ProposalEntity proposal = proposalRepository.findByProposalId(proposalId);
 
         // 2️⃣ 스케줄 조회 및 그룹핑 (dayNumber 기준)
         List<ScheduleResponse> schedules = scheduleFinder.findSchedulesByProposalId(proposal.getProposalId()).stream()
@@ -582,46 +587,33 @@ public class ProposalService {
 
 
     // 제안서 투표 시작
-    public CreateVoteSurveyResponse createVoteSurvey(CreateVoteSurveyCommand command) {
+    @Transactional
+    public void createVoteSurvey(CreateVoteSurveyCommand command) {
 
-        // 여행 계획(travelPlanId) 존재 여부 확인
-        MemberTravelPlanEntity memberTravelPlan = memberTravelPlanFinder
-                .findByTravelPlanIdAndMemberId(command.getTravelPlanId(), command.getMemberId());
-
-        if(memberTravelPlan==null){
-            throw new EntityNotFoundException("해당 일정을 찾을 수 없습니다.");
-        }
-
-        // memberId가 해당 여행 계획의 호스트인지 확인
-        if (!memberTravelPlan.isHostYn()) {
-            throw new IllegalArgumentException("투표를 시작할 권한이 없습니다 방장만 투표를 시작할 수 있습니다.");
-        }
+        // 제안서 불러오기
+        List<ProposalEntity> proposals = proposalRepository.findByTravelPlanId(command.getTravelPlanId());
 
         // 투표 설문 생성 (현재 시간 기준 +72시간 설정)
         VoteSurveyEntity savedVoteSurvey = VoteSurveyEntity.builder()
                 .surveyStartTime(command.getSurveyStartTime())
                 .surveyEndTime(command.getSurveyEndTime()) // 72시간 후 종료
-                .travelPlan(memberTravelPlan.getTravelPlan())
+                .travelPlan(proposals.get(0).getTravelPlan())
                 .build();
 
         // 투표 설문 저장
         VoteSurvey voteSurvey = voteSurveyMapper.entityToDomain(voteSurveyRepository.save(savedVoteSurvey));
-
-        //투표 진행 중으로 상태 업데이트
-        List<ProposalEntity> proposals = proposalRepository.findByTravelPlanId(command.getTravelPlanId());
 
         proposals.forEach(proposal -> proposal.updateVotingStatus());
 
         // 배치 업데이트
         jpaProposalRepository.saveAll(proposals);
 
-        return CreateVoteSurveyResponse.builder()
-                .surveyStartTime(voteSurvey.getSurveyStartTime())
-                .surveyEndTime(voteSurvey.getSurveyEndTime())
-                .travelPlanId(memberTravelPlan.getTravelPlan().getTravelPlanId())
-                .voteSurveyId(voteSurvey.getVoteSurveyId())
+        ProposalVoteSurveyStartEvent event = ProposalVoteSurveyStartEvent.builder()
+                .closeTime(command.getSurveyEndTime())
+                .travelPlanId(command.getTravelPlanId())
                 .build();
 
+        eventPublisher.publish(event);
     }
 
     // 제안서 투표
@@ -808,6 +800,20 @@ public class ProposalService {
         // Domain 객체로 변환 후 반환
         return travelersToSave.stream()
                 .map(travelerMapper::entityToDomain)
+                .collect(Collectors.toList());
+    }
+
+    public List<TravelerPassportResponse> getTravelerPassportList(Integer proposalId) {
+        return jpaTravelerRepository.findByProposal_ProposalId(proposalId).stream()
+                .map(traveler -> TravelerPassportResponse.builder()
+                        .travelerId(traveler.getTravelerId())
+                        .koreanName(traveler.getKoreanName())
+                        .englishName(traveler.getEnglishName())
+                        .passportNumber(traveler.getPassportNumber())
+                        .expirationDate(traveler.getExpirationDate())
+                        .birthDate(traveler.getBirthDate())
+                        .phoneNumber(traveler.getPhoneNumber())
+                        .build())
                 .collect(Collectors.toList());
     }
 }

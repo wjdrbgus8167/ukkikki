@@ -2,6 +2,7 @@ package com.dancing_orangutan.ukkikki.proposal.infrastructure.proposal;
 
 import com.dancing_orangutan.ukkikki.geography.domain.airport.AirportEntity;
 import com.dancing_orangutan.ukkikki.member.domain.company.CompanyEntity;
+import com.dancing_orangutan.ukkikki.proposal.constant.ProposalStatus;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.ProposalEntity;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.airport.AirportFinder;
@@ -81,9 +82,9 @@ public class ProposalRepository  {
 
     }
 
-    public ProposalEntity findByProposalIdAndCompany_CompanyId(Integer proposalId,Integer companyId) {
+    public ProposalEntity findByProposalId(Integer proposalId) {
 
-        ProposalEntity entity = jpaProposalRepository.findByProposalIdAndCompany_CompanyId(proposalId,companyId)
+        ProposalEntity entity = jpaProposalRepository.findByProposalId(proposalId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 제안서를 찾을 수 없습니다."));
 
         return entity;
@@ -97,5 +98,10 @@ public class ProposalRepository  {
             throw new EntityNotFoundException("등록된 제안서가 없습니다");
         }
             return proposals;
+    }
+
+
+    public List<ProposalEntity> findByCompanyIdAndProposalStatus(Integer companyId, ProposalStatus proposalStatus) {
+        return jpaProposalRepository.findByCompany_CompanyIdAndProposalStatus(companyId, proposalStatus);
     }
 }
