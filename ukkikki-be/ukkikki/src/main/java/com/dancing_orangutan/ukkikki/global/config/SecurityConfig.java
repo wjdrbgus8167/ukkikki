@@ -55,7 +55,7 @@ public class SecurityConfig {
 
     @Bean
     public OAuth2FailureHandler oAuth2FailureHandler() {
-        return new OAuth2FailureHandler();
+        return new OAuth2FailureHandler(appConfig);
     }
 
     @Bean
