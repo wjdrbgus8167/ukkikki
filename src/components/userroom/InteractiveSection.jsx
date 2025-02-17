@@ -80,8 +80,9 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
         console.log("✅ 웹소켓 좋아요 이벤트 발행됨:", updatedMarker);
       }
   
-      // ✅ 여기서는 상태를 변경하지 않고, 웹소켓에서 받은 데이터만 `setFavorites`에 반영
-      setSelectedMarker(updatedMarker);
+      setFavorites((prev) =>
+        prev.map((fav) => (fav.placeId === placeId ? updatedMarker : fav))
+      );      
   
     } catch (error) {
       console.error("🚨 좋아요 처리 실패:", error);
