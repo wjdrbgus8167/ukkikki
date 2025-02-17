@@ -20,3 +20,10 @@ export const STATUS_MAP = {
     축구: "bg-soccer text-white",
   };
     
+
+export const STATUS_PROPOSAL = {  
+  D: "거절",
+  A: "수락",
+  W: "투표전",
+  V: "투표중",
+};
