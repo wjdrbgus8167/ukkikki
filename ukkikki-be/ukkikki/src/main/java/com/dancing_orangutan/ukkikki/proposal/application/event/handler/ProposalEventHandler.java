@@ -21,6 +21,8 @@ public class ProposalEventHandler {
     @EventListener
     public void handleProposalVoteSurveyStart(TravelPlanSubmittedEvent event) {
 
+        log.info("여행계획이벤트가 제출되었습니다.");
+
         LocalDateTime surveyStartTime = event.closeTime().plusHours(168); // 제출 후 1분 뒤 시작
         LocalDateTime surveyEndTime = event.closeTime().plusHours(240); // 72시간 뒤 종료
 
@@ -36,11 +38,8 @@ public class ProposalEventHandler {
 
     @EventListener
     public void handleProposalVoteSurveyEnd(VoteSurveyCloseTimeReachedEvent event){
-
         proposalService.confirmProposal(event.travelPlanId());
-
         log.info(" 투표 마감:{} ",event.travelPlanId());
-
     }
 
 }

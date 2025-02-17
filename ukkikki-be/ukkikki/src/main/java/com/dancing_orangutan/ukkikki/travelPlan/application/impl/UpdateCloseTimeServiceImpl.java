@@ -6,6 +6,7 @@ import com.dancing_orangutan.ukkikki.global.error.ErrorCode;
 import com.dancing_orangutan.ukkikki.travelPlan.application.UpdateCloseTimeService;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.UpdateCloseTimeCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.event.TravelPlanCloseTimeChangedEvent;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.event.TravelPlanSubmittedEvent;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,12 @@ public class UpdateCloseTimeServiceImpl implements UpdateCloseTimeService {
 		TravelPlanCloseTimeChangedEvent event = entity.updateCloseTime(
 				command.closeTime(), command.memberId());
 
-		eventPublisher.publish(event);
+		TravelPlanSubmittedEvent submittedEvent = TravelPlanSubmittedEvent.builder()
+				.travelPlanId(command.travelPlanId())
+				.closeTime(command.closeTime())
+				.build();
 
+		eventPublisher.publish(event);
+		eventPublisher.publish(submittedEvent);
 	}
 }
