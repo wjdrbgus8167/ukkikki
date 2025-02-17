@@ -13,7 +13,7 @@ export const stompClient = new Client({
   heartbeatOutgoing: 4000,
 });
 
-const WebSocketComponent = ({ travelPlanId, setFavorites,favorites }) => {
+const WebSocketComponent = ({ travelPlanId, setFavorites,favorites,fetchRoomData }) => {
   useEffect(() => {
     stompClient.onConnect = () => {
       console.log('✅ STOMP WebSocket 연결됨');
@@ -23,23 +23,11 @@ const WebSocketComponent = ({ travelPlanId, setFavorites,favorites }) => {
         `/sub/likes/travel-plan/${travelPlanId}`,
         (message) => {
           const updatedPlace = JSON.parse(message.body);
-          console.log('🔥 받은 마커 업데이트 데이터:', updatedPlace);
-      
-          setFavorites((prev) => {
-            const existingMarker = prev.find((fav) => fav.placeId === updatedPlace.placeId);
-            if (existingMarker) {
-              return prev.map((fav) =>
-                fav.placeId === updatedPlace.placeId
-                  ? { ...fav, likeCount: updatedPlace.likeCount } // <-- 좋아요 수를 업데이트하는지 확인
-                  : fav
-              );
-            }
-            return [...prev, updatedPlace];
-          });
+          console.log("🔥 받은 마커 업데이트 데이터:", updatedPlace);
+          // ✅ 최신 방 데이터를 다시 가져오기
+          fetchRoomData(travelPlanId);
         }
       );
-    
-
     };
 
     stompClient.onDisconnect = () => {

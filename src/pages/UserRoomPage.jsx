@@ -7,6 +7,8 @@ import Footer from '../components/layout/Footer';
 import OverviewBar from '../components/userroom/OverviewBar';
 import FavoriteList from '../components/userroom/FavoriteList';
 import { LoadScript } from '@react-google-maps/api';
+import WebSocketComponent, { stompClient } from '../components/userroom/WebSocketComponent';
+
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
 const UserRoom = () => {
@@ -89,6 +91,15 @@ const UserRoom = () => {
                 favorites={favorites}
                 setFavorites={setFavorites}
               />
+
+
+  <WebSocketComponent 
+  travelPlanId={travelPlanId} 
+  fetchRoomData={fetchRoomData} 
+  setFavorites={setFavorites} 
+  favorites={favorites} 
+/>
+
               <button
                 onClick={() => setIsLikeListOpen(false)}
                 className="absolute top-1/2 right-[-40px] transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-r-lg"
