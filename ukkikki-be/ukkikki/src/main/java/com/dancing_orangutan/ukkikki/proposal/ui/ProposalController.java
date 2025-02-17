@@ -155,6 +155,19 @@ public class ProposalController {
        return ApiUtils.success("일정이 변경되었습니다");
     }
 
+    @PutMapping("/{proposalId}")
+    public ApiUtils.ApiResponse<?> updateProposal(
+            @PathVariable Integer travelPlanId,
+            @PathVariable Integer proposalId,
+            @AuthenticationPrincipal CompanyUserDetails companyUserDetails,
+            @RequestBody UpdateProposalRequest request
+    ){
+        UpdateProposalCommand command = request.toCommand(travelPlanId,companyUserDetails.getCompanyId(),proposalId);
+
+        proposalService.updateProposal(command);
+
+        return ApiUtils.success("제안서 수정이 완료되었습니다.");
+    }
     // 투표 시작하기
     @PostMapping("/{proposalId}/vote-survey")
     public ApiUtils.ApiResponse<CreateVoteSurveyResponse> voteSurvey(
