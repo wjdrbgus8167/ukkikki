@@ -1,9 +1,10 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { publicRequest } from '../../hooks/requestMethod';
 import useAuthStore from '../../stores/authStore';
 import Swal from 'sweetalert2';
 import MapSearchBar from '../../services/map/MapSearchBar';
 import { CiCirclePlus } from 'react-icons/ci';
+import { stompClient } from '../../components/userroom/WebSocketComponent';
 
 const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
   const { user } = useAuthStore();
@@ -56,8 +57,6 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
         };
       }
 
-      console.info(likeCount);
-
       // WebSocket 이벤트 발행
       if (stompClient && stompClient.connected) {
         stompClient.publish({
@@ -65,13 +64,16 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
           body: JSON.stringify(updatedPlace),
         });
       }
+      // favorites 상태 업데이트
+      setFavorites((prev) =>
+        prev.map((fav) => (fav.placeId === placeId ? updatedPlace : fav)),
+      );
     } catch (error) {
       console.error('🚨 좋아요 처리 실패:', error);
       Swal.fire('알림', '🚨 좋아요 처리 중 오류가 발생했습니다.', 'error');
     }
   };
 
-  // 태그 삭제 핸들러 (내가 쓴 태그 클릭 시)
   const handleTagDelete = async (placeId, tagId) => {
     Swal.fire({
       title: '태그 삭제',
@@ -84,7 +86,6 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const travelPlanId = selectedCard.travelPlanId;
           const response = await publicRequest.delete(
             `/api/v1/travel-plans/${travelPlanId}/tags/${tagId}`,
           );
@@ -109,7 +110,6 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
     });
   };
 
-  // 헤더 클릭 시 확장/축소 토글
   const handleToggleExpand = (place) => {
     if (expandedPlaceId === place.placeId) {
       setExpandedPlaceId(null);
@@ -122,20 +122,17 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
     }
   };
 
-  // 플러스 버튼 클릭 시 태그 입력창 표시
   const handleShowTagInput = (e) => {
     e.stopPropagation();
     setShowTagInput(true);
   };
 
-  // 태그 입력 값 변경 (최대 20자)
   const handleTagInputChange = (e) => {
     if (e.target.value.length <= 20) {
       setNewTag(e.target.value);
     }
   };
 
-  // 태그 제출 핸들러 - API 호출 후 로컬 업데이트
   const handleTagSubmit = async (e) => {
     e.stopPropagation();
     if (newTag.trim() === '') return;
@@ -147,7 +144,6 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
         { placeTagName: newTag.trim() },
       );
       if (response.status === 200) {
-        // response.data에 새 태그의 id가 포함되어 있다고 가정합니다.
         setFavorites((prev) =>
           prev.map((fav) =>
             fav.placeId === placeId
@@ -180,6 +176,7 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
       <MapSearchBar
         onPlaceSelected={handlePlaceSelected}
         selectedTravelPlanId={travelPlanId}
+        favorites={favorites}
       />
 
       {/* 찜한 장소 목록 */}
@@ -188,7 +185,6 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
           key={index}
           className="p-4 transition-all duration-300 bg-gray-100 rounded-lg hover:bg-gray-200"
         >
-          {/* 헤더 영역 (클릭 시 확장/축소) */}
           <div
             className="flex items-center justify-between cursor-pointer"
             onClick={() => handleToggleExpand(item)}
@@ -213,7 +209,6 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
             </button>
           </div>
 
-          {/* 확장 영역: 태그 목록 및 태그 추가 */}
           {expandedPlaceId === item.placeId && (
             <div className="mt-4 transition-all duration-300">
               {item.tags && item.tags.length > 0 ? (
@@ -237,7 +232,7 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
                         <span className="inline-flex items-center justify-center w-5 h-5 ml-1 text-xs text-white bg-red-500 rounded-full">
                           ×
                         </span>
-                      )}{' '}
+                      )}
                     </span>
                   ))}
                 </div>
