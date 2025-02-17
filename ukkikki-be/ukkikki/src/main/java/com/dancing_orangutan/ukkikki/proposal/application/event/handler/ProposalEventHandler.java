@@ -3,6 +3,7 @@ package com.dancing_orangutan.ukkikki.proposal.application.event.handler;
 import com.dancing_orangutan.ukkikki.proposal.application.ProposalService;
 import com.dancing_orangutan.ukkikki.proposal.application.command.CreateVoteSurveyCommand;
 import com.dancing_orangutan.ukkikki.proposal.domain.event.VoteSurveyCloseTimeReachedEvent;
+import com.dancing_orangutan.ukkikki.proposal.ui.response.ConfirmProposalResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.event.TravelPlanSubmittedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,9 +38,14 @@ public class ProposalEventHandler {
     }
 
     @EventListener
-    public void handleProposalVoteSurveyEnd(VoteSurveyCloseTimeReachedEvent event){
-        proposalService.confirmProposal(event.travelPlanId());
+    public ConfirmProposalResponse handleProposalVoteSurveyEnd(VoteSurveyCloseTimeReachedEvent event){
+
+        ConfirmProposalResponse response =proposalService.confirmProposal(event.travelPlanId());
+
         log.info(" 투표 마감:{} ",event.travelPlanId());
+        log.info("확정된 투표 : {}",response);
+
+        return response;
     }
 
 }
