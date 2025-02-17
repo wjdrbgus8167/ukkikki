@@ -4,6 +4,7 @@ import useAuthStore from '../../stores/authStore';
 import Swal from 'sweetalert2';
 import MapSearchBar from '../../services/map/MapSearchBar';
 import { CiCirclePlus } from 'react-icons/ci';
+import { stompClient } from '../../components/userroom/WebSocketComponent';
 
 const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
   const { user } = useAuthStore();
@@ -11,6 +12,28 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
   const [showTagInput, setShowTagInput] = useState(false);
   const [newTag, setNewTag] = useState('');
   const travelPlanId = selectedCard.travelPlanId;
+
+  // WebSocket 구독: /sub/likes 채널로부터 좋아요 업데이트 메시지를 받아 favorites 업데이트
+  useEffect(() => {
+    if (stompClient && stompClient.connected) {
+      const subscription = stompClient.subscribe('/sub/likes', (message) => {
+        try {
+          const updatedMarker = JSON.parse(message.body);
+          console.log('웹소켓 수신, 업데이트된 마커:', updatedMarker);
+          setFavorites((prev) =>
+            prev.map((fav) =>
+              fav.placeId === updatedMarker.placeId ? updatedMarker : fav,
+            ),
+          );
+        } catch (e) {
+          console.error('웹소켓 메시지 처리 실패:', e);
+        }
+      });
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, [setFavorites]);
 
   // MapSearchBar에서 선택 시 부모의 favorites에 추가
   const handlePlaceSelected = (newPlace) => {
@@ -31,12 +54,12 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
     const placeId = place.placeId;
     const isLiked = place.isLiked;
     const totalMember = selectedCard.member.totalParticipants;
-  
+
     try {
       let updatedPlace;
       if (!isLiked) {
         await publicRequest.post(
-          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`
+          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
         );
         updatedPlace = {
           ...place,
@@ -46,7 +69,7 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
         };
       } else {
         await publicRequest.delete(
-          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`
+          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
         );
         updatedPlace = {
           ...place,
@@ -56,22 +79,24 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
         };
       }
 
-      console.info(likeCount);
-  
-      // WebSocket 이벤트 발행
+      // WebSocket 이벤트 발행: 다른 클라이언트와 현재 클라이언트에 실시간으로 반영
       if (stompClient && stompClient.connected) {
         stompClient.publish({
-          destination: "/pub/likes",
+          destination: '/pub/likes',
           body: JSON.stringify(updatedPlace),
         });
+        console.log('웹소켓 이벤트 발행됨:', updatedPlace);
       }
+      // 로컬 상태 업데이트
+      setFavorites((prev) =>
+        prev.map((fav) => (fav.placeId === placeId ? updatedPlace : fav)),
+      );
     } catch (error) {
       console.error('🚨 좋아요 처리 실패:', error);
       Swal.fire('알림', '🚨 좋아요 처리 중 오류가 발생했습니다.', 'error');
     }
   };
 
-  // 태그 삭제 핸들러 (내가 쓴 태그 클릭 시)
   const handleTagDelete = async (placeId, tagId) => {
     Swal.fire({
       title: '태그 삭제',
@@ -84,7 +109,6 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const travelPlanId = selectedCard.travelPlanId;
           const response = await publicRequest.delete(
             `/api/v1/travel-plans/${travelPlanId}/tags/${tagId}`,
           );
@@ -109,7 +133,6 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
     });
   };
 
-  // 헤더 클릭 시 확장/축소 토글
   const handleToggleExpand = (place) => {
     if (expandedPlaceId === place.placeId) {
       setExpandedPlaceId(null);
@@ -122,35 +145,29 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
     }
   };
 
-  // 플러스 버튼 클릭 시 태그 입력창 표시
   const handleShowTagInput = (e) => {
     e.stopPropagation();
     setShowTagInput(true);
   };
 
-  // 태그 입력 값 변경 (최대 20자)
   const handleTagInputChange = (e) => {
     if (e.target.value.length <= 20) {
       setNewTag(e.target.value);
     }
   };
 
-  // 태그 제출 핸들러 - API 호출 후 로컬 업데이트
   const handleTagSubmit = async (e) => {
     e.stopPropagation();
     if (newTag.trim() === '') return;
-    const travelPlanId = selectedCard.travelPlanId;
-    const placeId = expandedPlaceId;
     try {
       const response = await publicRequest.post(
-        `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/tags`,
+        `/api/v1/travel-plans/${travelPlanId}/places/${expandedPlaceId}/tags`,
         { placeTagName: newTag.trim() },
       );
       if (response.status === 200) {
-        // response.data에 새 태그의 id가 포함되어 있다고 가정합니다.
         setFavorites((prev) =>
           prev.map((fav) =>
-            fav.placeId === placeId
+            fav.placeId === expandedPlaceId
               ? {
                   ...fav,
                   tags: [
@@ -180,6 +197,7 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
       <MapSearchBar
         onPlaceSelected={handlePlaceSelected}
         selectedTravelPlanId={travelPlanId}
+        favorites={favorites}
       />
 
       {/* 찜한 장소 목록 */}
@@ -188,7 +206,6 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
           key={index}
           className="p-4 transition-all duration-300 bg-gray-100 rounded-lg hover:bg-gray-200"
         >
-          {/* 헤더 영역 (클릭 시 확장/축소) */}
           <div
             className="flex items-center justify-between cursor-pointer"
             onClick={() => handleToggleExpand(item)}
@@ -213,7 +230,6 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
             </button>
           </div>
 
-          {/* 확장 영역: 태그 목록 및 태그 추가 */}
           {expandedPlaceId === item.placeId && (
             <div className="mt-4 transition-all duration-300">
               {item.tags && item.tags.length > 0 ? (
@@ -237,7 +253,7 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
                         <span className="inline-flex items-center justify-center w-5 h-5 ml-1 text-xs text-white bg-red-500 rounded-full">
                           ×
                         </span>
-                      )}{' '}
+                      )}
                     </span>
                   ))}
                 </div>

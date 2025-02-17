@@ -71,17 +71,19 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
         updatedMarker = { ...place, likeYn: true, isLiked: true, likeCount: place.likeCount + totalMember };
       }
   
-      // ✅ WebSocket을 통해 실시간으로 마커 상태 변경 전송
+          // ✅ WebSocket을 통해 실시간으로 마커 상태 변경 전송 (travelPlanId 포함)
       if (stompClient && stompClient.connected) {
+      const wsData = { ...updatedMarker, travelPlanId }; // 웹소켓 전송용 데이터
         stompClient.publish({
           destination: "/pub/likes",
-          body: JSON.stringify(updatedMarker),
+          body: JSON.stringify(wsData),
         });
-        console.log("✅ 웹소켓 좋아요 이벤트 발행됨:", updatedMarker);
+        console.log("✅ 웹소켓 좋아요 이벤트 발행됨:", wsData);
       }
   
-      // ✅ 여기서는 상태를 변경하지 않고, 웹소켓에서 받은 데이터만 `setFavorites`에 반영
-      setSelectedMarker(updatedMarker);
+      setFavorites((prev) =>
+        prev.map((fav) => (fav.placeId === placeId ? updatedMarker : fav))
+      );      
   
     } catch (error) {
       console.error("🚨 좋아요 처리 실패:", error);
@@ -93,7 +95,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
   return (
     <div className="relative w-full h-screen">
       {/* ✅ 웹소켓 구독을 위한 WebSocketComponent 추가 */}
-      <WebSocketComponent travelPlanId={selectedCard.travelPlanId} setFavorites={setFavorites} />
+      <WebSocketComponent travelPlanId={selectedCard.travelPlanId} setFavorites={setFavorites} favorites={favorites} />
 
       {/* 지도 영역 */}
       <div className="w-full h-full">
