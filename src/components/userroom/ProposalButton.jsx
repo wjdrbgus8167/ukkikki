@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
@@ -23,7 +23,7 @@ const ProposalButton = ({
   // 버튼 활성화 여부: 인원이 충분하고 아직 마감일시가 설정되지 않은 경우
   const isEnabled = currentParticipants >= minPeople && !selectedCard.closeTime;
 
-  // 마감일시 미설정 시: 입력창을 띄워 closeTime을 설정하는 함수
+  // 마감일시 입력창 띄우기
   const handleButtonClick = () => {
     if (!isEnabled) {
       Swal.fire({
@@ -41,6 +41,7 @@ const ProposalButton = ({
     setCloseTime(e.target.value);
   };
 
+  // 마감일시 설정 API 호출
   const handleSubmitCloseTime = async () => {
     if (!closeTime) {
       Swal.fire({
@@ -73,7 +74,6 @@ const ProposalButton = ({
       return;
     }
     setIsSubmitting(true);
-    // closeTime 값에 초가 없으면 ":00" 추가
     const formattedCloseTime =
       closeTime.length === 16 ? `${closeTime}:00` : closeTime;
     try {
@@ -108,48 +108,92 @@ const ProposalButton = ({
     }
   };
 
-  // 마감일시가 설정된 경우, 자동 리다이렉션을 위한 useEffect
-  useEffect(() => {
-    if (selectedCard.closeTime) {
-      const now = new Date();
-      const deadline = new Date(selectedCard.closeTime);
-      const deadlinePlus7 = new Date(deadline.getTime() + 7 * 24 * 3600 * 1000);
-      // 만약 이미 투표 시작 상태라면 즉시 이동
-      if (selectedCard.voteSurveyInfo?.canVote) {
-        navigate(`/user-vote/${travelPlanId}`, { state: { selectedCard } });
-      }
-      // 아니면, 마감일시 + 7일이 지난 경우 자동 이동
-      else if (now > deadlinePlus7) {
-        navigate(`/user-vote/${travelPlanId}`, { state: { selectedCard } });
-      }
-    }
-  }, [selectedCard, travelPlanId, navigate]);
-
-  // 동적 버튼 렌더링: 마감일시가 설정되어 있으면 안내 메시지 표시
+  // 동적 버튼 렌더링
   const renderDynamicButton = () => {
     const now = new Date();
     const deadline = new Date(selectedCard.closeTime);
-    // 1. 마감 전: 제출 기한 안내
+    const deadlinePlus7 = new Date(deadline.getTime() + 7 * 24 * 3600 * 1000);
+
     if (now < deadline) {
+      // 마감 전: 제출 기한 안내 버튼
       const diffDays = Math.ceil((deadline - now) / (1000 * 3600 * 24));
       return (
         <button disabled className="px-4 py-2 text-white bg-gray-400 rounded">
           여행사에 제출하기까지 {diffDays}일 남았습니다.
         </button>
       );
-    }
-    // 2. 마감 후 7일 이내: 제안 대기 안내
-    const deadlinePlus7 = new Date(deadline.getTime() + 7 * 24 * 3600 * 1000);
-    if (now < deadlinePlus7) {
+    } else if (now < deadlinePlus7) {
+      // 마감 후 7일 이내: 제안 대기 안내 버튼
       const diffDays = Math.ceil((deadlinePlus7 - now) / (1000 * 3600 * 24));
       return (
         <button disabled className="px-4 py-2 text-white bg-gray-400 rounded">
           여행사 제안을 받기까지 {diffDays}일 남았습니다.
         </button>
       );
+    } else {
+      // 마감 후 7일 경과한 경우
+      if (selectedCard.voteSurveyInfo?.canVote) {
+        // 이미 투표 시작되었다면 바로 투표 페이지로 이동할 수 있게 함
+        return (
+          <button
+            onClick={() => navigate(`/user-vote/${travelPlanId}`)}
+            className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
+          >
+            여행사 제안 보러가기
+          </button>
+        );
+      } else {
+        // 투표가 시작되지 않았으면, 방장인 경우 투표 시작 버튼, 아니면 대기 안내 버튼
+        if (selectedCard.member?.isHost) {
+          return (
+            <button
+              onClick={async () => {
+                setIsSubmitting(true);
+                try {
+                  const voteStartResponse = await publicRequest.post(
+                    `/api/v1/travel-plans/${travelPlanId}/proposals/1/vote-survey`,
+                  );
+                  if (voteStartResponse.status === 200) {
+                    Swal.fire({
+                      title: '투표 시작 완료!',
+                      text: '투표가 시작되었습니다.',
+                      icon: 'success',
+                      confirmButtonText: '확인',
+                    });
+                    // 투표 시작 여부 업데이트
+                    selectedCard.voteSurveyInfo.canVote = true;
+                    navigate(`/user-vote/${travelPlanId}`);
+                  }
+                } catch (error) {
+                  console.error('투표 시작 실패:', error);
+                  Swal.fire(
+                    '투표 시작 실패',
+                    '투표 시작 도중 오류가 발생했습니다.',
+                    'error',
+                  );
+                } finally {
+                  setIsSubmitting(false);
+                }
+              }}
+              className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? '처리 중...' : '투표 시작하기'}
+            </button>
+          );
+        } else {
+          return (
+            <button
+              disabled
+              className="px-4 py-2 text-white bg-gray-400 rounded cursor-not-allowed"
+              title="방장이 투표를 시작하면 제안서를 확인할 수 있습니다."
+            >
+              방장이 투표 시작할 때까지 대기중
+            </button>
+          );
+        }
+      }
     }
-    // 3. 조건 충족 시: useEffect에서 자동으로 리다이렉션하므로 버튼은 렌더링하지 않음.
-    return null;
   };
 
   return (
