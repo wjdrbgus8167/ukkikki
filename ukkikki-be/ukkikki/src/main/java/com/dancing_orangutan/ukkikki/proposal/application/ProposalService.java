@@ -351,10 +351,10 @@ public class ProposalService {
     }
 
     //여행사 본인 제안서 상세 조회
-    public CompanyProposalDetailResponse getCompanyProposalDetail(Integer proposalId, Integer companyId) {
+    public CompanyProposalDetailResponse getCompanyProposalDetail(Integer proposalId) {
 
         // 1️⃣ 제안서 조회
-        ProposalEntity proposal = proposalRepository.findByProposalIdAndCompany_CompanyId(proposalId, companyId);
+        ProposalEntity proposal = proposalRepository.findByProposalId(proposalId);
 
         // 2️⃣ 스케줄 조회 및 그룹핑 (dayNumber 기준)
         List<ScheduleResponse> schedules = scheduleFinder.findSchedulesByProposalId(proposal.getProposalId()).stream()
