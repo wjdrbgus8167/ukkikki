@@ -31,12 +31,12 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
     const placeId = place.placeId;
     const isLiked = place.isLiked;
     const totalMember = selectedCard.member.totalParticipants;
-  
+
     try {
       let updatedPlace;
       if (!isLiked) {
         await publicRequest.post(
-          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`
+          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
         );
         updatedPlace = {
           ...place,
@@ -46,7 +46,7 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
         };
       } else {
         await publicRequest.delete(
-          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`
+          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
         );
         updatedPlace = {
           ...place,
@@ -57,11 +57,11 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
       }
 
       console.info(likeCount);
-  
+
       // WebSocket 이벤트 발행
       if (stompClient && stompClient.connected) {
         stompClient.publish({
-          destination: "/pub/likes",
+          destination: '/pub/likes',
           body: JSON.stringify(updatedPlace),
         });
       }
