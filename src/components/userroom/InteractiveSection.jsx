@@ -17,10 +17,17 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
   const [newTag, setNewTag] = useState('');
   const [renderKey, setRenderKey] = useState(0); // GoogleMap 강제 리렌더링용
 
+  // 태그 제출 핸들러 (필요에 따라 실제 로직 구현)
+  const handleTagSubmit = () => {
+    console.log('새 태그:', newTag);
+    setShowTagInput(false);
+    setNewTag('');
+  };
+
   // ✅ WebSocket을 활용한 실시간 마커 업데이트
   useEffect(() => {
-    console.log("✅ favorites 상태 변경됨:", favorites);
-    setRenderKey(prev => prev + 1); // Google Map 강제 리렌더링
+    console.log('✅ favorites 상태 변경됨:', favorites);
+    setRenderKey((prev) => prev + 1); // Google Map 강제 리렌더링
   }, [favorites]);
 
   // ✅ 도시 좌표 가져오기 (Google Geocoding API)
@@ -52,7 +59,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
 
   const handleLikePlace = async (place) => {
     if (!place || !selectedCard || !selectedCard.travelPlanId) {
-      console.error("🚨 장소 정보 또는 여행방 ID가 없습니다.");
+      console.error('🚨 장소 정보 또는 여행방 ID가 없습니다.');
       return;
     }
 
@@ -60,10 +67,8 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
     const placeId = place.placeId;
     const isLiked = place.likeYn; // 기존 좋아요 상태
     const totalMember = selectedCard?.member?.totalParticipants || 0;
-
     const placeName = place.name;
     let actionType;
-
 
     try {
       let updatedMarker;
@@ -75,7 +80,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
           ...place,
           likeYn: false,
           isLiked: false,
-          likeCount: Math.max(place.likeCount - totalMember, 0)
+          likeCount: Math.max(place.likeCount - totalMember, 0),
         };
         actionType = "UNLIKE"
       } else {
@@ -85,23 +90,24 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
           ...place,
           likeYn: true,
           isLiked: true,
-          likeCount: place.likeCount + totalMember
+          likeCount: place.likeCount + totalMember,
         };
-        actionType = "LIKE"
+        actionType = 'LIKE';
       }
 
       // ✅ 상태 업데이트 - 새로운 배열을 반환하여 리렌더링 유도
       setFavorites((prev) => {
         const newFavorites = prev.map((fav) =>
-          fav.placeId === placeId ? { ...updatedMarker } : fav
+          fav.placeId === placeId ? { ...updatedMarker } : fav,
         );
         return [...newFavorites]; // 새로운 배열을 반환해 참조 변경
       });
 
       // ✅ 현재 선택된 마커도 업데이트 (UI 즉시 반영)
       setSelectedMarker((prev) =>
-        prev && prev.placeId === placeId ? { ...updatedMarker } : prev
+        prev && prev.placeId === placeId ? { ...updatedMarker } : prev,
       );
+
       // ✅ WebSocket을 통해 실시간으로 마커 상태 변경 전송
       if (stompClient && stompClient.connected) {
         const wsData = {
@@ -110,19 +116,16 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
           travelPlanId
         };
         stompClient.publish({
-          destination: "/pub/actions",
+          destination: '/pub/actions',
           body: JSON.stringify(wsData),
         });
-        console.log("✅ InteractiveSection 좋아요 이벤트:", wsData);
+        console.log('✅ InteractiveSection 좋아요 이벤트:', wsData);
       }
-
     } catch (error) {
-      console.error("🚨 좋아요 처리 실패:", error);
-      Swal.fire("알림", "🚨 좋아요 처리 중 오류가 발생했습니다.", "error");
+      console.error('🚨 좋아요 처리 실패:', error);
+      Swal.fire('알림', '🚨 좋아요 처리 중 오류가 발생했습니다.', 'error');
     }
   };
-
-
 
   return (
     <div className="relative w-full h-screen">
@@ -132,6 +135,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
       {/* 지도 영역 */}
       <div className="w-full h-full">
         <GoogleMap
+          key={renderKey}
           mapContainerStyle={{ width: '100%', height: '100%' }}
           center={coordinates}
           zoom={12}
@@ -163,6 +167,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
               </div>
             </OverlayView>
           ))}
+
           {selectedMarker && (
             <InfoWindow
               position={{
@@ -243,30 +248,21 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
         </GoogleMap>
       </div>
 
-      {/* 채팅창 */}
-      <div
-        className={`absolute transition-all duration-300 overflow-hidden ${isChatOpen
-          ? 'top-4 right-4 w-96 h-[500px] rounded-lg overflow-hidden'
-          : 'bottom-4 right-4 w-12 h-12 rounded-lg  overflow-visible'
-          }`}
-      >
+      <div className="fixed bottom-4 right-4 z-[9999]">
         {isChatOpen ? (
-          <div className="relative w-full h-full bg-white rounded-lg shadow-lg">
+          <div className="relative w-96 h-[500px] rounded-lg bg-white shadow-lg">
             <Chat travelPlanId={selectedCard.travelPlanId} />
             <button
               onClick={() => setIsChatOpen(false)}
-              className="absolute p-2 text-white bg-gray-800 rounded-full top-2 right-2"
+              className="absolute top-2 right-2 p-2 text-white bg-gray-800 rounded-full"
             >
               ✕
             </button>
           </div>
         ) : (
           <button
-            onClick={() => {
-              console.log('채팅 열기 클릭됨');
-              setIsChatOpen(true);
-            }}
-            className="flex items-center justify-center w-full h-full text-white bg-gray-800 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+            onClick={() => setIsChatOpen(true)}
+            className="flex items-center justify-center w-12 h-12 text-white bg-gray-800 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
           >
             <RiChatSmileAiLine size={24} />
           </button>
@@ -277,7 +273,3 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
 };
 
 export default InteractiveSection;
-
-
-
-
