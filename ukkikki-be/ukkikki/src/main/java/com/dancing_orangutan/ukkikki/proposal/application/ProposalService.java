@@ -182,6 +182,7 @@ public class ProposalService {
                             .companyName(companyName)
                             .voteCount(voteCount)
                             .votedYn(votedYn)
+                            .proposalStatus(proposal.getProposalStatus())
                             .build();
 
                 })// 제안서를 투표 순으로 나열
@@ -221,6 +222,7 @@ public class ProposalService {
         return ProposalDetailResponse.builder()
                 .proposalId(proposal.getProposalId())
                 .companyId(proposal.getCompany().getCompanyId())
+                .travelPlanId(proposal.getTravelPlan().getTravelPlanId())
                 .name(proposal.getName())
                 .airLine(proposal.getAirline())
                 .startDate(proposal.getStartDate())
@@ -474,6 +476,7 @@ public class ProposalService {
         jpaScheduleRepository.save(scheduleEntity);
     }
 
+    //제안서 수정 (일정 포함)
     public void updateProposal(UpdateProposalCommand command) {
 
         log.info("command:{}", command);
