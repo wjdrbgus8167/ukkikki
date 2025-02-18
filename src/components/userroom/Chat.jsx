@@ -21,6 +21,7 @@ const Chat = ({ travelPlanId }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const [autoScrolled, setAutoScrolled] = useState(false);
+  const initialFetchDone = useRef(false); // 추가: 초기 기록 로드 여부 추적
 
   const chatContainerRef = useRef(null);
   const topSentinelRef = useRef(null);
@@ -33,8 +34,8 @@ const Chat = ({ travelPlanId }) => {
   // ▼ 스크롤 맨 아래로 이동하는 함수
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
+      const container = chatContainerRef.current;
+      container.scrollTop = container.scrollHeight;
     }
   };
 
@@ -66,9 +67,21 @@ const Chat = ({ travelPlanId }) => {
           oldestMessageTime.current = data.messages[0].createdAt;
           const container = chatContainerRef.current;
           const prevScrollHeight = container ? container.scrollHeight : 0;
-          setMessages((prev) => [...data.messages, ...prev]);
 
-          // 과거 메시지 로딩 시, 기존 스크롤 위치 보정
+          // 중복 메시지 필터링
+          const existingIds = new Set(messages.map(msg => msg.id)); // 메시지 ID 기반 필터링
+          const filteredMessages = data.messages.filter(msg =>
+            !existingIds.has(msg.id)
+          );
+
+          if (filteredMessages.length === 0) {
+            setHasMoreMessages(data.hasMore);
+            return;
+          }
+
+          setMessages((prev) => [...filteredMessages, ...prev]);
+
+          // 스크롤 위치 보정
           setTimeout(() => {
             if (container) {
               container.scrollTop = container.scrollHeight - prevScrollHeight;
@@ -116,14 +129,13 @@ const Chat = ({ travelPlanId }) => {
 
     try {
       stompClient.send(`/pub/chat/message`, {}, JSON.stringify(message));
+      setInputMessage('');
+      scrollToBottom(); // 즉시 스크롤 내림
     } catch (err) {
       console.error('메시지 전송 에러:', err);
     }
-    setInputMessage('');
-
-    // ▼ 메시지 전송 후 잠시 뒤 스크롤을 맨 아래로 이동
-    setTimeout(scrollToBottom, 100);
   };
+
 
   // Intersection Observer: 상단 sentinel 감지 시 history 요청
   useEffect(() => {
@@ -141,6 +153,19 @@ const Chat = ({ travelPlanId }) => {
     if (topSentinelRef.current) observer.observe(topSentinelRef.current);
     return () => observer.disconnect();
   }, [stompClient]);
+
+  // ▼ 새로운 메시지 도착 시 스크롤 처리
+  useEffect(() => {
+    const container = chatContainerRef.current;
+    if (!container) return;
+    // 스크롤이 맨 아래 근처인지 확인 (100px 이내)
+    const isNearBottom =
+      container.scrollHeight - container.scrollTop <= container.clientHeight + 100;
+
+    if (isNearBottom) {
+      scrollToBottom();
+    }
+  }, [messages]); // messages가 변경될 때마다 실행
 
   // 최초 스크롤: 처음 메시지가 로드되면 컨테이너 하단으로 스크롤
   useEffect(() => {
@@ -177,6 +202,12 @@ const Chat = ({ travelPlanId }) => {
           travelPlanId,
         );
         sendEnterMessage(client, travelPlanId);
+
+        // 초기 기록 로드 (한 번만 실행)
+        if (!initialFetchDone.current) {
+          fetchHistoryMessages(client);
+          initialFetchDone.current = true;
+        }
       },
       (error) => {
         console.error('WebSocket 연결 실패:', error);
@@ -231,9 +262,8 @@ const Chat = ({ travelPlanId }) => {
             return (
               <div
                 key={index}
-                className={`flex mb-4 w-full ${
-                  isMyMessage ? 'justify-end' : 'justify-start'
-                }`}
+                className={`flex mb-4 w-full ${isMyMessage ? 'justify-end' : 'justify-start'
+                  }`}
               >
                 {/* 프로필 이미지 및 이름 */}
                 {!isMyMessage && (
@@ -261,23 +291,20 @@ const Chat = ({ travelPlanId }) => {
 
                 {/* 말풍선 + 시간 */}
                 <div
-                  className={`flex flex-col flex-1 ${
-                    isMyMessage ? 'items-end' : 'items-start'
-                  }`}
+                  className={`flex flex-col flex-1 ${isMyMessage ? 'items-end' : 'items-start'
+                    }`}
                 >
                   <div
-                    className={`max-w-[70%] p-3 rounded-lg ${
-                      isMyMessage
-                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
-                        : 'bg-gray-200 text-gray-800'
-                    }`}
+                    className={`max-w-[70%] p-3 rounded-lg ${isMyMessage
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
+                      : 'bg-gray-200 text-gray-800'
+                      }`}
                   >
                     <p className="text-sm">{msg.content}</p>
                   </div>
                   <p
-                    className={`text-xs text-gray-500 mt-1 ${
-                      isMyMessage ? 'text-right' : 'text-left'
-                    }`}
+                    className={`text-xs text-gray-500 mt-1 ${isMyMessage ? 'text-right' : 'text-left'
+                      }`}
                   >
                     {format(new Date(msg.createdAt), 'yyyy-MM-dd HH:mm')}
                   </p>
@@ -330,11 +357,10 @@ const Chat = ({ travelPlanId }) => {
           <button
             onClick={sendMessage}
             disabled={!isConnected}
-            className={`flex items-center justify-center px-6 py-3 text-lg font-semibold text-white transition-colors duration-300 rounded-lg shadow-md focus:outline-none ${
-              isConnected
-                ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'
-                : 'bg-gray-400 cursor-not-allowed'
-            }`}
+            className={`flex items-center justify-center px-6 py-3 text-lg font-semibold text-white transition-colors duration-300 rounded-lg shadow-md focus:outline-none ${isConnected
+              ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'
+              : 'bg-gray-400 cursor-not-allowed'
+              }`}
           >
             <RiSendPlaneLine size={24} />
           </button>
