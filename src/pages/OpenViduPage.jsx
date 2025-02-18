@@ -25,10 +25,10 @@ class OpenViduPage extends Component {
             session: undefined,
             mainStreamManager: undefined,
             publisher: undefined,
-            subscribers: [],
-            sessions: [], // 세션 목록을 저장할 상태 추가
-            screenSharing: false,
             screenPublisher: null,
+            subscribers: [],
+            regularSubscribers: [], // 일반 참가자 스트림을 저장
+            screenSubscribers: [], // 화면 공유 스트림을 저장
         };
 
         this.createSession = this.createSession.bind(this);
@@ -85,7 +85,7 @@ class OpenViduPage extends Component {
         }
     }
 
-    joinSession(sessionId) {
+    async joinSession(sessionId) {
         this.setState({
             mySessionId: sessionId,
             myUserName: 'Participant' + Math.floor(Math.random() * 100),
@@ -101,18 +101,45 @@ class OpenViduPage extends Component {
                 () => {
                     var mySession = this.state.session;
 
+                    // 스트림 생성 이벤트 핸들러 수정
                     mySession.on('streamCreated', (event) => {
-                        var subscriber = mySession.subscribe(event.stream, undefined);
-                        var subscribers = this.state.subscribers;
-                        subscribers.push(subscriber);
-
-                        this.setState({
-                            subscribers: subscribers,
-                        });
+                        const subscriber = mySession.subscribe(event.stream, undefined);
+                        
+                        // 스트림 타입에 따라 분류
+                        if (event.stream.typeOfVideo === 'SCREEN') {
+                            this.setState(prevState => ({
+                                screenSubscribers: [...prevState.screenSubscribers, subscriber],
+                                subscribers: [...prevState.subscribers, subscriber]
+                            }));
+                        } else {
+                            this.setState(prevState => ({
+                                regularSubscribers: [...prevState.regularSubscribers, subscriber],
+                                subscribers: [...prevState.subscribers, subscriber]
+                            }));
+                        }
                     });
 
                     mySession.on('streamDestroyed', (event) => {
-                        this.deleteSubscriber(event.stream.streamManager);
+                        const stream = event.stream;
+                        if (stream.typeOfVideo === 'SCREEN') {
+                            this.setState(prevState => ({
+                                screenSubscribers: prevState.screenSubscribers.filter(sub => 
+                                    sub.stream.streamId !== stream.streamId
+                                ),
+                                subscribers: prevState.subscribers.filter(sub => 
+                                    sub.stream.streamId !== stream.streamId
+                                )
+                            }));
+                        } else {
+                            this.setState(prevState => ({
+                                regularSubscribers: prevState.regularSubscribers.filter(sub => 
+                                    sub.stream.streamId !== stream.streamId
+                                ),
+                                subscribers: prevState.subscribers.filter(sub => 
+                                    sub.stream.streamId !== stream.streamId
+                                )
+                            }));
+                        }
                     });
 
                     mySession.on('exception', (exception) => {
@@ -222,31 +249,24 @@ class OpenViduPage extends Component {
             this.setState({
                 screenSharing: false,
                 screenPublisher: null,
+                mainStreamManager: this.state.publisher // 메인 화면을 원래 카메라로 복구
             });
         } else {
-            if (this.state.screenPublisher) {
-                console.warn('이미 화면 공유가 활성화되어 있습니다.');
-                return;
-            }
-    
             try {
-                const screenPublisher = await this.OV.initPublisherAsync("screen-share-container", {
+                const screenPublisher = await this.OV.initPublisherAsync("undefined", {
                     videoSource: "screen",
                     publishAudio: false,
                     publishVideo: true,
                     mirror: false
                 });
     
-                screenPublisher.once('accessAllowed', () => {
-                    this.state.session.publish(screenPublisher);
-    
-                    // 강제 렌더링 갱신
-                    setTimeout(() => {
-                        this.setState({
-                            screenSharing: true,
-                            screenPublisher,
-                        });
-                    }, 100);
+                screenPublisher.once('accessAllowed', async () => {
+                    await this.state.session.publish(screenPublisher);
+                    this.setState({
+                        screenSharing: true,
+                        screenPublisher,
+                        mainStreamManager: screenPublisher
+                    });
                 });
     
                 screenPublisher.once('accessDenied', () => {
@@ -365,28 +385,37 @@ class OpenViduPage extends Component {
                             />
                         </SessionHeader>
 
-                        {/* 메인 카메라 스트림 */}
-                        {this.state.mainStreamManager !== undefined ? (
-                            <MainVideo className="col-md-6">
-                                <UserVideoComponent streamManager={this.state.mainStreamManager} />
-                            </MainVideo>
-                        ) : null}
-
-                        {/* 화면 공유 스트림 */}
-                        <div id="screen-share-container"></div>
-
                         <div id="video-container" className="col-md-6">
-                            {this.state.publisher !== undefined ? (
-                                <StreamContainer className="col-md-6 col-xs-6" onClick={() => this.handleMainVideoStream(this.state.publisher)}>
+                            {/* 카메라 스트림 표시 */}
+                            {this.state.publisher && (
+                                <StreamContainer 
+                                    className="col-md-6 col-xs-6" 
+                                    onClick={() => this.handleMainVideoStream(this.state.publisher)}
+                                >
                                     <UserVideoComponent streamManager={this.state.publisher} />
                                 </StreamContainer>
-                            ) : null}
+                            )}
 
-
-                            {/* 구독자 스트림 */}
-                            {this.state.subscribers.map((sub, i) => (
-                                <StreamContainer key={i} className="col-md-6 col-xs-6" onClick={() => this.handleMainVideoStream(sub)}>
+                            {/* 일반 참가자 스트림 표시 */}
+                            {this.state.regularSubscribers.map((sub, i) => (
+                                <StreamContainer 
+                                    key={sub.stream.streamId} 
+                                    className="col-md-6 col-xs-6" 
+                                    onClick={() => this.handleMainVideoStream(sub)}
+                                >
                                     <StreamContainerText>{sub.stream.connection.connectionId}</StreamContainerText>
+                                    <UserVideoComponent streamManager={sub} />
+                                </StreamContainer>
+                            ))}
+
+                            {/* 화면 공유 스트림 표시 */}
+                            {this.state.screenSubscribers.map((sub, i) => (
+                                <StreamContainer 
+                                    key={sub.stream.streamId} 
+                                    className="col-md-6 col-xs-6" 
+                                    onClick={() => this.handleMainVideoStream(sub)}
+                                >
+                                    <StreamContainerText>Screen Share: {sub.stream.connection.connectionId}</StreamContainerText>
                                     <UserVideoComponent streamManager={sub} />
                                 </StreamContainer>
                             ))}
