@@ -39,6 +39,10 @@ const OverviewBar = ({ selectedCard }) => {
   if (!selectedCard) {
     return <p>로딩 중입니다...</p>;
   }
+  useEffect(() => {
+    console.log('---selectedCard:', selectedCard); // selectedCard 객체 출력
+    console.log('selectedCard.closeTime:', selectedCard?.closeTime); // closeTime 값 확인
+  }, [selectedCard]); // selectedCard가 변경될 때마다 실행
 
   useEffect(() => {
     if (hasFetched.current) return;
