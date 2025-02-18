@@ -262,108 +262,114 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
 
 
   return (
-    <div className="space-y-4">
+    <div>
       {/* MapSearchBar */}
-      <MapSearchBar
-        onPlaceSelected={handlePlaceSelected}
-        selectedTravelPlanId={travelPlanId}
-        favorites={favorites}
-      />
+      <div className="sticky top-0 z-20 bg-white shadow-md m-1 rounded-lg">
+        <MapSearchBar
+          onPlaceSelected={handlePlaceSelected}
+          selectedTravelPlanId={travelPlanId}
+          favorites={favorites}
+        />
+      </div>
 
-      {/* 찜한 장소 목록 */}
-      {sortedWishlists.map((item, index) => (
-        <div
-          key={index}
-          className="p-4 transition-all duration-300 bg-gray-100 rounded-lg hover:bg-gray-200"
-        >
+
+      <div className="max-h-[calc(100vh-60px)] overflow-y-auto no-scrollbar">
+        {/* 찜한 장소 목록 */}
+        {sortedWishlists.map((item, index) => (
           <div
-            className="flex items-center justify-between cursor-pointer"
-            onClick={() => handleToggleExpand(item)}
+            key={index}
+            className="p-4 transition-all duration-300 bg-gray-100 rounded-lg hover:bg-gray-200 m-1"
           >
-            <div className="flex items-center space-x-2">
-              <h3 className="text-lg font-semibold text-gray-700">
-                {index + 1}. {item.name}
-              </h3>
-            </div>
-            <button
-              className={`px-2 py-1 text-sm rounded-md ${item.isLiked
-                ? 'text-red-500 bg-gray-300'
-                : 'text-gray-500 bg-gray-200'
-                }`}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleLikeToggle(item);
-              }}
+            <div
+              className="flex items-center justify-between cursor-pointer"
+              onClick={() => handleToggleExpand(item)}
             >
-              {item.isLiked ? '❤️' : '🤍'} {item.likeCount}
-            </button>
-          </div>
+              <div className="flex items-center space-x-2">
+                <h3 className="text-lg font-semibold text-gray-700">
+                  {index + 1}. {item.name}
+                </h3>
+              </div>
+              <button
+                className={`px-2 py-1 text-sm rounded-md ${item.isLiked
+                  ? 'text-red-500 bg-gray-300'
+                  : 'text-gray-500 bg-gray-200'
+                  }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleLikeToggle(item);
+                }}
+              >
+                {item.isLiked ? '❤️' : '🤍'} {item.likeCount}
+              </button>
+            </div>
 
-          {expandedPlaceId === item.placeId && (
-            <div className="mt-4 transition-all duration-300">
-              {item.tags && item.tags.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {item.tags.map((tag, idx) => (
-                    <span
-                    key={tag.placeTagId || idx}
-                    onClick={() => handleTagDelete(item.placeId, tag.placeTagId)}
-                    className={`px-2 py-1 text-sm rounded-full cursor-pointer ${
-                      tag.isMyTag ? 'bg-blue-500 text-white' : 'bg-yellow text-brown'
-                    }`}
-                  >
-                    {typeof tag === 'object' ? tag.name : tag}
-                    {tag.isMyTag && (
-                      <span className="inline-flex items-center justify-center w-5 h-5 ml-1 text-xs text-white bg-red-500 rounded-full">
-                        ×
-                      </span>
-                    )}
-                  </span>
-                  
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-gray-500">등록된 태그가 없습니다.</p>
-              )}
-              <div className="flex justify-center mt-2">
-                {showTagInput ? (
-                  <div
-                    className="flex items-center gap-2 p-2 rounded"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <input
-                      type="text"
-                      value={newTag}
-                      onChange={handleTagInputChange}
-                      placeholder="태그를 입력해주세요."
-                      className="px-2 py-1 border rounded"
-                      maxLength={20}
-                    />
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleTagSubmit(e);
-                      }}
-                      className="flex items-center justify-center px-2 py-1 text-white bg-blue-500 rounded hover:bg-blue-600"
+            {expandedPlaceId === item.placeId && (
+              <div className="mt-4 transition-all duration-300">
+                {item.tags && item.tags.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {item.tags.map((tag, idx) => (
+                      <span
+                      key={tag.placeTagId || idx}
+                      onClick={() => handleTagDelete(item.placeId, tag.placeTagId)}
+                      className={`px-2 py-1 text-sm rounded-full cursor-pointer ${
+                        tag.isMyTag ? 'bg-blue-500 text-white' : 'bg-yellow text-brown'
+                      }`}
                     >
-                      입력
-                    </button>
+                      {typeof tag === 'object' ? tag.name : tag}
+                      {tag.isMyTag && (
+                        <span className="inline-flex items-center justify-center w-5 h-5 ml-1 text-xs text-white bg-red-500 rounded-full">
+                          ×
+                        </span>
+                      )}
+                    </span>
+                    
+                    ))}
                   </div>
                 ) : (
-                  <button
-                    className="px-3 py-1 text-white rounded"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleShowTagInput(e);
-                    }}
-                  >
-                    <CiCirclePlus size={35} style={{ color: 'black' }} />
-                  </button>
+                  <p className="text-sm text-gray-500">등록된 태그가 없습니다.</p>
                 )}
+                <div className="flex justify-center mt-2">
+                  {showTagInput ? (
+                    <div
+                      className="flex items-center gap-2 p-2 rounded"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <input
+                        type="text"
+                        value={newTag}
+                        onChange={handleTagInputChange}
+                        placeholder="태그를 입력해주세요."
+                        className="px-2 py-1 border rounded"
+                        maxLength={20}
+                      />
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTagSubmit(e);
+                        }}
+                        className="flex items-center justify-center px-2 py-1 text-white bg-blue-500 rounded hover:bg-blue-600"
+                      >
+                        입력
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      className="px-3 py-1 text-white rounded"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleShowTagInput(e);
+                      }}
+                    >
+                      <CiCirclePlus size={35} style={{ color: 'black' }} />
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-      ))}
+            )}
+          </div>
+        ))}
+      </div>
+
     </div>
   );
 };
