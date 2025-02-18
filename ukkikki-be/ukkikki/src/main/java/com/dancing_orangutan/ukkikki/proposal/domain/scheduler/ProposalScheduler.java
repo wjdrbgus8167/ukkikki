@@ -2,7 +2,9 @@ package com.dancing_orangutan.ukkikki.proposal.domain.scheduler;
 
 import com.dancing_orangutan.ukkikki.event.eventPublisher.SpringEventPublisher;
 import com.dancing_orangutan.ukkikki.proposal.domain.event.ProposalVoteSurveyStartEvent;
+import com.dancing_orangutan.ukkikki.proposal.domain.scheduler.task.ProposalSubmissionPeriodExpirationTask;
 import com.dancing_orangutan.ukkikki.proposal.domain.scheduler.task.ProposalVoteSurveyExpirationTask;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.event.TravelPlanSubmittedEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
@@ -35,4 +37,19 @@ public class ProposalScheduler {
 
         scheduler.schedule(expirationTask, expirationInstant);
     }
+
+    @EventListener
+    public void scheduleProposalSubmissionDeadline(final TravelPlanSubmittedEvent event) {
+        Instant expirationInstant = event.closeTime().plusDays(7).atZone(ZoneId.systemDefault())
+                .toInstant();
+
+        ProposalSubmissionPeriodExpirationTask task = ProposalSubmissionPeriodExpirationTask.builder()
+                .travelPlanId(event.travelPlanId())
+                .eventPublisher(springEventPublisher)
+                .expireTime(event.closeTime().plusDays(7))
+                .build();
+
+        scheduler.schedule(task, expirationInstant);
+    }
+
 }

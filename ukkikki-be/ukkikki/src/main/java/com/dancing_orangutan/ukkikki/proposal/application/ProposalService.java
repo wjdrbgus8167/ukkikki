@@ -1,6 +1,8 @@
 package com.dancing_orangutan.ukkikki.proposal.application;
 
 import com.dancing_orangutan.ukkikki.event.eventPublisher.SpringEventPublisher;
+import com.dancing_orangutan.ukkikki.global.error.ApiException;
+import com.dancing_orangutan.ukkikki.global.error.ErrorCode;
 import com.dancing_orangutan.ukkikki.proposal.application.command.*;
 import com.dancing_orangutan.ukkikki.proposal.constant.ProposalStatus;
 import com.dancing_orangutan.ukkikki.proposal.domain.Inquiry.Inquiry;
@@ -582,15 +584,14 @@ public class ProposalService {
                 .forEach(jpaScheduleRepository::delete);
     }
 
-
-
-
     // 제안서 투표 시작
     @Transactional
     public void createVoteSurvey(CreateVoteSurveyCommand command) {
-
         // 제안서 불러오기
         List<ProposalEntity> proposals = proposalRepository.findByTravelPlanId(command.getTravelPlanId());
+        if (proposals.isEmpty()) {
+            throw new ApiException(ErrorCode.NO_PROPOSALS_FOR_TRAVEL_PLAN);
+        }
 
         // 투표 설문 생성
         VoteSurveyEntity savedVoteSurvey = VoteSurveyEntity.builder()
@@ -601,8 +602,7 @@ public class ProposalService {
 
         // 투표 설문 저장
         VoteSurvey voteSurvey = voteSurveyMapper.entityToDomain(voteSurveyRepository.save(savedVoteSurvey));
-
-        proposals.forEach(proposal -> proposal.updateVotingStatus());
+        proposals.forEach(ProposalEntity::updateVotingStatus);
 
         // 배치 업데이트
         jpaProposalRepository.saveAll(proposals);

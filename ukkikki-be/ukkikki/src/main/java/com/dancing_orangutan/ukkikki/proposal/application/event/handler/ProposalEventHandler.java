@@ -2,9 +2,9 @@ package com.dancing_orangutan.ukkikki.proposal.application.event.handler;
 
 import com.dancing_orangutan.ukkikki.proposal.application.ProposalService;
 import com.dancing_orangutan.ukkikki.proposal.application.command.CreateVoteSurveyCommand;
+import com.dancing_orangutan.ukkikki.proposal.domain.event.ProposalSubmissionPeriodExpiredEvent;
 import com.dancing_orangutan.ukkikki.proposal.domain.event.VoteSurveyCloseTimeReachedEvent;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.ConfirmProposalResponse;
-import com.dancing_orangutan.ukkikki.travelPlan.domain.event.TravelPlanSubmittedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -20,12 +20,10 @@ public class ProposalEventHandler {
     private final ProposalService proposalService;
 
     @EventListener
-    public void handleProposalVoteSurveyStart(TravelPlanSubmittedEvent event) {
+    public void handleProposalVoteSurveyStart(ProposalSubmissionPeriodExpiredEvent event) {
 
-        log.info("여행계획이벤트가 제출되었습니다.");
-
-        LocalDateTime surveyStartTime = event.closeTime().plusHours(168); // 제출 후 1분 뒤 시작
-        LocalDateTime surveyEndTime = event.closeTime().plusHours(240); // 72시간 뒤 종료
+        LocalDateTime surveyStartTime = event.expireTime().plusMinutes(1); // 제출 후 1분 뒤 시작
+        LocalDateTime surveyEndTime = event.expireTime().plusHours(72);
 
         proposalService.createVoteSurvey(CreateVoteSurveyCommand.builder()
                 .travelPlanId(event.travelPlanId())
