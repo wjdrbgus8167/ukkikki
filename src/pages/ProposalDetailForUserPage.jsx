@@ -1,26 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import ProposalDetailInfo from '../components/ProposalDetailForUser/ProposalDetailInfo';
+import ProposalDetailTimeline from '../components/ProposalDetailForUser/ProposalDetailTimeline';
+import ProposalDetailContact from '../components/ProposalDetailForUser/ProposalDetailContact';
+import ReservationDepositModal from '../components/vote/ReservationDepositModal';
 import { publicRequest } from '../hooks/requestMethod';
 import Swal from 'sweetalert2';
-import ProposalDetailTimeline from '../components/ProposalDetailForUser/ProposalDetailTimeline';
-import ProposalDetailInfo from '../components/ProposalDetailForUser/ProposalDetailInfo';
-import ProposalDetailContact from '../components/ProposalDetailForUser/ProposalDetailContact';
 
 const ProposalDetailForUser = () => {
   const { travelPlanId, proposalId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { selectedCard } = location.state || {};
-
   const [proposal, setProposal] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // 기본 탭은 '상세보기'로 설정
-  const [activeTab, setActiveTab] = useState('detail');
+  const [activeTab, setActiveTab] = useState('detail'); // 'detail', 'timeline', 'contact', 'deposit'
+  const [showDepositModal, setShowDepositModal] = useState(false);
 
-  // 제안서 상세 정보 API 호출
   useEffect(() => {
     const fetchProposalDetail = async () => {
       setLoading(true);
@@ -32,7 +31,6 @@ const ProposalDetailForUser = () => {
           setProposal(response.data.data);
         }
       } catch (error) {
-        console.error('API 호출 실패:', error);
         setError('제안서 정보를 가져오는 데 실패했습니다.');
       } finally {
         setLoading(false);
@@ -41,7 +39,6 @@ const ProposalDetailForUser = () => {
     fetchProposalDetail();
   }, [travelPlanId, proposalId]);
 
-  // 날짜/시간 포맷 함수
   const formatDateTime = (dateTimeStr) => {
     return new Date(dateTimeStr).toLocaleString('ko-KR', {
       year: 'numeric',
@@ -52,13 +49,12 @@ const ProposalDetailForUser = () => {
     });
   };
 
-  // 상태 배지 렌더링 함수
   const getStatusBadge = (status) => {
     const statusMap = {
       W: { text: '투표 전', className: 'bg-green-100 text-green-800' },
       V: { text: '투표 중', className: 'bg-yellow-100 text-yellow-800' },
-      A: { text: '수락', className: 'bg-blue-100 text-blue-800' },
-      D: { text: '거절', className: 'bg-red-100 text-red-800' },
+      A: { text: '채택', className: 'bg-blue-100 text-blue-800' },
+      D: { text: '탈락', className: 'bg-red-100 text-red-800' },
     };
     return (
       statusMap[status] || {
@@ -113,7 +109,7 @@ const ProposalDetailForUser = () => {
           </div>
         </div>
 
-        {/* 탭 전환 버튼들 */}
+        {/* 탭 전환 버튼 */}
         <div className="flex mb-4 space-x-4">
           <button
             onClick={() => setActiveTab('detail')}
@@ -141,6 +137,18 @@ const ProposalDetailForUser = () => {
           >
             문의하기
           </button>
+          {proposal.confirmStatus === 'A' && (
+            <button
+              onClick={() => setActiveTab('deposit')}
+              className={`px-4 py-2 rounded-lg ${
+                activeTab === 'deposit'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-200'
+              }`}
+            >
+              예약금 결제하러 가기
+            </button>
+          )}
         </div>
 
         {/* 탭 내용 렌더링 */}
@@ -161,6 +169,15 @@ const ProposalDetailForUser = () => {
             travelPlanId={travelPlanId}
             proposalId={proposalId}
           />
+        )}
+        {activeTab === 'deposit' && (
+          <div>
+            <ReservationDepositModal
+              travelPlanId={travelPlanId}
+              proposalId={proposalId}
+              onClose={() => setActiveTab('detail')}
+            />
+          </div>
         )}
       </main>
       <Footer />
