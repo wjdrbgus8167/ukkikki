@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { AgencyProposalListDetail } from '../apis/agency';
 import Header from '../components/layout/Header.jsx';
 import Footer from '../components/layout/Footer.jsx';
@@ -7,7 +7,8 @@ import 'tailwindcss/tailwind.css';
 import { MainContent } from './style/AgencyRoomListPageStyle';
 
 const AgencyProposalDetail = () => {
-  const { proposalId } = useParams();
+  const { proposalId, travelPlanId } = useParams();
+  const navigate = useNavigate();
   const [proposal, setProposal] = useState(null);
   const [activeTab, setActiveTab] = useState('상세 내용');
   const [loading, setLoading] = useState(true);
@@ -17,8 +18,9 @@ const AgencyProposalDetail = () => {
     const fetchProposalDetail = async () => {
       setLoading(true);
       try {
-        const response = await AgencyProposalListDetail(proposalId);
+        const response = await AgencyProposalListDetail(proposalId,travelPlanId);
         if (response) {
+          console.log('제안서 상세 정보 호출 성공:',response.data)
           setProposal(response.data);
         }
       } catch (error) {
@@ -30,6 +32,11 @@ const AgencyProposalDetail = () => {
     };
     fetchProposalDetail();
   }, [proposalId]);
+
+  const onhandleUpdatePlan =() => {
+    console.log('수정 버튼 클릭:', proposal)
+    navigate(`/travel-plans/${travelPlanId}/proposals/${proposalId}`);
+  };
 
   const getStatusBadge = (status) => {
     const statusMap = {
@@ -103,6 +110,7 @@ const AgencyProposalDetail = () => {
     proposal?.companyDaySchedules?.map(
       (schedule) => `${schedule.dayNumber}일차`,
     ) || [];
+
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -279,7 +287,9 @@ const AgencyProposalDetail = () => {
 
           {/* Bottom Buttons */}
           <div className="flex justify-center gap-4 mt-6">
-            <button className="px-6 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600">
+            <button 
+              onClick={onhandleUpdatePlan}
+              className="px-6 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600">
               수정하기
             </button>
             <button className="px-6 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600">

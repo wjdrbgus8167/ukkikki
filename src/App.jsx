@@ -49,21 +49,19 @@ const App = () => {
         <Route path="/user-vote/:travelPlanId" element={<UserVotePage />} />
         <Route path="/oauth/success" element={<OAuthSuccessPage />} />
         <Route
-          path="/travel-plans/:travelPlanId/proposals"
+          path="/travel-plans/:travelPlanId/proposals/:proposalId?"
           element={<CreateTravel />}
         />
-        {/* <Route
-          path="/travel-proposal/:travelPlanId/proposals/:proposalId"
-          element={<TravelProposal />}
-        /> */}
+
         <Route path="/myprofile" element={<MyProfile />} />
 
         <Route path="/myprofile" element={<MyProfile />} />
         {/* 여행사 본인이 제시한 제안서 상세 조회 */}
         <Route
-          path="/agency-proposal-detail/:proposalId"
+          path="/agency-proposal-detail/:travelPlanId/:proposalId"
           element={<AgencyProposalDetailPage />}
         />
+
         <Route path="/meeting" element={<OpenViduPage />} />
         <Route
           path="/proposal-detail/:travelPlanId/:proposalId"

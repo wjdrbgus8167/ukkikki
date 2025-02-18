@@ -39,7 +39,7 @@ const OngoingProposals = () => {
       setError(null);
       try {
         const data = await AgencyProposalslist();
-        console.log("API 응답 데이터:", data);
+        console.log(" 진행중인 목록 API 응답 데이터:", data);
         setProposals(data);
       } catch (error) {
         setError("제안서를 불러오는 데 실패했습니다.");
@@ -50,9 +50,10 @@ const OngoingProposals = () => {
     getAgencyProposals();
   }, []);
 
-  const onhandleDetail = (proposalId) => {
-    navigate(`/agency-proposal-detail/${proposalId}`);
+  const onhandleDetail = (proposal) => {
+    navigate(`/agency-proposal-detail/${proposal.travelPlanId}/${proposal.proposalId}`);
   };
+  
 
   const statusMapping = {
     D: "거절",
@@ -112,7 +113,7 @@ const OngoingProposals = () => {
                   filteredProposals.map((proposal) => (
                     <TableRow
                       key={proposal.proposalId}
-                      onClick={() => onhandleDetail(proposal.proposalId)}
+                      onClick={() => onhandleDetail(proposal)}
                     >
                       {/* 여행 제목 */}
                       <TableCell>

@@ -16,13 +16,12 @@ import {
   PlaceListWrapper,
   AcceptButton,
   ButtonPosition
-} from "./style/ProposalDetailPageStyle.jsx"; // 스타일드 컴포넌트 import
+} from "./style/ProposalDetailPageStyle.jsx"; 
 
 const ProposalDetail = () => {
   const { travelPlanId } = useParams();
   const navigate = useNavigate();
   const [selectedPlace, setSelectedPlace] = useState(null);
-
 
   const onhandleCreatePlan = () => {
     navigate(`/travel-plans/${travelPlanId}/proposals`);

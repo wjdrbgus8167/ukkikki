@@ -21,6 +21,7 @@ const Schedule = ({
     }
   }, [selectedPlaces]); // selectedPlaces가 변경될 때마다 실행
 
+  
   return (
     <SelectedPlacesContainer ref={containerRef}>
       {selectedPlaces.map((place, index) => {

@@ -13,7 +13,7 @@ export const ProposalDetailProvider = ({children, travelPlanId}) => {
     const fetchProposalData = async() => {
       try {
         const data = await AgencyProposalDetail(travelPlanId);
-        console.log('context:',data)
+        console.log('제안서 상세 정보 호출 성공:',data)
         setProposals(data);
 
       } catch(error) {
