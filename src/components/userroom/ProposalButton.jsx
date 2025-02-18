@@ -20,7 +20,7 @@ const ProposalButton = ({
   const [showDateInput, setShowDateInput] = useState(false);
   const [closeTime, setCloseTime] = useState('');
 
-  // 버튼 활성화 여부: 인원이 충분하고 아직 마감일시가 설정되지 않은 경우
+  // 버튼 활성화 여부: 인원이 충분하고 closeTime이 아직 설정되지 않은 경우
   const isEnabled = currentParticipants >= minPeople && !selectedCard.closeTime;
 
   // 마감일시 입력창 띄우기
@@ -91,6 +91,20 @@ const ProposalButton = ({
         });
         setShowDateInput(false);
       }
+
+      if (stompClient && stompClient.connected) {
+        const wsData = {
+          action: "CLOSE_TIME_UPDATED",
+          travelPlanId,
+        };
+        stompClient.publish({
+          destination: '/pub/actions',
+          body: JSON.stringify(wsData),
+        });
+        console.log('✅ 마감 일시 설정 이벤트:', wsData);
+      }
+
+
     } catch (error) {
       if (error.response?.data?.error?.code === 'TP003') {
         Swal.fire('알림', '방장만 마감일시를 설정할 수 있어요', 'error');
@@ -108,7 +122,7 @@ const ProposalButton = ({
     }
   };
 
-  // 동적 버튼 렌더링
+  // 동적 버튼 렌더링 함수
   const renderDynamicButton = () => {
     const now = new Date();
     const deadline = new Date(selectedCard.closeTime);
@@ -133,65 +147,30 @@ const ProposalButton = ({
     } else {
       // 마감 후 7일 경과한 경우
       if (selectedCard.voteSurveyInfo?.canVote) {
-        // 이미 투표 시작되었다면 바로 투표 페이지로 이동할 수 있게 함
+        // 투표 시작 정보가 이미 있는 경우 투표 페이지로 바로 이동
         return (
           <button
-            onClick={() => navigate(`/user-vote/${travelPlanId}`)}
+            onClick={() =>
+              navigate(`/user-vote/${travelPlanId}`, {
+                state: { selectedCard },
+              })
+            }
             className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
           >
             여행사 제안 보러가기
           </button>
         );
       } else {
-        // 투표가 시작되지 않았으면, 방장인 경우 투표 시작 버튼, 아니면 대기 안내 버튼
-        if (selectedCard.member?.isHost) {
-          return (
-            <button
-              onClick={async () => {
-                setIsSubmitting(true);
-                try {
-                  const voteStartResponse = await publicRequest.post(
-                    `/api/v1/travel-plans/${travelPlanId}/proposals/1/vote-survey`,
-                  );
-                  if (voteStartResponse.status === 200) {
-                    Swal.fire({
-                      title: '투표 시작 완료!',
-                      text: '투표가 시작되었습니다.',
-                      icon: 'success',
-                      confirmButtonText: '확인',
-                    });
-                    // 투표 시작 여부 업데이트
-                    selectedCard.voteSurveyInfo.canVote = true;
-                    navigate(`/user-vote/${travelPlanId}`);
-                  }
-                } catch (error) {
-                  console.error('투표 시작 실패:', error);
-                  Swal.fire(
-                    '투표 시작 실패',
-                    '투표 시작 도중 오류가 발생했습니다.',
-                    'error',
-                  );
-                } finally {
-                  setIsSubmitting(false);
-                }
-              }}
-              className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? '처리 중...' : '투표 시작하기'}
-            </button>
-          );
-        } else {
-          return (
-            <button
-              disabled
-              className="px-4 py-2 text-white bg-gray-400 rounded cursor-not-allowed"
-              title="방장이 투표를 시작하면 제안서를 확인할 수 있습니다."
-            >
-              방장이 투표 시작할 때까지 대기중
-            </button>
-          );
-        }
+        // 투표 시작 정보가 없는 경우(방장이 아닌 경우)
+        return (
+          <button
+            disabled
+            className="px-4 py-2 text-white bg-gray-400 rounded cursor-not-allowed"
+            title="방장이 투표를 시작하면 제안서를 확인할 수 있습니다."
+          >
+            투표 시작할 때까지 대기중
+          </button>
+        );
       }
     }
   };
@@ -200,11 +179,10 @@ const ProposalButton = ({
     <div className="relative p-4 text-center bg-yellow-100 rounded-lg md:w-1/3">
       {!selectedCard.closeTime ? (
         <button
-          className={`px-4 py-2 text-white rounded-md ${
-            isEnabled
+          className={`px-4 py-2 text-white rounded-md ${isEnabled
               ? 'bg-[#FF3951] hover:bg-[#e23047]'
               : 'bg-gray-400 cursor-not-allowed'
-          }`}
+            }`}
           onClick={handleButtonClick}
           disabled={isSubmitting}
         >
