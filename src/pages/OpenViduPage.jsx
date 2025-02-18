@@ -250,23 +250,10 @@ class OpenViduPage extends Component {
     }
 
     async createSession(sessionId) {
-        try {
-            // 세션이 이미 존재하는지 확인
-            const response = await axios.get(APPLICATION_SERVER_URL + '/sessions/' + sessionId, {
-                headers: { 'Content-Type': 'application/json', },
-            });
-            return response.data; // 세션이 존재하면 세션 ID 반환
-        } catch (error) {
-            if (error.response && error.response.status === 404) {
-                // 세션이 존재하지 않으면 새로운 세션 생성
-                const response = await axios.post(APPLICATION_SERVER_URL + '/sessions', { customSessionId: sessionId }, {
-                    headers: { 'Content-Type': 'application/json', },
-                });
-                return response.data; // 생성된 세션 ID 반환
-            } else {
-                throw error;
-            }
-        }
+        const response = await axios.post(APPLICATION_SERVER_URL + '/sessions', { customSessionId: sessionId }, {
+            headers: { 'Content-Type': 'application/json', },
+        });
+        return response.data;
     }
 
     async getToken() {
