@@ -177,15 +177,6 @@ public class ProposalController {
             @PathVariable Integer proposalId,
             @AuthenticationPrincipal MemberUserDetails memberUserDetails
     ){
-//        CreateVoteSurveyCommand command =CreateVoteSurveyCommand.builder()
-//                .surveyStartTime(LocalDateTime.now())
-//                .surveyEndTime(LocalDateTime.now().plusHours(72))
-//                .travelPlanId(travelPlanId)
-//                .proposalId(proposalId)
-//                .memberId(memberUserDetails.getMemberId())
-//                .build();
-
-        //CreateVoteSurveyResponse response = proposalService.createVoteSurvey(command);
 
         return ApiUtils.success("투표시작 ");
     }
@@ -237,5 +228,15 @@ public class ProposalController {
         List<Traveler> travelers = proposalService.createTravelers(command);
 
         return ApiUtils.success(travelers);
+    }
+
+    // 투표 상태 가져오기
+    @GetMapping("/schedules/vote-survey")
+    public ApiUtils.ApiResponse<VoteSurveyStatusResponse> getVoteSurveyStatus(
+            @PathVariable Integer travelPlanId
+    ){
+        VoteSurveyStatusResponse response = proposalService.getVoteSurveyStatus(travelPlanId);
+
+        return ApiUtils.success(response);
     }
 }
