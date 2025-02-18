@@ -5,7 +5,7 @@ import MapDisplay from "./MapDisplay";
 import ScheduleByDate from "./ScheduleByDate";
 import PlaceSelection from "./PlaceSelection";
 import DetailForm from "./DetailForm";
-import { CreateTravelProposal } from "../../apis/agency";
+import { CreateTravelProposal, UpdateTravelProposal } from "../../apis/agency";
 import { 
   StyledMainLayout,
   StyledDateSidebar,
@@ -197,12 +197,20 @@ const MainLayout = () => {
     console.log("POST할 데이터:", payload);
   
     try {
-      const data = await CreateTravelProposal(proposal.data.travelPlan.travelPlanId, payload);
-      console.log("제출 성공:", data);
+      let data;
+      // proposal.data에 proposalId가 존재하면 수정
+      if (proposal.data.proposalId) {
+        data = await UpdateTravelProposal(proposal.data.travelPlan.travelPlanId, payload);
+        console.log("수정 성공:", data);
+      } else {
+        data = await CreateTravelProposal(proposal.data.travelPlan.travelPlanId, payload);
+        console.log("제출 성공:", data);
+      }
     } catch (error) {
       console.error("제출 오류:", error);
     }
   };
+
 
   return (
     <StyledMainLayout>

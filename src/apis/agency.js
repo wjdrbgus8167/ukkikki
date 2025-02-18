@@ -50,7 +50,7 @@ export const AgencyProposalDetail =  async(travelPlanId) => {
   };
 };
 
-//여행계획 제안서 (상세내용)
+//여행계획 제안서보내기 (상세내용)
 
 export const CreateTravelProposal = async(travelPlanId, payload) => {
   try {
@@ -62,11 +62,21 @@ export const CreateTravelProposal = async(travelPlanId, payload) => {
   };
 };
 
+export const UpdateTravelProposal = async(travelPlanId, payload) => {
+  try {
+    const response = await publicRequest.put(`api/v1/travel-plans/${travelPlanId}/proposals`, payload);
+    console.log('여행 제안서 수정 완료:', response.data)
+    return response.data;
+  } catch(error) {
+    console.log(' 여행 제안서 수정 실패:', error)
+  };
+};
+
 //확정된 제안서의 여권 조회
 export const getPassport = async(proposalId) => {
   try {
     const response = await publicRequest.get(`api/v1/proposals/${proposalId}/passports`);
-    console.log(' 확정된 제안서의 여권 조회회:', response.data)
+    console.log(' 확정된 제안서의 여권 조회:', response.data)
     return response.data;
   } catch(error) {
     console.log('error:',error)

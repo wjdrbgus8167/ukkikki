@@ -65,6 +65,7 @@ const UserLocationMap = ({ latitude, longitude }) => {
         >
           <div style={{ width: "300px", minHeight: "100px" }} className="p-4">
             <h3 className="text-lg font-bold">{selectedMarker?.name}</h3>
+            <div>태그:</div>
             {selectedMarker.tags && selectedMarker.tags.length > 0 ? (
               <div className="mt-2">
                 {selectedMarker.tags.map((tag, idx) => (
