@@ -12,7 +12,8 @@ const AgencyProposalDetail = () => {
   const [activeTab, setActiveTab] = useState('상세 내용');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const [modalMessage, setModalMessage] = React.useState('');
+  
   useEffect(() => {
     const fetchProposalDetail = async () => {
       setLoading(true);
@@ -75,12 +76,9 @@ const AgencyProposalDetail = () => {
             </h3>
           </div>
           <div className="ml-4">
-            {' '}
-            {/* 일정 목록 오른쪽 이동 */}
             {daySchedule.schedules.map((schedule, index) => (
-              <div key={index} className="p-4 rounded-lg bg-gray-50">
-                <h3 className="mb-2 font-bold">{schedule.scheduleName}</h3>
-                <br></br>
+              <div key={index} className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-bold mb-2">{schedule.scheduleName}</h3><br></br>
                 <p>시작: {formatDateTime(schedule.startTime)}</p>
                 <p>종료: {formatDateTime(schedule.endTime)}</p>
               </div>
@@ -91,34 +89,73 @@ const AgencyProposalDetail = () => {
     );
   };
 
+  const handleButtonClick = (action) => {
+    let message = '';
+    if (!proposal) {
+      message = '제안서 정보가 없습니다.';
+    } else {
+      switch (proposal.confirmStatus) {
+        case 'W':
+          if (action === 'edit' || action === 'delete') {
+            message = `${action === 'edit' ? '수정' : '삭제'} 작업이 가능합니다.`;
+          } else {
+            message = '문의하기 버튼을 클릭했습니다.';
+          }
+          break;
+        case 'A':
+          if (action === 'delete') {
+            message = '수락 후에는 삭제할 수 없습니다.';
+          } else if (action === 'edit') {
+            message = '수정이 가능합니다.';
+          }
+          break;
+        case 'D':
+          if (action === 'edit') {
+            message = '거절된 제안서는 수정할 수 없습니다.';
+          } else if (action === 'delete') {
+            message = '삭제가 가능합니다.';
+          }
+          break;
+        case 'V':
+          message = '투표 진행 중이므로 수정 및 삭제가 불가능합니다.';
+          break;
+        default:
+          message = '알 수 없는 상태입니다.';
+      }
+    }
+    setModalMessage(message);
+  };
+
   if (loading) return <p className="mt-10 text-center">로딩 중...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
   if (!proposal)
     return <p className="text-center">제안서 정보를 찾을 수 없습니다.</p>;
 
   const status = getStatusBadge(proposal.confirmStatus);
-
-  // Generate day tabs dynamically
-  const dayTabs =
-    proposal?.companyDaySchedules?.map(
-      (schedule) => `${schedule.dayNumber}일차`,
-    ) || [];
+  const dayTabs = proposal?.companyDaySchedules?.map(schedule => `${schedule.dayNumber}일차`) || [];
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Header />
       <MainContent className="flex-1">
-        <div className="max-w-6xl px-4 py-6 mx-auto">
+        {modalMessage && (
+          <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+              <p className="mb-4">{modalMessage}</p>
+              <button
+                className="px-4 py-2 bg-gray-200 text-black rounded hover:bg-gray-300"
+                onClick={() => setModalMessage('')}
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="max-w-6xl mx-auto px-4 py-6">
           {/* Top Section */}
-          <div className="p-6 mb-8 bg-white rounded-lg shadow-md">
-            <div className="flex gap-6">
-              <div className="w-1/3">
-                <img
-                  src={proposal.imageUrl || '/api/placeholder/400/300'}
-                  alt="여행 상품"
-                  className="object-cover w-full h-48 rounded-lg"
-                />
-              </div>
+          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+            <div className="flex gap-6 relative">
               <div className="w-2/3">
                 <h1 className="mb-4 text-2xl font-bold">{proposal.name}</h1>
                 <p className="mb-2">
@@ -130,12 +167,69 @@ const AgencyProposalDetail = () => {
                 </p>
                 <div className="flex gap-2 mt-4">
                   진행 상태 :
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm ${status.className}`}
-                  >
+                  <span className={`px-3 py-1 rounded-full text-sm ${status.className}`}>
                     {status.text}
                   </span>
                 </div>
+              </div>
+              <div className="absolute bottom-4 right-4 flex gap-2">
+                {proposal.confirmStatus === 'W' && (
+                  <>
+                    <button
+                      className="px-4 py-2 bg-white text-black rounded hover:bg-gray-100"
+                      onClick={() => handleButtonClick('edit')}
+                    >
+                      수정하기
+                    </button>
+                    <button
+                      className="px-4 py-2 bg-white text-black rounded hover:bg-gray-100"
+                      onClick={() => handleButtonClick('delete')}
+                    >
+                      삭제하기
+                    </button>
+                    <button
+                      className="px-4 py-2 bg-white text-black rounded hover:bg-gray-100"
+                      onClick={() => handleButtonClick('inquire')}
+                    >
+                      문의하기
+                    </button>
+                  </>
+                )}
+                
+                {proposal.confirmStatus === 'A' && (
+                  <>
+                    <button
+                      className="px-4 py-2 bg-white text-black rounded hover:bg-gray-100"
+                      onClick={() => handleButtonClick('edit')}
+                    >
+                      수정하기
+                    </button>
+                    <button
+                      className="px-4 py-2 bg-white text-black rounded hover:bg-gray-100"
+                      onClick={() => handleButtonClick('inquire')}
+                    >
+                      문의하기
+                    </button>
+                  </>
+                )}
+                
+                {proposal.confirmStatus === 'D' && (
+                  <button
+                    className="px-4 py-2 bg-white text-black rounded hover:bg-gray-100"
+                    onClick={() => handleButtonClick('delete')}
+                  >
+                    삭제하기
+                  </button>
+                )}
+                
+                {proposal.confirmStatus === 'V' && (
+                  <button
+                    className="px-4 py-2 bg-white text-black rounded hover:bg-gray-100"
+                    onClick={() => handleButtonClick('inquire')}
+                  >
+                    문의하기
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -162,7 +256,7 @@ const AgencyProposalDetail = () => {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 bg-white rounded-lg shadow-md p-6 min-h-[600px] w-[680px] overflow-y-auto overflow-x-hidden">
+            <div className="flex-1 bg-white rounded-lg shadow-md p-6 min-h-[600px] w-[680px] overflow-y-auto overflow-x-hidden custom-scroll">
               <div className="h-[500px]">
                 {activeTab === '상세 내용' && (
                   <div className="space-y-6">
@@ -206,11 +300,9 @@ const AgencyProposalDetail = () => {
                           </p>
                         </div>
                         <div className="w-[280px]">
-                          <p>귀국 공항 : {proposal.arrivalAirport}</p>
-                          <br></br>
-                          <p>탑승 시간 :</p>
-                          <p>{formatDateTime(proposal.endDateBoardingTime)}</p>
-                          <br></br>
+                          <p>귀국 공항 : {proposal.arrivalAirport}</p><br></br>
+                          <p>탑승 시간 :</p> 
+                          <p>{formatDateTime(proposal.endDateBoardingTime)}</p><br></br>
                           <p>도착 시간 : </p>
                           <p>{formatDateTime(proposal.endDateArrivalTime)}</p>
                         </div>
@@ -275,16 +367,6 @@ const AgencyProposalDetail = () => {
                 )}
               </div>
             </div>
-          </div>
-
-          {/* Bottom Buttons */}
-          <div className="flex justify-center gap-4 mt-6">
-            <button className="px-6 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600">
-              수정하기
-            </button>
-            <button className="px-6 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600">
-              삭제하기
-            </button>
           </div>
         </div>
       </MainContent>
