@@ -7,6 +7,7 @@ import { publicRequest } from '../hooks/requestMethod';
 import Swal from 'sweetalert2';
 import ReservationDepositModal from '../components/vote/ReservationDepositModal';
 import { IoIosArrowBack } from 'react-icons/io';
+import logo from '../assets/loading-spinner.png';
 
 const UserVotePage = () => {
   const { travelPlanId } = useParams();
@@ -160,11 +161,22 @@ const UserVotePage = () => {
           <div className="w-10 mr-4" />
         </div>
 
-        <AgencyList
-          agencies={agencies}
-          onVote={handleVote}
-          onDetail={handleDetail}
-        />
+        {/* 제안서가 없는 경우 메시지 출력 */}
+        {agencies.length === 0 ? (
+          <div className="flex flex-col items-center justify-center min-h-screen text-gray-600">
+            <img src={logo} alt="바나나 로고" className="w-16 h-16 mb-4" />
+            <p className="text-center text-gray-500">
+              여행사에게 받은 제안서가 없습니다. <br />
+            </p>
+          </div>
+        ) : (
+          <AgencyList
+            agencies={agencies}
+            onVote={handleVote}
+            onDetail={handleDetail}
+          />
+        )}
+
         {hasAcceptedProposal && (
           <div className="flex justify-center mt-8">
             <button
