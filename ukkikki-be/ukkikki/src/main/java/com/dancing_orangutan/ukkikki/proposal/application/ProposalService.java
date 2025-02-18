@@ -70,6 +70,7 @@ public class ProposalService {
     private final CompanyFinder companyFinder;
     private final AirportFinder airportFinder;
     private final SpringEventPublisher eventPublisher;
+    private final JpaVoteSurveyRepository jpaVoteSurveyRepository;
 
     // 제안서 작성
     @Transactional
@@ -354,10 +355,10 @@ public class ProposalService {
     //여행사 본인 제안서 상세 조회
     public CompanyProposalDetailResponse getCompanyProposalDetail(Integer proposalId) {
 
-        // 1️⃣ 제안서 조회
+        // 제안서 조회
         ProposalEntity proposal = proposalRepository.findByProposalId(proposalId);
 
-        // 2️⃣ 스케줄 조회 및 그룹핑 (dayNumber 기준)
+        //스케줄 조회 및 그룹핑 (dayNumber 기준)
         List<ScheduleResponse> schedules = scheduleFinder.findSchedulesByProposalId(proposal.getProposalId()).stream()
                 .map(schedule -> new ScheduleResponse(
                         schedule.getScheduleName(),
@@ -370,7 +371,7 @@ public class ProposalService {
                         schedule.getScheduleId()))
                 .collect(Collectors.toList());
 
-        // 3️⃣ dayNumber 기준으로 그룹핑
+        //dayNumber 기준으로 그룹핑
         List<CompanyProposalDetailResponse.CompanyDayResponse> companyDayResponses = schedules.stream()
                 .filter(schedule -> schedule.getDayNumber() != null) // dayNumber가 null이 아닌 경우만 처리
                 .collect(Collectors.groupingBy(ScheduleResponse::getDayNumber))
@@ -382,7 +383,7 @@ public class ProposalService {
                 .sorted(Comparator.comparing(CompanyProposalDetailResponse.CompanyDayResponse::getDayNumber))
                 .collect(Collectors.toList());
 
-        // 4️⃣ 최종 응답 반환
+        // 최종 응답 반환
         return CompanyProposalDetailResponse.builder()
                 .proposalId(proposal.getProposalId())
                 .companyId(proposal.getCompany().getCompanyId())
@@ -579,8 +580,6 @@ public class ProposalService {
         existingSchedules.stream()
                 .filter(schedule -> !incomingScheduleIds.contains(schedule.getScheduleId()))
                 .forEach(jpaScheduleRepository::delete);
-
-        log.info("✅ 일정 업데이트 완료!");
     }
 
 
@@ -593,7 +592,7 @@ public class ProposalService {
         // 제안서 불러오기
         List<ProposalEntity> proposals = proposalRepository.findByTravelPlanId(command.getTravelPlanId());
 
-        // 투표 설문 생성 (현재 시간 기준 +72시간 설정)
+        // 투표 설문 생성
         VoteSurveyEntity savedVoteSurvey = VoteSurveyEntity.builder()
                 .surveyStartTime(command.getSurveyStartTime())
                 .surveyEndTime(command.getSurveyEndTime()) // 72시간 후 종료
@@ -815,5 +814,19 @@ public class ProposalService {
                         .phoneNumber(traveler.getPhoneNumber())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public VoteSurveyStatusResponse getVoteSurveyStatus(Integer travelPlanId){
+
+        VoteSurveyEntity voteSurveyEntity = jpaVoteSurveyRepository.findById(travelPlanId)
+                .orElseThrow(()-> new EntityNotFoundException("투표 중이 아닙니다"));
+
+
+        return VoteSurveyStatusResponse.builder()
+                .voteSurveyId(voteSurveyEntity.getVoteSurveyId())
+                .surveyStartTime(voteSurveyEntity.getSurveyStartTime())
+                .surveyEndTime(voteSurveyEntity.getSurveyEndTime())
+                .travelPlanId(travelPlanId)
+                .build();
     }
 }
