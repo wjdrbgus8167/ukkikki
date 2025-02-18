@@ -217,17 +217,19 @@ class OpenViduPage extends Component {
 
     async toggleScreenShare() {
         if (this.state.screenSharing) {
-            // 화면 공유 중이면 중단
+            // 화면 공유 중단
             this.state.session.unpublish(this.state.screenPublisher);
-            const updatedSubscribers = this.state.subscribers.filter(sub => sub !== this.state.screenPublisher);
             this.setState({
                 screenSharing: false,
                 screenPublisher: null,
-                subscribers: updatedSubscribers
             });
         } else {
+            if (this.state.screenPublisher) {
+                console.warn('이미 화면 공유가 활성화되어 있습니다.');
+                return;
+            }
+    
             try {
-                // 화면 공유 퍼블리셔 생성: 반드시 HTML 요소 ID 지정
                 const screenPublisher = await this.OV.initPublisherAsync("screen-share-container", {
                     videoSource: "screen",
                     publishAudio: false,
@@ -236,24 +238,22 @@ class OpenViduPage extends Component {
                 });
     
                 screenPublisher.once('accessAllowed', () => {
-                    console.log('✅ 화면 공유 허용됨.');
                     this.state.session.publish(screenPublisher);
     
-                    this.setState({
-                        screenSharing: true,
-                        screenPublisher,
-                        mainStreamManager: screenPublisher,
-                        subscribers: [...this.state.subscribers, screenPublisher],
-                    });
+                    // 강제 렌더링 갱신
+                    setTimeout(() => {
+                        this.setState({
+                            screenSharing: true,
+                            screenPublisher,
+                        });
+                    }, 100);
                 });
     
                 screenPublisher.once('accessDenied', () => {
                     console.warn('❌ 화면 공유 접근이 거부되었습니다.');
                 });
     
-                // 화면 공유 종료 이벤트 처리
                 screenPublisher.stream.getMediaStream().getVideoTracks()[0].addEventListener('ended', () => {
-                    console.log('🛑 사용자가 화면 공유를 중단했습니다.');
                     this.toggleScreenShare();
                 });
     
@@ -261,7 +261,7 @@ class OpenViduPage extends Component {
                 console.error("🚨 화면 공유 중 오류 발생:", error);
             }
         }
-    }
+    }    
 
     async createSession(sessionId) {
         const response = await axios.post(APPLICATION_SERVER_URL + '/sessions', { customSessionId: sessionId }, {
