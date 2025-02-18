@@ -47,10 +47,7 @@ class OpenViduPage extends Component {
         const response = await axios.post(APPLICATION_SERVER_URL + '/sessions', { customSessionId: sessionId }, {
             headers: { 'Content-Type': 'application/json', },
         });
-        const newSession = response.data;
-        this.setState(prevState => ({
-            sessions: [...prevState.sessions, newSession]
-        }));
+        return response.data.id;
     }
 
     componentDidMount() {
@@ -104,7 +101,7 @@ class OpenViduPage extends Component {
             // --- 1) OpenVidu (웹캠, 마이크 사용) 객체 생성
             this.OV = new OpenVidu();
 
-            // --- 2) 세션 속성 초기화화
+            // --- 2) 세션 속성 초기화
             this.setState(
                 {
                     session: this.OV.initSession(),
@@ -269,7 +266,7 @@ class OpenViduPage extends Component {
         const response = await axios.post(APPLICATION_SERVER_URL + '/sessions/' + sessionId + '/connections', {}, {
             headers: { 'Content-Type': 'application/json', },
         });
-        return response.data;
+        return response.data.token;
     }
 
     render() {
