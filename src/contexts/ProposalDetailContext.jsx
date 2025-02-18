@@ -1,38 +1,31 @@
-//제안서 디테일
 import React, { createContext, useEffect, useState } from "react";
-import { AgencyProposalDetail } from "../apis/agency";
+import { ProposalDetail } from "../apis/agency";
 
 const ProposalDetailContext = createContext();
 
-export const ProposalDetailProvider = ({children, travelPlanId}) => {
-  const [proposal, setProposals ] = useState(null);
-  const [selectedDayId, setSelectedDayId] = useState(null);
-  
+export const ProposalDetailProvider = ({children, proposalId, travelPlanId}) => {
+  const [proposal, setProposal] = useState(null);
+  const [selectedDayId, setSelectedDay] = useState(1); 
 
   useEffect(() => {
     const fetchProposalData = async() => {
       try {
-        const data = await AgencyProposalDetail(travelPlanId);
-        console.log('제안서 상세 정보 호출 성공:',data)
-        setProposals(data);
-
+        const response = await ProposalDetail(proposalId, travelPlanId);
+        console.log('제안서 상세 데이터 호출 성공:', response.data)
+        setProposal(response.data)
       } catch(error) {
-        console.log('error:', error);
+        console.log('제안서 상세 데이터 호출 실패:', error)
       }
     };
-    if (travelPlanId) {
+    if(travelPlanId && proposalId) {
       fetchProposalData();
     }
-  },[travelPlanId]);
+  }, [travelPlanId, proposalId]);
 
-  const setSelectedDay = (dayId) => {
-    setSelectedDayId(dayId);
-  }
   return (
     <ProposalDetailContext.Provider value={{proposal, selectedDayId, setSelectedDay}}>
       {children}
     </ProposalDetailContext.Provider>
-  );
+  )
 };
-
 export default ProposalDetailContext;
