@@ -1,7 +1,17 @@
 import React, { Component } from 'react';
+import Header from '../components/layout/Header';
 import { OpenVidu } from 'openvidu-browser';
 import axios from 'axios';
 import UserVideoComponent from '../components/userVideo/UserVideoComponent';
+import {
+    Container,
+    JoinDialog,
+    SessionHeader,
+    MainVideo,
+    StreamContainer,
+    StreamContainerText,
+    Button
+} from './style/OpenViduPageStyle';
 
 const APPLICATION_SERVER_URL = 'https://i12c204.p.ssafy.io:9443/api/v1';
 
@@ -16,8 +26,10 @@ class OpenViduPage extends Component {
             mainStreamManager: undefined,
             publisher: undefined,
             subscribers: [],
+            sessions: [], // 세션 목록을 저장할 상태 추가
         };
 
+        this.createSession = this.createSession.bind(this);
         this.joinSession = this.joinSession.bind(this);
         this.leaveSession = this.leaveSession.bind(this);
         this.switchCamera = this.switchCamera.bind(this);
@@ -25,6 +37,17 @@ class OpenViduPage extends Component {
         this.handleChangeUserName = this.handleChangeUserName.bind(this);
         this.handleMainVideoStream = this.handleMainVideoStream.bind(this);
         this.onbeforeunload = this.onbeforeunload.bind(this);
+    }
+
+    async createSession() {
+        const sessionId = 'Session' + Math.floor(Math.random() * 1000);
+        const response = await axios.post(APPLICATION_SERVER_URL + '/sessions', { customSessionId: sessionId }, {
+            headers: { 'Content-Type': 'application/json', },
+        });
+        const newSession = response.data;
+        this.setState(prevState => ({
+            sessions: [...prevState.sessions, newSession]
+        }));
     }
 
     componentDidMount() {
@@ -70,66 +93,86 @@ class OpenViduPage extends Component {
         }
     }
 
-    joinSession() {
-        this.OV = new OpenVidu();
-        this.setState(
-            {
-                session: this.OV.initSession(),
-            },
-            () => {
-                var mySession = this.state.session;
+    joinSession(sessionId) {
+        this.setState({
+            mySessionId: sessionId,
+            myUserName: 'Participant' + Math.floor(Math.random() * 100),
+        }, () => {
+            // --- 1) OpenVidu (웹캠, 마이크 사용) 객체 생성
+            this.OV = new OpenVidu();
 
-                mySession.on('streamCreated', (event) => {
-                    var subscriber = mySession.subscribe(event.stream, undefined);
-                    var subscribers = this.state.subscribers;
-                    subscribers.push(subscriber);
+            // --- 2) 세션 속성 초기화화
+            this.setState(
+                {
+                    session: this.OV.initSession(),
+                },
+                () => {
+                    var mySession = this.state.session;
 
-                    this.setState({
-                        subscribers: subscribers,
-                    });
-                });
+                    mySession.on('streamCreated', (event) => {
+                        var subscriber = mySession.subscribe(event.stream, undefined);
+                        var subscribers = this.state.subscribers;
+                        subscribers.push(subscriber);
 
-                mySession.on('streamDestroyed', (event) => {
-                    this.deleteSubscriber(event.stream.streamManager);
-                });
-
-                mySession.on('exception', (exception) => {
-                    console.warn(exception);
-                });
-
-                this.getToken().then((token) => {
-                    mySession.connect(token, { clientData: this.state.myUserName })
-                        .then(async () => {
-                            let publisher = await this.OV.initPublisherAsync(undefined, {
-                                audioSource: undefined,
-                                videoSource: undefined,
-                                publishAudio: true,
-                                publishVideo: true,
-                                resolution: '640x480',
-                                frameRate: 30,
-                                insertMode: 'APPEND',
-                                mirror: false,
-                            });
-
-                            mySession.publish(publisher);
-
-                            var devices = await this.OV.getDevices();
-                            var videoDevices = devices.filter(device => device.kind === 'videoinput');
-                            var currentVideoDeviceId = publisher.stream.getMediaStream().getVideoTracks()[0].getSettings().deviceId;
-                            var currentVideoDevice = videoDevices.find(device => device.deviceId === currentVideoDeviceId);
-
-                            this.setState({
-                                currentVideoDevice: currentVideoDevice,
-                                mainStreamManager: publisher,
-                                publisher: publisher,
-                            });
-                        })
-                        .catch((error) => {
-                            console.log('There was an error connecting to the session:', error.code, error.message);
+                        this.setState({
+                            subscribers: subscribers,
                         });
-                });
-            },
-        );
+                    });
+
+                    mySession.on('streamDestroyed', (event) => {
+                        this.deleteSubscriber(event.stream.streamManager);
+                    });
+
+                    mySession.on('exception', (exception) => {
+                        console.warn(exception);
+                    });
+                    
+                    // --- 4) 사용자 토큰 검증 및 세션 연결
+
+                    // 배포된 OpenVidu 서버에서 토큰 가져오기
+                    this.getToken().then((token) => {
+
+                        mySession.connect(token, { clientData: this.state.myUserName })
+                            .then(async () => {
+
+                                // --- 5) 자신의 카메라 스트림 가져오기
+
+                                // undefined를 targetElement로 전달하여 퍼블리셔를 초기화합니다 (OpenVidu가 비디오 요소를 삽입하지 않도록 함).
+                                let publisher = await this.OV.initPublisherAsync(undefined, {
+                                    audioSource: undefined, // 오디오 소스. undefined이면 기본 마이크 사용
+                                    videoSource: undefined, // 비디오 소스. undefined이면 기본 웹캠 사용
+                                    publishAudio: true, // 오디오를 음소거하지 않고 시작할지 여부
+                                    publishVideo: true, // 비디오를 활성화된 상태로 시작할지 여부
+                                    resolution: '640x480', // 비디오 해상도
+                                    frameRate: 30, // 비디오 프레임 속도
+                                    insertMode: 'APPEND', // 비디오가 'video-container' 요소에 삽입되는 방식
+                                    mirror: false, // 로컬 비디오를 미러링할지 여부
+                                });
+                                
+                                // --- 6) 자신의 스트림 구독
+
+                                mySession.publish(publisher);
+
+                                // 현재 사용 중인 비디오 장치 가져오기
+                                var devices = await this.OV.getDevices();
+                                var videoDevices = devices.filter(device => device.kind === 'videoinput');
+                                var currentVideoDeviceId = publisher.stream.getMediaStream().getVideoTracks()[0].getSettings().deviceId;
+                                var currentVideoDevice = videoDevices.find(device => device.deviceId === currentVideoDeviceId);
+                                
+                                // 페이지의 메인 비디오에 웹캠이 표시되도록 설정
+                                this.setState({
+                                    currentVideoDevice: currentVideoDevice,
+                                    mainStreamManager: publisher,
+                                    publisher: publisher,
+                                });
+                            })
+                            .catch((error) => {
+                                console.log('세션에 연결하는 중 오류가 발생했습니다:', error.code, error.message);
+                            });
+                    });
+                },
+            );
+        });
     }
 
     leaveSession() {
@@ -199,20 +242,54 @@ class OpenViduPage extends Component {
         return response.data;
     }
 
+    // 화면 공유 토글 함수
+    async toggleScreenShare() {
+        if (this.state.screenSharing) {
+            // 화면 공유 중이면 중단
+            this.state.session.unpublish(this.state.screenPublisher);
+            this.setState({ screenSharing: false, screenPublisher: null });
+        } else {
+            try {
+                // 새로운 화면 공유 퍼블리셔 생성
+                const screenPublisher = await this.OV.initPublisherAsync(undefined, {
+                    videoSource: "screen",
+                    publishAudio: false, // 마이크는 필요하지 않음
+                    publishVideo: true,
+                    mirror: false
+                });
+
+                // 화면 공유 퍼블리셔를 세션에 퍼블리시
+                await this.state.session.publish(screenPublisher);
+                this.setState({
+                    screenSharing: true,
+                    screenPublisher,
+                    mainStreamManager: screenPublisher
+                });
+
+                // 화면 공유 스트림이 중단되면 기본 카메라로 전환
+                screenPublisher.stream.getMediaStream().getVideoTracks()[0].onended = () => {
+                    this.toggleScreenShare();
+                };
+
+            } catch (error) {
+                console.error("화면 공유 중 오류 발생:", error);
+            }
+        }
+    }
+
     render() {
         const mySessionId = this.state.mySessionId;
         const myUserName = this.state.myUserName;
 
         return (
-            <div className="container">
+            <Container>
+                <Header />
+                
                 {this.state.session === undefined ? (
                     <div id="join">
-                        <div id="img-div">
-                            <img src="resources/images/openvidu_grey_bg_transp_cropped.png" alt="OpenVidu logo" />
-                        </div>
-                        <div id="join-dialog" className="jumbotron vertical-center">
-                            <h1> Join a video session </h1>
-                            <form className="form-group" onSubmit={this.joinSession}>
+                        <JoinDialog className="jumbotron vertical-center">
+                            <h1> 화상회의 참여하기 </h1>
+                            <form className="form-group" onSubmit={(e) => { e.preventDefault(); this.joinSession(this.state.mySessionId); }}>
                                 <p>
                                     <label>Participant: </label>
                                     <input
@@ -236,54 +313,74 @@ class OpenViduPage extends Component {
                                     />
                                 </p>
                                 <p className="text-center">
-                                    <input className="btn btn-lg btn-success" name="commit" type="submit" value="JOIN" />
+                                    <Button className="btn btn-lg btn-success" name="commit" type="submit" value="입장하기" />
                                 </p>
                             </form>
+                            <Button className="btn btn-lg btn-primary" onClick={this.createSession} value="세션 생성" />
+                        </JoinDialog>
+                        <div>
+                            <h2>세션 목록</h2>
+                            <ul>
+                                {this.state.sessions.map((session, index) => (
+                                    <li key={index}>
+                                        {session.customSessionId}
+                                        <Button className="btn btn-sm btn-success" onClick={() => this.joinSession(session.customSessionId)} value="입장하기" />
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
                     </div>
                 ) : null}
 
                 {this.state.session !== undefined ? (
                     <div id="session">
-                        <div id="session-header">
+                        <SessionHeader>
                             <h1 id="session-title">{mySessionId}</h1>
-                            <input
+                            <Button
                                 className="btn btn-large btn-danger"
                                 type="button"
                                 id="buttonLeaveSession"
                                 onClick={this.leaveSession}
                                 value="Leave session"
                             />
-                            <input
+                            <Button
                                 className="btn btn-large btn-success"
                                 type="button"
                                 id="buttonSwitchCamera"
                                 onClick={this.switchCamera}
                                 value="Switch Camera"
+                                disabled={this.state.screenSharing}
                             />
-                        </div>
+                            <Button
+                                className={`btn btn-large ${this.state.screenSharing ? "btn-danger" : "btn-primary"}`}
+                                type="button"
+                                id="buttonToggleScreenShare"
+                                onClick={() => this.toggleScreenShare()}
+                                value={this.state.screenSharing ? "Stop Sharing" : "Start Sharing"}
+                            />
+                        </SessionHeader>
 
                         {this.state.mainStreamManager !== undefined ? (
-                            <div id="main-video" className="col-md-6">
+                            <MainVideo className="col-md-6">
                                 <UserVideoComponent streamManager={this.state.mainStreamManager} />
-                            </div>
+                            </MainVideo>
                         ) : null}
                         <div id="video-container" className="col-md-6">
                             {this.state.publisher !== undefined ? (
-                                <div className="stream-container col-md-6 col-xs-6" onClick={() => this.handleMainVideoStream(this.state.publisher)}>
+                                <StreamContainer className="col-md-6 col-xs-6" onClick={() => this.handleMainVideoStream(this.state.publisher)}>
                                     <UserVideoComponent streamManager={this.state.publisher} />
-                                </div>
+                                </StreamContainer>
                             ) : null}
                             {this.state.subscribers.map((sub, i) => (
-                                <div key={sub.id} className="stream-container col-md-6 col-xs-6" onClick={() => this.handleMainVideoStream(sub)}>
-                                    <span>{sub.id}</span>
+                                <StreamContainer key={sub.id} className="col-md-6 col-xs-6" onClick={() => this.handleMainVideoStream(sub)}>
+                                    <StreamContainerText>{sub.id}</StreamContainerText>
                                     <UserVideoComponent streamManager={sub} />
-                                </div>
+                                </StreamContainer>
                             ))}
                         </div>
                     </div>
                 ) : null}
-            </div>
+            </Container>
         );
     }
 }
