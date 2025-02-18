@@ -37,6 +37,10 @@ public enum ErrorCode {
 	//MEMBER_TRAVEL_PLAN
 	MEMBER_TRAVEL_PLAN_NOT_FOUND(HttpStatus.NOT_FOUND,"MTP001","해당 멤버-여행계획을 찾을 수 없습니다."),
 
+	//PROPOSAL
+	PROPOSAL_NOT_FOUND(HttpStatus.NOT_FOUND, "P001", "해당 제안서를 찾을 수 없습니다."),
+	NO_PROPOSALS_FOR_TRAVEL_PLAN(HttpStatus.NOT_FOUND, "P002", "해당 여행 계획에 대한 제안서가 존재하지 않습니다."),
+
 	//CITY
 	CITY_NOT_FOUND(HttpStatus.NOT_FOUND,"C0001","해당 도시를 찾을 수 없습니다."),
 
