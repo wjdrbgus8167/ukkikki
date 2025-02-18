@@ -1,8 +1,7 @@
 import React from 'react';
+import { FaCheckCircle } from 'react-icons/fa';
 
 const AgencyCard = ({ agency, onVote, onDetail }) => {
-  const isSelected = agency.votedYn;
-
   return (
     <div className="flex flex-col items-center w-64 p-6 bg-white border rounded-lg shadow-md">
       <p className="mb-1 text-lg font-semibold">{agency.name}</p>
@@ -14,15 +13,12 @@ const AgencyCard = ({ agency, onVote, onDetail }) => {
         <button
           onClick={() => onVote(agency)}
           disabled={agency.votedYn}
-          className={`w-10 h-10 flex items-center justify-center rounded-full mb-3 text-white text-xl transition-all
-            ${
-              agency.votedYn
-                ? 'bg-blue-500 hover:bg-blue-600'
-                : 'bg-gray-400 hover:bg-gray-500'
-            }
-          `}
+          className="flex items-center justify-center w-10 h-10 mb-3 transition-all focus:outline-none active:outline-none ring-0"
         >
-          ✔
+          <FaCheckCircle
+            className={agency.votedYn ? 'text-blue-500' : 'text-gray-400'}
+            size={30}
+          />
         </button>
       </div>
       {/* 상세보기 버튼 */}

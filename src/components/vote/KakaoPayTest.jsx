@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import logo from '../assets/kakaopay.png';
+import logo from '../../assets/kakaopay.png';
 import Swal from 'sweetalert2';
 const KakaoPayTest = () => {
   useEffect(() => {
