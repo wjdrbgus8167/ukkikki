@@ -10,11 +10,33 @@ const UserVotePage = () => {
   const { travelPlanId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  // location.state에서 전달받은 selectedCard를 사용
-  const { selectedCard } = location.state || {};
+  // location.state에서 전달받은 selectedCard (없으면 null)
+  const initialSelectedCard = location.state?.selectedCard || null;
+  const [selectedCard, setSelectedCard] = useState(initialSelectedCard);
   const [agencies, setAgencies] = useState([]);
 
-  // 제안 목록(API 호출) - 투표 시작 후 이 페이지에서 조회
+  // 만약 selectedCard 정보가 없다면 여행방 정보를 가져와서 selectedCard로 설정
+  useEffect(() => {
+    const fetchRoomData = async () => {
+      try {
+        const response = await publicRequest.get(
+          `/api/v1/travel-plans/${travelPlanId}/members`,
+        );
+        if (response.data?.data?.travelPlan) {
+          // 여행방 데이터에서 selectedCard로 쓸 부분만 추출
+          setSelectedCard(response.data.data.travelPlan);
+        }
+      } catch (error) {
+        console.error('🚨 여행방 데이터 가져오기 실패:', error);
+      }
+    };
+
+    if (!selectedCard && travelPlanId) {
+      fetchRoomData();
+    }
+  }, [travelPlanId, selectedCard]);
+
+  // 제안 목록(API 호출)
   useEffect(() => {
     const fetchProposals = async () => {
       try {
@@ -43,7 +65,7 @@ const UserVotePage = () => {
     }
   }, [travelPlanId]);
 
-  // 투표 처리 함수 (투표는 한 번만 가능)
+  // 투표 처리 함수 (투표 로직은 그대로 두되, 투표 시작 관련 로직은 제거)
   const handleVote = async (agency) => {
     if (agency.votedYn) {
       Swal.fire(
@@ -65,8 +87,8 @@ const UserVotePage = () => {
     if (!result.isConfirmed) return;
 
     try {
-      // selectedCard.voteSurveyInfo가 존재하고, 투표가 시작된 상태라면 그 voteSurveyId를 사용
-      const voteSurveyId = selectedCard.voteSurveyInfo.voteSurveyId;
+      // selectedCard.voteSurveyInfo.voteSurveyId가 백엔드에서 자동 설정되므로 그대로 사용
+      const voteSurveyId = selectedCard.voteSurveyInfo?.voteSurveyId;
       if (!voteSurveyId) {
         Swal.fire(
           '오류',
@@ -111,7 +133,7 @@ const UserVotePage = () => {
     }
   };
 
-  // 상세보기 함수: 상세보기 페이지로 navigate
+  // 상세보기 함수: ProposalDetailForUser 페이지로 이동 (selectedCard 정보도 함께 전달)
   const handleDetail = (agency) => {
     navigate(`/proposal-detail/${travelPlanId}/${agency.proposalId}`, {
       state: { agency, selectedCard },

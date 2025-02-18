@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { publicRequest } from '../hooks/requestMethod';
 import InteractiveSection from '../components/userroom/InteractiveSection';
@@ -7,7 +7,9 @@ import Footer from '../components/layout/Footer';
 import OverviewBar from '../components/userroom/OverviewBar';
 import FavoriteList from '../components/userroom/FavoriteList';
 import { LoadScript } from '@react-google-maps/api';
-import WebSocketComponent, { stompClient } from '../components/userroom/WebSocketComponent';
+import WebSocketComponent, {
+  stompClient,
+} from '../components/userroom/WebSocketComponent';
 
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
@@ -15,12 +17,12 @@ const UserRoom = () => {
   const { travelPlanId: travelPlanIdFromUrl } = useParams();
   const location = useLocation();
   const initialSelectedCard = location.state?.selectedCard;
-  const [selectedCard, setSelectedCard] = useState(initialSelectedCard);
+  const [selectedCard, setSelectedCard] = useState(initialSelectedCard || {}); // 초기값 설정
   const [isLikeListOpen, setIsLikeListOpen] = useState(true);
   const [favorites, setFavorites] = useState([]);
   const libraries = ['places'];
 
-  const travelPlanId = initialSelectedCard?.travelPlanId || travelPlanIdFromUrl;
+  const travelPlanId = selectedCard?.travelPlanId || travelPlanIdFromUrl; // selectedCard.travelPlanId 또는 URL의 travelPlanId 사용
 
   // fetchRoomData를 useCallback으로 메모이제이션
   const fetchRoomData = useCallback(async (id) => {
@@ -44,6 +46,7 @@ const UserRoom = () => {
         setFavorites(mappedPlaces);
 
         console.log('✅ 여행방 데이터:', travelPlan);
+        setSelectedCard(travelPlan); // 여행방 데이터를 selectedCard에 업데이트
       }
     } catch (error) {
       console.error('🚨 여행방 데이터 가져오기 실패:', error);
@@ -60,7 +63,7 @@ const UserRoom = () => {
     }
   }, [travelPlanId, fetchRoomData]);
 
-  if (!selectedCard) {
+  if (!selectedCard || !selectedCard.closeTime) {
     return (
       <div className="p-10 text-center text-red-500">
         🚨 여행방 정보를 찾을 수 없습니다.
@@ -87,11 +90,12 @@ const UserRoom = () => {
 
       <div className="flex flex-col min-h-screen">
         <Header />
-        <OverviewBar selectedCard={selectedCard} />
+        <OverviewBar selectedCard={selectedCard} /> {/* selectedCard를 전달 */}
         <div className="relative flex flex-1">
           <div
-            className={`absolute left-0 top-0 h-full transition-transform duration-300 ${isLikeListOpen ? 'translate-x-0' : '-translate-x-full'
-              }`}
+            className={`absolute left-0 top-0 h-full transition-transform duration-300 ${
+              isLikeListOpen ? 'translate-x-0' : '-translate-x-full'
+            }`}
             style={{ width: '320px', zIndex: 10 }}
           >
             <div className="relative h-full bg-white">
