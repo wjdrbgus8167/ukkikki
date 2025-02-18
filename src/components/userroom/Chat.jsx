@@ -218,7 +218,7 @@ const Chat = ({ travelPlanId }) => {
     <div className="flex flex-col h-full">
       <div
         ref={chatContainerRef}
-        className="flex-1 relative p-4 overflow-y-auto bg-gray-100 scrollbar-hide"
+        className="flex-1 relative p-4 overflow-y-auto bg-gray-100 no-scrollbar"
       >
         <div ref={topSentinelRef} className="h-1 w-full" />
         {messages.length === 0 ? (

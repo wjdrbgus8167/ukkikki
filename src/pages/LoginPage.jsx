@@ -18,18 +18,6 @@ const LoginPage = () => {
   const { setUser } = useAuthStore();
   const [isCompany, setIsCompany] = useState(false);
 
-  // ✅ OAuth 로그인 후 리디렉션된 경우 처리
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-
-    if (token) {
-      localStorage.setItem('accessToken', token); // ✅ 토큰 저장
-      setUser({ token }); // ✅ 상태 업데이트
-      navigate('/'); // ✅ 메인 페이지로 이동
-    }
-  }, [navigate, setUser]);
-
   return (
     <div
       className="flex flex-col min-h-screen"
