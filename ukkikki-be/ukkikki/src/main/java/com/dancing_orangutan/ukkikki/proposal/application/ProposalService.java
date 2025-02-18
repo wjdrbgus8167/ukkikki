@@ -755,9 +755,15 @@ public class ProposalService {
         }
 
         // 해당 travelPlanId 내에서 수락된(A) 제안서인지 확인
-        ProposalEntity proposal = jpaProposalRepository.findByProposalIdAndTravelPlan_TravelPlanIdAndProposalStatus(
-                commands.get(0).getProposalId(), commands.get(0).getTravelPlanId(), ProposalStatus.A
+        ProposalEntity proposal = jpaProposalRepository.findByProposalId(commands.get(0).getProposalId()
         ).orElseThrow(() -> new EntityNotFoundException("해당 여행 계획에 수락된 제안서가 없습니다."));
+
+        Set<String> passportNumbers = new HashSet<>();
+        for (CreateTravelerCommand command : commands) {
+            if (!passportNumbers.add(command.getPassportNumber())) {
+                throw new ApiException(ErrorCode.TRAVELER_PASSPORT_DUPLICATION);
+            }
+        }
 
         // MemberTravelPlan 조회 (여행 계획과 회원 간의 관계 확인)
         MemberTravelPlanEntity memberTravelPlan = memberTravelPlanFinder.findByTravelPlanIdAndMemberId(
@@ -819,6 +825,7 @@ public class ProposalService {
                 .collect(Collectors.toList());
     }
 
+    // 투표 상태 조회
     public VoteSurveyStatusResponse getVoteSurveyStatus(Integer travelPlanId){
 
         VoteSurveyEntity voteSurveyEntity = jpaVoteSurveyRepository.findById(travelPlanId)
