@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import ProposalDetailContext from "../../contexts/ProposalDetailContext";
 import Schedule from "./PlaceList/SchedulePlaces";
 import { Info, ScheduleByDateContainer, ButtonContainer, ScheduleContainer } from "./style/ScheduleByDateStyle";
@@ -7,6 +7,11 @@ const ScheduleByDate = ({ onTogglePlaceSelection, selectedPlaces = [], onDeleteP
   const [timeData, setTimeData] = useState({});
   const [showTimeInput, setShowTimeInput] = useState(null);
   const { proposal } = useContext(ProposalDetailContext);
+
+  useEffect(() => {
+    console.log("Selected places in ScheduleByDate:", selectedPlaces);
+    console.log('스케줄 데이터의 proposal:', proposal)
+  }, [selectedPlaces]);
 
   if (!proposal) {
     return <div>로딩중</div>;
@@ -35,6 +40,7 @@ const ScheduleByDate = ({ onTogglePlaceSelection, selectedPlaces = [], onDeleteP
     const fullStartTime = computeFullTime(dayNumber, rawData.startTime);
     const fullEndTime = computeFullTime(dayNumber, rawData.endTime);
     onAddTime(placeId, fullStartTime, fullEndTime);
+    console.log("시간 저장 완료:", { placeId, fullStartTime, fullEndTime });
     setShowTimeInput(null);
   };
 

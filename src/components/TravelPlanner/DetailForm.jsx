@@ -167,7 +167,77 @@ const DetailForm = ({ proposalData, setProposalData }) => {
                                 />
                             </td>
                         </tr>
-
+                         {/* 항공편 */}
+                         <tr>
+                            <td>출발 항공</td>
+                            <td>
+                                <div>
+                                    <label htmlFor="startDateBoardingTime">출발일 탑승 일시 </label>
+                                    <DatePicker
+                                        id="startDateBoardingTime"
+                                        selected={getDateValue("startDateBoardingTime")}
+                                        onChange={handleDateChange("startDateBoardingTime")}
+                                        dateFormat="yyyy/MM/dd HH:mm"
+                                        showTimeSelect
+                                        timeFormat="HH:mm"
+                                        timeIntervals={1}
+                                        minDate={new Date()}
+                                        locale={ko}
+                                        placeholderText="yyyy/MM/dd HH:mm"
+                                        />
+                                </div>
+                                <div>
+                                    <label htmlFor="startDateArrivalTime">출발일 도착 일시</label>
+                                    <DatePicker
+                                        id="startDateArrivalTime"
+                                        selected={getDateValue("startDateArrivalTime")}
+                                        onChange={handleDateChange("startDateArrivalTime")}
+                                        dateFormat="yyyy/MM/dd HH:mm"
+                                        showTimeSelect
+                                        timeFormat="HH:mm"
+                                        timeIntervals={1}
+                                        minDate={new Date()}
+                                        locale={ko}
+                                        placeholderText="yyyy/MM/dd HH:mm"
+                                        />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>도착 항공</td>
+                            <td>
+                                <div>
+                                    <label htmlFor="endDateBoardingTime">도착일 탑승 일시 </label>
+                                    <DatePicker
+                                        id="endDateBoardingTime"
+                                        selected={getDateValue("endDateBoardingTime")}
+                                        onChange={handleDateChange("endDateBoardingTime")}
+                                        dateFormat="yyyy/MM/dd HH:mm"
+                                        showTimeSelect
+                                        timeFormat="HH:mm"
+                                        timeIntervals={1}
+                                        minDate={new Date()}
+                                        locale={ko}
+                                        placeholderText="yyyy/MM/dd HH:mm"
+                                        />
+                                </div>
+                                <div>
+                                    <label htmlFor="endDateArrivalTime">출발일 도착 일시</label>
+                                    <DatePicker
+                                        id="endDateArrivalTime"
+                                        selected={getDateValue("endDateArrivalTime")}
+                                        onChange={handleDateChange("endDateArrivalTime")}
+                                        dateFormat="yyyy/MM/dd HH:mm"
+                                        showTimeSelect
+                                        timeFormat="HH:mm"
+                                        timeIntervals={1}
+                                        minDate={new Date()}
+                                        locale={ko}
+                                        placeholderText="yyyy/MM/dd HH:mm"
+                                        />
+                                </div>
+                            </td>
+                        </tr>
                         {/* 예약금 */}
                         <tr>
                             <td>예약금</td>
