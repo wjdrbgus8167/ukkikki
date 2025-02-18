@@ -6,7 +6,7 @@ import { publicRequest } from '../../hooks/requestMethod';
 import MapSearchBar from '../../services/map/MapSearchBar';
 import useAuthStore from '../../stores/authStore';
 
-const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
+const FavoriteList = ({ selectedCard, favorites, setFavorites, disabled }) => {
   const { user } = useAuthStore();
   const [expandedPlaceId, setExpandedPlaceId] = useState(null);
   const [showTagInput, setShowTagInput] = useState(false);
@@ -51,6 +51,10 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
   }, [favorites]);
 
   const handleLikeToggle = async (place) => {
+    if (disabled) {
+      Swal.fire('알림', '현재 조작이 불가능합니다.', 'info');
+      return;
+    }
     const placeId = place.placeId;
     const isLiked = place.isLiked;
     const totalMember = selectedCard?.member?.totalParticipants || 0;
@@ -261,7 +265,7 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
   return (
     <div>
       {/* MapSearchBar */}
-      <div className="sticky top-0 z-20 bg-white shadow-md m-1 rounded-lg">
+      <div className="sticky top-0 z-20 m-1 bg-white rounded-lg shadow-md">
         <MapSearchBar
           onPlaceSelected={handlePlaceSelected}
           selectedTravelPlanId={travelPlanId}
@@ -274,7 +278,7 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
           {sortedWishlists.map((item, index) => (
             <div
               key={index}
-              className="p-4 transition-all duration-300 bg-gray-100 rounded-lg hover:bg-gray-200 m-1"
+              className="p-4 m-1 transition-all duration-300 bg-gray-100 rounded-lg hover:bg-gray-200"
             >
               <div
                 className="flex items-center justify-between cursor-pointer"
