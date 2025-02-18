@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ProposalButton from './ProposalButton';
 import { STATUS_MAP, THEME_COLORS, STATUS_STYLES } from '../../constants';
-
+import { useNavigate } from 'react-router';
 const apiKey = import.meta.env.VITE_APP_UNSPLASH_API_KEY;
 
 const getThemeColor = (theme) => THEME_COLORS[theme] || 'bg-gray-500 text-white';
