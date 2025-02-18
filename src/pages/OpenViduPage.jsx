@@ -261,11 +261,6 @@ class OpenViduPage extends Component {
             }
         } else {
             try {
-                // 기존 퍼블리셔 언퍼블리시
-                if (this.state.publisher) {
-                    await this.state.session.unpublish(this.state.publisher);
-                }
-    
                 const screenPublisher = await this.OV.initPublisherAsync(undefined, {
                     videoSource: "screen",
                     publishAudio: true, // 화면 공유 시 오디오 허용
