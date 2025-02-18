@@ -105,17 +105,6 @@ const WebSocketComponent = ({ travelPlanId, setFavorites, favorites, fetchRoomDa
     };
 
     stompClient.onDisconnect = () => {
-      if (stompClient && stompClient.connected) {
-        const wsData = {
-          action: "EXIT",
-          travelPlanId,
-        };
-        stompClient.publish({
-          destination: '/pub/actions',
-          body: JSON.stringify(wsData),
-        });
-        console.log('✅ WebSocketComponent 퇴장 이벤트:', wsData);
-  }
       console.log('❌ STOMP WebSocket 연결 종료');
     };
 
@@ -127,6 +116,16 @@ const WebSocketComponent = ({ travelPlanId, setFavorites, favorites, fetchRoomDa
 
     return () => {
       if (stompClient.connected) {
+        if (stompClient && stompClient.connected) {
+          const wsData = {
+            action: "EXIT",
+            travelPlanId,
+          };
+          stompClient.publish({
+            destination: '/pub/actions',
+            body: JSON.stringify(wsData),
+          });
+          console.log('✅ WebSocketComponent 퇴장 이벤트:', wsData);
         stompClient.deactivate();
         console.log('🛑 STOMP WebSocket 종료');
       }
