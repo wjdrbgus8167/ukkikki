@@ -839,4 +839,19 @@ public class ProposalService {
                 .travelPlanId(travelPlanId)
                 .build();
     }
+
+    @Transactional
+    public TravelPlanCountResponse getTravelPlanCount(Integer travelPlanId) {
+
+        List<MemberTravelPlanEntity> memberTravelPlans = memberTravelPlanFinder.findByTravelPlan_TravelPlanIdAndExitYnFalse(travelPlanId);
+
+        int totalParticipants = memberTravelPlans.stream()
+                .mapToInt(MemberTravelPlanEntity::calTotalParticipants)
+                .sum();
+
+        return TravelPlanCountResponse.builder()
+                .travelPlanId(travelPlanId)
+                .count(totalParticipants)
+                .build();
+    }
 }

@@ -1,5 +1,6 @@
 package com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravelPlan;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberTravelPlanRepository {
@@ -13,4 +14,6 @@ public interface MemberTravelPlanRepository {
 
 
 	void store(MemberTravelPlanEntity entity);
+
+	List<MemberTravelPlanEntity> findByTravelPlan_TravelPlanIdAndExitYnFalse(Integer travelPlanId);
 }

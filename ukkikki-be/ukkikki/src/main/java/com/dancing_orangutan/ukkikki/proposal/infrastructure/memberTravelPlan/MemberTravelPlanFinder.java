@@ -7,6 +7,8 @@ import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravelPlan.MemberTr
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component("inquiryMemberTravelPlanFinder")
 @RequiredArgsConstructor
 public class MemberTravelPlanFinder {
@@ -24,5 +26,9 @@ public class MemberTravelPlanFinder {
 		return jpamemberTravelPlanRepository.findMemberTravelPlanEntityByMember_MemberIdAndTravelPlan_TravelPlanId(
 						memberId, travelPlanId)
 				.orElseThrow(() -> new ApiException(ErrorCode.MEMBER_TRAVEL_PLAN_NOT_FOUND));
+	}
+
+	public List<MemberTravelPlanEntity> findByTravelPlan_TravelPlanIdAndExitYnFalse(Integer travelPlanId) {
+		return jpamemberTravelPlanRepository.findByTravelPlan_TravelPlanIdAndExitYnFalse(travelPlanId);
 	}
 }
