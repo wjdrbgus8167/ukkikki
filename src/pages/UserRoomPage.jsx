@@ -130,7 +130,7 @@ const UserRoom = () => {
             </div>
 
             {/* 오른쪽: OverviewBar (사용자 조작 허용) */}
-            <div className="z-20 flex-1 m-2 overflow-auto bg-transparent pointer-events-auto">
+            <div className="flex-1 overflow-auto bg-transparent m-2 z-20">
               <OverviewBar selectedCard={selectedCard} />
             </div>
           </div>
