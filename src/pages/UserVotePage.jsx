@@ -60,6 +60,14 @@ const UserVotePage = () => {
 
   // 투표 처리 함수 (투표 로직은 그대로 유지)
   const handleVote = async (agency) => {
+    if (hasAcceptedProposal) {
+      Swal.fire(
+        '투표 불가',
+        '투표가 끝났습니다. 투표 기능이 비활성화되었습니다.',
+        'info',
+      );
+      return;
+    }
     if (agency.votedYn) {
       Swal.fire(
         '알림',
