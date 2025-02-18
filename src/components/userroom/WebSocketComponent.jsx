@@ -42,6 +42,9 @@ const WebSocketComponent = ({ travelPlanId, setFavorites, favorites, fetchRoomDa
         showConfirmButton: false,
         timer: 6000, // 3초 후 자동 닫힘
         timerProgressBar: true, // 진행 바 표시
+        didOpen: (toast) => {
+          toast.style.zIndex = 10000; // 다른 UI 요소 위에 표시
+        }
       });
 
 
