@@ -34,18 +34,20 @@ const WebSocketComponent = ({ travelPlanId, setFavorites, favorites, fetchRoomDa
       console.log("📍 실시간 이벤트 수신:", eventData);
 
       // ✅ 오른쪽 위에 알림(Toast) 띄우기
-      Swal.fire({
+      Swal.mixin({
         toast: true,
-        position: "top-end", // 🔥 오른쪽 위에 표시
-        icon: "info", // 기본 아이콘 (정보)
-        title: `${eventData.memberName}님이 ${eventData.placeName ? eventData.placeName + ' ' : ''}${getActionText(eventData.action)}`,
+        position: "top-end", 
+        icon: "info",
         showConfirmButton: false,
-        timer: 6000, // 3초 후 자동 닫힘
-        timerProgressBar: true, // 진행 바 표시
+        timer: 5000, 
+        timerProgressBar: true,
         didOpen: (toast) => {
-          toast.style.zIndex = 10000; // 다른 UI 요소 위에 표시
+          toast.style.zIndex = 10000; 
         }
+      }).fire({
+        title: `${eventData.memberName}님이 ${eventData.placeName ? eventData.placeName + ' ' : ''}${getActionText(eventData.action)}`
       });
+      
 
 
     } catch (error) {
@@ -72,7 +74,7 @@ const WebSocketComponent = ({ travelPlanId, setFavorites, favorites, fetchRoomDa
       case "CLOSE_TIME_UPDATED" :
         return "여행 계획의 마감일시가 설정되었습니다. 그대로 진행을 원하시면 유지해주세요!" 
       case "EXIT" :
-        return "방에 퇴장하셨습니다.!" 
+        return "방에서 퇴장하셨습니다." 
       default:
         return "🤔 알 수 없는 행동을 했습니다!";
     }
