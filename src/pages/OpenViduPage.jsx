@@ -194,7 +194,7 @@ class OpenViduPage extends Component {
                 var newVideoDevice = videoDevices.filter(device => device.deviceId !== this.state.currentVideoDevice.deviceId)
 
                 if (newVideoDevice.length > 0) {
-                    var newPublisher = this.OV.initPublisher(undefined, {
+                    var newPublisher = this.OV.initPublisher("screen-share-container", {
                         videoSource: newVideoDevice[0].deviceId,
                         publishAudio: true,
                         publishVideo: true,
@@ -220,39 +220,45 @@ class OpenViduPage extends Component {
             // 화면 공유 중이면 중단
             this.state.session.unpublish(this.state.screenPublisher);
             const updatedSubscribers = this.state.subscribers.filter(sub => sub !== this.state.screenPublisher);
-            this.setState({ 
-                screenSharing: false, 
-                screenPublisher: null, 
-                subscribers: updatedSubscribers 
+            this.setState({
+                screenSharing: false,
+                screenPublisher: null,
+                subscribers: updatedSubscribers
             });
         } else {
             try {
-                // 새로운 화면 공유 퍼블리셔 생성
-                const screenPublisher = await this.OV.initPublisherAsync(undefined, {
+                // 화면 공유 퍼블리셔 생성: 반드시 HTML 요소 ID 지정
+                const screenPublisher = await this.OV.initPublisherAsync("screen-share-container", {
                     videoSource: "screen",
-                    publishAudio: false, // 마이크는 필요하지 않음
+                    publishAudio: false,
                     publishVideo: true,
                     mirror: false
                 });
-
-                // 화면 공유 퍼블리셔를 세션에 퍼블리시
-                await this.state.session.publish(screenPublisher);
-                
-                // 화면 공유 퍼블리셔를 subscribers 리스트에 추가
-                this.setState({
-                    screenSharing: true,
-                    screenPublisher,
-                    mainStreamManager: screenPublisher,
-                    subscribers: [...this.state.subscribers, screenPublisher],
+    
+                screenPublisher.once('accessAllowed', () => {
+                    console.log('✅ 화면 공유 허용됨.');
+                    this.state.session.publish(screenPublisher);
+    
+                    this.setState({
+                        screenSharing: true,
+                        screenPublisher,
+                        mainStreamManager: screenPublisher,
+                        subscribers: [...this.state.subscribers, screenPublisher],
+                    });
                 });
-
-                // 화면 공유 스트림이 중단되면 기본 카메라로 전환
-                screenPublisher.stream.getMediaStream().getVideoTracks()[0].onended = () => {
+    
+                screenPublisher.once('accessDenied', () => {
+                    console.warn('❌ 화면 공유 접근이 거부되었습니다.');
+                });
+    
+                // 화면 공유 종료 이벤트 처리
+                screenPublisher.stream.getMediaStream().getVideoTracks()[0].addEventListener('ended', () => {
+                    console.log('🛑 사용자가 화면 공유를 중단했습니다.');
                     this.toggleScreenShare();
-                };
-
+                });
+    
             } catch (error) {
-                console.error("화면 공유 중 오류 발생:", error);
+                console.error("🚨 화면 공유 중 오류 발생:", error);
             }
         }
     }
@@ -359,20 +365,28 @@ class OpenViduPage extends Component {
                             />
                         </SessionHeader>
 
+                        {/* 메인 카메라 스트림 */}
                         {this.state.mainStreamManager !== undefined ? (
                             <MainVideo className="col-md-6">
                                 <UserVideoComponent streamManager={this.state.mainStreamManager} />
                             </MainVideo>
                         ) : null}
+
+                        {/* 화면 공유 스트림 */}
+                        <div id="screen-share-container"></div>
+
                         <div id="video-container" className="col-md-6">
                             {this.state.publisher !== undefined ? (
                                 <StreamContainer className="col-md-6 col-xs-6" onClick={() => this.handleMainVideoStream(this.state.publisher)}>
                                     <UserVideoComponent streamManager={this.state.publisher} />
                                 </StreamContainer>
                             ) : null}
+
+
+                            {/* 구독자 스트림 */}
                             {this.state.subscribers.map((sub, i) => (
-                                <StreamContainer key={sub.id} className="col-md-6 col-xs-6" onClick={() => this.handleMainVideoStream(sub)}>
-                                    <StreamContainerText>{sub.id}</StreamContainerText>
+                                <StreamContainer key={i} className="col-md-6 col-xs-6" onClick={() => this.handleMainVideoStream(sub)}>
+                                    <StreamContainerText>{sub.stream.connection.connectionId}</StreamContainerText>
                                     <UserVideoComponent streamManager={sub} />
                                 </StreamContainer>
                             ))}
