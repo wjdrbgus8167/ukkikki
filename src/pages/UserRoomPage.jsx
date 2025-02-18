@@ -94,7 +94,7 @@ const UserRoom = () => {
         {/* 지도 + 왼쪽 사이드바 + 오른쪽 OverviewBar */}
         <div className="relative flex-1">
           {/* 지도 (배경 레이어) */}
-          <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 z-0 ">
             <InteractiveSection
               selectedCard={selectedCard}
               favorites={favorites}
@@ -123,7 +123,6 @@ const UserRoom = () => {
                     selectedCard={selectedCard}
                     favorites={favorites}
                     setFavorites={setFavorites}
-                    disabled={disabled}
                   />
                 </div>
               )}
