@@ -41,10 +41,20 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
     setRoomData({ ...roomData, [e.target.name]: e.target.value });
   };
 
-  // 1단계 → 2단계 이동
+  // 1단계 → 2단계 이동 핸들러
   const handleNextStep = () => {
-    if (!roomData.title || !roomData.minPeople || !roomData.maxPeople) {
+    // 모든 필수 항목이 입력되었는지 확인
+    if (
+      !roomData.title ||
+      roomData.minPeople === '' ||
+      roomData.maxPeople === ''
+    ) {
       Swal.fire('알림', '모든 항목을 입력해주세요.', 'warning');
+      return;
+    }
+    // 최소 인원과 최대 인원 비교 (숫자로 변환하여 비교)
+    if (parseInt(roomData.maxPeople, 10) < parseInt(roomData.minPeople, 10)) {
+      Swal.fire('알림', '최대 인원은 최소 인원 이상이어야 합니다.', 'warning');
       return;
     }
     setStep(2);
