@@ -63,7 +63,7 @@ const UserRoom = () => {
     }
   }, [travelPlanId, fetchRoomData]);
 
-  if (!selectedCard || !selectedCard.closeTime) {
+  if (!selectedCard) {
     return (
       <div className="p-10 text-center text-red-500">
         🚨 여행방 정보를 찾을 수 없습니다.

@@ -1,6 +1,8 @@
+// ReservationDepositModal.jsx
 import React, { useState } from 'react';
 import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
+import KakaoPayTest from './KakaoPayTest';
 
 const ReservationDepositModal = ({ travelPlanId, proposalId, onClose }) => {
   const [step, setStep] = useState(1);
@@ -16,6 +18,7 @@ const ReservationDepositModal = ({ travelPlanId, proposalId, onClose }) => {
   ]);
   const [loading, setLoading] = useState(false);
 
+  // 여행자 정보 변경 핸들러
   const handleTravelerChange = (index, field, value) => {
     const newTravelers = [...travelers];
     newTravelers[index][field] = value;
@@ -40,6 +43,7 @@ const ReservationDepositModal = ({ travelPlanId, proposalId, onClose }) => {
     setTravelers(travelers.filter((_, i) => i !== index));
   };
 
+  // 여행자 등록 API 호출 후 2단계(결제 단계)로 이동
   const handleSubmitTravelers = async () => {
     // 간단한 유효성 검사
     for (let traveler of travelers) {
@@ -73,8 +77,8 @@ const ReservationDepositModal = ({ travelPlanId, proposalId, onClose }) => {
     }
   };
 
+  // 결제 완료 후 처리할 함수 (KakaoPayTest에서 결제 성공 시 호출)
   const handlePaymentComplete = () => {
-    // 실제 카카오 결제 컴포넌트를 연동하면 해당 컴포넌트 내부에서 결제 완료 후 호출하도록 구성합니다.
     Swal.fire('성공', '예약금 결제가 완료되었습니다.', 'success');
     onClose();
   };
@@ -183,16 +187,7 @@ const ReservationDepositModal = ({ travelPlanId, proposalId, onClose }) => {
         {step === 2 && (
           <div>
             <h3 className="mb-4 text-xl font-semibold">예약금 결제</h3>
-            {/* 여기에 실제 카카오 결제 컴포넌트를 연동하세요. 아래는 예시 */}
-            <div className="p-4 mb-4 border rounded">
-              <p className="mb-2">카카오 결제 컴포넌트 (예시)</p>
-              <button
-                onClick={handlePaymentComplete}
-                className="px-4 py-2 text-white bg-orange-500 rounded hover:bg-orange-600"
-              >
-                결제 완료
-              </button>
-            </div>
+            <KakaoPayTest onPaymentComplete={handlePaymentComplete} />
           </div>
         )}
         <div className="flex justify-end mt-4">
