@@ -47,7 +47,7 @@ class OpenViduPage extends Component {
         const response = await axios.post(APPLICATION_SERVER_URL + '/sessions', { customSessionId: sessionId }, {
             headers: { 'Content-Type': 'application/json', },
         });
-        return response.data.id;
+        return response.data;
     }
 
     componentDidMount() {
@@ -266,7 +266,7 @@ class OpenViduPage extends Component {
         const response = await axios.post(APPLICATION_SERVER_URL + '/sessions/' + sessionId + '/connections', {}, {
             headers: { 'Content-Type': 'application/json', },
         });
-        return response.data.token;
+        return response.data;
     }
 
     render() {
