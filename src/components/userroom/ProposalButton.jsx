@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
+import WebSocketComponent, {
+  stompClient,
+} from '../../components/userroom/WebSocketComponent';
 
 const getMinDateTime = () => {
   const now = new Date();
