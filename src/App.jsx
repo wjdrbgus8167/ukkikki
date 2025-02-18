@@ -20,7 +20,6 @@ import AOS from 'aos';
 import 'aos/dist/aos.css'; // AOS 스타일 불러오기
 import AgencyProposalDetailPage from './pages/AgencyProposalDetailPage';
 import ProposalDetailForUser from './pages/ProposalDetailForUserPage';
-import useAutoLogout from './hooks/useAutoLogout';
 
 const App = () => {
   useEffect(() => {
@@ -30,8 +29,6 @@ const App = () => {
       once: true, // 애니메이션을 한 번만 실행 (기본값: false)
     });
   }, []);
-
-  useAutoLogout(); // 자동 로그아웃 체크
 
   return (
     <Router>
