@@ -106,20 +106,33 @@ class OpenViduPage extends Component {
                     // 스트림 생성 이벤트 핸들러 수정
                     mySession.on('streamCreated', (event) => {
                         const subscriber = mySession.subscribe(event.stream, undefined);
-                        
-                        // 스트림 타입에 따라 분류
+                    
                         if (event.stream.typeOfVideo === 'SCREEN') {
-                            this.setState(prevState => ({
-                                screenSubscribers: [...prevState.screenSubscribers, subscriber],
-                                subscribers: [...prevState.subscribers, subscriber]
+                            // 화면 공유 스트림 추가
+                            this.setState((prevState) => ({
+                                screenSubscribers: [
+                                    ...prevState.screenSubscribers.filter(sub => sub.stream.streamId !== event.stream.streamId),
+                                    subscriber
+                                ],
+                                subscribers: [
+                                    ...prevState.subscribers.filter(sub => sub.stream.streamId !== event.stream.streamId),
+                                    subscriber
+                                ]
                             }));
                         } else {
-                            this.setState(prevState => ({
-                                regularSubscribers: [...prevState.regularSubscribers, subscriber],
-                                subscribers: [...prevState.subscribers, subscriber]
+                            // 일반 카메라 스트림 추가
+                            this.setState((prevState) => ({
+                                regularSubscribers: [
+                                    ...prevState.regularSubscribers.filter(sub => sub.stream.streamId !== event.stream.streamId),
+                                    subscriber
+                                ],
+                                subscribers: [
+                                    ...prevState.subscribers.filter(sub => sub.stream.streamId !== event.stream.streamId),
+                                    subscriber
+                                ]
                             }));
                         }
-                    });
+                    });                    
 
                     mySession.on('streamDestroyed', (event) => {
                         const stream = event.stream;
@@ -249,24 +262,26 @@ class OpenViduPage extends Component {
             // 화면 공유 중단
             try {
                 await this.state.session.unpublish(this.state.screenPublisher);
-                await this.state.session.publish(this.state.publisher); // 기존 카메라 스트림 다시 퍼블리시
-                
                 this.setState({
                     screenSharing: false,
                     screenPublisher: null,
-                    mainStreamManager: this.state.publisher
                 });
             } catch (error) {
                 console.error("화면 공유 중단 중 오류 발생:", error);
             }
         } else {
             try {
-                // 기존 스트림 언퍼블리시
-                await this.state.session.unpublish(this.state.publisher);
-                
-                const screenPublisher = await this.OV.initPublisherAsync(undefined, {
+                // 새로운 OpenVidu 인스턴스 생성 (독립적 화면 공유 스트림 생성)
+                const screenOV = new OpenVidu();
+                const screenSession = screenOV.initSession();
+    
+                // 동일한 세션에 다시 연결
+                const token = await this.getToken();
+                await screenSession.connect(token, { clientData: this.state.myUserName + "_screen" });
+    
+                const screenPublisher = await screenOV.initPublisherAsync(undefined, {
                     videoSource: "screen",
-                    publishAudio: true,
+                    publishAudio: false,
                     publishVideo: true,
                     resolution: "1280x720",
                     frameRate: 30,
@@ -275,41 +290,28 @@ class OpenViduPage extends Component {
                 });
     
                 screenPublisher.once('accessAllowed', async () => {
-                    try {
-                        await this.state.session.publish(screenPublisher);
-                        
-                        this.setState({
-                            screenSharing: true,
-                            screenPublisher,
-                            mainStreamManager: screenPublisher
-                        });
+                    await screenSession.publish(screenPublisher);
     
-                        // 화면 공유 종료 이벤트 리스너
-                        screenPublisher.stream.getMediaStream().getVideoTracks()[0].addEventListener('ended', () => {
-                            console.log("화면 공유가 종료되었습니다.");
-                            this.toggleScreenShare();
-                        });
+                    this.setState({
+                        screenSharing: true,
+                        screenPublisher,
+                        screenSubscribers: [...this.state.screenSubscribers, screenPublisher]
+                    });
     
-                    } catch (error) {
-                        console.error("화면 공유 스트림 게시 중 오류 발생:", error);
-                        // 오류 발생 시 기존 스트림 다시 퍼블리시
-                        this.state.session.publish(this.state.publisher);
-                    }
+                    screenPublisher.stream.getMediaStream().getVideoTracks()[0].addEventListener('ended', () => {
+                        this.toggleScreenShare();
+                    });
                 });
     
                 screenPublisher.once('accessDenied', () => {
                     console.warn('화면 공유 접근이 거부되었습니다.');
-                    // 접근 거부 시 기존 스트림 다시 퍼블리시
-                    this.state.session.publish(this.state.publisher);
                 });
     
             } catch (error) {
                 console.error("화면 공유 초기화 중 오류 발생:", error);
-                // 오류 발생 시 기존 스트림 다시 퍼블리시
-                this.state.session.publish(this.state.publisher);
             }
         }
-    }
+    }    
 
     async createSession(sessionId) {
         try {
