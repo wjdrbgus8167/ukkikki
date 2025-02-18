@@ -91,6 +91,20 @@ const ProposalButton = ({
         });
         setShowDateInput(false);
       }
+
+      if (stompClient && stompClient.connected) {
+        const wsData = {
+          action: "CLOSE_TIME_UPDATED",
+          travelPlanId,
+        };
+        stompClient.publish({
+          destination: '/pub/actions',
+          body: JSON.stringify(wsData),
+        });
+        console.log('✅ 마감 일시 설정 이벤트:', wsData);
+      }
+
+
     } catch (error) {
       if (error.response?.data?.error?.code === 'TP003') {
         Swal.fire('알림', '방장만 마감일시를 설정할 수 있어요', 'error');
@@ -165,11 +179,10 @@ const ProposalButton = ({
     <div className="relative p-4 text-center bg-yellow-100 rounded-lg md:w-1/3">
       {!selectedCard.closeTime ? (
         <button
-          className={`px-4 py-2 text-white rounded-md ${
-            isEnabled
+          className={`px-4 py-2 text-white rounded-md ${isEnabled
               ? 'bg-[#FF3951] hover:bg-[#e23047]'
               : 'bg-gray-400 cursor-not-allowed'
-          }`}
+            }`}
           onClick={handleButtonClick}
           disabled={isSubmitting}
         >
