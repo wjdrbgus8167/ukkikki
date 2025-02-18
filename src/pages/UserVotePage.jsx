@@ -96,18 +96,26 @@ const UserVotePage = () => {
       }
     } catch (error) {
       console.error('투표 실패:', error);
-      Swal.fire('투표 실패', '투표 도중 오류가 발생했습니다.', 'error');
+      const errorMessage =
+        error.response?.data?.error?.message ||
+        '투표 도중 오류가 발생했습니다.';
+      if (errorMessage.includes('이미 투표를 진행한 회원입니다.')) {
+        Swal.fire(
+          '중복 투표',
+          '이미 투표하셨습니다. 투표는 한 번만 가능합니다.',
+          'info',
+        );
+      } else {
+        Swal.fire('투표 실패', errorMessage, 'error');
+      }
     }
   };
 
   // 상세보기 함수: 상세보기 페이지로 navigate
   const handleDetail = (agency) => {
-    navigate(
-      `/travel-proposal/${travelPlanId}/proposals/${agency.proposalId}`,
-      {
-        state: { agency, selectedCard },
-      },
-    );
+    navigate(`/proposal-detail/${travelPlanId}/${agency.proposalId}`, {
+      state: { agency, selectedCard },
+    });
   };
 
   return (

@@ -15,7 +15,7 @@ const mapOptions = {
   fullscreenControl: false,
 };
 
-const PlaceMap = ({ coordinates, markers, zoom}) => {
+const PlaceMap = ({ coordinates, markers, zoom, children}) => {
   // 마커 아이콘 옵션 (크기 30×30)
   const bananaIconObject = {
     url: bananaIcon,
@@ -41,10 +41,12 @@ const PlaceMap = ({ coordinates, markers, zoom}) => {
         {markers.map((marker, index) => (
           <Marker
             key={index}
-            position={{ lat: marker.latitude, lng: marker.longitude }}
+            position={{ lat: marker.lat, lng: marker.lng }}
             icon={bananaIconObject}
+            onClick={marker.onClick}
           />
         ))}
+        {children}
       </GoogleMap>
     </div>
   );

@@ -70,22 +70,43 @@ const MapSearchBar = ({ onPlaceSelected, selectedTravelPlanId, favorites }) => {
       return;
     }
     try {
-      // DB 저장 (API 호출)
-      const response = await publicRequest.post(
-        `/api/v1/travel-plans/${selectedTravelPlanId}/places`,
-        searchedPlace,
-      );
-      if (response.status === 200) {
-        // 응답에서 DB의 고유 ID 추출 (예: response.data.data.placeId)
-        const dbPlaceId = response.data.data.placeId;
-        console.log('DB 응답, 새 장소 ID:', dbPlaceId);
-        // 구글의 placeId 대신 DB에서 생성된 ID로 업데이트
-        const updatedPlace = { ...searchedPlace, placeId: dbPlaceId };
-        // 부모 콜백 호출해 favorites 상태 업데이트
-        onPlaceSelected(updatedPlace);
-        setIsRegistered(true);
-        Swal.fire('성공', '장소가 등록되었습니다.', 'success');
-        console.log('등록된 장소:', updatedPlace);
+      if (!isRegistered) {
+        const message = {
+          ...searchedPlace,
+          travelPlanId: selectedTravelPlanId,
+        };
+        console.log(message); // travelPlanId가 추가된 객체 확인
+
+        if (stompClient && stompClient.connected) {
+          stompClient.publish({
+            destination: '/pub/actions',
+            body: JSON.stringify(message),
+          });
+          console.log('✅ MapSearchBar Event 발행됨:', message);
+        } else {
+          console.warn('⚠️ 웹소켓 연결이 끊어져 있어 이벤트를 발행하지 못함.');
+        }
+
+        const response = await publicRequest.post(
+          `/api/v1/travel-plans/${selectedTravelPlanId}/places`,
+          searchedPlace,
+        );
+        if (response.status === 200) {
+          // 응답에서 DB의 고유 ID 추출 (예: response.data.data.placeId)
+          const dbPlaceId = response.data.data.placeId;
+          console.log('DB 응답, 새 장소 ID:', dbPlaceId);
+          // 구글의 placeId 대신 DB에서 생성된 ID로 업데이트
+          const updatedPlace = { ...searchedPlace, placeId: dbPlaceId };
+          // 부모 콜백 호출해 favorites 상태 업데이트
+          onPlaceSelected(updatedPlace);
+          setIsRegistered(true);
+          Swal.fire('성공', '장소가 등록되었습니다.', 'success');
+          console.log('등록된 장소:', updatedPlace);
+        } else {
+          setIsRegistered(false);
+        }
+
+        // DB 저장 (API 호출)
       }
     } catch (error) {
       console.error('새 장소 등록 실패:', error);
