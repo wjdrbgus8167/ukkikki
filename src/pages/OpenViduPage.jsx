@@ -3,15 +3,6 @@ import Header from '../components/layout/Header';
 import { OpenVidu } from 'openvidu-browser';
 import axios from 'axios';
 import UserVideoComponent from '../components/userVideo/UserVideoComponent';
-import {
-    Container,
-    JoinDialog,
-    SessionHeader,
-    MainVideo,
-    StreamContainer,
-    StreamContainerText,
-    Button
-} from './style/OpenViduPageStyle';
 
 const APPLICATION_SERVER_URL = 'https://i12c204.p.ssafy.io:9443/api/v1';
 
@@ -106,20 +97,33 @@ class OpenViduPage extends Component {
                     // 스트림 생성 이벤트 핸들러 수정
                     mySession.on('streamCreated', (event) => {
                         const subscriber = mySession.subscribe(event.stream, undefined);
-                        
-                        // 스트림 타입에 따라 분류
+                    
                         if (event.stream.typeOfVideo === 'SCREEN') {
-                            this.setState(prevState => ({
-                                screenSubscribers: [...prevState.screenSubscribers, subscriber],
-                                subscribers: [...prevState.subscribers, subscriber]
+                            // 화면 공유 스트림 추가
+                            this.setState((prevState) => ({
+                                screenSubscribers: [
+                                    ...prevState.screenSubscribers.filter(sub => sub.stream.streamId !== event.stream.streamId),
+                                    subscriber
+                                ],
+                                subscribers: [
+                                    ...prevState.subscribers.filter(sub => sub.stream.streamId !== event.stream.streamId),
+                                    subscriber
+                                ]
                             }));
                         } else {
-                            this.setState(prevState => ({
-                                regularSubscribers: [...prevState.regularSubscribers, subscriber],
-                                subscribers: [...prevState.subscribers, subscriber]
+                            // 일반 카메라 스트림 추가
+                            this.setState((prevState) => ({
+                                regularSubscribers: [
+                                    ...prevState.regularSubscribers.filter(sub => sub.stream.streamId !== event.stream.streamId),
+                                    subscriber
+                                ],
+                                subscribers: [
+                                    ...prevState.subscribers.filter(sub => sub.stream.streamId !== event.stream.streamId),
+                                    subscriber
+                                ]
                             }));
                         }
-                    });
+                    });                    
 
                     mySession.on('streamDestroyed', (event) => {
                         const stream = event.stream;
@@ -245,30 +249,45 @@ class OpenViduPage extends Component {
     }
 
     async toggleScreenShare() {
-        if (this.state.screenSharing) {
-            // 화면 공유 중단
+        const { session, publisher, screenSharing, screenPublisher } = this.state;
+    
+        if (screenSharing) {
+            // 🔹 화면 공유 중단
             try {
-                await this.state.session.unpublish(this.state.screenPublisher);
-                
-                // 기존 카메라 스트림을 다시 메인으로 설정
-                this.setState({
-                    screenSharing: false,
-                    screenPublisher: null,
-                    mainStreamManager: this.state.publisher
-                });
+                if (screenPublisher) {
+                    session.unpublish(screenPublisher);
+                    console.log('✅ 화면 공유 중단 완료');
+    
+                    // 🔹 기존 카메라 스트림 다시 게시
+                    session.publish(publisher);
+                    console.log('🔄 카메라 스트림 재게시');
+    
+                    this.setState({
+                        screenSharing: false,
+                        screenPublisher: null,
+                        mainStreamManager: publisher,
+                        screenSubscribers: []
+                    });
+                }
             } catch (error) {
-                console.error("화면 공유 중단 중 오류 발생:", error);
+                console.error("🛑 화면 공유 중단 중 오류 발생:", error);
             }
         } else {
+            // 🔹 화면 공유 시작
             try {
-                // 기존 퍼블리셔 언퍼블리시
-                if (this.state.publisher) {
-                    await this.state.session.unpublish(this.state.publisher);
+                // 🔍 이미 화면 공유 중이면 중단
+                if (screenSharing || screenPublisher) {
+                    console.warn('⚠️ 이미 화면 공유 중입니다.');
+                    return;
                 }
     
-                const screenPublisher = await this.OV.initPublisherAsync(undefined, {
+                // 🔹 카메라 스트림 언퍼블리시 (OpenVidu는 하나의 stream만 게시 가능)
+                session.unpublish(publisher);
+                console.log('⛔️ 카메라 스트림 언퍼블리시');
+    
+                const newScreenPublisher = await this.OV.initPublisherAsync(undefined, {
                     videoSource: "screen",
-                    publishAudio: true, // 화면 공유 시 오디오 허용
+                    publishAudio: false,
                     publishVideo: true,
                     resolution: "1280x720",
                     frameRate: 30,
@@ -276,43 +295,45 @@ class OpenViduPage extends Component {
                     mirror: false
                 });
     
-                screenPublisher.once('accessAllowed', async () => {
-                    try {
-                        await this.state.session.publish(screenPublisher);
-                        
-                        // 화면 공유 퍼블리셔를 상태에 저장
-                        this.setState({
+                newScreenPublisher.once('accessAllowed', async () => {
+                    await session.publish(newScreenPublisher);
+                    console.log('🎉 화면 공유 시작 완료');
+    
+                    // 🔹 화면 공유 스트림 추가 (중복 방지)
+                    this.setState((prevState) => {
+                        const isDuplicate = prevState.screenSubscribers.some(
+                            (sub) => sub.stream.streamId === newScreenPublisher.stream.streamId
+                        );
+    
+                        if (isDuplicate) {
+                            console.warn('⚠️ 이미 등록된 화면 공유 스트림입니다.');
+                            return prevState;
+                        }
+    
+                        return {
                             screenSharing: true,
-                            screenPublisher,
-                            mainStreamManager: screenPublisher
-                        });
+                            screenPublisher: newScreenPublisher,
+                            mainStreamManager: newScreenPublisher,
+                            screenSubscribers: [...prevState.screenSubscribers, newScreenPublisher]
+                        };
+                    });
     
-                        // 화면 공유 종료 이벤트 리스너
-                        screenPublisher.stream.getMediaStream().getVideoTracks()[0].addEventListener('ended', () => {
-                            console.log("화면 공유가 종료되었습니다.");
-                            this.toggleScreenShare();
-                        });
-    
-                    } catch (error) {
-                        console.error("화면 공유 스트림 게시 중 오류 발생:", error);
-                    }
+                    // 🔹 화면 공유 종료 이벤트 리스너
+                    newScreenPublisher.stream.getMediaStream().getVideoTracks()[0].addEventListener('ended', () => {
+                        console.log('🛑 화면 공유 종료 이벤트 감지');
+                        this.toggleScreenShare();
+                    });
                 });
     
-                screenPublisher.once('accessDenied', () => {
-                    console.warn('화면 공유 접근이 거부되었습니다.');
+                newScreenPublisher.once('accessDenied', () => {
+                    console.warn('🚫 화면 공유 접근 거부');
                 });
     
             } catch (error) {
-                console.error("화면 공유 초기화 중 오류 발생:", error);
-                // 오류 발생 시 원래 상태로 복구
-                this.setState({
-                    screenSharing: false,
-                    screenPublisher: null,
-                    mainStreamManager: this.state.publisher
-                });
+                console.error("🚨 화면 공유 초기화 중 오류 발생:", error);
             }
         }
-    }
+    }    
 
     async createSession(sessionId) {
         try {
@@ -344,135 +365,50 @@ class OpenViduPage extends Component {
     }
 
     render() {
-        const mySessionId = this.state.mySessionId;
-        const myUserName = this.state.myUserName;
+        const { mySessionId, myUserName, session, mainStreamManager, subscribers, screenSubscribers } = this.state;
 
         return (
-            <Container>
+            <div className="min-h-screen bg-gray-100 text-gray-800">
                 <Header />
-                
-                {this.state.session === undefined ? (
-                    <div id="join">
-                        <JoinDialog className="jumbotron vertical-center">
-                            <h1> 화상회의 참여하기 </h1>
-                            <form className="form-group" onSubmit={(e) => { e.preventDefault(); this.joinSession(this.state.mySessionId); }}>
-                                <p>
-                                    <label>Participant: </label>
-                                    <input
-                                        className="form-control"
-                                        type="text"
-                                        id="userName"
-                                        value={myUserName}
-                                        onChange={this.handleChangeUserName}
-                                        required
-                                    />
-                                </p>
-                                <p>
-                                    <label> Session: </label>
-                                    <input
-                                        className="form-control"
-                                        type="text"
-                                        id="sessionId"
-                                        value={mySessionId}
-                                        onChange={this.handleChangeSessionId}
-                                        required
-                                    />
-                                </p>
-                                <p className="text-center">
-                                    <Button className="btn btn-lg btn-success" name="commit" type="submit" value="입장하기" />
-                                </p>
-                            </form>
-                            <Button className="btn btn-lg btn-primary" onClick={this.createSession} value="세션 생성" />
-                        </JoinDialog>
-                        <div>
-                            <h2>세션 목록</h2>
-                            <ul>
-                                {this.state.sessions.map((session, index) => (
-                                    <li key={index}>
-                                        {session.customSessionId}
-                                        <Button className="btn btn-sm btn-success" onClick={() => this.joinSession(session.customSessionId)} value="입장하기" />
-                                    </li>
-                                ))}
-                            </ul>
+                <div className="flex flex-col items-center justify-center h-full">
+                    {session === undefined ? (
+                        <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                            <h1 className="text-2xl font-bold mb-4">화상회의 참여하기</h1>
+                            <input className="w-full p-2 mb-2 border border-gray-300 rounded" type="text" value={myUserName} onChange={this.handleChangeUserName} placeholder="이름 입력" />
+                            <input className="w-full p-2 mb-4 border border-gray-300 rounded" type="text" value={mySessionId} onChange={this.handleChangeSessionId} placeholder="세션 ID 입력" />
+                            <button className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2" onClick={() => this.joinSession(mySessionId)}>참여하기</button>
+                            <button className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onClick={this.createSession}>세션 생성</button>
                         </div>
-                    </div>
-                ) : null}
-
-                {this.state.session !== undefined ? (
-                    <div id="session">
-                        <SessionHeader>
-                            <h1 id="session-title">{mySessionId}</h1>
-                            <Button
-                                className="btn btn-large btn-danger"
-                                type="button"
-                                id="buttonLeaveSession"
-                                onClick={this.leaveSession}
-                                value="Leave session"
-                            />
-                            <Button
-                                className="btn btn-large btn-success"
-                                type="button"
-                                id="buttonSwitchCamera"
-                                onClick={this.switchCamera}
-                                value="Switch Camera"
-                                disabled={this.state.screenSharing}
-                            />
-                            <Button
-                                className={`btn btn-large ${this.state.screenSharing ? "btn-danger" : "btn-primary"}`}
-                                type="button"
-                                id="buttonToggleScreenShare"
-                                onClick={() => this.toggleScreenShare()}
-                                value={this.state.screenSharing ? "Stop Sharing" : "Start Sharing"}
-                            />
-                        </SessionHeader>
-
-                        <div id="video-container" className="col-md-6">
-                            {/* 메인 비디오 스트림 */}
-                            {this.state.mainStreamManager && (
-                                <MainVideo>
-                                    <UserVideoComponent streamManager={this.state.mainStreamManager} />
-                                </MainVideo>
-                            )}
-                            
-                            <div className="streams-container">
-                                {/* 카메라 스트림 표시 */}
-                                {this.state.publisher && !this.state.screenSharing && (
-                                    <StreamContainer 
-                                        className="col-md-6 col-xs-6" 
-                                        onClick={() => this.handleMainVideoStream(this.state.publisher)}
-                                    >
-                                        <UserVideoComponent streamManager={this.state.publisher} />
-                                    </StreamContainer>
+                    ) : (
+                        <div className="w-full p-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <h1 className="text-3xl font-bold">세션: {mySessionId}</h1>
+                                <div>
+                                    <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-2" onClick={this.leaveSession}>나가기</button>
+                                    <button className={`py-2 px-4 font-bold rounded ${this.state.screenSharing ? 'bg-red-500 hover:bg-red-700' : 'bg-blue-500 hover:bg-blue-700'} text-white`} onClick={this.toggleScreenShare}>{this.state.screenSharing ? '화면 공유 중지' : '화면 공유 시작'}</button>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-4">
+                                {mainStreamManager && (
+                                    <div className="col-span-3">
+                                        <UserVideoComponent streamManager={mainStreamManager} />
+                                    </div>
                                 )}
-
-                                {/* 일반 참가자 스트림 표시 */}
-                                {this.state.regularSubscribers.map((sub, i) => (
-                                    <StreamContainer 
-                                        key={sub.stream.streamId} 
-                                        className="col-md-6 col-xs-6" 
-                                        onClick={() => this.handleMainVideoStream(sub)}
-                                    >
-                                        <StreamContainerText>{sub.stream.connection.connectionId}</StreamContainerText>
+                                {subscribers.map((sub, i) => (
+                                    <div key={i} className="border border-gray-300 rounded overflow-hidden">
                                         <UserVideoComponent streamManager={sub} />
-                                    </StreamContainer>
+                                    </div>
                                 ))}
-
-                                {/* 화면 공유 스트림 표시 */}
-                                {this.state.screenSubscribers.map((sub, i) => (
-                                    <StreamContainer 
-                                        key={sub.stream.streamId} 
-                                        className="col-md-12" // 화면 공유는 더 넓게 표시
-                                        onClick={() => this.handleMainVideoStream(sub)}
-                                    >
-                                        <StreamContainerText>Screen Share</StreamContainerText>
+                                {screenSubscribers.map((sub, i) => (
+                                    <div key={i} className="border border-green-300 rounded overflow-hidden">
                                         <UserVideoComponent streamManager={sub} />
-                                    </StreamContainer>
+                                    </div>
                                 ))}
                             </div>
                         </div>
-                    </div>
-                ) : null}
-            </Container>
+                    )}
+                </div>
+            </div>
         );
     }
 }
