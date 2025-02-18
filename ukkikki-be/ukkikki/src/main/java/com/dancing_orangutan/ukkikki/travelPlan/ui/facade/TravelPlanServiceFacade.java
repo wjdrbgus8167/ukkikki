@@ -5,6 +5,7 @@ import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.CreateTrav
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.JoinTravelPlanRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.UpdateCloseTimeRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.UpdateCompanionCountRequest;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.UpdatePlanningStatusRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.WriteCommentRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.CreateTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchAvailableTravelPlansResponse;
@@ -52,4 +53,6 @@ public interface TravelPlanServiceFacade {
 	void exitTravelPlan(Integer travelPlanId, Integer memberId);
 
 	SearchMyTravelPlanResponse searchMyTravelPlans(PlanningStatus status, Integer memberId);
+
+	void updatePlanningStatus(UpdatePlanningStatusRequest status, Integer travelPlanId);
 }

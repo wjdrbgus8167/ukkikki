@@ -135,6 +135,15 @@ public class TravelPlanController {
 		return ApiUtils.success("여행계획이 성공적으로 퇴장되었습니다.");
 	}
 
+	@PutMapping("/{travelPlanId}")
+	public ApiUtils.ApiResponse<String> updatePlanningStatus(
+			@RequestBody UpdatePlanningStatusRequest request,
+			@PathVariable(name = "travelPlanId") Integer travelPlanId) {
+		travelPlanServiceFacade.updatePlanningStatus(request,travelPlanId);
+		return ApiUtils.success("여행 계획 상태가 성공적으로 변경되었습니다.");
+	}
+
+
 	@GetMapping("/my-search")
 	public ApiUtils.ApiResponse<SearchMyTravelPlanResponse> searchMyTravelPlans(
 			@RequestParam(value = "status", required = false) PlanningStatus status,
