@@ -16,58 +16,31 @@ import {
 const APPLICATION_SERVER_URL = 'https://i12c204.p.ssafy.io:9443/api/v1';
 
 class OpenViduPage extends Component {
-  constructor(props) {
-    super(props);
+    constructor(props) {
+        super(props);
 
-    this.state = {
-      mySessionId: 'SessionA',
-      myUserName: 'Participant' + Math.floor(Math.random() * 100),
-      session: undefined,
-      mainStreamManager: undefined,
-      publisher: undefined,
-      subscribers: [],
-    };
+        this.state = {
+            mySessionId: 'SessionA',
+            myUserName: 'Participant' + Math.floor(Math.random() * 100),
+            session: undefined,
+            mainStreamManager: undefined,
+            publisher: undefined,
+            subscribers: [],
+            sessions: [], // 세션 목록을 저장할 상태 추가
+            screenSharing: false,
+            screenPublisher: null,
+        };
 
-    this.joinSession = this.joinSession.bind(this);
-    this.leaveSession = this.leaveSession.bind(this);
-    this.switchCamera = this.switchCamera.bind(this);
-    this.handleChangeSessionId = this.handleChangeSessionId.bind(this);
-    this.handleChangeUserName = this.handleChangeUserName.bind(this);
-    this.handleMainVideoStream = this.handleMainVideoStream.bind(this);
-    this.onbeforeunload = this.onbeforeunload.bind(this);
-  }
-
-  componentDidMount() {
-    window.addEventListener('beforeunload', this.onbeforeunload);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('beforeunload', this.onbeforeunload);
-  }
-
-  onbeforeunload(event) {
-    this.leaveSession();
-  }
-
-  handleChangeSessionId(e) {
-    this.setState({
-      mySessionId: e.target.value,
-    });
-  }
-
-  handleChangeUserName(e) {
-    this.setState({
-      myUserName: e.target.value,
-    });
-  }
-
-  handleMainVideoStream(stream) {
-    if (this.state.mainStreamManager !== stream) {
-      this.setState({
-        mainStreamManager: stream,
-      });
+        this.createSession = this.createSession.bind(this);
+        this.joinSession = this.joinSession.bind(this);
+        this.leaveSession = this.leaveSession.bind(this);
+        this.switchCamera = this.switchCamera.bind(this);
+        this.toggleScreenShare = this.toggleScreenShare.bind(this);
+        this.handleChangeSessionId = this.handleChangeSessionId.bind(this);
+        this.handleChangeUserName = this.handleChangeUserName.bind(this);
+        this.handleMainVideoStream = this.handleMainVideoStream.bind(this);
+        this.onbeforeunload = this.onbeforeunload.bind(this);
     }
-  }
 
     async createSession() {
         const sessionId = 'Session' + Math.floor(Math.random() * 1000);
@@ -83,99 +56,45 @@ class OpenViduPage extends Component {
     componentDidMount() {
         window.addEventListener('beforeunload', this.onbeforeunload);
     }
-  }
 
-  joinSession() {
-    this.OV = new OpenVidu();
-    this.setState(
-      {
-        session: this.OV.initSession(),
-      },
-      () => {
-        var mySession = this.state.session;
-
-        mySession.on('streamCreated', (event) => {
-          var subscriber = mySession.subscribe(event.stream, undefined);
-          var subscribers = this.state.subscribers;
-          subscribers.push(subscriber);
-
-          this.setState({
-            subscribers: subscribers,
-          });
-        });
-
-        mySession.on('streamDestroyed', (event) => {
-          this.deleteSubscriber(event.stream.streamManager);
-        });
-
-        mySession.on('exception', (exception) => {
-          console.warn(exception);
-        });
-
-        this.getToken().then((token) => {
-          mySession
-            .connect(token, { clientData: this.state.myUserName })
-            .then(async () => {
-              let publisher = await this.OV.initPublisherAsync(undefined, {
-                audioSource: undefined,
-                videoSource: undefined,
-                publishAudio: true,
-                publishVideo: true,
-                resolution: '640x480',
-                frameRate: 30,
-                insertMode: 'APPEND',
-                mirror: false,
-              });
-
-              mySession.publish(publisher);
-
-              var devices = await this.OV.getDevices();
-              var videoDevices = devices.filter(
-                (device) => device.kind === 'videoinput',
-              );
-              var currentVideoDeviceId = publisher.stream
-                .getMediaStream()
-                .getVideoTracks()[0]
-                .getSettings().deviceId;
-              var currentVideoDevice = videoDevices.find(
-                (device) => device.deviceId === currentVideoDeviceId,
-              );
-
-              this.setState({
-                currentVideoDevice: currentVideoDevice,
-                mainStreamManager: publisher,
-                publisher: publisher,
-              });
-            })
-            .catch((error) => {
-              console.log(
-                'There was an error connecting to the session:',
-                error.code,
-                error.message,
-              );
-            });
-        });
-      },
-    );
-  }
-
-  leaveSession() {
-    const mySession = this.state.session;
-
-    if (mySession) {
-      mySession.disconnect();
+    componentWillUnmount() {
+        window.removeEventListener('beforeunload', this.onbeforeunload);
     }
 
-    this.OV = null;
-    this.setState({
-      session: undefined,
-      subscribers: [],
-      mySessionId: 'SessionA',
-      myUserName: 'Participant' + Math.floor(Math.random() * 100),
-      mainStreamManager: undefined,
-      publisher: undefined,
-    });
-  }
+    onbeforeunload(event) {
+        this.leaveSession();
+    }
+
+    handleChangeSessionId(e) {
+        this.setState({
+            mySessionId: e.target.value,
+        });
+    }
+
+    handleChangeUserName(e) {
+        this.setState({
+            myUserName: e.target.value,
+        });
+    }
+
+    handleMainVideoStream(stream) {
+        if (this.state.mainStreamManager !== stream) {
+            this.setState({
+                mainStreamManager: stream
+            });
+        }
+    }
+
+    deleteSubscriber(streamManager) {
+        let subscribers = this.state.subscribers;
+        let index = subscribers.indexOf(streamManager, 0);
+        if (index > -1) {
+            subscribers.splice(index, 1);
+            this.setState({
+                subscribers: subscribers,
+            });
+        }
+    }
 
     joinSession(sessionId) {
         this.setState({
@@ -259,79 +178,54 @@ class OpenViduPage extends Component {
         });
     }
 
-        if (newVideoDevice.length > 0) {
-          var newPublisher = this.OV.initPublisher(undefined, {
-            videoSource: newVideoDevice[0].deviceId,
-            publishAudio: true,
-            publishVideo: true,
-            mirror: true,
-          });
+    leaveSession() {
+        const mySession = this.state.session;
 
-          await this.state.session.unpublish(this.state.mainStreamManager);
-          await this.state.session.publish(newPublisher);
-          this.setState({
-            currentVideoDevice: newVideoDevice[0],
-            mainStreamManager: newPublisher,
-            publisher: newPublisher,
-          });
+        if (mySession) {
+            mySession.disconnect();
         }
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
 
-  async getToken() {
-    const sessionId = await this.createSession(this.state.mySessionId);
-    return await this.createToken(sessionId);
-  }
-
-  async createSession(sessionId) {
-    const response = await axios.post(
-      APPLICATION_SERVER_URL + '/sessions',
-      { customSessionId: sessionId },
-      {
-        headers: { 'Content-Type': 'application/json' },
-      },
-    );
-    return response.data;
-  }
-
-  async createToken(sessionId) {
-    const response = await axios.post(
-      APPLICATION_SERVER_URL + '/sessions/' + sessionId + '/connections',
-      {},
-      {
-        headers: { 'Content-Type': 'application/json' },
-      },
-    );
-    return response.data;
-  }
-
-  render() {
-    const mySessionId = this.state.mySessionId;
-    const myUserName = this.state.myUserName;
-
-    async getToken() {
-        const sessionId = await this.createSession(this.state.mySessionId);
-        return await this.createToken(sessionId);
-    }
-
-    async createSession(sessionId) {
-        const response = await axios.post(APPLICATION_SERVER_URL + '/sessions', { customSessionId: sessionId }, {
-            headers: { 'Content-Type': 'application/json', },
+        this.OV = null;
+        this.setState({
+            session: undefined,
+            subscribers: [],
+            mySessionId: 'SessionA',
+            myUserName: 'Participant' + Math.floor(Math.random() * 100),
+            mainStreamManager: undefined,
+            publisher: undefined
         });
-        return response.data;
     }
 
-    async createToken(sessionId) {
-        const response = await axios.post(APPLICATION_SERVER_URL + '/sessions/' + sessionId + '/connections', {}, {
-            headers: { 'Content-Type': 'application/json', },
-        });
-        return response.data;
+    async switchCamera() {
+        try {
+            const devices = await this.OV.getDevices()
+            var videoDevices = devices.filter(device => device.kind === 'videoinput');
+
+            if (videoDevices && videoDevices.length > 1) {
+                var newVideoDevice = videoDevices.filter(device => device.deviceId !== this.state.currentVideoDevice.deviceId)
+
+                if (newVideoDevice.length > 0) {
+                    var newPublisher = this.OV.initPublisher(undefined, {
+                        videoSource: newVideoDevice[0].deviceId,
+                        publishAudio: true,
+                        publishVideo: true,
+                        mirror: true
+                    });
+
+                    await this.state.session.unpublish(this.state.mainStreamManager)
+                    await this.state.session.publish(newPublisher)
+                    this.setState({
+                        currentVideoDevice: newVideoDevice[0],
+                        mainStreamManager: newPublisher,
+                        publisher: newPublisher,
+                    });
+                }
+            }
+        } catch (e) {
+            console.error(e);
+        }
     }
 
-    // 화면 공유 토글 함수
     async toggleScreenShare() {
         if (this.state.screenSharing) {
             // 화면 공유 중이면 중단
@@ -364,6 +258,18 @@ class OpenViduPage extends Component {
                 console.error("화면 공유 중 오류 발생:", error);
             }
         }
+    }
+
+    async getToken() {
+        const sessionId = await this.createSession(this.state.mySessionId);
+        return await this.createToken(sessionId);
+    }
+
+    async createToken(sessionId) {
+        const response = await axios.post(APPLICATION_SERVER_URL + '/sessions/' + sessionId + '/connections', {}, {
+            headers: { 'Content-Type': 'application/json', },
+        });
+        return response.data;
     }
 
     render() {

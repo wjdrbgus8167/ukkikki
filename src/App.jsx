@@ -64,7 +64,7 @@ const App = () => {
           path="/agency-proposal-detail/:proposalId"
           element={<AgencyProposalDetailPage />}
         />
-        <Route path="/openvidu" element={<OpenViduPage />} />
+        <Route path="/meeting" element={<OpenViduPage />} />
         <Route
           path="/proposal-detail/:travelPlanId/:proposalId"
           element={<ProposalDetailForUser />}
