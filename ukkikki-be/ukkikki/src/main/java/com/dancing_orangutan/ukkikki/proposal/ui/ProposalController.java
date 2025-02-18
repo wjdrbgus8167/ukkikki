@@ -10,6 +10,7 @@ import com.dancing_orangutan.ukkikki.proposal.domain.schedule.Schedule;
 import com.dancing_orangutan.ukkikki.proposal.domain.traveler.Traveler;
 import com.dancing_orangutan.ukkikki.proposal.ui.request.*;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.*;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -236,6 +237,16 @@ public class ProposalController {
             @PathVariable Integer travelPlanId
     ){
         VoteSurveyStatusResponse response = proposalService.getVoteSurveyStatus(travelPlanId);
+
+        return ApiUtils.success(response);
+    }
+
+    //방 총인원
+    @GetMapping("/total-count")
+    public ApiUtils.ApiResponse<TravelPlanCountResponse> getTravelPlanCount(
+            @PathVariable Integer travelPlanId)
+    {
+        TravelPlanCountResponse response = proposalService.getTravelPlanCount(travelPlanId);
 
         return ApiUtils.success(response);
     }
