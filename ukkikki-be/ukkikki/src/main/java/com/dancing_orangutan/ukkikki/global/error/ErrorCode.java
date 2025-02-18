@@ -90,7 +90,10 @@ public enum ErrorCode {
 	DEPARTURE_CITY_REQUIRED(HttpStatus.BAD_REQUEST, "V035", "출발 도시는 필수입니다."),
 	KEYWORDS_REQUIRED(HttpStatus.BAD_REQUEST, "V036", "키워드는 최소 1개 이상 필요합니다."),
 	PARTICIPANT_COUNT_NEGATIVE(HttpStatus.BAD_REQUEST, "V037", "성인, 유아, 어린이 인원 수는 음수가 될 수 없습니다."),
-	PARTICIPANT_COUNT_ZERO(HttpStatus.BAD_REQUEST, "V038", "성인, 유아, 어린이 인원 수의 합은 0이 될 수 없습니다.");
+	PARTICIPANT_COUNT_ZERO(HttpStatus.BAD_REQUEST, "V038", "성인, 유아, 어린이 인원 수의 합은 0이 될 수 없습니다."),
+
+	//TRAVELER
+	TRAVELER_PASSPORT_DUPLICATION(HttpStatus.BAD_REQUEST, "P001", "중복된 여권 정보가는 등록할 수 없습니다.");
 
 
     private final HttpStatus status;
