@@ -128,6 +128,7 @@ const WebSocketComponent = ({ travelPlanId, setFavorites, favorites, fetchRoomDa
           console.log('✅ WebSocketComponent 퇴장 이벤트:', wsData);
         stompClient.deactivate();
         console.log('🛑 STOMP WebSocket 종료');
+        }
       }
     };
   }, [travelPlanId, fetchRoomData, handleUpdate]);
