@@ -155,6 +155,10 @@ const CardList = ({ cards }) => {
                 </div>
               </div>
 
+              {/* 여행 도시 */}
+              <p className="text-black">
+                <strong>여행지:</strong> {card.arrivalCity.name}
+              </p>
               {/* 여행 날짜 */}
               <p className="text-black">
                 <strong>여행 날짜:</strong> {card.startDate} ~ {card.endDate}

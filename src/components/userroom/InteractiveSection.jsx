@@ -156,11 +156,11 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
               prev.map((marker) =>
                 marker.placeId === placeId
                   ? {
-                      ...marker,
-                      tags: marker.tags.filter(
-                        (tag) => tag.placeTagId !== tagId
-                      ),
-                    }
+                    ...marker,
+                    tags: marker.tags.filter(
+                      (tag) => tag.placeTagId !== tagId
+                    ),
+                  }
                   : marker
               )
             );
@@ -188,12 +188,14 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
           name: newTag.trim(),
           isMyTag: true,
         };
-        // 선택된 마커의 태그 업데이트
+
+        // ✅ 선택된 마커의 태그 업데이트
         setSelectedMarker((prev) => ({
           ...prev,
           tags: [...(prev.tags || []), newTagObj],
         }));
-        // favorites 배열 내 해당 마커의 태그 업데이트
+
+        // ✅ favorites 배열 내 해당 마커의 태그 업데이트
         setFavorites((prev) =>
           prev.map((marker) =>
             marker.placeId === selectedMarker.placeId
@@ -201,6 +203,21 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
               : marker
           )
         );
+
+        // ✅ WebSocket을 통해 태그 추가 이벤트 전송
+        if (stompClient && stompClient.connected) {
+          const wsData = {
+            action: 'ADD_TAG', // ✅ Action Enum 값 전송
+            placeName: selectedMarker.name,
+            travelPlanId: selectedCard.travelPlanId,
+          };
+          stompClient.publish({
+            destination: '/pub/actions',
+            body: JSON.stringify(wsData),
+          });
+          console.log('✅ InteractiveSection 태그 추가 이벤트:', wsData);
+        }
+
         setNewTag('');
         setShowTagInput(false);
       }
@@ -209,6 +226,17 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
       Swal.fire('알림', '태그 추가에 실패했습니다.', 'error');
     }
   };
+
+  useEffect(() => {
+    if (selectedMarker) {
+      const updatedMarker = favorites.find((marker) => marker.placeId === selectedMarker.placeId);
+      if (updatedMarker) {
+        setSelectedMarker(updatedMarker);
+      }
+    }
+  }, [favorites]);
+
+
 
   return (
     <div className="relative w-full h-screen">

@@ -1,7 +1,10 @@
+// ProposalButton.jsx
 import React, { useState } from 'react';
 import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
+import { stompClient } from '../../components/userroom/WebSocketComponent';
+import CloseTimeModal from './CloseTimeModal';
 
 const getMinDateTime = () => {
   const now = new Date();
@@ -17,13 +20,13 @@ const ProposalButton = ({
 }) => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showDateInput, setShowDateInput] = useState(false);
+  const [showCloseTimeModal, setShowCloseTimeModal] = useState(false);
   const [closeTime, setCloseTime] = useState('');
 
   // 버튼 활성화 여부: 인원이 충분하고 closeTime이 아직 설정되지 않은 경우
   const isEnabled = currentParticipants >= minPeople && !selectedCard.closeTime;
 
-  // 마감일시 입력창 띄우기
+  // 방장 여부에 따라 버튼 다르게 표시
   const handleButtonClick = () => {
     if (!isEnabled) {
       Swal.fire({
@@ -34,25 +37,13 @@ const ProposalButton = ({
       });
       return;
     }
-    setShowDateInput(true);
+    // 방장인 경우 마감일자 설정 모달 오픈
+    setShowCloseTimeModal(true);
   };
 
-  const handleDateTimeChange = (e) => {
-    setCloseTime(e.target.value);
-  };
-
-  // 마감일시 설정 API 호출
-  const handleSubmitCloseTime = async () => {
-    if (!closeTime) {
-      Swal.fire({
-        title: '⚠️ 입력 필요!',
-        text: '날짜와 시간을 입력해주세요.',
-        icon: 'warning',
-        confirmButtonText: '확인',
-      });
-      return;
-    }
-    const parsedDate = new Date(closeTime);
+  // 마감일자 설정 API 호출 (CloseTimeModal의 onSubmit 콜백)
+  const handleSubmitCloseTime = async (inputCloseTime) => {
+    const parsedDate = new Date(inputCloseTime);
     if (isNaN(parsedDate.getTime())) {
       Swal.fire({
         title: '❌ 잘못된 입력!',
@@ -74,8 +65,9 @@ const ProposalButton = ({
       return;
     }
     setIsSubmitting(true);
+    // formattedCloseTime: 만약 길이가 16이면 초를 붙임.
     const formattedCloseTime =
-      closeTime.length === 16 ? `${closeTime}:00` : closeTime;
+      inputCloseTime.length === 16 ? `${inputCloseTime}:00` : inputCloseTime;
     try {
       const response = await publicRequest.put(
         `/api/v1/travel-plans/${travelPlanId}/closeTime`,
@@ -89,12 +81,11 @@ const ProposalButton = ({
           icon: 'success',
           confirmButtonText: '확인',
         });
-        setShowDateInput(false);
+        setShowCloseTimeModal(false);
       }
-
       if (stompClient && stompClient.connected) {
         const wsData = {
-          action: "CLOSE_TIME_UPDATED",
+          action: 'CLOSE_TIME_UPDATED',
           travelPlanId,
         };
         stompClient.publish({
@@ -103,8 +94,6 @@ const ProposalButton = ({
         });
         console.log('✅ 마감 일시 설정 이벤트:', wsData);
       }
-
-
     } catch (error) {
       if (error.response?.data?.error?.code === 'TP003') {
         Swal.fire('알림', '방장만 마감일시를 설정할 수 있어요', 'error');
@@ -122,32 +111,56 @@ const ProposalButton = ({
     }
   };
 
-  // 동적 버튼 렌더링 함수
+  // 동적 버튼 렌더링 함수 (마감일시가 설정된 경우)
   const renderDynamicButton = () => {
     const now = new Date();
     const deadline = new Date(selectedCard.closeTime);
     const deadlinePlus7 = new Date(deadline.getTime() + 7 * 24 * 3600 * 1000);
 
+    // 24시간을 밀리초 단위로 계산
+    const oneDayMs = 1000 * 3600 * 24;
+
     if (now < deadline) {
-      // 마감 전: 제출 기한 안내 버튼
-      const diffDays = Math.ceil((deadline - now) / (1000 * 3600 * 24));
-      return (
-        <button disabled className="px-4 py-2 text-white bg-gray-400 rounded">
-          여행사에 제출하기까지 {diffDays}일 남았습니다.
-        </button>
-      );
+      const remainingMs = deadline - now;
+      if (remainingMs <= oneDayMs) {
+        // 남은 시간이 1일 이하인 경우: 시간과 분 단위로 표시
+        const totalMinutes = Math.ceil(remainingMs / (1000 * 60));
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        return (
+          <button disabled className="px-4 py-2 text-white bg-gray-400 rounded">
+            여행사에 제출하기까지 {hours}시간 {minutes}분 남았습니다.
+          </button>
+        );
+      } else {
+        const diffDays = Math.ceil(remainingMs / oneDayMs);
+        return (
+          <button disabled className="px-4 py-2 text-white bg-gray-400 rounded">
+            여행사에 제출하기까지 {diffDays}일 남았습니다.
+          </button>
+        );
+      }
     } else if (now < deadlinePlus7) {
-      // 마감 후 7일 이내: 제안 대기 안내 버튼
-      const diffDays = Math.ceil((deadlinePlus7 - now) / (1000 * 3600 * 24));
-      return (
-        <button disabled className="px-4 py-2 text-white bg-gray-400 rounded">
-          여행사 제안을 받기까지 {diffDays}일 남았습니다.
-        </button>
-      );
+      const remainingMs = deadlinePlus7 - now;
+      if (remainingMs <= oneDayMs) {
+        const totalMinutes = Math.ceil(remainingMs / (1000 * 60));
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        return (
+          <button disabled className="px-4 py-2 text-white bg-gray-400 rounded">
+            여행사 제안을 받기까지 {hours}시간 {minutes}분 남았습니다.
+          </button>
+        );
+      } else {
+        const diffDays = Math.ceil(remainingMs / oneDayMs);
+        return (
+          <button disabled className="px-4 py-2 text-white bg-gray-400 rounded">
+            여행사 제안을 받기까지 {diffDays}일 남았습니다.
+          </button>
+        );
+      }
     } else {
-      // 마감 후 7일 경과한 경우
       if (selectedCard.voteSurveyInfo?.canVote) {
-        // 투표 시작 정보가 이미 있는 경우 투표 페이지로 바로 이동
         return (
           <button
             onClick={() =>
@@ -161,7 +174,6 @@ const ProposalButton = ({
           </button>
         );
       } else {
-        // 투표 시작 정보가 없는 경우(방장이 아닌 경우)
         return (
           <button
             disabled
@@ -178,39 +190,35 @@ const ProposalButton = ({
   return (
     <div className="relative p-4 text-center bg-yellow-100 rounded-lg md:w-1/3">
       {!selectedCard.closeTime ? (
-        <button
-          className={`px-4 py-2 text-white rounded-md ${isEnabled
-              ? 'bg-[#FF3951] hover:bg-[#e23047]'
-              : 'bg-gray-400 cursor-not-allowed'
+        // 방장인 경우에만 '여행사에 제안하기' 버튼 표시, 그렇지 않으면 대기 메시지 표시
+        selectedCard.member?.isHost ? (
+          <button
+            className={`px-4 py-2 text-white rounded-md ${
+              isEnabled
+                ? 'bg-[#FF3951] hover:bg-[#e23047]'
+                : 'bg-gray-400 cursor-not-allowed'
             }`}
-          onClick={handleButtonClick}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? '설정 중...' : '여행사에 제안하기'}
-        </button>
+            onClick={handleButtonClick}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? '설정 중...' : '여행사에 제안하기'}
+          </button>
+        ) : (
+          <div className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md">
+            방장의 제출하기를 기다리는 중
+          </div>
+        )
       ) : (
         renderDynamicButton()
       )}
-      {showDateInput && !selectedCard.closeTime && (
-        <div
-          className="absolute flex flex-col items-center p-4 transform -translate-x-1/2 bg-white rounded-lg shadow-lg left-1/2 -top-20"
-          style={{ zIndex: 1000 }}
-        >
-          <input
-            type="datetime-local"
-            value={closeTime}
-            onChange={handleDateTimeChange}
-            min={getMinDateTime()}
-            className="p-2 border rounded-md"
-          />
-          <button
-            onClick={handleSubmitCloseTime}
-            className="px-4 py-2 mt-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
-            disabled={isSubmitting}
-          >
-            설정
-          </button>
-        </div>
+      {showCloseTimeModal && !selectedCard.closeTime && (
+        <CloseTimeModal
+          initialCloseTime={closeTime}
+          minDateTime={getMinDateTime()}
+          onSubmit={handleSubmitCloseTime}
+          onClose={() => setShowCloseTimeModal(false)}
+          isSubmitting={isSubmitting}
+        />
       )}
     </div>
   );
