@@ -250,27 +250,30 @@ class OpenViduPage extends Component {
 
     async toggleScreenShare() {
         if (this.state.screenSharing) {
-            // 화면 공유 중단
+            // 화면 공유 중지
             try {
-                await this.state.session.unpublish(this.state.screenPublisher);
-                this.setState({
+                this.state.session.unpublish(this.state.screenPublisher);
+                this.setState((prevState) => ({
                     screenSharing: false,
                     screenPublisher: null,
-                });
+                    // screenSubscribers 배열에서 현재 화면 공유 스트림 제거
+                    screenSubscribers: prevState.screenSubscribers.filter(
+                        (sub) => sub.stream.streamId !== prevState.screenPublisher?.stream?.streamId
+                    )
+                }));
             } catch (error) {
                 console.error("화면 공유 중단 중 오류 발생:", error);
             }
         } else {
+            // 화면 공유 시작
             try {
-                // 새로운 OpenVidu 인스턴스 생성 (독립적 화면 공유 스트림 생성)
-                const screenOV = new OpenVidu();
-                const screenSession = screenOV.initSession();
+                // 이미 화면 공유 중이면 중복 방지
+                if (this.state.screenSharing || this.state.screenPublisher) {
+                    console.log("이미 화면 공유 중입니다.");
+                    return;
+                }
     
-                // 동일한 세션에 다시 연결
-                const token = await this.getToken();
-                await screenSession.connect(token, { clientData: this.state.myUserName + "_screen" });
-    
-                const screenPublisher = await screenOV.initPublisherAsync(undefined, {
+                const screenPublisher = await this.OV.initPublisherAsync(undefined, {
                     videoSource: "screen",
                     publishAudio: false,
                     publishVideo: true,
@@ -281,14 +284,26 @@ class OpenViduPage extends Component {
                 });
     
                 screenPublisher.once('accessAllowed', async () => {
-                    await screenSession.publish(screenPublisher);
+                    await this.state.session.publish(screenPublisher);
     
-                    this.setState({
-                        screenSharing: true,
-                        screenPublisher,
-                        screenSubscribers: [...this.state.screenSubscribers, screenPublisher]
+                    this.setState((prevState) => {
+                        const isDuplicate = prevState.screenSubscribers.some(
+                            (sub) => sub.stream.streamId === screenPublisher.stream.streamId
+                        );
+    
+                        if (isDuplicate) {
+                            console.log("이미 등록된 화면 공유 스트림입니다.");
+                            return prevState;
+                        }
+    
+                        return {
+                            screenSharing: true,
+                            screenPublisher,
+                            screenSubscribers: [...prevState.screenSubscribers, screenPublisher]
+                        };
                     });
     
+                    // 화면 공유 종료 이벤트 리스너
                     screenPublisher.stream.getMediaStream().getVideoTracks()[0].addEventListener('ended', () => {
                         this.toggleScreenShare();
                     });
