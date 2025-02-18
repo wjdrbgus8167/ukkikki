@@ -249,31 +249,43 @@ class OpenViduPage extends Component {
     }
 
     async toggleScreenShare() {
-        if (this.state.screenSharing) {
-            // 화면 공유 중지
+        const { session, publisher, screenSharing, screenPublisher } = this.state;
+    
+        if (screenSharing) {
+            // 🔹 화면 공유 중단
             try {
-                this.state.session.unpublish(this.state.screenPublisher);
-                this.setState((prevState) => ({
-                    screenSharing: false,
-                    screenPublisher: null,
-                    // screenSubscribers 배열에서 현재 화면 공유 스트림 제거
-                    screenSubscribers: prevState.screenSubscribers.filter(
-                        (sub) => sub.stream.streamId !== prevState.screenPublisher?.stream?.streamId
-                    )
-                }));
+                if (screenPublisher) {
+                    session.unpublish(screenPublisher);
+                    console.log('✅ 화면 공유 중단 완료');
+    
+                    // 🔹 기존 카메라 스트림 다시 게시
+                    session.publish(publisher);
+                    console.log('🔄 카메라 스트림 재게시');
+    
+                    this.setState({
+                        screenSharing: false,
+                        screenPublisher: null,
+                        mainStreamManager: publisher,
+                        screenSubscribers: []
+                    });
+                }
             } catch (error) {
-                console.error("화면 공유 중단 중 오류 발생:", error);
+                console.error("🛑 화면 공유 중단 중 오류 발생:", error);
             }
         } else {
-            // 화면 공유 시작
+            // 🔹 화면 공유 시작
             try {
-                // 이미 화면 공유 중이면 중복 방지
-                if (this.state.screenSharing || this.state.screenPublisher) {
-                    console.log("이미 화면 공유 중입니다.");
+                // 🔍 이미 화면 공유 중이면 중단
+                if (screenSharing || screenPublisher) {
+                    console.warn('⚠️ 이미 화면 공유 중입니다.');
                     return;
                 }
     
-                const screenPublisher = await this.OV.initPublisherAsync(undefined, {
+                // 🔹 카메라 스트림 언퍼블리시 (OpenVidu는 하나의 stream만 게시 가능)
+                session.unpublish(publisher);
+                console.log('⛔️ 카메라 스트림 언퍼블리시');
+    
+                const newScreenPublisher = await this.OV.initPublisherAsync(undefined, {
                     videoSource: "screen",
                     publishAudio: false,
                     publishVideo: true,
@@ -283,38 +295,42 @@ class OpenViduPage extends Component {
                     mirror: false
                 });
     
-                screenPublisher.once('accessAllowed', async () => {
-                    await this.state.session.publish(screenPublisher);
+                newScreenPublisher.once('accessAllowed', async () => {
+                    await session.publish(newScreenPublisher);
+                    console.log('🎉 화면 공유 시작 완료');
     
+                    // 🔹 화면 공유 스트림 추가 (중복 방지)
                     this.setState((prevState) => {
                         const isDuplicate = prevState.screenSubscribers.some(
-                            (sub) => sub.stream.streamId === screenPublisher.stream.streamId
+                            (sub) => sub.stream.streamId === newScreenPublisher.stream.streamId
                         );
     
                         if (isDuplicate) {
-                            console.log("이미 등록된 화면 공유 스트림입니다.");
+                            console.warn('⚠️ 이미 등록된 화면 공유 스트림입니다.');
                             return prevState;
                         }
     
                         return {
                             screenSharing: true,
-                            screenPublisher,
-                            screenSubscribers: [...prevState.screenSubscribers, screenPublisher]
+                            screenPublisher: newScreenPublisher,
+                            mainStreamManager: newScreenPublisher,
+                            screenSubscribers: [...prevState.screenSubscribers, newScreenPublisher]
                         };
                     });
     
-                    // 화면 공유 종료 이벤트 리스너
-                    screenPublisher.stream.getMediaStream().getVideoTracks()[0].addEventListener('ended', () => {
+                    // 🔹 화면 공유 종료 이벤트 리스너
+                    newScreenPublisher.stream.getMediaStream().getVideoTracks()[0].addEventListener('ended', () => {
+                        console.log('🛑 화면 공유 종료 이벤트 감지');
                         this.toggleScreenShare();
                     });
                 });
     
-                screenPublisher.once('accessDenied', () => {
-                    console.warn('화면 공유 접근이 거부되었습니다.');
+                newScreenPublisher.once('accessDenied', () => {
+                    console.warn('🚫 화면 공유 접근 거부');
                 });
     
             } catch (error) {
-                console.error("화면 공유 초기화 중 오류 발생:", error);
+                console.error("🚨 화면 공유 초기화 중 오류 발생:", error);
             }
         }
     }    
