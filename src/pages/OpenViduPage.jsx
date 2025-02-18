@@ -219,7 +219,12 @@ class OpenViduPage extends Component {
         if (this.state.screenSharing) {
             // 화면 공유 중이면 중단
             this.state.session.unpublish(this.state.screenPublisher);
-            this.setState({ screenSharing: false, screenPublisher: null });
+            const updatedSubscribers = this.state.subscribers.filter(sub => sub !== this.state.screenPublisher);
+            this.setState({ 
+                screenSharing: false, 
+                screenPublisher: null, 
+                subscribers: updatedSubscribers 
+            });
         } else {
             try {
                 // 새로운 화면 공유 퍼블리셔 생성
@@ -232,10 +237,13 @@ class OpenViduPage extends Component {
 
                 // 화면 공유 퍼블리셔를 세션에 퍼블리시
                 await this.state.session.publish(screenPublisher);
+                
+                // 화면 공유 퍼블리셔를 subscribers 리스트에 추가
                 this.setState({
                     screenSharing: true,
                     screenPublisher,
-                    mainStreamManager: screenPublisher
+                    mainStreamManager: screenPublisher,
+                    subscribers: [...this.state.subscribers, screenPublisher],
                 });
 
                 // 화면 공유 스트림이 중단되면 기본 카메라로 전환
