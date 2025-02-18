@@ -5,16 +5,20 @@ import Header from '../components/layout/Header';
 import AgencyList from '../components/vote/AgencyList';
 import { publicRequest } from '../hooks/requestMethod';
 import Swal from 'sweetalert2';
+import ReservationDepositModal from '../components/vote/ReservationDepositModal';
 
 const UserVotePage = () => {
   const { travelPlanId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  // location.state에서 전달받은 selectedCard를 사용
-  const { selectedCard } = location.state || {};
+  // location.state에서 전달받은 selectedCard (없으면 null)
+  const initialSelectedCard = location.state?.selectedCard || null;
+  const [selectedCard, setSelectedCard] = useState(initialSelectedCard);
   const [agencies, setAgencies] = useState([]);
+  const [hasAcceptedProposal, setHasAcceptedProposal] = useState(false);
+  const [showDepositModal, setShowDepositModal] = useState(false);
 
-  // 제안 목록(API 호출) - 투표 시작 후 이 페이지에서 조회
+  // 제안 목록(API 호출)
   useEffect(() => {
     const fetchProposals = async () => {
       try {
@@ -22,8 +26,19 @@ const UserVotePage = () => {
           `/api/v1/travel-plans/${travelPlanId}/proposals`,
         );
         if (response.status === 200) {
-          setAgencies(response.data.data);
-          console.log('📦 제안 목록:', response.data.data);
+          let proposals = response.data.data;
+          // 채택된 제안서(proposalStatus가 'A')가 있는지 확인
+          const acceptedProposals = proposals.filter(
+            (proposal) => proposal.proposalStatus === 'A',
+          );
+          if (acceptedProposals.length > 0) {
+            setHasAcceptedProposal(true);
+            proposals = acceptedProposals; // 채택된 제안서만 표시
+          } else {
+            setHasAcceptedProposal(false);
+          }
+          setAgencies(proposals);
+          console.log('📦 제안 목록:', proposals);
         }
       } catch (error) {
         if (
@@ -43,7 +58,7 @@ const UserVotePage = () => {
     }
   }, [travelPlanId]);
 
-  // 투표 처리 함수 (투표는 한 번만 가능)
+  // 투표 처리 함수 (투표 로직은 그대로 유지)
   const handleVote = async (agency) => {
     if (agency.votedYn) {
       Swal.fire(
@@ -65,8 +80,8 @@ const UserVotePage = () => {
     if (!result.isConfirmed) return;
 
     try {
-      // selectedCard.voteSurveyInfo가 존재하고, 투표가 시작된 상태라면 그 voteSurveyId를 사용
-      const voteSurveyId = selectedCard.voteSurveyInfo.voteSurveyId;
+      // 백엔드에서 투표 시작이 자동으로 처리되므로 voteSurveyId는 그대로 사용
+      const voteSurveyId = selectedCard.voteSurveyInfo?.voteSurveyId;
       if (!voteSurveyId) {
         Swal.fire(
           '오류',
@@ -75,7 +90,6 @@ const UserVotePage = () => {
         );
         return;
       }
-      // 투표하기 API 호출
       const voteResponse = await publicRequest.post(
         `/api/v1/travel-plans/${travelPlanId}/proposals/${agency.proposalId}/vote-survey/${voteSurveyId}`,
       );
@@ -111,7 +125,7 @@ const UserVotePage = () => {
     }
   };
 
-  // 상세보기 함수: 상세보기 페이지로 navigate
+  // 상세보기 함수: ProposalDetailForUser 페이지로 이동 (selectedCard 정보도 함께 전달)
   const handleDetail = (agency) => {
     navigate(`/proposal-detail/${travelPlanId}/${agency.proposalId}`, {
       state: { agency, selectedCard },
@@ -121,20 +135,34 @@ const UserVotePage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-
       <div className="max-w-4xl p-6 mx-auto">
         <h1 className="mb-6 text-2xl font-bold text-center text-gray-800">
-          제안받은 여행사
+          {hasAcceptedProposal ? '채택된 여행사' : '제안받은 여행사'}
         </h1>
-
         <AgencyList
           agencies={agencies}
           onVote={handleVote}
           onDetail={handleDetail}
         />
+        {hasAcceptedProposal && (
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={() => setShowDepositModal(true)}
+              className="px-8 py-3 rounded text-brown bg-yellow hover:bg-orange-400"
+            >
+              예약금 결제하러 가기
+            </button>
+          </div>
+        )}
       </div>
-
       <Footer />
+      {showDepositModal && (
+        <ReservationDepositModal
+          travelPlanId={travelPlanId}
+          proposalId={agencies[0]?.proposalId} // 채택된 제안서가 있을 때 해당 proposalId 사용
+          onClose={() => setShowDepositModal(false)}
+        />
+      )}
     </div>
   );
 };
