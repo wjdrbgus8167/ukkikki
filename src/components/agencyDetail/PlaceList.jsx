@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import ProposalDetailContext from "../../contexts/ProposalDetailContext";
+import TravelPlanDetailContext from "../../contexts/TravelPlanDetailContext";
 import {
   PlaceContainer,
   PlaceCard,
@@ -11,7 +11,7 @@ import {
 } from './style/PlaceListStyle'; 
 
 const PlaceList = ({ handlePlaceClick }) => {
-  const { proposal } = useContext(ProposalDetailContext);
+  const { proposal } = useContext(TravelPlanDetailContext);
 
   if (!proposal || !proposal.data || !proposal.data.travelPlan) {
     return <div>장소를 불러오지 못했습니다.</div>;

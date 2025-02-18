@@ -13,25 +13,26 @@ const Schedule = ({
   handleSaveTime,
   computeDuration,
 }) => {
-  const containerRef = useRef(null); // container에 대한 참조를 생성
+  const containerRef = useRef(null);
 
   useEffect(() => {
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight; // 새로운 항목이 추가될 때마다 가장 아래로 스크롤
     }
-  }, [selectedPlaces]); // selectedPlaces가 변경될 때마다 실행
+  }, [selectedPlaces]);
 
-  
   return (
     <SelectedPlacesContainer ref={containerRef}>
       {selectedPlaces.map((place, index) => {
-        const timeInfo = timeData[place.placeId];
-        const hasTimeInput = timeInfo && timeInfo.startTime && timeInfo.endTime;
+        // timeData에 값이 없으면, place에 있는 startTime/endTime을 fallback으로 사용
+        const startTime = timeData[place.placeId]?.startTime || place.startTime || "";
+        const endTime = timeData[place.placeId]?.endTime || place.endTime || "";
+        const hasTimeInput = startTime && endTime;
 
         const duration = hasTimeInput
-          ? computeDuration(timeInfo.startTime, timeInfo.endTime)
+          ? computeDuration(startTime, endTime)
           : null;
-        const hasDuration = duration !== null; // hasDuration이 true/false로 설정
+        const hasDuration = duration !== null;
 
         return (
           <div key={place.placeId} className="selected-place">
@@ -46,7 +47,7 @@ const Schedule = ({
                     <img src={clock} alt="clock icon" className="w-6 h-6" />
                   )}
                 </button>
-                <button onClick={() => { onDeletePlace(place.placeId); }}>
+                <button onClick={() => onDeletePlace(place.placeId)}>
                   <img src={trashCan} alt="trashCan icon" className="w-6 h-6" />
                 </button>
               </span>
@@ -57,20 +58,25 @@ const Schedule = ({
                   <div className="time-input-fields">
                     <input
                       type="time"
-                      value={timeData[place.placeId]?.startTime || ""}
+                      value={timeData[place.placeId]?.startTime || place.startTime || ""}
                       onChange={(e) =>
                         handleTimeChange(place.placeId, "startTime", e.target.value)
                       }
                     />
                     <input
                       type="time"
-                      value={timeData[place.placeId]?.endTime || ""}
+                      value={timeData[place.placeId]?.endTime || place.endTime || ""}
                       onChange={(e) =>
                         handleTimeChange(place.placeId, "endTime", e.target.value)
                       }
                     />
                   </div>
-                  <button className="btn" onClick={() => handleSaveTime(place.placeId, place.dayNumber)}>완료</button>
+                  <button
+                    className="btn"
+                    onClick={() => handleSaveTime(place.placeId, place.dayNumber)}
+                  >
+                    완료
+                  </button>
                 </div>
               )}
             </SelectedPlacesContent>

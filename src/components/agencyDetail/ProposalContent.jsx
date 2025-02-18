@@ -1,11 +1,11 @@
 //제안서 디테일(계획)
 
 import React, { useContext } from 'react';
-import ProposalDetailContext from '../../contexts/ProposalDetailContext';
+import TravelPlanDetailContext from '../../contexts/TravelPlanDetailContext';
 import { PorposalContentContainer } from './style/ProposalContentStyle';
 
 const ProposalContent = () => {
-  const { proposal } = useContext(ProposalDetailContext);
+  const { proposal } = useContext(TravelPlanDetailContext);
 
   if (!proposal) {
     return <div>제안서 불러오는 중,,</div>;
