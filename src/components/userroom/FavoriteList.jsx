@@ -6,7 +6,7 @@ import { publicRequest } from '../../hooks/requestMethod';
 import MapSearchBar from '../../services/map/MapSearchBar';
 import useAuthStore from '../../stores/authStore';
 
-const FavoriteList = ({ selectedCard, favorites, setFavorites, disabled }) => {
+const FavoriteList = ({ selectedCard, favorites, setFavorites }) => {
   const { user } = useAuthStore();
   const [expandedPlaceId, setExpandedPlaceId] = useState(null);
   const [showTagInput, setShowTagInput] = useState(false);
@@ -51,10 +51,6 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites, disabled }) => {
   }, [favorites]);
 
   const handleLikeToggle = async (place) => {
-    if (disabled) {
-      Swal.fire('알림', '현재 조작이 불가능합니다.', 'info');
-      return;
-    }
     const placeId = place.placeId;
     const isLiked = place.isLiked;
     const totalMember = selectedCard?.member?.totalParticipants || 0;

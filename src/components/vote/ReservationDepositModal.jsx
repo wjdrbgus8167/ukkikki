@@ -69,30 +69,44 @@ const ReservationDepositModal = ({ travelPlanId, proposalId, onClose }) => {
   const handlePaymentComplete = async () => {
     setLoading(true);
     try {
+      // 여행자 등록 API 호출
       const response = await publicRequest.post(
         `/api/v1/travel-plans/${travelPlanId}/proposals/${proposalId}/travelers`,
         travelers,
       );
       if (response.status === 200) {
-        Swal.fire({
-          title: '성공',
-          html: '예약금 결제가 완료되었고 여행자 등록도 완료되었습니다.<br/>10초 후에 유저룸으로 이동합니다.',
-          icon: 'success',
-          showConfirmButton: true,
-          confirmButtonText: '지금 이동',
-          allowOutsideClick: false,
-          allowEscapeKey: false,
-          timer: 10000,
-          timerProgressBar: true,
-        }).then(() => {
-          navigate(`/user-room/${travelPlanId}`);
-        });
+        // 여행자 등록이 완료되면 방 상태를 CONFIRMED로 업데이트
+        const statusResponse = await publicRequest.put(
+          `/api/v1/travel-plans/${travelPlanId}`,
+          { planningStatus: 'CONFIRMED' },
+        );
+        if (statusResponse.status === 200) {
+          Swal.fire({
+            title: '성공',
+            html: '예약금 결제가 완료되었고, 여행자 등록 및 방 상태 업데이트가 완료되었습니다.<br/>10초 후에 유저룸으로 이동합니다.',
+            icon: 'success',
+            showConfirmButton: true,
+            confirmButtonText: '지금 이동',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            timer: 10000,
+            timerProgressBar: true,
+          }).then(() => {
+            navigate(`/user-room/${travelPlanId}`);
+          });
+        } else {
+          Swal.fire('오류', '방 상태 업데이트에 실패했습니다.', 'error');
+        }
       } else {
         Swal.fire('오류', '여행자 등록에 실패했습니다.', 'error');
       }
     } catch (error) {
-      console.error('여행자 등록 실패:', error);
-      Swal.fire('오류', '여행자 등록에 실패했습니다.', 'error');
+      console.error('여행자 등록 및 방 상태 업데이트 실패:', error);
+      Swal.fire(
+        '오류',
+        '여행자 등록 및 방 상태 업데이트에 실패했습니다.',
+        'error',
+      );
     } finally {
       setLoading(false);
     }

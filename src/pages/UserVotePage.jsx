@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import ReservationDepositModal from '../components/vote/ReservationDepositModal';
 import { IoIosArrowBack } from 'react-icons/io';
 import logo from '../assets/loading-spinner.png';
+import VoteCountdown from '../components/vote/VoteCountdown';
 
 const UserVotePage = () => {
   const { travelPlanId } = useParams();
@@ -160,7 +161,11 @@ const UserVotePage = () => {
           {/* 오른쪽: 같은 너비의 빈 요소로 가운데 정렬 유지 */}
           <div className="w-10 mr-4" />
         </div>
-
+        {selectedCard && selectedCard.closeTime && (
+          <div className="mb-4">
+            <VoteCountdown closeTime={selectedCard.closeTime} />
+          </div>
+        )}
         {/* 제안서가 없는 경우 메시지 출력 */}
         {agencies.length === 0 ? (
           <div className="flex flex-col items-center justify-center min-h-screen text-gray-600">
