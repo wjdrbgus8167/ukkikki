@@ -4,7 +4,7 @@ import { FaCheckCircle } from 'react-icons/fa';
 const AgencyCard = ({ agency, onVote, onDetail }) => {
   return (
     <div className="flex flex-col items-center w-64 p-6 bg-white border rounded-lg shadow-md">
-      <p className="mb-1 text-lg font-semibold">{agency.name}</p>
+      <p className="mb-1 text-xl font-semibold">{agency.companyName}</p>
       <p className="mb-2 text-gray-700">금액: {agency.deposit}원</p>
       <p className="mb-2">투표수: {agency.voteCount}</p>
 
