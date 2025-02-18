@@ -4,25 +4,24 @@ import Chat from './Chat';
 import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
 import bananaIcon from '../../assets/loading-spinner.png';
-import WebSocketComponent, { stompClient } from '../../components/userroom/WebSocketComponent';
+import WebSocketComponent, {
+  stompClient,
+} from '../../components/userroom/WebSocketComponent';
 import { RiChatSmileAiLine } from 'react-icons/ri';
 
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
 const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [coordinates, setCoordinates] = useState({ lat: 35.6895, lng: 139.6917 });
+  const [coordinates, setCoordinates] = useState({
+    lat: 35.6895,
+    lng: 139.6917,
+  });
   const [selectedMarker, setSelectedMarker] = useState(null);
   const [showTagInput, setShowTagInput] = useState(false);
   const [newTag, setNewTag] = useState('');
   const [renderKey, setRenderKey] = useState(0); // GoogleMap 강제 리렌더링용
 
-  // 태그 제출 핸들러 (필요에 따라 실제 로직 구현)
-  const handleTagSubmit = () => {
-    console.log('새 태그:', newTag);
-    setShowTagInput(false);
-    setNewTag('');
-  };
 
   // ✅ WebSocket을 활용한 실시간 마커 업데이트
   useEffect(() => {
@@ -57,69 +56,6 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
     setSelectedMarker({ ...marker });
   };
 
-  const handleTagSubmit = async () => {
-    if (!newTag.trim()) return;
-    if (!selectedMarker || !selectedMarker.placeId) {
-      console.error("🚨 태그 추가 실패: 선택된 마커가 없습니다.");
-      return;
-    }
-  
-    const placeId = selectedMarker.placeId;
-    const placeName = selectedMarker.name; // ✅ placeName 가져오기
-    const travelPlanId = selectedCard.travelPlanId;
-  
-    try {
-      const response = await publicRequest.post(
-        `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/tags`,
-        { placeTagName: newTag.trim() }
-      );
-  
-      if (stompClient && stompClient.connected) {
-        const wsData = {
-          action: "ADD_TAG",
-          placeName, // ✅ placeName 추가
-          travelPlanId,
-        };
-  
-        stompClient.publish({
-          destination: "/pub/actions",
-          body: JSON.stringify(wsData),
-        });
-        console.log("✅ InteractiveSection- 태그 추가 이벤트:", wsData);
-      }
-  
-      if (response.status === 200) {
-        setFavorites((prev) =>
-          prev.map((fav) =>
-            fav.placeId === placeId
-              ? {
-                  ...fav,
-                  tags: [
-                    ...fav.tags,
-                    {
-                      placeTagId: response.data.id,
-                      name: newTag.trim(),
-                      isMyTag: true,
-                    },
-                  ],
-                }
-              : fav
-          )
-        );
-        setSelectedMarker((prev) => ({
-          ...prev,
-          tags: [...prev.tags, { placeTagId: response.data.id, name: newTag.trim(), isMyTag: true }],
-        }));
-        setNewTag("");
-        setShowTagInput(false);
-      }
-    } catch (error) {
-      console.error("🚨 태그 추가 실패:", error);
-      Swal.fire("알림", "태그 추가에 실패했습니다.", "error");
-    }
-  };
-  
-
   const handleLikePlace = async (place) => {
     if (!place || !selectedCard || !selectedCard.travelPlanId) {
       console.error('🚨 장소 정보 또는 여행방 ID가 없습니다.');
@@ -137,18 +73,22 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
       let updatedMarker;
 
       if (isLiked) {
-        console.log("좋아요 삭제");
-        await publicRequest.delete(`/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`);
+        console.log('좋아요 삭제');
+        await publicRequest.delete(
+          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
+        );
         updatedMarker = {
           ...place,
           likeYn: false,
           isLiked: false,
           likeCount: Math.max(place.likeCount - totalMember, 0),
         };
-        actionType = "UNLIKE"
+        actionType = 'UNLIKE';
       } else {
-        console.log("좋아요 추가");
-        await publicRequest.post(`/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`);
+        console.log('좋아요 추가');
+        await publicRequest.post(
+          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
+        );
         updatedMarker = {
           ...place,
           likeYn: true,
@@ -176,7 +116,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
         const wsData = {
           action: actionType, // ✅ Action Enum 값 전송
           placeName,
-          travelPlanId
+          travelPlanId,
         };
         stompClient.publish({
           destination: '/pub/actions',
@@ -273,7 +213,11 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
   return (
     <div className="relative w-full h-screen">
       {/* ✅ 웹소켓 구독을 위한 WebSocketComponent 추가 */}
-      <WebSocketComponent travelPlanId={selectedCard.travelPlanId} setFavorites={setFavorites} favorites={favorites} />
+      <WebSocketComponent
+        travelPlanId={selectedCard.travelPlanId}
+        setFavorites={setFavorites}
+        favorites={favorites}
+      />
 
       {/* 지도 영역 */}
       <div className="w-full h-full">
@@ -391,7 +335,13 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
         </GoogleMap>
       </div>
 
-      <div className="fixed bottom-4 right-4 z-[9999]">
+      {/* 채팅창 */}
+      <div
+        className={`absolute transition-all duration-300 overflow-hidden ${isChatOpen
+          ? 'top-4 right-4 w-96 h-[500px] rounded-lg overflow-hidden'
+          : 'bottom-4 right-4 w-12 h-12 rounded-lg  overflow-visible'
+          }`}
+      >
         {isChatOpen ? (
           <div className="relative w-96 h-[500px] rounded-lg bg-white shadow-lg">
             <Chat travelPlanId={selectedCard.travelPlanId} />
@@ -404,8 +354,11 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
           </div>
         ) : (
           <button
-            onClick={() => setIsChatOpen(true)}
-            className="flex items-center justify-center w-12 h-12 text-white bg-gray-800 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+            onClick={() => {
+              console.log('채팅 열기 클릭됨');
+              setIsChatOpen(true);
+            }}
+            className="flex items-center justify-center w-full h-full text-white bg-gray-800 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
           >
             <RiChatSmileAiLine size={24} />
           </button>
