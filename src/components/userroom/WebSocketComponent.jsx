@@ -71,7 +71,7 @@ const WebSocketComponent = ({ travelPlanId, setFavorites, favorites, fetchRoomDa
         return "방에 참가하셨습니다."
       case "CLOSE_TIME_UPDATED" :
         return "여행 계획의 마감일시가 설정되었습니다. 그대로 진행을 원하시면 유지해주세요!" 
-      case "CLOSE_TIME_UPDATED" :
+      case "EXIT" :
         return "방에 퇴장하셨습니다.!" 
       default:
         return "🤔 알 수 없는 행동을 했습니다!";
