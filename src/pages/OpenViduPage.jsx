@@ -249,8 +249,8 @@ class OpenViduPage extends Component {
             // 화면 공유 중단
             try {
                 await this.state.session.unpublish(this.state.screenPublisher);
+                await this.state.session.publish(this.state.publisher); // 기존 카메라 스트림 다시 퍼블리시
                 
-                // 기존 카메라 스트림을 다시 메인으로 설정
                 this.setState({
                     screenSharing: false,
                     screenPublisher: null,
@@ -261,9 +261,12 @@ class OpenViduPage extends Component {
             }
         } else {
             try {
+                // 기존 스트림 언퍼블리시
+                await this.state.session.unpublish(this.state.publisher);
+                
                 const screenPublisher = await this.OV.initPublisherAsync(undefined, {
                     videoSource: "screen",
-                    publishAudio: true, // 화면 공유 시 오디오 허용
+                    publishAudio: true,
                     publishVideo: true,
                     resolution: "1280x720",
                     frameRate: 30,
@@ -275,7 +278,6 @@ class OpenViduPage extends Component {
                     try {
                         await this.state.session.publish(screenPublisher);
                         
-                        // 화면 공유 퍼블리셔를 상태에 저장
                         this.setState({
                             screenSharing: true,
                             screenPublisher,
@@ -290,21 +292,21 @@ class OpenViduPage extends Component {
     
                     } catch (error) {
                         console.error("화면 공유 스트림 게시 중 오류 발생:", error);
+                        // 오류 발생 시 기존 스트림 다시 퍼블리시
+                        this.state.session.publish(this.state.publisher);
                     }
                 });
     
                 screenPublisher.once('accessDenied', () => {
                     console.warn('화면 공유 접근이 거부되었습니다.');
+                    // 접근 거부 시 기존 스트림 다시 퍼블리시
+                    this.state.session.publish(this.state.publisher);
                 });
     
             } catch (error) {
                 console.error("화면 공유 초기화 중 오류 발생:", error);
-                // 오류 발생 시 원래 상태로 복구
-                this.setState({
-                    screenSharing: false,
-                    screenPublisher: null,
-                    mainStreamManager: this.state.publisher
-                });
+                // 오류 발생 시 기존 스트림 다시 퍼블리시
+                this.state.session.publish(this.state.publisher);
             }
         }
     }
@@ -431,7 +433,7 @@ class OpenViduPage extends Component {
                             
                             <div className="streams-container">
                                 {/* 카메라 스트림 표시 */}
-                                {this.state.publisher && !this.state.screenSharing && (
+                                {this.state.publisher && (
                                     <StreamContainer 
                                         className="col-md-6 col-xs-6" 
                                         onClick={() => this.handleMainVideoStream(this.state.publisher)}
