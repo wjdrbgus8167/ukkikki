@@ -3,8 +3,12 @@ import React, { useState } from 'react';
 import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
 import KakaoPayTest from './KakaoPayTest';
+import { IoIosCloseCircle } from 'react-icons/io';
+import { useNavigate } from 'react-router-dom';
+import { IoIosArrowBack } from 'react-icons/io';
 
 const ReservationDepositModal = ({ travelPlanId, proposalId, onClose }) => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [travelers, setTravelers] = useState([
     {
@@ -43,9 +47,8 @@ const ReservationDepositModal = ({ travelPlanId, proposalId, onClose }) => {
     setTravelers(travelers.filter((_, i) => i !== index));
   };
 
-  // 여행자 등록 API 호출 후 2단계(결제 단계)로 이동
-  const handleSubmitTravelers = async () => {
-    // 간단한 유효성 검사
+  // 1단계: 모든 여행자 정보가 올바르게 입력되었는지 확인한 후 결제 단계로 진행
+  const handleNext = () => {
     for (let traveler of travelers) {
       if (
         !traveler.koreanName.trim() ||
@@ -59,6 +62,11 @@ const ReservationDepositModal = ({ travelPlanId, proposalId, onClose }) => {
         return;
       }
     }
+    setStep(2);
+  };
+
+  // 2단계: 결제 완료 후, 여행자 등록 API를 호출한 뒤 유저룸으로 이동
+  const handlePaymentComplete = async () => {
     setLoading(true);
     try {
       const response = await publicRequest.post(
@@ -66,8 +74,21 @@ const ReservationDepositModal = ({ travelPlanId, proposalId, onClose }) => {
         travelers,
       );
       if (response.status === 200) {
-        Swal.fire('성공', '여행자 등록이 완료되었습니다.', 'success');
-        setStep(2); // 결제 단계로 이동
+        Swal.fire({
+          title: '성공',
+          html: '예약금 결제가 완료되었고 여행자 등록도 완료되었습니다.<br/>10초 후에 유저룸으로 이동합니다.',
+          icon: 'success',
+          showConfirmButton: true,
+          confirmButtonText: '지금 이동',
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          timer: 10000,
+          timerProgressBar: true,
+        }).then(() => {
+          navigate(`/user-room/${travelPlanId}`);
+        });
+      } else {
+        Swal.fire('오류', '여행자 등록에 실패했습니다.', 'error');
       }
     } catch (error) {
       console.error('여행자 등록 실패:', error);
@@ -77,127 +98,171 @@ const ReservationDepositModal = ({ travelPlanId, proposalId, onClose }) => {
     }
   };
 
-  // 결제 완료 후 처리할 함수 (KakaoPayTest에서 결제 성공 시 호출)
-  const handlePaymentComplete = () => {
-    Swal.fire('성공', '예약금 결제가 완료되었습니다.', 'success');
-    onClose();
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="w-full max-w-2xl p-6 bg-white rounded-lg">
+      <div className="relative w-full max-w-2xl p-6 bg-white rounded-lg">
+        {/* 오른쪽 상단에 닫기 아이콘 */}
+        <button onClick={onClose} className="absolute top-4 right-4 text-brown">
+          <IoIosCloseCircle size={40} />
+        </button>
         <h2 className="mb-4 text-2xl font-bold">예약금 결제</h2>
         {step === 1 && (
           <div>
             <h3 className="mb-4 text-xl font-semibold">여행자 등록</h3>
-            {travelers.map((traveler, index) => (
-              <div key={index} className="p-4 mb-4 border rounded">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold">여행자 {index + 1}</span>
-                  {travelers.length > 1 && (
-                    <button
-                      onClick={() => removeTraveler(index)}
-                      className="text-red-500"
-                    >
-                      삭제
-                    </button>
-                  )}
+            {/* 스크롤 영역 적용: 내용이 길어지면 스크롤 */}
+            <div className="pr-2 overflow-y-auto max-h-96">
+              {travelers.map((traveler, index) => (
+                <div key={index} className="p-4 mb-4 border rounded">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-semibold">여행자 {index + 1}</span>
+                    {travelers.length > 1 && (
+                      <button
+                        onClick={() => removeTraveler(index)}
+                        className="text-red-500"
+                      >
+                        삭제
+                      </button>
+                    )}
+                  </div>
+                  {/* 한글 이름 */}
+                  <div className="mb-2">
+                    <label className="block mb-1 text-sm font-medium text-gray-700">
+                      한글 이름
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="한글 이름"
+                      value={traveler.koreanName}
+                      onChange={(e) =>
+                        handleTravelerChange(
+                          index,
+                          'koreanName',
+                          e.target.value,
+                        )
+                      }
+                      className="w-full p-2 border rounded"
+                    />
+                  </div>
+                  {/* 영문 이름 */}
+                  <div className="mb-2">
+                    <label className="block mb-1 text-sm font-medium text-gray-700">
+                      영문 이름
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="영문 이름"
+                      value={traveler.englishName}
+                      onChange={(e) =>
+                        handleTravelerChange(
+                          index,
+                          'englishName',
+                          e.target.value,
+                        )
+                      }
+                      className="w-full p-2 border rounded"
+                    />
+                  </div>
+                  {/* 여권번호 */}
+                  <div className="mb-2">
+                    <label className="block mb-1 text-sm font-medium text-gray-700">
+                      여권번호
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="여권번호"
+                      value={traveler.passportNumber}
+                      onChange={(e) =>
+                        handleTravelerChange(
+                          index,
+                          'passportNumber',
+                          e.target.value,
+                        )
+                      }
+                      className="w-full p-2 border rounded"
+                    />
+                  </div>
+                  {/* 여권 만료일 */}
+                  <div className="mb-2">
+                    <label className="block mb-1 text-sm font-medium text-gray-700">
+                      여권 만료일
+                    </label>
+                    <input
+                      type="date"
+                      value={traveler.expirationDate}
+                      onChange={(e) =>
+                        handleTravelerChange(
+                          index,
+                          'expirationDate',
+                          e.target.value,
+                        )
+                      }
+                      className="w-full p-2 border rounded"
+                    />
+                  </div>
+                  {/* 생년월일 */}
+                  <div className="mb-2">
+                    <label className="block mb-1 text-sm font-medium text-gray-700">
+                      생년월일
+                    </label>
+                    <input
+                      type="date"
+                      value={traveler.birthDate}
+                      onChange={(e) =>
+                        handleTravelerChange(index, 'birthDate', e.target.value)
+                      }
+                      className="w-full p-2 border rounded"
+                    />
+                  </div>
+                  {/* 전화번호 */}
+                  <div className="mb-2">
+                    <label className="block mb-1 text-sm font-medium text-gray-700">
+                      전화번호
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="전화번호"
+                      value={traveler.phoneNumber}
+                      onChange={(e) =>
+                        handleTravelerChange(
+                          index,
+                          'phoneNumber',
+                          e.target.value,
+                        )
+                      }
+                      className="w-full p-2 border rounded"
+                    />
+                  </div>
                 </div>
-                <input
-                  type="text"
-                  placeholder="한글 이름"
-                  value={traveler.koreanName}
-                  onChange={(e) =>
-                    handleTravelerChange(index, 'koreanName', e.target.value)
-                  }
-                  className="w-full p-2 mb-2 border rounded"
-                />
-                <input
-                  type="text"
-                  placeholder="영문 이름"
-                  value={traveler.englishName}
-                  onChange={(e) =>
-                    handleTravelerChange(index, 'englishName', e.target.value)
-                  }
-                  className="w-full p-2 mb-2 border rounded"
-                />
-                <input
-                  type="text"
-                  placeholder="여권번호"
-                  value={traveler.passportNumber}
-                  onChange={(e) =>
-                    handleTravelerChange(
-                      index,
-                      'passportNumber',
-                      e.target.value,
-                    )
-                  }
-                  className="w-full p-2 mb-2 border rounded"
-                />
-                <input
-                  type="date"
-                  placeholder="여권 만료일"
-                  value={traveler.expirationDate}
-                  onChange={(e) =>
-                    handleTravelerChange(
-                      index,
-                      'expirationDate',
-                      e.target.value,
-                    )
-                  }
-                  className="w-full p-2 mb-2 border rounded"
-                />
-                <input
-                  type="date"
-                  placeholder="생년월일"
-                  value={traveler.birthDate}
-                  onChange={(e) =>
-                    handleTravelerChange(index, 'birthDate', e.target.value)
-                  }
-                  className="w-full p-2 mb-2 border rounded"
-                />
-                <input
-                  type="text"
-                  placeholder="전화번호"
-                  value={traveler.phoneNumber}
-                  onChange={(e) =>
-                    handleTravelerChange(index, 'phoneNumber', e.target.value)
-                  }
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-            ))}
+              ))}
+            </div>
             <button
               onClick={addTraveler}
-              className="px-4 py-2 mb-4 text-white bg-green-500 rounded hover:bg-green-600"
+              className="px-4 py-2 mb-4 text-black bg-white border border-gray-300 rounded hover:bg-gray-100"
             >
               여행자 추가
             </button>
             <div className="flex justify-end">
               <button
-                onClick={handleSubmitTravelers}
-                className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
+                onClick={handleNext}
+                className="px-4 py-2 text-white rounded bg-airbnb"
                 disabled={loading}
               >
-                {loading ? '등록 중...' : '등록 완료'}
+                {loading ? '처리 중...' : '다음'}
               </button>
             </div>
           </div>
         )}
         {step === 2 && (
-          <div>
-            <h3 className="mb-4 text-xl font-semibold">예약금 결제</h3>
+          <div className="min-h-[500px] flex flex-col items-center justify-center">
+            {/* 뒤로가기 버튼 추가 */}
+            <div className="flex justify-start w-full mb-4">
+              <button onClick={() => setStep(1)} className="ml-4 text-brown">
+                <IoIosArrowBack size={32} className="text-3xl font-bold" />
+              </button>
+            </div>
             <KakaoPayTest onPaymentComplete={handlePaymentComplete} />
           </div>
         )}
-        <div className="flex justify-end mt-4">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300"
-          >
-            닫기
-          </button>
-        </div>
       </div>
     </div>
   );

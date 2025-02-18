@@ -6,6 +6,7 @@ import AgencyList from '../components/vote/AgencyList';
 import { publicRequest } from '../hooks/requestMethod';
 import Swal from 'sweetalert2';
 import ReservationDepositModal from '../components/vote/ReservationDepositModal';
+import { IoIosArrowBack } from 'react-icons/io';
 
 const UserVotePage = () => {
   const { travelPlanId } = useParams();
@@ -143,10 +144,22 @@ const UserVotePage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
+
       <div className="max-w-4xl p-6 mx-auto">
-        <h1 className="mb-6 text-2xl font-bold text-center text-gray-800">
-          {hasAcceptedProposal ? '채택된 여행사' : '제안받은 여행사'}
-        </h1>
+        {/* 제목 영역 - 뒤로가기 버튼과 제목을 flex로 배치 */}
+        <div className="flex items-center justify-between mb-6">
+          {/* 왼쪽: 뒤로가기 버튼 */}
+          <button onClick={() => navigate(-1)} className="ml-4 text-brown">
+            <IoIosArrowBack size={32} className="text-3xl font-bold" />
+          </button>
+          {/* 가운데: 제목 */}
+          <h1 className="flex-1 text-2xl font-bold text-center text-gray-800">
+            {hasAcceptedProposal ? '채택된 여행사' : '제안받은 여행사'}
+          </h1>
+          {/* 오른쪽: 같은 너비의 빈 요소로 가운데 정렬 유지 */}
+          <div className="w-10 mr-4" />
+        </div>
+
         <AgencyList
           agencies={agencies}
           onVote={handleVote}
@@ -156,7 +169,7 @@ const UserVotePage = () => {
           <div className="flex justify-center mt-8">
             <button
               onClick={() => setShowDepositModal(true)}
-              className="px-8 py-3 rounded text-brown bg-yellow hover:bg-orange-400"
+              className="px-8 py-3 rounded text-brown bg-yellow"
             >
               예약금 결제하러 가기
             </button>
