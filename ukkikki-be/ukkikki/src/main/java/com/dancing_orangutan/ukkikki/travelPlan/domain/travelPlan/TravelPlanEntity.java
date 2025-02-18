@@ -156,6 +156,10 @@ public class TravelPlanEntity {
 		this.hostComment = hostComment;
 	}
 
+	public void updatePlanningStatus(final PlanningStatus status) {
+		this.planningStatus = status;
+	}
+
 	private boolean isHost(final Integer memberId) {
 		return memberTravelPlans.stream()
 				.filter(mtp -> mtp.getMemberTravelPlanId().getMemberId().equals(memberId))
@@ -169,4 +173,5 @@ public class TravelPlanEntity {
 				.findFirst()
 				.orElseThrow(() -> new ApiException(ErrorCode.MEMBER_TRAVEL_PLAN_NOT_FOUND));
 	}
+
 }

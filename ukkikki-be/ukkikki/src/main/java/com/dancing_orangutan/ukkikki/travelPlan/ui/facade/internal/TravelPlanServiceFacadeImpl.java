@@ -7,7 +7,9 @@ import com.dancing_orangutan.ukkikki.travelPlan.application.JoinTravelPlanServic
 import com.dancing_orangutan.ukkikki.travelPlan.application.QueryTravelPlanService;
 import com.dancing_orangutan.ukkikki.travelPlan.application.UpdateCloseTimeService;
 import com.dancing_orangutan.ukkikki.travelPlan.application.UpdateCompanionCountService;
+import com.dancing_orangutan.ukkikki.travelPlan.application.UpdatePlanningStatusService;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.ExitTravelPlanCommand;
+import com.dancing_orangutan.ukkikki.travelPlan.application.command.UpdateTravelPlanStatusCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchAvailableTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQueryByMember;
@@ -21,6 +23,7 @@ import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.CreateTrav
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.JoinTravelPlanRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.UpdateCloseTimeRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.UpdateCompanionCountRequest;
+import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.UpdatePlanningStatusRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.request.WriteCommentRequest;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.CreateTravelPlanResponse;
 import com.dancing_orangutan.ukkikki.travelPlan.ui.facade.dto.response.FetchAvailableTravelPlansResponse;
@@ -50,6 +53,7 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 	private final UpdateCloseTimeService updateCloseTimeService;
 	private final UpdateCompanionCountService updateCompanionCountService;
 	private final ExitTravelPlanService exitTravelPlanService;
+	private final UpdatePlanningStatusService updatePlanningStatusService;
 	private final TravelPlanResponseMapper mapper;
 
 	@Override
@@ -101,6 +105,16 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 				.memberId(memberId)
 				.build();
 		exitTravelPlanService.exitTravelPlan(command);
+	}
+
+	@Override
+	public void updatePlanningStatus(final UpdatePlanningStatusRequest request,final Integer travelPlanId) {
+		UpdateTravelPlanStatusCommand command = UpdateTravelPlanStatusCommand.builder()
+				.status(request.planningStatus())
+				.travelPlanId(travelPlanId)
+				.build();
+
+		updatePlanningStatusService.updatePlanningStatus(command);
 	}
 
 	@Override
@@ -178,4 +192,6 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 	public FetchKeywordsResponse fetchKeywords() {
 		return mapper.fetchKeywordsResponse(queryTravelPlanService.fetchKeywords());
 	}
+
+
 }
