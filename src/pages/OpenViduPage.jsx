@@ -29,6 +29,8 @@ class OpenViduPage extends Component {
             subscribers: [],
             regularSubscribers: [], // 일반 참가자 스트림을 저장
             screenSubscribers: [], // 화면 공유 스트림을 저장
+            sessions: [],
+            screenSharing: false,
         };
 
         this.createSession = this.createSession.bind(this);
@@ -284,10 +286,20 @@ class OpenViduPage extends Component {
     }    
 
     async createSession(sessionId) {
-        const response = await axios.post(APPLICATION_SERVER_URL + '/sessions', { customSessionId: sessionId }, {
-            headers: { 'Content-Type': 'application/json', },
-        });
-        return response.data;
+        try {
+            const response = await axios.post(APPLICATION_SERVER_URL + '/sessions', { customSessionId: sessionId }, {
+                headers: { 'Content-Type': 'application/json', },
+            });
+            
+            // sessions 배열 업데이트
+            this.setState(prevState => ({
+                sessions: [...prevState.sessions, response.data]
+            }));
+            
+            return response.data;
+        } catch (error) {
+            console.error('세션 생성 중 오류 발생:', error);
+        }
     }
 
     async getToken() {
