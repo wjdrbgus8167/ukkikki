@@ -14,6 +14,7 @@ public class ProposalDetailResponse {
 
     private Integer proposalId;
     private Integer companyId;
+    private Integer travelPlanId;
     private String name;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -34,7 +35,7 @@ public class ProposalDetailResponse {
     private List<DayResponse> daySchedules;
 
     @Builder
-    public ProposalDetailResponse(Integer proposalId,Integer companyId, String name, LocalDate startDate, LocalDate endDate
+    public ProposalDetailResponse(Integer proposalId,Integer companyId,Integer travelPlanId, String name, LocalDate startDate, LocalDate endDate
             ,String airLine,String departureAirport,String arrivalAirport,LocalDateTime startDateBoardingTime
             ,LocalDateTime startDateArrivalTime, LocalDateTime endDateBoardingTime, LocalDateTime endDateArrivalTime
             , int deposit, int minPeople, boolean guideIncluded, String productInformation, String refundPolicy
@@ -42,6 +43,7 @@ public class ProposalDetailResponse {
 
         this.proposalId = proposalId;
         this.companyId = companyId;
+        this.travelPlanId = travelPlanId;
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
