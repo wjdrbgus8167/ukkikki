@@ -29,6 +29,7 @@ const SearchRoom = () => {
       const fetchTravelPlans = async () => {
         try {
           const response = await publicRequest.get('/api/v1/travel-plans');
+          console.log('🚀 여행방 전체 조회 결과:', response.data);
           if (response.status === 200 && response.data?.data?.travelPlans) {
             setRooms(response.data.data.travelPlans);
             setFilteredRooms(response.data.data.travelPlans);
