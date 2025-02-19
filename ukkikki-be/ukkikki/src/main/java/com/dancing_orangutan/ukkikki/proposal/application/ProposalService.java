@@ -40,6 +40,7 @@ import com.dancing_orangutan.ukkikki.proposal.mapper.VoteSurveyMapper;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.*;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravelPlan.MemberTravelPlanEntity;
 import io.openvidu.java.client.*;
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -85,6 +86,11 @@ public class ProposalService {
 
     @Value("${OPENVIDU_SECRET}")
     private String OPENVIDU_SECRET;
+
+    @PostConstruct
+    public void init() {
+        this.openVidu = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
+    }
 
     // 제안서 작성
     @Transactional
