@@ -42,10 +42,14 @@ function MeetingPage() {
         // 호스트면 카메라 ON, 일반 사용자는 오디오만
         if (isHost) {
           const pub = OV.initPublisher(undefined, {
-            videoSource: 'camera',
-            audioSource: true,
-            publishVideo: true,
-            publishAudio: true,
+            audioSource: undefined, // 오디오 소스. undefined이면 기본 마이크 사용
+            videoSource: undefined, // 비디오 소스. undefined이면 기본 웹캠 사용
+            publishAudio: true, // 오디오를 음소거하지 않고 시작할지 여부
+            publishVideo: true, // 비디오를 활성화된 상태로 시작할지 여부
+            resolution: '640x480', // 비디오 해상도
+            frameRate: 30, // 비디오 프레임 속도
+            insertMode: 'APPEND', // 비디오가 'video-container' 요소에 삽입되는 방식
+            mirror: false, // 로컬 비디오를 미러링할지 여부~
           });
           newSession.publish(pub);
           setPublisher(pub);
