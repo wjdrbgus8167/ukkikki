@@ -26,13 +26,6 @@ const InteractiveSection = ({
   const [selectedMarker, setSelectedMarker] = useState(null);
   const [showTagInput, setShowTagInput] = useState(false);
   const [newTag, setNewTag] = useState('');
-  const [renderKey, setRenderKey] = useState(0); // GoogleMap 강제 리렌더링용
-
-  // ✅ WebSocket을 활용한 실시간 마커 업데이트
-  useEffect(() => {
-    console.log('✅ favorites 상태 변경됨:', favorites);
-    setRenderKey((prev) => prev + 1); // Google Map 강제 리렌더링
-  }, [favorites]);
 
   // ✅ 도시 좌표 가져오기 (Google Geocoding API)
   useEffect(() => {
@@ -288,7 +281,6 @@ const InteractiveSection = ({
       {/* 지도 영역 */}
       <div className="w-full h-full">
         <GoogleMap
-          key={renderKey}
           mapContainerStyle={{ width: '100%', height: '100%' }}
           center={mapCenter}
           zoom={12}
