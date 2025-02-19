@@ -188,7 +188,7 @@ const ProposalButton = ({
   };
 
   return (
-    <div className="w-full sm:w-auto bg-yellow-100 font-bold py-2 px-6 rounded-lg text-lg sm:text-xl">
+    <div className="w-full sm:w-auto bg-yellow-100 font-bold rounded-lg text-xl sm:text-2xl">
       {!selectedCard.closeTime ? (
         // 방장인 경우에만 '여행사에 제안하기' 버튼 표시, 그렇지 않으면 대기 메시지 표시
         selectedCard.member?.isHost ? (
