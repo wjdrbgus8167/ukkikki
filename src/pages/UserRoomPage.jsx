@@ -3,10 +3,10 @@ import { useLocation, useParams } from 'react-router-dom';
 import { publicRequest } from '../hooks/requestMethod';
 import InteractiveSection from '../components/userroom/InteractiveSection';
 import Header from '../components/layout/Header';
-import OverviewBar from '../components/userroom/OverviewBar';
 import FavoriteList from '../components/userroom/FavoriteList';
 import { LoadScript } from '@react-google-maps/api';
 import WebSocketComponent from '../components/userroom/WebSocketComponent';
+import BoardingPass from '../components/common/BoardingPass';
 
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
@@ -14,14 +14,14 @@ const UserRoom = () => {
   const { travelPlanId: travelPlanIdFromUrl } = useParams();
   const location = useLocation();
   const initialSelectedCard = location.state?.selectedCard;
-  const [selectedCard, setSelectedCard] = useState(initialSelectedCard || {}); // 초기값 설정
+  const [selectedCard, setSelectedCard] = useState(initialSelectedCard || {});
   const [isLikeListOpen, setIsLikeListOpen] = useState(true);
   const [favorites, setFavorites] = useState([]);
   const libraries = ['places'];
 
-  const travelPlanId = selectedCard?.travelPlanId || travelPlanIdFromUrl; // selectedCard.travelPlanId 또는 URL의 travelPlanId 사용
+  const travelPlanId = selectedCard?.travelPlanId || travelPlanIdFromUrl;
 
-  // disabled: planningStatus가 BIDDING, BOOKING, CONFIRMED이면 사용자 조작 차단 (OverviewBar 제외)
+  // 특정 상태에서는 사용자 조작 차단
   const disabled = ['BIDDING', 'BOOKING', 'CONFIRMED'].includes(
     selectedCard.planningStatus,
   );
@@ -45,7 +45,7 @@ const UserRoom = () => {
         }));
         setFavorites(mappedPlaces);
         console.log('✅ 여행방 데이터:', travelPlan);
-        setSelectedCard(travelPlan); // 여행방 데이터를 selectedCard에 업데이트
+        setSelectedCard(travelPlan);
       }
     } catch (error) {
       console.error('🚨 여행방 데이터 가져오기 실패:', error);
@@ -56,9 +56,7 @@ const UserRoom = () => {
     if (travelPlanId) {
       fetchRoomData(travelPlanId);
     } else {
-      console.error(
-        '🚨 travelPlanId가 없습니다. 올바른 ID를 전달했는지 확인하세요.',
-      );
+      console.error('🚨 travelPlanId가 없습니다.');
     }
   }, [travelPlanId, fetchRoomData]);
 
@@ -91,7 +89,7 @@ const UserRoom = () => {
       <div className="flex flex-col h-screen overflow-hidden">
         <Header />
 
-        {/* 지도 + 왼쪽 사이드바 + 오른쪽 OverviewBar */}
+        {/* 지도 + 왼쪽 사이드바 */}
         <div className="relative flex-1">
           {/* 지도 (배경 레이어) */}
           <div className="absolute inset-0 z-0">
@@ -102,6 +100,7 @@ const UserRoom = () => {
             />
           </div>
 
+          {/* FavoriteList와 BoardingPass 배치 컨테이너 */}
           <div className="relative flex h-full pointer-events-none">
             {/* 왼쪽 사이드바 (즐겨찾기 목록) */}
             <div
@@ -128,10 +127,10 @@ const UserRoom = () => {
                 </div>
               )}
             </div>
-
-            {/* 오른쪽: OverviewBar (사용자 조작 허용) */}
-            <div className="flex-1 overflow-auto bg-transparent m-2 z-20">
-              <OverviewBar selectedCard={selectedCard} />
+          </div>
+          <div className="fixed top-[60px] right-4 z-50 pointer-events-auto">
+            <div className="scale-[0.65] transform-origin-top-right">
+              <BoardingPass selectedCard={selectedCard} />
             </div>
           </div>
         </div>
