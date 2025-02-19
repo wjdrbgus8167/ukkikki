@@ -7,8 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
 
-const apiKey = import.meta.env.VITE_APP_UNSPLASH_API_KEY;
-
 // 화살표 커스터마이징 컴포넌트
 const PrevArrow = ({ onClick }) => (
   <button
@@ -36,34 +34,33 @@ const TravelPackageCarousel = () => {
   // ✅ 여행지 이미지 가져오기 (axios 사용)
   useEffect(() => {
     const fetchImages = async () => {
-      console.log('📌 [디버깅] 이미지 요청 시작');
-
       const imageRequests = travelPlans.map(async (plan) => {
         const cityName = plan.arrivalCity?.name;
-        console.log(`🔎 [도시] 검색 대상: ${cityName}`);
 
-        if (!cityName) {
-          console.warn(`⚠️ [경고] 도착 도시 정보 없음 -> ${plan}`);
+        if (!cityName || !plan.arrivalCity.cityId) {
           return null;
         }
 
-        if (imageUrls[cityName]) {
-          console.log(`✅ [스킵] 이미 불러온 이미지: ${cityName}`);
+        if (imageUrls[plan.arrivalCity.cityId]) {
           return null;
         }
         try {
           // ✅ S3 버킷에서 해당 도시에 맞는 이미지 URL 생성
-          const s3Url = `https://ukkikki-bucket.s3.ap-northeast-2.amazonaws.com/city/tokyo.jpg`;
-          
+          const s3Url = `https://ukkikki-bucket.s3.ap-northeast-2.amazonaws.com/city/${plan.arrivalCity.cityId}.jpg`;
+
           // ✅ 이미지가 존재하는지 확인
           const response = await axios.head(s3Url);
           if (response.status === 200) {
-            console.log(`🎉 [응답] S3 이미지 URL 사용: ${s3Url}`);
-            return { [cityName]: s3Url };
+            return { [plan.arrivalCity.cityId]: s3Url };
           }
         } catch (error) {
-          console.warn(`⚠️ [경고] S3에서 이미지 없음, 기본 이미지 사용: ${cityName}`);
-          return { [cityName]: 'https://via.placeholder.com/400' }; // 기본 이미지
+          console.warn(
+            `⚠️ [경고] S3에서 이미지 없음, 기본 이미지 사용: ${cityName}`,
+          );
+          return {
+            [plan.arrivalCity.cityId]:
+              'https://ukkikki-bucket.s3.ap-northeast-2.amazonaws.com/placeholder.jpg',
+          }; // 기본 이미지
         }
       });
 
@@ -85,7 +82,7 @@ const TravelPackageCarousel = () => {
     };
 
     if (travelPlans.length > 0) fetchImages();
-  }, [travelPlans, apiKey]);
+  }, [travelPlans]);
 
   // ✅ API 호출하여 여행방 데이터를 가져오기
   useEffect(() => {
@@ -175,14 +172,14 @@ const TravelPackageCarousel = () => {
           <div data-aos="fade-left" data-aos-delay="300">
             <Slider {...settings}>
               {travelPlans.map((plan) => {
-                const cityName = plan.arrivalCity?.name;
+                const cityId = plan.arrivalCity?.cityId;
                 const imageUrl =
-                  imageUrls[cityName] || 'https://via.placeholder.com/400';
+                  (cityId && imageUrls[cityId]) ||
+                  'https://ukkikki-bucket.s3.ap-northeast-2.amazonaws.com/placeholder.jpg';
 
                 return (
                   <div key={plan.travelPlanId} className="p-4">
                     <div className="overflow-hidden bg-white rounded-lg shadow-lg">
-                      {/* ✅ Unsplash에서 가져온 이미지 사용 */}
                       <img
                         src={imageUrl}
                         alt={plan.name}
