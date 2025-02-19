@@ -9,13 +9,13 @@ export const ProposalDetailContainer = styled.div`
 
 // 페이지 내용 컨테이너
 export const ContentContainer = styled.div`
-  padding: 2.5rem; /* p-10 */
+  padding-top: 30px;
   flex-grow: 1; /* 페이지가 전체 높이를 차지하도록 함 */
 `;
 
 // ProposalContent 영역
 export const ProposalContentWrapper = styled.div`
-  padding: 2.5rem; /* p-10 */
+
 `;
 
 // 지도 및 장소 리스트 영역

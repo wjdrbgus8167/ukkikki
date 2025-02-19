@@ -16,6 +16,7 @@ export const DayLabel = styled.span`
   font-size: 30px;
   font-weight: bold;
   color: #333;
+  
 `;
 
 // 날짜(date)를 위한 스타일 (예: 20px 크기, 조금 아래에 마진 추가)
@@ -24,7 +25,9 @@ export const DayDate = styled.span`
   color: #555;
   margin-left: 5px;  /* label과 date 사이의 간격 */
 `;
-
+export const DayContent =  styled.div`
+  margin-left: 5px;
+`;
 export const TabButton = styled.div`
   display: flex;
   margin-bottom: 14px; /* 버튼과 아래 콘텐츠 사이의 간격 */
@@ -60,3 +63,20 @@ export const StylePlaceContainer = styled.div`
  }
 `;
 
+export const StylePlaceDay = styled.div`
+  background-color: #FFFFFF;
+  margin-left: -5px;
+  margin-top: -14px; 
+  width:102%;
+
+  /* 작은 화면에서 크기를 조정 */
+  @media (max-width: 768px) {
+    width: 95%;  /* 화면이 작은 경우 95%로 축소 */
+    margin: 0 auto;  /* 가운데 정렬 */
+  }
+  
+  /* 더 작은 화면에서는 더 작은 크기 */
+  @media (max-width: 480px) {
+    width: 90%;  /* 화면이 더 작은 경우 90%로 축소 */
+  }
+`;

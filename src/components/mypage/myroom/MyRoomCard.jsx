@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { publicRequest } from '../../../hooks/requestMethod';
 import { STATUS_MAP, THEME_COLORS } from '../../../constants';
 
-const MyRoomCard = ({ room, imageUrl }) => {
+const MyRoomCard = ({ room }) => {
   const navigate = useNavigate();
 
   const handleCardClick = async () => {
@@ -36,9 +36,14 @@ const MyRoomCard = ({ room, imageUrl }) => {
           {STATUS_MAP[room.planningStatus] || '상태 없음'}
         </span>
         <img
-          src={imageUrl || '/default-image.jpg'}
+          src={`https://ukkikki-bucket.s3.ap-northeast-2.amazonaws.com/city/${room.arrivalCity.cityId}.jpg`}
           alt={room.arrivalCity?.name}
           className="object-cover w-full h-48 transition-transform duration-200 hover:scale-105"
+          onError={(e) => {
+            e.target.onerror = null; // 무한 반복 방지
+            e.target.src =
+              'https://ukkikki-bucket.s3.ap-northeast-2.amazonaws.com/placeholder.jpg';
+          }}
         />
       </div>
 

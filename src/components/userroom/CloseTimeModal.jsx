@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import Swal from 'sweetalert2';
 
 const CloseTimeModal = ({
@@ -27,7 +28,7 @@ const CloseTimeModal = ({
     onSubmit(closeTime);
   };
 
-  return (
+  return ReactDOM.createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
         <h2 className="mb-4 text-2xl font-bold text-center">마감일자 설정</h2>
@@ -57,7 +58,8 @@ const CloseTimeModal = ({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.getElementById('modal-root') 
   );
 };
 

@@ -63,8 +63,11 @@ const UserLocationMap = ({ latitude, longitude }) => {
           }}
           onCloseClick={() => setSelectedMarker(null)}
         >
-          <div style={{ width: "300px", minHeight: "100px" }} className="p-4">
-            <h3 className="text-lg font-bold">{selectedMarker?.name}</h3>
+          <div style={{ width: "300px", minHeight: "100px", marginTop: '-10px',}} className="p-2">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span className="text-lg font-bold">{selectedMarker?.name}</span>
+              <span className=" pr-2 text-[15px] font-bold rounded-full right-7"  style={{ whiteSpace: "nowrap" }} >❤️{selectedMarker?.likeCount}</span>
+            </div>
             <div>태그:</div>
             {selectedMarker.tags && selectedMarker.tags.length > 0 ? (
               <div className="mt-2">

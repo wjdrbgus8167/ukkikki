@@ -43,36 +43,45 @@ const Sidebar = ({ onMenuClick }) => {
   };
 
   const menuItems =
-    // 여행사인 경우
-    userRole === 'company'
+    userRole === 'company' && location.pathname.includes('/proposal')
       ? [
         {
-          label: '제시받은 목록',
-          onClick: () => onMenuClick('ReceivedProposals'),
+          label: '패키지 의뢰',
+          onClick: () => onMenuClick('receivedProposals'),
           icon: <FaHistory />,
+          to: '/received-proposals', 
         },
         {
-          label: '진행중인 목록',
-          onClick: () => onMenuClick('OngoingProposals'),
+          label: '제시 현황',
+          onClick: () => onMenuClick('ongoingProposals'),
           icon: <FaHistory />,
+          to: '/ongoing-proposals', 
         },
-        { label: '프로필', onClick: () => onMenuClick('profile'), icon: <FaUser /> },
+      ]
+      : userRole === 'company'
+        ? [
+          {
+            label: '여행 성사 내역',
+            onClick: () => onMenuClick('AcceptedProposals'),
+            icon: <FaHistory />,
+            to: '/accepted-proposals', 
+          },
+          { label: '프로필', onClick: () => onMenuClick('profile'), icon: <FaUser />, to: '/profile' },
           {
             label: '로그아웃',
-            href: '/',
-            icon: <FaSignOutAlt />,
             onClick: handleLogout,
+            icon: <FaSignOutAlt />,
+            to: '/', 
           },
         ]
       : [
           // 일반 사용자인 경우
-          { label: '내 여행', href: '/mypage/myroom', icon: <FaHistory /> },
-          { label: '프로필', href: '/mypage/profile', icon: <FaUser /> },
+          { label: '프로필', href: '/myprofile', icon: <FaUser /> },
           {
             label: '로그아웃',
-            href: '/',
-            icon: <FaSignOutAlt />,
             onClick: handleLogout,
+            icon: <FaSignOutAlt />,
+            to: '/', 
           },
         ];
 
@@ -85,10 +94,8 @@ const Sidebar = ({ onMenuClick }) => {
               key={item.label}
               icon={item.icon}
               label={item.label}
-              href={item.href}
-              active={
-                item.label !== '로그아웃' && location.pathname === item.href
-              }
+              to={item.to} 
+              active={item.label !== '로그아웃' && location.pathname === item.to}
               onClick={item.onClick}
             />
           ))}
