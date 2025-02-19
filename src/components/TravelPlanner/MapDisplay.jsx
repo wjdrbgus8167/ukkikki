@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
-
+import bananaIcon from '../../assets/loading-spinner.png';
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
 const MapDisplay = ({ arrivalCity, selectedPlaces = [], day }) => {
   const [coordinates, setCoordinates] = useState({ lat: 0, lng: 0 });
 
-  // useJsApiLoader를 사용하여 API 로딩 상태를 관리합니다.
+  // useJsApiLoader에 language 옵션 추가하여 한국어로 로드합니다.
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: apiKey,
     libraries: ['places'],
+    language: 'ko',
   });
 
   useEffect(() => {
@@ -34,7 +35,6 @@ const MapDisplay = ({ arrivalCity, selectedPlaces = [], day }) => {
     }
   }, [arrivalCity]);
 
-  // 구글 API가 로드되지 않은 경우 로딩 메시지 출력
   if (loadError) return <div>맵을 불러오지 못했습니다.</div>;
   if (!isLoaded) return <div>맵을 불러오는 중...</div>;
 
@@ -63,6 +63,10 @@ const MapDisplay = ({ arrivalCity, selectedPlaces = [], day }) => {
         }}
         center={coordinates}
         zoom={12}
+        // 기본 UI 컨트롤들을 제거합니다.
+        options={{
+          disableDefaultUI: true,
+        }}
       >
         {/* 중심 마커 */}
         <Marker position={coordinates} />

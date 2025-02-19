@@ -166,6 +166,8 @@ const MainLayout = () => {
       ? proposal.data.travelPlan.arrivalCity
       : { name: proposal.arrivalAirport || '도착지 미정' };
 
+  console.log('arrivalCity:', arrivalCity);
+
   // 장소 추가 버튼 토글 함수
   const togglePlaceSelection = () => {
     setShowPlaceSelection((prev) => !prev);
@@ -187,7 +189,7 @@ const MainLayout = () => {
       ...prev,
       [selectedDayId]: [...(prev[selectedDayId] || []), placeWithId],
     }));
-    setShowPlaceSelection(false);
+    // setShowPlaceSelection(false);
   };
 
   const currentDayPlaces = selectedPlacesByDay[selectedDayId] || [];

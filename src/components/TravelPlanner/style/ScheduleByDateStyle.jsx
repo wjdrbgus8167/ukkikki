@@ -1,9 +1,8 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const ScheduleByDateContainer = styled.div`
-   margin: 10px 0px;
-   width: 100%;
-
+  margin: 10px 0px;
+  width: 100%;
 `;
 export const Info = styled.div`
   width: 100%; /* 가로 길이 고정 */
@@ -16,7 +15,7 @@ export const Info = styled.div`
   h1 {
     font-size: 40px; /* 제목 크기 */
     font-weight: bold; /* 굵은 글씨 */
-    margin-left: 5px; 
+    margin-left: 5px;
   }
 
   h3 {
@@ -31,20 +30,17 @@ export const ButtonContainer = styled.div`
 
   button {
     width: 280px;
-    border: 3px dotted #C9C9C9;
+    border: 1px solid #c9c9c9; /* dotted -> solid로 변경 */
     border-radius: 8px;
     padding: 8px 80px;
     transition: border-color 0.3s ease;
 
     &:hover {
-      border-color: #FFD21C;
-
-
+      border-color: #ffd21c;
+    }
   }
 `;
-
 export const ScheduleContainer = styled.div`
-
   height: 570px;
-  overflow-y:auto;
+  overflow-y: auto;
 `;

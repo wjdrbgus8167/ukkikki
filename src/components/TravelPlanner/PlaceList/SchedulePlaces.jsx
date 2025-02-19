@@ -1,7 +1,10 @@
-import React, { useEffect, useRef } from "react";
-import clock from "../../../assets/clock.png"; // 상대 경로로 수정
-import trashCan from "../../../assets/trash_can.png"; // 상대 경로로 수정
-import { SelectedPlacesContainer, SelectedPlacesContent } from "./style/SchedulePlacesStyle";
+import React, { useEffect, useRef } from 'react';
+import clock from '../../../assets/clock.png'; // 상대 경로로 수정
+import trashCan from '../../../assets/trash_can.png'; // 상대 경로로 수정
+import {
+  SelectedPlacesContainer,
+  SelectedPlacesContent,
+} from './style/SchedulePlacesStyle';
 
 const Schedule = ({
   selectedPlaces,
@@ -25,8 +28,9 @@ const Schedule = ({
     <SelectedPlacesContainer ref={containerRef}>
       {selectedPlaces.map((place, index) => {
         // timeData에 값이 없으면, place에 있는 startTime/endTime을 fallback으로 사용
-        const startTime = timeData[place.placeId]?.startTime || place.startTime || "";
-        const endTime = timeData[place.placeId]?.endTime || place.endTime || "";
+        const startTime =
+          timeData[place.placeId]?.startTime || place.startTime || '';
+        const endTime = timeData[place.placeId]?.endTime || place.endTime || '';
         const hasTimeInput = startTime && endTime;
 
         const duration = hasTimeInput
@@ -54,26 +58,54 @@ const Schedule = ({
 
               {/* 시간 입력 폼 */}
               {showTimeInput === place.placeId && (
-                <div className="time-input">
-                  <div className="time-input-fields">
-                    <input
-                      type="time"
-                      value={timeData[place.placeId]?.startTime || place.startTime || ""}
-                      onChange={(e) =>
-                        handleTimeChange(place.placeId, "startTime", e.target.value)
-                      }
-                    />
-                    <input
-                      type="time"
-                      value={timeData[place.placeId]?.endTime || place.endTime || ""}
-                      onChange={(e) =>
-                        handleTimeChange(place.placeId, "endTime", e.target.value)
-                      }
-                    />
-                  </div>
+                <div
+                  className="time-input"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginTop: '8px',
+                  }}
+                >
+                  <input
+                    type="time"
+                    step="300" // 5분 단위
+                    value={
+                      timeData[place.placeId]?.startTime ||
+                      place.startTime ||
+                      ''
+                    }
+                    onChange={(e) =>
+                      handleTimeChange(
+                        place.placeId,
+                        'startTime',
+                        e.target.value,
+                      )
+                    }
+                    style={{ marginRight: '8px' }}
+                  />
+                  <span style={{ marginRight: '8px' }}>~</span>
+                  <input
+                    type="time"
+                    step="300" // 5분 단위
+                    // 종료시간은 시작시간보다 늦은 값만 선택 가능
+                    min={
+                      timeData[place.placeId]?.startTime ||
+                      place.startTime ||
+                      ''
+                    }
+                    value={
+                      timeData[place.placeId]?.endTime || place.endTime || ''
+                    }
+                    onChange={(e) =>
+                      handleTimeChange(place.placeId, 'endTime', e.target.value)
+                    }
+                    style={{ marginRight: '8px' }}
+                  />
                   <button
                     className="btn"
-                    onClick={() => handleSaveTime(place.placeId, place.dayNumber)}
+                    onClick={() =>
+                      handleSaveTime(place.placeId, place.dayNumber)
+                    }
                   >
                     완료
                   </button>
