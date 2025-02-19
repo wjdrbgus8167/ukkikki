@@ -17,13 +17,12 @@ public class CreateInquiryAnswerRequest {
         this.answer = answer;
     }
 
-    public CreateInquiryAnswerCommand toCommand(Integer proposalId, Integer travelPlanId, Integer companyId,Integer inquiryId) {
+    public CreateInquiryAnswerCommand toCommand(Integer proposalId, Integer travelPlanId,Integer inquiryId) {
 
         return CreateInquiryAnswerCommand
                 .builder()
                 .travelPlanId(travelPlanId)
                 .proposalId(proposalId)
-                .companyId(companyId)
                 .answer(answer)
                 .inquiryId(inquiryId)
                 .build();
