@@ -52,9 +52,14 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
 
   // ✅ 마커 클릭 시 상태 업데이트
   const handleMarkerClick = (marker) => {
-    setSelectedMarker({ ...marker });
+    if (selectedMarker) {
+      setSelectedMarker(null); // 기존 InfoWindow 닫기
+    }
+    setTimeout(() => {
+      setSelectedMarker({ ...marker });
+    }, 10); // 약간의 딜레이 추가하여 InfoWindow 충돌 방지
   };
-
+  
   const handleLikePlace = async (place) => {
     if (!place || !selectedCard || !selectedCard.travelPlanId) {
       console.error('🚨 장소 정보 또는 여행방 ID가 없습니다.');
