@@ -275,6 +275,9 @@ const FavoriteList = ({
           onPlaceSelected={handlePlaceSelected}
           selectedTravelPlanId={travelPlanId}
           favorites={favorites}
+          onLocationChange={(place) =>
+            setMapCenter({ lat: place.latitude, lng: place.longitude })
+          }
         />
       </div>
       <div className="flex flex-col h-screen">

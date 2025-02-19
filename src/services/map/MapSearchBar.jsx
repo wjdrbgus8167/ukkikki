@@ -9,6 +9,7 @@ const MapSearchBar = ({
   onPlaceSelected,
   selectedTravelPlanId,
   favorites = [],
+  onLocationChange,
 }) => {
   const [searchedPlace, setSearchedPlace] = useState(null);
   const [isRegistered, setIsRegistered] = useState(false);
@@ -57,6 +58,9 @@ const MapSearchBar = ({
     }
     setSearchedPlace(newPlace);
     setIsRegistered(false);
+    if (onLocationChange) {
+      onLocationChange(newPlace);
+    }
   };
 
   // "장소 등록" 버튼 클릭 시 처리
@@ -105,9 +109,9 @@ const MapSearchBar = ({
 
         if (stompClient && stompClient.connected) {
           const wsData = {
-            action: "ADD_PLACE", // ✅ Action Enum 값 전송
+            action: 'ADD_PLACE', // ✅ Action Enum 값 전송
             placeName,
-            travelPlanId: selectedTravelPlanId
+            travelPlanId: selectedTravelPlanId,
           };
           stompClient.publish({
             destination: '/pub/actions',
@@ -147,8 +151,9 @@ const MapSearchBar = ({
           <input
             type="text"
             placeholder="장소 검색"
-            className=" w-full h-12 pl-4 pr-12 text-base rounded-full focus:outline-none bg-transparent"/>
-          <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-xl text-gray-400">
+            className="w-full h-12 pl-4 pr-12 text-base bg-transparent rounded-full focus:outline-none"
+          />
+          <div className="absolute inset-y-0 flex items-center text-xl text-gray-400 pointer-events-none right-4">
             <FaSearch />
           </div>
         </div>
