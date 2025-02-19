@@ -19,6 +19,7 @@ import 'aos/dist/aos.css'; // AOS 스타일 불러오기
 import AgencyProposalDetailPage from './pages/AgencyProposalDetailPage';
 import ProposalDetailForUser from './pages/ProposalDetailForUserPage';
 import ProposalDetail from './pages/ProposalDetailPage';
+import ProposalStatus from './pages/ProposalStatusPage';
 
 const App = () => {
   useEffect(() => {
@@ -58,17 +59,18 @@ const App = () => {
           path="/agency-proposal-detail/:travelPlanId/:proposalId"
           element={<AgencyProposalDetailPage />}
         /> */}
-
         <Route path="/meeting" element={<OpenViduPage />} />
         <Route
           path="/proposal-detail/:travelPlanId/:proposalId"
           element={<ProposalDetailForUser />}
         />
-
-
         <Route
           path="/agency-proposal-detail/:travelPlanId/:proposalId"
           element={<ProposalDetail />}
+        />
+        <Route 
+          path="/proposal"
+          element={<ProposalStatus />}
         />
       </Routes>
     </Router>

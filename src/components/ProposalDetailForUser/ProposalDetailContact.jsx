@@ -4,6 +4,7 @@ import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import InquiryCard from './InquiryCard'; // 위에서 작성한 InquiryCard 컴포넌트 import
 
 const ProposalDetailContact = () => {
   const { travelPlanId, proposalId } = useParams();
@@ -20,6 +21,7 @@ const ProposalDetailContact = () => {
         `/api/v1/travel-plans/${travelPlanId}/proposals/${proposalId}/inquiries`,
       );
       if (response.status === 200) {
+        console.log('문의사항 조회 결과:', response.data.data);
         setInquiries(response.data.data);
       }
     } catch (error) {
@@ -122,14 +124,11 @@ const ProposalDetailContact = () => {
         ) : (
           <div className="space-y-4">
             {inquiries.map((inquiry) => (
-              <div
+              <InquiryCard
                 key={inquiry.id}
-                data-aos="fade-up"
-                className="p-4 bg-white border rounded shadow-sm"
-              >
-                <h4 className="text-lg font-bold">{inquiry.title}</h4>
-                <p className="mt-2">{inquiry.content}</p>
-              </div>
+                inquiry={inquiry}
+                onSubmitAnswer={() => {}}
+              />
             ))}
           </div>
         )}
