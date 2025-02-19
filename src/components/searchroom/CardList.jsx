@@ -3,6 +3,7 @@ import useRoomModal from './useRoomModal'; // ➀ 커스텀 훅 import
 import RoomModal from './RoomModal';
 import logo from '../../assets/loading-spinner.png';
 import { useNavigate } from 'react-router-dom'; // ✅ 메인페이지 이동을 위한 useNavigate 추가
+import Swal from 'sweetalert2';
 
 const apiKey = import.meta.env.VITE_APP_UNSPLASH_API_KEY;
 const statusMap = {
@@ -191,13 +192,17 @@ const CardList = ({ cards }) => {
               className="px-4 py-2 mt-4 text-white rounded-md bg-brown hover:bg-yellow hover:text-brown hover:font-bold"
               onClick={() => {
                 console.log('선택된 카드:', card); // 카드 콘솔 출력
+
                 // 이미 참여 중인 방이라면 바로 입장 처리
                 if (card.hasJoined) {
                   navigate(`/user-room/${card.travelPlanId}`, {
                     state: { selectedCard: card },
                   });
                 } else {
-                  // 참여 중이 아니라면 모달을 열어서 자세히 보기 진행
+                  if (card.currentParticipants >= card.maxPeople) {
+                    Swal.fire('알림', '최대 인원을 초과했습니다.', 'warning');
+                    return;
+                  }
                   openModal(card);
                 }
               }}
