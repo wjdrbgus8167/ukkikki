@@ -60,7 +60,7 @@ const App = () => {
           path="/agency-proposal-detail/:travelPlanId/:proposalId"
           element={<AgencyProposalDetailPage />}
         /> */}
-        <Route path="/meeting/:propsalId" element={<MeetingPage />} />
+        <Route path="/meeting/:proposalId" element={<MeetingPage />} />
         <Route
           path="/proposal-detail/:travelPlanId/:proposalId"
           element={<ProposalDetailForUser />}

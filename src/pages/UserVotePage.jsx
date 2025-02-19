@@ -140,21 +140,19 @@ const UserVotePage = () => {
   // 홍보 미팅 참여 함수
   const handleJoinMeeting = async (agency) => {
     try {
-      // 일반 사용자는 isHost:false
+      // 백엔드로부터 참가자 권한 토큰을 발급
       const response = await publicRequest.post(
         `/api/v1/travel-plans/${travelPlanId}/proposals/${agency.proposalId}/meeting/connection`,
         { isHost: false }
       );
       if (response.status === 200) {
         const { token } = response.data;
-        // 회의 페이지로 이동 - 토큰 및 추가 정보를 state로 전달
-        navigate(`/meeting/${agency.proposalId}`, {
-          state: { token, isHost: false, agency },
-        });
+        // 쿼리 파라미터로 token, isHost를 넘겨서 이동
+        navigate(`/meeting/${agency.proposalId}?token=${encodeURIComponent(token)}&isHost=false`);
       }
     } catch (error) {
       console.error('회의 참여 실패:', error);
-      Swal.fire('오류', '회의 참여에 실패했습니다.', 'error');
+      Swal.fire('오류', '라이브 방송 참여에 실패했습니다.', 'error');
     }
   };
 

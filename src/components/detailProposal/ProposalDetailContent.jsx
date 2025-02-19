@@ -37,13 +37,7 @@ const ProposalDetailContent = () => {
       if (response.status === 200) {
         const { token } = response.data; // { token: '...' }
         // 회의 페이지로 이동, token을 state로 넘겨서 MeetingPage에서 사용
-        navigate(`/meeting/${proposalId}`, {
-          state: {
-            token,
-            isHost: true,
-            agency: proposal,
-          },
-        });
+        navigate(`/meeting/${proposalId}?token=${encodeURIComponent(token)}&isHost=true`);
       }
     } catch (error) {
       console.error('홍보 방송 시작 실패:', error);
