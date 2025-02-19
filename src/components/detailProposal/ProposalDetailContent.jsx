@@ -35,7 +35,7 @@ const ProposalDetailContent = () => {
         { isHost: true }
       );
       if (response.status === 200) {
-        const { token } = response.data; // { token: '...' }
+        const { token } = response.data.data; // { token: '...' }
         // 회의 페이지로 이동, token을 state로 넘겨서 MeetingPage에서 사용
         navigate(`/meeting/${proposalId}?token=${encodeURIComponent(token)}&isHost=true`);
       }
