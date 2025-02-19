@@ -11,15 +11,16 @@ public class CreateInquiryAnswerResponse {
     private String title;
     private String content;
     private String answer;
-
+    private String companyName;
 
     @Builder
-    public CreateInquiryAnswerResponse(String answer, Integer companyId, Integer inquiryId, Integer proposalId, String title, String content) {
+    public CreateInquiryAnswerResponse(String answer, Integer companyId, Integer inquiryId, Integer proposalId, String title, String content, String companyName) {
         this.answer = answer;
         this.companyId = companyId;
         this.title = title;
         this.content = content;
         this.inquiryId = inquiryId;
         this.proposalId = proposalId;
+        this.companyName = companyName;
     }
 }

@@ -401,18 +401,15 @@ public class ProposalService {
     public CreateInquiryAnswerResponse createInquiryAnswer(CreateInquiryAnswerCommand command) {
 
         // 제안서 존재 여부 확인
-        ProposalEntity proposal = jpaProposalRepository.findByProposalIdAndCompany_CompanyId(command.getProposalId(), command.getCompanyId())
+        ProposalEntity proposal = jpaProposalRepository.findByProposalId(command.getProposalId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 제안서를 찾을 수 없거나 접근 권한이 없습니다."));
         log.info("proposal:{}", proposal.getProposalId());
+
         // 문의 존재 여부 확인
         InquiryEntity inquiry = jpaInquiryRepository.findByInquiryIdAndProposal_ProposalId(command.getInquiryId(), proposal.getProposalId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 문의를 찾을 수 없습니다."));
 
         log.info("inquiry:{}", inquiry.getInquiryId());
-        // 3️⃣ 이미 답변이 있는지 확인
-        if (inquiry.getAnswer() != null && !inquiry.getAnswer().isEmpty()) {
-            throw new IllegalArgumentException("이미 답변이 작성된 문의입니다.");
-        }
 
         // 4️⃣ 답변 저장
         inquiry.updateAnswer(command.getAnswer(),LocalDateTime.now());
@@ -423,9 +420,10 @@ public class ProposalService {
                 .inquiryId(inquiry.getInquiryId())
                 .proposalId(inquiry.getProposal().getProposalId())
                 .answer(inquiry.getAnswer())
-                .companyId(command.getCompanyId())
+                .companyId(proposal.getCompany().getCompanyId())
                 .title(inquiry.getTitle())
                 .content(inquiry.getContent())
+                .companyName(proposal.getCompany().getCompanyName())
                 .build();
 
     }

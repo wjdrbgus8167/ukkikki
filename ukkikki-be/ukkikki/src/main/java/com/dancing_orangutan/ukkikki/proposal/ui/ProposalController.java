@@ -91,10 +91,9 @@ public class ProposalController {
             @PathVariable Integer travelPlanId,
             @PathVariable Integer proposalId,
             @PathVariable Integer inquiryId,
-            @AuthenticationPrincipal CompanyUserDetails companyUserDetails,
             @RequestBody CreateInquiryAnswerRequest request
     ){
-        CreateInquiryAnswerCommand command = request.toCommand(proposalId,travelPlanId,companyUserDetails.getCompanyId(),inquiryId);
+        CreateInquiryAnswerCommand command = request.toCommand(proposalId,travelPlanId,inquiryId);
 
         CreateInquiryAnswerResponse response = proposalService.createInquiryAnswer(command);
 
