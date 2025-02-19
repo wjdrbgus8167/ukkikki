@@ -101,8 +101,8 @@ const OngoingProposals = () => {
             <Table>
               <TableHead>
                 <TableHeadRow>
-                  <TableHeadCell>여행 제목</TableHeadCell>
-                  <TableHeadCell>경로</TableHeadCell>
+                  <TableHeadCell>상품명</TableHeadCell>
+                  <TableHeadCell>여행 경로</TableHeadCell>
                   <TableHeadCell>항공사</TableHeadCell>
                   <TableHeadCell>기간</TableHeadCell>
                   <TableHeadCell>상태</TableHeadCell>

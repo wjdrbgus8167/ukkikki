@@ -67,7 +67,6 @@ const DateSidebar = ({ onToggleDetailForm, onDaySelect, onSubmit }) => {
   }
 
   const handleDaySelect = (dayId) => {
-    console.log("Day selected:", dayId);
     setSelectedDay(dayId);
     if (onDaySelect) onDaySelect(dayId);
   };

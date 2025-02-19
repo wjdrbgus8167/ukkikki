@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { 
   StylePlaceList, 
   StylePlaceContent,
+  StylePlace,
 } from './style/SuggestedPlaceListStyle';
 
 const SuggestedPlaceList = ({ places, onSelectPlace, onSelectDay }) => {
@@ -31,32 +32,37 @@ const SuggestedPlaceList = ({ places, onSelectPlace, onSelectDay }) => {
       return newState;
     });
   };
+    
+  // 좋아요 수(likeCount)를 기준으로 내림차순 정렬 (좋아요가 높은 순)
+  const sortedPlaces = [...places].sort((a, b) => (b.likeCount || 0) - (a.likeCount || 0));
 
   return (
     <div>
-      {places.map((place) => {
+      {sortedPlaces.map((place) => {
+          console.log('likeCount for', place.name, ':', place.likeCount);
         const key = place.id || uuidv4(); // ID가 없으면 uuid 생성
         return (
           <StylePlaceList key={key}>
-            <div className="flex justify-between items-center mb-2">
+            <StylePlace>
               <div className="flex items-center">
                 {place.photoUrl ? (
                   <img 
                     src={place.photoUrl} 
                     alt={place.name} 
-                    className="w-20 h-20 object-cover aspect-square mr-4"
+                    className="w-20 h-20 object-cover aspect-square m-4 rounded-[20px]"
                   />
                 ) : (
                   <div className="w-20 h-20 bg-gray-200 flex items-center justify-center mr-4">
                     <span className="text-sm text-gray-600">No image</span>
                   </div>
                 )}
+
                 <StylePlaceContent>
-                  <p className="font-semibold">{place.name}</p>
-                  <p className="text-sm text-gray-600">{place.address}</p>
-                  <p className="text-sm text-gray-600">좋아요 👍: {place.likeCount}</p>
+                  <p className="font-semibold text-3xl">{place.name}</p>
+                  <p className="text-sm text-gray-600">❤️ {place.likeCount}</p>
                 </StylePlaceContent>
-                <button 
+              </div> 
+              <button 
                   onClick={() => 
                     handleClick({
                       scheduleName: place.name,
@@ -67,9 +73,9 @@ const SuggestedPlaceList = ({ places, onSelectPlace, onSelectDay }) => {
                   }
                 >
                   {selectedMap[key] ? 'test' : '✔️'} {/* 버튼 상태에 따라 text 변경 */}
-                </button>
-              </div>    
-            </div>
+              </button>
+                 
+            </StylePlace>
           </StylePlaceList>
         );
       })}
