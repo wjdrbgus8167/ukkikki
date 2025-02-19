@@ -82,8 +82,8 @@ const ReservationDepositModal = ({ travelPlanId, proposalId, onClose }) => {
         );
         if (statusResponse.status === 200) {
           Swal.fire({
-            title: '성공',
-            html: '예약금 결제가 완료되었고, 여행자 등록 및 방 상태 업데이트가 완료되었습니다.<br/>10초 후에 유저룸으로 이동합니다.',
+            title: '예약금 결제 완료',
+            html: '10초 후에 유저룸으로 이동합니다.',
             icon: 'success',
             showConfirmButton: true,
             confirmButtonText: '지금 이동',
