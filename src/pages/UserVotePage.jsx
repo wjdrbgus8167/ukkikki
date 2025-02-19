@@ -146,7 +146,7 @@ const UserVotePage = () => {
         { isHost: false }
       );
       if (response.status === 200) {
-        const { token } = response.data;
+        const { token } = response.data.data;
         // 쿼리 파라미터로 token, isHost를 넘겨서 이동
         navigate(`/meeting/${agency.proposalId}?token=${encodeURIComponent(token)}&isHost=false`);
       }
