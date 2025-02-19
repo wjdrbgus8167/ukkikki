@@ -43,29 +43,26 @@ const Sidebar = ({ onMenuClick }) => {
   };
 
   const menuItems =
-    // 여행사인 경우
     userRole === 'company'
       ? [
           {
-            label: '제시받은 목록',
+            label: '패키지 의뢰',
             onClick: () => onMenuClick('ReceivedProposals'),
             icon: <FaHistory />,
+            to: '/received-proposals', 
           },
           {
-            label: '진행중인 목록',
+            label: '제시 현황',
             onClick: () => onMenuClick('OngoingProposals'),
             icon: <FaHistory />,
+            to: '/ongoing-proposals', 
           },
-          {
-            label: '프로필',
-            onClick: () => onMenuClick('profile'),
-            icon: <FaUser />,
-          },
+          { label: '프로필', onClick: () => onMenuClick('profile'), icon: <FaUser />, to: '/profile' },
           {
             label: '로그아웃',
-            href: '/',
-            icon: <FaSignOutAlt />,
             onClick: handleLogout,
+            icon: <FaSignOutAlt />,
+            to: '/', 
           },
         ]
       : [
@@ -73,9 +70,9 @@ const Sidebar = ({ onMenuClick }) => {
           { label: '프로필', href: '/myprofile', icon: <FaUser /> },
           {
             label: '로그아웃',
-            href: '/',
-            icon: <FaSignOutAlt />,
             onClick: handleLogout,
+            icon: <FaSignOutAlt />,
+            to: '/', 
           },
         ];
 
@@ -88,10 +85,8 @@ const Sidebar = ({ onMenuClick }) => {
               key={item.label}
               icon={item.icon}
               label={item.label}
-              href={item.href}
-              active={
-                item.label !== '로그아웃' && location.pathname === item.href
-              }
+              to={item.to} 
+              active={item.label !== '로그아웃' && location.pathname === item.to}
               onClick={item.onClick}
             />
           ))}

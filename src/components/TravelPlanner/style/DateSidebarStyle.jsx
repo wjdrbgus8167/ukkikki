@@ -5,9 +5,9 @@ import styled from 'styled-components';
 export const SidebarContainer = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100%; /* 전체 높이를 채우도록 설정 */
+  height: 680px; /* 전체 높이를 채우도록 설정 */
   justify-content: space-between;
-  padding: 0px;
+  overflow: visible;
 
 `;
 
@@ -38,6 +38,7 @@ export const DetailButton = styled.button`
   font-size: 1rem;
   font-weight: 600;
   padding: 0.5rem 1rem;
+  margin-bottom: 7px;
   border: 2px solid #C9C9C9;
   border-radius: 0.5rem;
   width: 6.5rem;

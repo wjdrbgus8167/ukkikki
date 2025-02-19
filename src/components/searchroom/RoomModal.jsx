@@ -65,7 +65,20 @@ function RoomModal({
       );
       return;
     }
-
+    // 최대 인원 초과 체크 (selectedCard.maxPeople: 최대 허용 인원)
+    if (
+      totalPeople + selectedCard.currentParticipants >
+      selectedCard.maxPeople
+    ) {
+      Swal.fire(
+        '알림',
+        `최대 ${
+          selectedCard.maxPeople - selectedCard.currentParticipants
+        }명을 초과할 수 없습니다.`,
+        'warning',
+      );
+      return;
+    }
     const travelPlanId = selectedCard.travelPlanId;
     const requestBody = {
       adultCount: people.adult,

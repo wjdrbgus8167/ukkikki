@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { publicRequest } from '../hooks/requestMethod';
 import MyRoomCard from '../components/mypage/myroom/MyRoomCard';
 import { STATUS_MAP } from '../constants';
+import { IoIosArrowBack } from 'react-icons/io';
 
 // 필터 옵션 정의
 const FILTER_OPTIONS = [
@@ -59,24 +60,35 @@ const MyRoomsPage = () => {
       <Header />
 
       {/* 메인 컨테이너 */}
-      <div className="max-w-screen-xl mx-auto px-6 py-10">
-        <div className="flex items-center justify-center space-x-8 mb-8">
-          {FILTER_OPTIONS.map((option) => (
-            <button
-              key={option.label}
-              onClick={() => handleFilterChange(option)}
-              className={`relative py-2 text-sm font-medium transition-colors ${
-                selectedFilter.label === option.label
-                  ? 'text-brown'
-                  : 'text-gray-500 hover:text-brown'
-              }`}
-            >
-              {option.label}
-              {selectedFilter.label === option.label && (
-                <div className="absolute left-0 bottom-0 w-full h-0.5 bg-brown"></div>
-              )}
+      <div className="max-w-screen-xl px-6 py-10 mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          {/* 왼쪽 빈 공간 */}
+          <div className="flex justify-end w-10">
+            <button onClick={() => navigate(-1)} className="text-brown">
+              <IoIosArrowBack size={32} className="text-3xl font-bold" />
             </button>
-          ))}
+          </div>
+          {/* 가운데: 필터 옵션 */}
+          <div className="flex justify-center space-x-8">
+            {FILTER_OPTIONS.map((option) => (
+              <button
+                key={option.label}
+                onClick={() => handleFilterChange(option)}
+                className={`relative py-2 text-sm font-medium transition-colors ${
+                  selectedFilter.label === option.label
+                    ? 'text-brown'
+                    : 'text-gray-500 hover:text-brown'
+                }`}
+              >
+                {option.label}
+                {selectedFilter.label === option.label && (
+                  <div className="absolute left-0 bottom-0 w-full h-0.5 bg-brown"></div>
+                )}
+              </button>
+            ))}
+          </div>
+          {/* 오른쪽: 뒤로가기 버튼 */}
+          <div className="w-10" />
         </div>
 
         {/* 카드 목록 영역 */}
@@ -89,7 +101,7 @@ const MyRoomsPage = () => {
               />
             ))
           ) : (
-            <div className="col-span-full flex flex-col items-center justify-center mt-16 space-y-4">
+            <div className="flex flex-col items-center justify-center mt-16 space-y-4 col-span-full">
               <img src={logo} alt="바나나 로고" className="w-16 h-16" />
               <p className="text-center text-gray-500">
                 아직 참여한 방이 없습니다. <br />

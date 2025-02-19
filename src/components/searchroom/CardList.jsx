@@ -4,6 +4,34 @@ import RoomModal from './RoomModal';
 import logo from '../../assets/loading-spinner.png';
 import { useNavigate } from 'react-router-dom';
 import { STATUS_MAP, THEME_COLORS, STATUS_STYLES } from '../../constants';
+import { useNavigate } from 'react-router-dom'; // ✅ 메인페이지 이동을 위한 useNavigate 추가
+import Swal from 'sweetalert2';
+
+const apiKey = import.meta.env.VITE_APP_UNSPLASH_API_KEY;
+const statusMap = {
+  IN_PROGRESS: '진행중',
+  BIDDING: '입찰중',
+  BOOKING: '예약중',
+  CONFIRMED: '확정됨',
+};
+
+const getThemeColor = (theme) => {
+  const themeColors = {
+    골프: 'bg-golf text-white',
+    '관광+휴양': 'bg-tourism-relaxation text-white',
+    식도락: 'bg-food text-white',
+    현지문화체험: 'bg-local-culture text-white',
+    기차여행: 'bg-train-trip text-white',
+    SNS핫플: 'bg-sns-hot text-white',
+    럭셔리: 'bg-luxury text-white',
+    해양스포츠: 'bg-marine-sports text-white',
+    온천: 'bg-hot-spring text-white',
+    성지순례: 'bg-pilgrimage text-white',
+    '디저트 골프': 'bg-dessert-golf text-white',
+    축구: 'bg-soccer text-white',
+  };
+  return themeColors[theme] || 'bg-gray-500 text-white';
+};
 
 const CardList = ({ cards }) => {
   const navigate = useNavigate();
@@ -139,6 +167,10 @@ const CardList = ({ cards }) => {
                     state: { selectedCard: card },
                   });
                 } else {
+                  if (card.currentParticipants >= card.maxPeople) {
+                    Swal.fire('알림', '최대 인원을 초과했습니다.', 'warning');
+                    return;
+                  }
                   openModal(card);
                 }
               }}

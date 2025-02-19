@@ -42,16 +42,15 @@ const ReceivedProposals = () => {
       <CardWrapper>
         <Card>
           <TitleWrapper>
-            <Title>제안 목록</Title>
+            <Title>패키지 의뢰</Title>
           </TitleWrapper>
           <TableWrapper>
             <Table>
               <TableHead>
                 <TableHeadRow>
-                  <TableHeadCell>여행 제목</TableHeadCell>
-                  <TableHeadCell>경로</TableHeadCell>
-                  <TableHeadCell>기간</TableHeadCell>
-                  <TableHeadCell>상태</TableHeadCell>
+                  <TableHeadCell>상품명</TableHeadCell>
+                  <TableHeadCell>여행 경로</TableHeadCell>
+                  <TableHeadCell>여행 기간</TableHeadCell>
                   <TableHeadCell>참여자 수</TableHeadCell>
                 </TableHeadRow>
               </TableHead>
@@ -70,12 +69,6 @@ const ReceivedProposals = () => {
                         <TableCell>{proposal.departureCity.name} ➡ {proposal.arrivalCity.name}</TableCell>
                         {/* 기간 */}
                         <TableCell>{proposal.startDate} ~ {proposal.endDate}</TableCell>
-                        {/* 상태 */}
-                        <TableCell>
-                          <Status status={proposal.planningStatus}>
-                            {proposal.planningStatus}
-                          </Status>
-                        </TableCell>
                         {/* 참여자 수 */}
                         <TableCell>{proposal.currentParticipants}</TableCell>
                       </TableRow>
