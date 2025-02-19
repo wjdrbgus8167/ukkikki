@@ -11,7 +11,13 @@ import { RiChatSmileAiLine } from 'react-icons/ri';
 
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
-const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
+const InteractiveSection = ({
+  selectedCard,
+  favorites,
+  setFavorites,
+  isInteractionDisabled,
+  mapCenter,
+}) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [coordinates, setCoordinates] = useState({
     lat: 35.6895,
@@ -56,6 +62,15 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
   };
 
   const handleLikePlace = async (place) => {
+    if (isInteractionDisabled()) {
+      Swal.fire(
+        '알림',
+        '현재 상태에서는 이 기능을 사용할 수 없습니다.',
+        'warning',
+      );
+      return;
+    }
+
     if (!place || !selectedCard || !selectedCard.travelPlanId) {
       console.error('🚨 장소 정보 또는 여행방 ID가 없습니다.');
       return;
@@ -74,7 +89,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
       if (isLiked) {
         console.log('좋아요 삭제');
         await publicRequest.delete(
-          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`
+          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
         );
         updatedMarker = {
           ...place,
@@ -86,7 +101,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
       } else {
         console.log('좋아요 추가');
         await publicRequest.post(
-          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`
+          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
         );
         updatedMarker = {
           ...place,
@@ -100,14 +115,14 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
       // ✅ 상태 업데이트 - 새로운 배열을 반환하여 리렌더링 유도
       setFavorites((prev) => {
         const newFavorites = prev.map((fav) =>
-          fav.placeId === placeId ? { ...updatedMarker } : fav
+          fav.placeId === placeId ? { ...updatedMarker } : fav,
         );
         return [...newFavorites]; // 새로운 배열을 반환해 참조 변경
       });
 
       // ✅ 현재 선택된 마커도 업데이트 (UI 즉시 반영)
       setSelectedMarker((prev) =>
-        prev && prev.placeId === placeId ? { ...updatedMarker } : prev
+        prev && prev.placeId === placeId ? { ...updatedMarker } : prev,
       );
 
       // ✅ WebSocket을 통해 실시간으로 마커 상태 변경 전송
@@ -131,6 +146,15 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
 
   // 태그 삭제 함수 (내가 쓴 태그인 경우 클릭하면 삭제)
   const handleTagDelete = async (placeId, tagId) => {
+    if (isInteractionDisabled()) {
+      Swal.fire(
+        '알림',
+        '현재 상태에서는 이 기능을 사용할 수 없습니다.',
+        'warning',
+      );
+      return;
+    }
+
     Swal.fire({
       title: '태그 삭제',
       text: '정말 이 태그를 삭제하시겠습니까?',
@@ -143,7 +167,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
       if (result.isConfirmed) {
         try {
           const response = await publicRequest.delete(
-            `/api/v1/travel-plans/${selectedCard.travelPlanId}/tags/${tagId}`
+            `/api/v1/travel-plans/${selectedCard.travelPlanId}/tags/${tagId}`,
           );
           if (response.status === 200) {
             // 선택된 마커의 태그 업데이트
@@ -156,13 +180,13 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
               prev.map((marker) =>
                 marker.placeId === placeId
                   ? {
-                    ...marker,
-                    tags: marker.tags.filter(
-                      (tag) => tag.placeTagId !== tagId
-                    ),
-                  }
-                  : marker
-              )
+                      ...marker,
+                      tags: marker.tags.filter(
+                        (tag) => tag.placeTagId !== tagId,
+                      ),
+                    }
+                  : marker,
+              ),
             );
             Swal.fire('성공', '태그가 삭제되었습니다.', 'success');
           }
@@ -176,11 +200,20 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
 
   // 태그 추가 함수
   const handleTagSubmit = async () => {
+    if (isInteractionDisabled()) {
+      Swal.fire(
+        '알림',
+        '현재 상태에서는 이 기능을 사용할 수 없습니다.',
+        'warning',
+      );
+      return;
+    }
+
     if (newTag.trim() === '') return;
     try {
       const response = await publicRequest.post(
         `/api/v1/travel-plans/${selectedCard.travelPlanId}/places/${selectedMarker.placeId}/tags`,
-        { placeTagName: newTag.trim() }
+        { placeTagName: newTag.trim() },
       );
       if (response.status === 200) {
         const newTagObj = {
@@ -200,8 +233,8 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
           prev.map((marker) =>
             marker.placeId === selectedMarker.placeId
               ? { ...marker, tags: [...(marker.tags || []), newTagObj] }
-              : marker
-          )
+              : marker,
+          ),
         );
 
         // ✅ WebSocket을 통해 태그 추가 이벤트 전송
@@ -229,14 +262,14 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
 
   useEffect(() => {
     if (selectedMarker) {
-      const updatedMarker = favorites.find((marker) => marker.placeId === selectedMarker.placeId);
+      const updatedMarker = favorites.find(
+        (marker) => marker.placeId === selectedMarker.placeId,
+      );
       if (updatedMarker) {
         setSelectedMarker(updatedMarker);
       }
     }
   }, [favorites]);
-
-
 
   return (
     <div className="relative w-full h-screen">
@@ -252,7 +285,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
         <GoogleMap
           key={renderKey}
           mapContainerStyle={{ width: '100%', height: '100%' }}
-          center={coordinates}
+          center={mapCenter}
           zoom={12}
           options={{
             mapTypeControl: false,
@@ -299,9 +332,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
                 className="relative p-4"
                 style={{ width: '300px', minHeight: '200px' }}
               >
-                <h3 className="text-lg font-bold">
-                  {selectedMarker?.name}
-                </h3>
+                <h3 className="text-lg font-bold">{selectedMarker?.name}</h3>
                 {selectedMarker.address && (
                   <p className="text-sm text-gray-600">
                     {selectedMarker.address}
@@ -318,7 +349,17 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
                   <div className="flex items-center justify-between">
                     <h4 className="text-sm font-semibold">태그:</h4>
                     <button
-                      onClick={() => setShowTagInput(true)}
+                      onClick={() => {
+                        if (isInteractionDisabled()) {
+                          Swal.fire(
+                            '알림',
+                            '현재 상태에서는 이 기능을 사용할 수 없습니다.',
+                            'warning',
+                          );
+                          return;
+                        }
+                        setShowTagInput(true);
+                      }}
                       className="px-3 py-1 text-white bg-green-500 rounded hover:bg-green-600"
                     >
                       태그 추가
@@ -347,7 +388,13 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
                       {selectedMarker.tags.map((tag, idx) => (
                         <span
                           key={tag.placeTagId || idx}
-                          className="text-xs bg-gray-200 px-1 py-0.5 rounded"
+                          className="text-xs bg-gray-200 px-1 py-0.5 rounded cursor-pointer"
+                          onClick={() =>
+                            handleTagDelete(
+                              selectedMarker.placeId,
+                              tag.placeTagId,
+                            )
+                          }
                         >
                           {typeof tag === 'object' ? tag.name : tag}
                         </span>
@@ -372,7 +419,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
             <Chat travelPlanId={selectedCard.travelPlanId} />
             <button
               onClick={() => setIsChatOpen(false)}
-              className="absolute top-2 right-2 p-2 text-white bg-gray-800 rounded-full"
+              className="absolute p-2 text-white bg-gray-800 rounded-full top-2 right-2"
             >
               ✕
             </button>
@@ -380,7 +427,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
         ) : (
           <button
             onClick={() => setIsChatOpen(true)}
-            className="flex items-center justify-center w-12 h-12 text-white bg-gray-800 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+            className="flex items-center justify-center w-12 h-12 text-white transition-all duration-300 bg-gray-800 rounded-full shadow-lg hover:scale-110"
           >
             <RiChatSmileAiLine size={24} />
           </button>
