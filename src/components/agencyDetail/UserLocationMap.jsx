@@ -2,12 +2,12 @@ import React, { useContext, useEffect, useState } from "react";
 import { LoadScript, InfoWindow } from "@react-google-maps/api";
 import PlaceMap from "../../services/map/PlaceMap";
 import { MapContainer } from "./style/UserLocationMap";
-import ProposalDetailContext from "../../contexts/ProposalDetailContext";
+import TravelPlanDetailContext from "../../contexts/TravelPlanDetailContext";
 
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
 const UserLocationMap = ({ latitude, longitude }) => {
-  const { proposal } = useContext(ProposalDetailContext);
+  const { proposal } = useContext(TravelPlanDetailContext);
   const [centerCoordinates, setCenterCoordinates] = useState({ lat: 37.5665, lng: 126.9780 }); // 서울 기본 좌표 설정
   const [zoomLevel, setZoomLevel] = useState(12);
   const [place, setPlace] = useState([]);

@@ -6,6 +6,9 @@ import AgencyList from '../components/vote/AgencyList';
 import { publicRequest } from '../hooks/requestMethod';
 import Swal from 'sweetalert2';
 import ReservationDepositModal from '../components/vote/ReservationDepositModal';
+import { IoIosArrowBack } from 'react-icons/io';
+import logo from '../assets/loading-spinner.png';
+import VoteCountdown from '../components/vote/VoteCountdown';
 
 const UserVotePage = () => {
   const { travelPlanId } = useParams();
@@ -60,6 +63,14 @@ const UserVotePage = () => {
 
   // 투표 처리 함수 (투표 로직은 그대로 유지)
   const handleVote = async (agency) => {
+    if (hasAcceptedProposal) {
+      Swal.fire(
+        '투표 불가',
+        '투표가 끝났습니다. 투표 기능이 비활성화되었습니다.',
+        'info',
+      );
+      return;
+    }
     if (agency.votedYn) {
       Swal.fire(
         '알림',
@@ -135,20 +146,47 @@ const UserVotePage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
+
       <div className="max-w-4xl p-6 mx-auto">
-        <h1 className="mb-6 text-2xl font-bold text-center text-gray-800">
-          {hasAcceptedProposal ? '채택된 여행사' : '제안받은 여행사'}
-        </h1>
-        <AgencyList
-          agencies={agencies}
-          onVote={handleVote}
-          onDetail={handleDetail}
-        />
+        {/* 제목 영역 - 뒤로가기 버튼과 제목을 flex로 배치 */}
+        <div className="flex items-center justify-between mb-6">
+          {/* 왼쪽: 뒤로가기 버튼 */}
+          <button onClick={() => navigate(-1)} className="ml-4 text-brown">
+            <IoIosArrowBack size={32} className="text-3xl font-bold" />
+          </button>
+          {/* 가운데: 제목 */}
+          <h1 className="flex-1 text-2xl font-bold text-center text-gray-800">
+            {hasAcceptedProposal ? '채택된 여행사' : '제안받은 여행사'}
+          </h1>
+          {/* 오른쪽: 같은 너비의 빈 요소로 가운데 정렬 유지 */}
+          <div className="w-10 mr-4" />
+        </div>
+        {selectedCard && selectedCard.closeTime && (
+          <div className="mb-4">
+            <VoteCountdown closeTime={selectedCard.closeTime} />
+          </div>
+        )}
+        {/* 제안서가 없는 경우 메시지 출력 */}
+        {agencies.length === 0 ? (
+          <div className="flex flex-col items-center justify-center min-h-screen text-gray-600">
+            <img src={logo} alt="바나나 로고" className="w-16 h-16 mb-4" />
+            <p className="text-center text-gray-500">
+              여행사에게 받은 제안서가 없습니다. <br />
+            </p>
+          </div>
+        ) : (
+          <AgencyList
+            agencies={agencies}
+            onVote={handleVote}
+            onDetail={handleDetail}
+          />
+        )}
+
         {hasAcceptedProposal && (
           <div className="flex justify-center mt-8">
             <button
               onClick={() => setShowDepositModal(true)}
-              className="px-8 py-3 rounded text-brown bg-yellow hover:bg-orange-400"
+              className="px-8 py-3 rounded text-brown bg-yellow"
             >
               예약금 결제하러 가기
             </button>
