@@ -85,3 +85,15 @@ export const getPassport = async(proposalId) => {
   };
 };
 
+export const getTotalCount = async (travelPlanId,proposalId) => {
+  try {
+    console.log(travelPlanId);
+    const response = await publicRequest.get(`api/v1/travel-plans/${travelPlanId}/proposals/${proposalId}/total-count`);
+    console.log('전체 인원 조회:', response.data)
+    return response.data;
+
+  } catch (error) {
+    console.log('error',error)
+  };
+};
+
