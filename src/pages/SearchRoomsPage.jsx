@@ -106,7 +106,7 @@ const SearchRoom = () => {
             <select
               value={selectedArrivalCity}
               onChange={(e) => setSelectedArrivalCity(e.target.value)}
-              className="p-2 mr-4 border rounded"
+              className="p-2 mr-6 border rounded"
             >
               <option value="전체보기">전체보기</option>
               {uniqueArrivalCities.map((city) => (

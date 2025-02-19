@@ -4,10 +4,13 @@ import Swal from 'sweetalert2';
 import { stompClient } from '../../components/userroom/WebSocketComponent';
 import { publicRequest } from '../../hooks/requestMethod';
 import MapSearchBar from '../../services/map/MapSearchBar';
-import useAuthStore from '../../stores/authStore';
 
-const FavoriteList = ({ selectedCard, favorites, setFavorites, disabled }) => {
-  const { user } = useAuthStore();
+const FavoriteList = ({
+  selectedCard,
+  favorites,
+  setFavorites,
+  setMapCenter,
+}) => {
   const [expandedPlaceId, setExpandedPlaceId] = useState(null);
   const [showTagInput, setShowTagInput] = useState(false);
   const [newTag, setNewTag] = useState('');
@@ -50,11 +53,13 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites, disabled }) => {
     return [...favorites].sort((a, b) => b.likeCount - a.likeCount);
   }, [favorites]);
 
-  const handleLikeToggle = async (place) => {
-    if (disabled) {
-      Swal.fire('알림', '현재 조작이 불가능합니다.', 'info');
-      return;
+  // 장소 클릭 시 지도 중심을 해당 장소의 좌표로 변경
+  const handlePlaceClick = (place) => {
+    if (place.latitude && place.longitude) {
+      setMapCenter({ lat: place.latitude, lng: place.longitude });
     }
+  };
+  const handleLikeToggle = async (place) => {
     const placeId = place.placeId;
     const isLiked = place.isLiked;
     const totalMember = selectedCard?.member?.totalParticipants || 0;
@@ -270,6 +275,9 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites, disabled }) => {
           onPlaceSelected={handlePlaceSelected}
           selectedTravelPlanId={travelPlanId}
           favorites={favorites}
+          onLocationChange={(place) =>
+            setMapCenter({ lat: place.latitude, lng: place.longitude })
+          }
         />
       </div>
       <div className="flex flex-col h-screen">
@@ -279,6 +287,7 @@ const FavoriteList = ({ selectedCard, favorites, setFavorites, disabled }) => {
             <div
               key={index}
               className="p-4 m-1 transition-all duration-300 bg-gray-100 rounded-lg hover:bg-gray-200"
+              onClick={() => handlePlaceClick(item)}
             >
               <div
                 className="flex items-center justify-between cursor-pointer"

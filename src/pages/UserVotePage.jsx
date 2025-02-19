@@ -8,19 +8,18 @@ import Swal from 'sweetalert2';
 import ReservationDepositModal from '../components/vote/ReservationDepositModal';
 import { IoIosArrowBack } from 'react-icons/io';
 import logo from '../assets/loading-spinner.png';
+import VoteCountdown from '../components/vote/VoteCountdown';
 
 const UserVotePage = () => {
   const { travelPlanId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  // location.state에서 전달받은 selectedCard (없으면 null)
   const initialSelectedCard = location.state?.selectedCard || null;
   const [selectedCard, setSelectedCard] = useState(initialSelectedCard);
   const [agencies, setAgencies] = useState([]);
   const [hasAcceptedProposal, setHasAcceptedProposal] = useState(false);
   const [showDepositModal, setShowDepositModal] = useState(false);
 
-  // 제안 목록(API 호출)
   useEffect(() => {
     const fetchProposals = async () => {
       try {
@@ -29,13 +28,12 @@ const UserVotePage = () => {
         );
         if (response.status === 200) {
           let proposals = response.data.data;
-          // 채택된 제안서(proposalStatus가 'A')가 있는지 확인
           const acceptedProposals = proposals.filter(
             (proposal) => proposal.proposalStatus === 'A',
           );
           if (acceptedProposals.length > 0) {
             setHasAcceptedProposal(true);
-            proposals = acceptedProposals; // 채택된 제안서만 표시
+            proposals = acceptedProposals;
           } else {
             setHasAcceptedProposal(false);
           }
@@ -60,7 +58,6 @@ const UserVotePage = () => {
     }
   }, [travelPlanId]);
 
-  // 투표 처리 함수 (투표 로직은 그대로 유지)
   const handleVote = async (agency) => {
     if (hasAcceptedProposal) {
       Swal.fire(
@@ -90,7 +87,6 @@ const UserVotePage = () => {
     if (!result.isConfirmed) return;
 
     try {
-      // 백엔드에서 투표 시작이 자동으로 처리되므로 voteSurveyId는 그대로 사용
       const voteSurveyId = selectedCard.voteSurveyInfo?.voteSurveyId;
       if (!voteSurveyId) {
         Swal.fire(
@@ -135,7 +131,6 @@ const UserVotePage = () => {
     }
   };
 
-  // 상세보기 함수: ProposalDetailForUser 페이지로 이동 (selectedCard 정보도 함께 전달)
   const handleDetail = (agency) => {
     navigate(`/proposal-detail/${travelPlanId}/${agency.proposalId}`, {
       state: { agency, selectedCard },
@@ -143,56 +138,62 @@ const UserVotePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen">
       <Header />
 
-      <div className="max-w-4xl p-6 mx-auto">
-        {/* 제목 영역 - 뒤로가기 버튼과 제목을 flex로 배치 */}
-        <div className="flex items-center justify-between mb-6">
-          {/* 왼쪽: 뒤로가기 버튼 */}
-          <button onClick={() => navigate(-1)} className="ml-4 text-brown">
-            <IoIosArrowBack size={32} className="text-3xl font-bold" />
-          </button>
-          {/* 가운데: 제목 */}
-          <h1 className="flex-1 text-2xl font-bold text-center text-gray-800">
-            {hasAcceptedProposal ? '채택된 여행사' : '제안받은 여행사'}
-          </h1>
-          {/* 오른쪽: 같은 너비의 빈 요소로 가운데 정렬 유지 */}
-          <div className="w-10 mr-4" />
-        </div>
-
-        {/* 제안서가 없는 경우 메시지 출력 */}
-        {agencies.length === 0 ? (
-          <div className="flex flex-col items-center justify-center min-h-screen text-gray-600">
-            <img src={logo} alt="바나나 로고" className="w-16 h-16 mb-4" />
-            <p className="text-center text-gray-500">
-              여행사에게 받은 제안서가 없습니다. <br />
-            </p>
-          </div>
-        ) : (
-          <AgencyList
-            agencies={agencies}
-            onVote={handleVote}
-            onDetail={handleDetail}
-          />
-        )}
-
-        {hasAcceptedProposal && (
-          <div className="flex justify-center mt-8">
-            <button
-              onClick={() => setShowDepositModal(true)}
-              className="px-8 py-3 rounded text-brown bg-yellow"
-            >
-              예약금 결제하러 가기
+      {/* 메인 컨텐츠 영역의 최소 높이를 화면 높이에서 헤더/푸터 높이를 뺀 값으로 설정 */}
+      <div className="flex-1 bg-gray-50">
+        <div className="max-w-4xl p-6 mx-auto min-h-[calc(100vh-80px)]">
+          <div className="flex items-center justify-between mb-6">
+            <button onClick={() => navigate(-1)} className="ml-4 text-brown">
+              <IoIosArrowBack size={32} className="text-3xl font-bold" />
             </button>
+            <h1 className="flex-1 text-2xl font-bold text-center text-gray-800">
+              {hasAcceptedProposal ? '채택된 여행사' : '제안받은 여행사'}
+            </h1>
+            <div className="w-10 mr-4" />
           </div>
-        )}
+
+          {selectedCard && selectedCard.closeTime && (
+            <div className="mb-4">
+              <VoteCountdown closeTime={selectedCard.closeTime} />
+            </div>
+          )}
+
+          {agencies.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-[60vh] text-gray-600">
+              <img src={logo} alt="바나나 로고" className="w-16 h-16 mb-4" />
+              <p className="text-center text-gray-500">
+                여행사에게 받은 제안서가 없습니다. <br />
+              </p>
+            </div>
+          ) : (
+            <AgencyList
+              agencies={agencies}
+              onVote={handleVote}
+              onDetail={handleDetail}
+            />
+          )}
+
+          {hasAcceptedProposal && (
+            <div className="flex justify-center mt-8">
+              <button
+                onClick={() => setShowDepositModal(true)}
+                className="px-8 py-3 rounded text-brown bg-yellow"
+              >
+                예약금 결제하러 가기
+              </button>
+            </div>
+          )}
+        </div>
       </div>
+
       <Footer />
+
       {showDepositModal && (
         <ReservationDepositModal
           travelPlanId={travelPlanId}
-          proposalId={agencies[0]?.proposalId} // 채택된 제안서가 있을 때 해당 proposalId 사용
+          proposalId={agencies[0]?.proposalId}
           onClose={() => setShowDepositModal(false)}
         />
       )}

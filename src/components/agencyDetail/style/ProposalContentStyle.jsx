@@ -2,12 +2,14 @@ import styled from 'styled-components';
 
 export const PorposalContentContainer = styled.div`
   display: flex;
-  justify-content: flex-start;
-  column-gap: 10rem; /* space-x-40: 10rem (160px) */
+  justify-content: center; /* 수평 중앙 정렬 */
+  align-items: center; /* 수직 중앙 정렬 */
+  column-gap: 80px; /* space-x-40: 10rem (160px) */
+  margin-left: 150px;
 
   .proposal-title {
     flex: 1.5;
-    font-size: clamp(70px, 5vw, 90px);
+    font-size: clamp(80px, 5vw, 90px);
     color: #412b2b;
     font-weight: 800;
     line-height: 100px;
@@ -20,6 +22,8 @@ export const PorposalContentContainer = styled.div`
     font-size: 20px; /* text-[30px] */
     font-weight: 400; /* font-semibold */
     line-height: 50px; /* leading-[50px] */
+    
+    
   }
   .keywords-container {
     display: flex;

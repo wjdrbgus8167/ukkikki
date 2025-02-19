@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { over } from 'stompjs';
 import Swal from 'sweetalert2';
 import { RiSendPlaneLine } from 'react-icons/ri';
+import { publicRequest } from '../../hooks/requestMethod';
 
 const Chat = ({ travelPlanId }) => {
   if (!travelPlanId) {
@@ -20,7 +21,7 @@ const Chat = ({ travelPlanId }) => {
   const [stompClient, setStompClient] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
-  const [autoScrolled, setAutoScrolled] = useState(false);
+  const [autoScrolled, setAutoScrolled] = useState(true);
   const initialFetchDone = useRef(false); // 추가: 초기 기록 로드 여부 추적
 
   const chatContainerRef = useRef(null);
@@ -32,12 +33,18 @@ const Chat = ({ travelPlanId }) => {
   const memberId = useRef(null);
 
   // ▼ 스크롤 맨 아래로 이동하는 함수
-  const scrollToBottom = () => {
-    if (chatContainerRef.current) {
-      const container = chatContainerRef.current;
-      container.scrollTop = container.scrollHeight;
-    }
-  };
+const scrollToBottom = () => {
+  if (chatContainerRef.current) {
+    const container = chatContainerRef.current;
+
+    // 약간의 딜레이 후 실행 (렌더링 완료 후 동작)
+    setTimeout(() => {
+      container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+      console.log("스크롤 내리기");
+    }, 100); // 100ms 딜레이
+  }
+};
+
 
   // 채팅방 구독 함수
   const subscribeToChat = (client, travelPlanId) => {
@@ -94,18 +101,39 @@ const Chat = ({ travelPlanId }) => {
   };
 
   // history 요청 함수
-  const fetchHistoryMessages = (client = stompClient) => {
-    if (!isConnected || !client || !hasMoreMessages) return;
-    if (!client.ws || client.ws.readyState !== WebSocket.OPEN) return;
+  const fetchHistoryMessages = async () => {
+    if (!hasMoreMessages) return;
 
-    const request = {
-      travelPlanId,
-      createdAtBefore:
-        oldestMessageTime.current ||
-        format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSS"),
-    };
+    try {
+      const response = await publicRequest.get(`/api/v1/chat/${travelPlanId}/history`, {
+        params: {
+          createdAtBefore: oldestMessageTime.current || format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSS"),
+        },
+      });
 
-    client.send('/pub/chat/history', {}, JSON.stringify(request));
+      if (response.data?.data?.messages) {
+        const historyMessages = response.data.data.messages;
+
+        if (historyMessages.length > 0) {
+          oldestMessageTime.current = historyMessages[0].createdAt;
+          const container = chatContainerRef.current;
+          const prevScrollHeight = container ? container.scrollHeight : 0;
+
+          setMessages((prev) => [...historyMessages, ...prev]);
+
+          setTimeout(() => {
+            if (container) {
+              container.scrollTop = container.scrollHeight - prevScrollHeight;
+            }
+            scrollToBottom();
+          }, 0);
+        }
+
+        setHasMoreMessages(response.data.data.hasMore);
+      }
+    } catch (error) {
+      console.error("🚨 채팅 기록 가져오기 실패:", error);
+    }
   };
 
   // ENTER 메시지 전송 (한 번만 전송)
@@ -140,20 +168,22 @@ const Chat = ({ travelPlanId }) => {
   // Intersection Observer: 상단 sentinel 감지 시 history 요청
   useEffect(() => {
     if (!chatContainerRef.current) return;
+  
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            fetchHistoryMessages(stompClient);
+            fetchHistoryMessages(); // 상단 도달 시 추가 메시지 HTTP 요청
           }
         });
       },
-      { root: chatContainerRef.current, threshold: 0.1 },
+      { root: chatContainerRef.current, threshold: 0.1 }
     );
+  
     if (topSentinelRef.current) observer.observe(topSentinelRef.current);
     return () => observer.disconnect();
-  }, [stompClient]);
-
+  }, []);
+  
   // ▼ 새로운 메시지 도착 시 스크롤 처리
   useEffect(() => {
     const container = chatContainerRef.current;
@@ -205,8 +235,9 @@ const Chat = ({ travelPlanId }) => {
 
         // 초기 기록 로드 (한 번만 실행)
         if (!initialFetchDone.current) {
-          fetchHistoryMessages(client);
+          fetchHistoryMessages();
           initialFetchDone.current = true;
+          console.log("과거 기록 가져오기");
         }
       },
       (error) => {
