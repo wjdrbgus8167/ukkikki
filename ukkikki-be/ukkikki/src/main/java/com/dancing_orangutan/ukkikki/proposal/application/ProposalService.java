@@ -12,6 +12,7 @@ import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.ProposalEntity;
 import com.dancing_orangutan.ukkikki.proposal.domain.schedule.Schedule;
 import com.dancing_orangutan.ukkikki.proposal.domain.schedule.ScheduleEntity;
+import com.dancing_orangutan.ukkikki.proposal.domain.session.SessionEntity;
 import com.dancing_orangutan.ukkikki.proposal.domain.traveler.Traveler;
 import com.dancing_orangutan.ukkikki.proposal.domain.traveler.TravelerEntity;
 import com.dancing_orangutan.ukkikki.proposal.domain.vote.VoteEntity;
@@ -29,6 +30,7 @@ import com.dancing_orangutan.ukkikki.proposal.infrastructure.proposal.ProposalRe
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.schedule.JpaScheduleRepository;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.schedule.ScheduleFinder;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.schedule.ScheduleRepository;
+import com.dancing_orangutan.ukkikki.proposal.infrastructure.session.SessionRepository;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.traveler.JpaTravelerRepository;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.vote.JpaVoteRepository;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.voteSurvey.JpaVoteSurveyRepository;
@@ -37,9 +39,11 @@ import com.dancing_orangutan.ukkikki.proposal.mapper.TravelerMapper;
 import com.dancing_orangutan.ukkikki.proposal.mapper.VoteSurveyMapper;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.*;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravelPlan.MemberTravelPlanEntity;
+import io.openvidu.java.client.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,10 +77,18 @@ public class ProposalService {
     private final AirportFinder airportFinder;
     private final SpringEventPublisher eventPublisher;
     private final JpaVoteSurveyRepository jpaVoteSurveyRepository;
+    private final SessionRepository sessionRepository;
+    private OpenVidu openVidu;
+
+    @Value("${OPENVIDU_URL}")
+    private String OPENVIDU_URL;
+
+    @Value("${OPENVIDU_SECRET}")
+    private String OPENVIDU_SECRET;
 
     // 제안서 작성
     @Transactional
-   public CreateProposalResponse createProposal(CreateProposalCommand command){
+    public CreateProposalResponse createProposal(CreateProposalCommand command){
 
        Proposal domain= Proposal.builder()
                .name(command.getName())
@@ -131,9 +143,104 @@ public class ProposalService {
                .proposal(savedProposal)
                .schedules(scheduleList)
                .build();
-   }
+    }
 
-   // 제안서 목록 조회
+    // 제안서에 대한 화상 회의 세션 생성
+    @Transactional
+    public void createSessionForProposal(Integer proposalId) {
+        // 1) 세션 생성
+        SessionProperties props = new SessionProperties.Builder().build();
+        try {
+            Session session = openVidu.createSession(props);
+            String sessionId = session.getSessionId();
+
+            // 2) DB에 sessionId 저장
+            SessionEntity sessionEntity = SessionEntity.builder()
+                    .proposalId(proposalId)
+                    .sessionId(sessionId)
+                    .build();
+
+        } catch (OpenViduJavaClientException | OpenViduHttpException e) {
+            throw new RuntimeException("OpenVidu 세션 생성에 실패했습니다.", e);
+        }
+    }
+
+    /**
+     * proposalId를 받아서 세션이 이미 있으면 재사용, 없으면 생성.
+     * -> 화상 회의 페이지에서 토큰 요청 시 사용 가능
+     */
+    @Transactional
+    public String getOrCreateSession(Integer proposalId) {
+        SessionEntity sessionEntity = sessionRepository.findByProposalId(proposalId)
+                .orElse(null);
+        if (sessionEntity != null) {
+            // 이미 세션이 존재
+            return sessionEntity.getSessionId();
+        } else {
+            // 없으면 새로 생성
+            createSessionForProposal(proposalId);
+            // 다시 조회
+            sessionEntity = sessionRepository.findByProposalId(proposalId)
+                    .orElseThrow(() -> new RuntimeException("OpenVidu 세션 생성에 실패했습니다."));
+            return sessionEntity.getSessionId();
+        }
+    }
+
+    /**
+     * 토큰 생성 로직
+     * @param isHost = true -> PUBLISHER(여행사)
+     * @param isHost = false -> SUBSCRIBER(유저)
+     */
+    public String generateToken(Integer proposalId, boolean isHost, String memberName) {
+        try {
+            String sessionId = getOrCreateSession(proposalId);
+            Session session = openVidu.getActiveSession(sessionId);
+            if (session == null) {
+                // 세션이 만료되었거나 이미 close된 경우 다시 생성
+                sessionId = createNewSessionManually(proposalId);
+                session = openVidu.getActiveSession(sessionId);
+            }
+
+            ConnectionProperties connectionProperties = new ConnectionProperties.Builder()
+                    .role(isHost ? OpenViduRole.PUBLISHER : OpenViduRole.SUBSCRIBER)
+                    .data(memberName)
+                    .build();
+
+            Connection connection = session.createConnection(connectionProperties);
+            return connection.getToken();
+        } catch (OpenViduJavaClientException | OpenViduHttpException e) {
+            throw new RuntimeException("토큰 생성에 실패했습니다.", e);
+        }
+    }
+
+    private String createNewSessionManually(Integer proposalId)
+            throws OpenViduJavaClientException, OpenViduHttpException {
+        Session session = openVidu.createSession();
+        String newSessionId = session.getSessionId();
+        // 기존 sessionId 업데이트
+        SessionEntity sessionEntity = sessionRepository.findByProposalId(proposalId)
+                .orElseThrow(() -> new RuntimeException("세션 기록이 발견되지 않았습니다."));
+        sessionEntity.setSessionId(newSessionId);
+        sessionRepository.save(sessionEntity);
+        return newSessionId;
+    }
+
+    /**
+     * 호스트 접속 여부 체크 (PUBLISHER가 연결되어 있으면 true)
+     */
+    public boolean isHostConnected(Integer proposalId) {
+        SessionEntity sessionEntity = sessionRepository.findByProposalId(proposalId)
+                .orElse(null);
+        if (sessionEntity == null) return false;
+
+        Session session = openVidu.getActiveSession(sessionEntity.getSessionId());
+        if (session == null) return false;
+
+        return session.getConnections().stream()
+                .anyMatch(connection -> connection.getRole() == OpenViduRole.PUBLISHER);
+    }
+
+    // 제안서 목록 조회
     @Transactional
     public List<ProposalListResponse> getProposalList(ProposalListCommand command) {
 
