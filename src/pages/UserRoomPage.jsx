@@ -7,6 +7,7 @@ import OverviewBar from '../components/userroom/OverviewBar';
 import FavoriteList from '../components/userroom/FavoriteList';
 import { LoadScript } from '@react-google-maps/api';
 import WebSocketComponent from '../components/userroom/WebSocketComponent';
+import Swal from 'sweetalert2';
 
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
@@ -17,14 +18,26 @@ const UserRoom = () => {
   const [selectedCard, setSelectedCard] = useState(initialSelectedCard || {}); // 초기값 설정
   const [isLikeListOpen, setIsLikeListOpen] = useState(true);
   const [favorites, setFavorites] = useState([]);
+  const [mapCenter, setMapCenter] = useState({ lat: 35.6895, lng: 139.6917 });
+
   const libraries = ['places'];
 
   const travelPlanId = selectedCard?.travelPlanId || travelPlanIdFromUrl; // selectedCard.travelPlanId 또는 URL의 travelPlanId 사용
-
+  console.log('📌 uuu-selectedCard:', selectedCard.planningStatus);
   // disabled: planningStatus가 BIDDING, BOOKING, CONFIRMED이면 사용자 조작 차단 (OverviewBar 제외)
   const disabled = ['BIDDING', 'BOOKING', 'CONFIRMED'].includes(
     selectedCard.planningStatus,
   );
+  // 비활성 상태에서 사용자 조작 시 알림창 띄우기
+  const handleDisabledClick = useCallback((e) => {
+    e.stopPropagation();
+    Swal.fire({
+      title: '기능 제한',
+      html: '현재 여행방 상태가 입찰중, 예약중, 또는 여행확정 상태이므로 <br>일부 기능은 제한됩니다.',
+      icon: 'warning',
+      confirmButtonText: '확인',
+    });
+  }, []);
 
   // 여행방 데이터 가져오기
   const fetchRoomData = useCallback(async (id) => {
@@ -51,6 +64,28 @@ const UserRoom = () => {
       console.error('🚨 여행방 데이터 가져오기 실패:', error);
     }
   }, []);
+
+  // selectedCard가 업데이트될 때 도착 도시 좌표 가져오기
+  useEffect(() => {
+    if (selectedCard && selectedCard.arrivalCity?.name) {
+      const city = selectedCard.arrivalCity.name;
+      const getCoordinates = async () => {
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${city}&key=${apiKey}`;
+        try {
+          const response = await fetch(url);
+          const data = await response.json();
+          if (data.status === 'OK') {
+            const { lat, lng } = data.results[0].geometry.location;
+            setMapCenter({ lat, lng });
+          }
+        } catch (error) {
+          console.error('🚨 Geocoding 요청 실패:', error);
+        }
+      };
+
+      getCoordinates();
+    }
+  }, [selectedCard]);
 
   useEffect(() => {
     if (travelPlanId) {
@@ -99,9 +134,17 @@ const UserRoom = () => {
               selectedCard={selectedCard}
               favorites={favorites}
               setFavorites={setFavorites}
+              isInteractionDisabled={disabled}
+              mapCenter={mapCenter}
             />
           </div>
-
+          {disabled && (
+            <div
+              className="absolute inset-0 z-10"
+              onClick={handleDisabledClick}
+              style={{ cursor: 'not-allowed' }}
+            />
+          )}
           <div className="relative flex h-full pointer-events-none">
             {/* 왼쪽 사이드바 (즐겨찾기 목록) */}
             <div
@@ -123,13 +166,21 @@ const UserRoom = () => {
                     selectedCard={selectedCard}
                     favorites={favorites}
                     setFavorites={setFavorites}
+                    setMapCenter={setMapCenter}
                   />
+                  {disabled && (
+                    <div
+                      className="absolute inset-0 z-10"
+                      onClick={handleDisabledClick}
+                      style={{ cursor: 'not-allowed' }}
+                    />
+                  )}
                 </div>
               )}
             </div>
 
             {/* 오른쪽: OverviewBar (사용자 조작 허용) */}
-            <div className="flex-1 overflow-auto bg-transparent m-2 z-20">
+            <div className="z-20 flex-1 m-2 overflow-auto bg-transparent">
               <OverviewBar selectedCard={selectedCard} />
             </div>
           </div>
