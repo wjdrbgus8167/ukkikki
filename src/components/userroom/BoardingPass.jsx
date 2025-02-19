@@ -32,7 +32,7 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.60 }) => {
       break;
     case "BIDDING":
       buttonText = "제안서 제출 완료";
-      todoItems = ["☐ 가고 싶은 패키지 투표하기", "☐ 여행사에게 문의하기"];
+      todoItems = ["☐ 패키지 투표하기", "☐ 여행사에게 문의하기"];
       statusDescription = "여행사에서 패키지 여행을 계획하고 있어요!";
       break;
     case "BOOKING":
