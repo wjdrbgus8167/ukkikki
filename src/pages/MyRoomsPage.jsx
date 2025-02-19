@@ -86,9 +86,6 @@ const MyRoomsPage = () => {
               <MyRoomCard
                 key={room.travelPlanId}
                 room={room}
-                imageUrl={
-                  'https://ukkikki-bucket.s3.ap-northeast-2.amazonaws.com/city/tokyo.jpg'
-                }
               />
             ))
           ) : (
