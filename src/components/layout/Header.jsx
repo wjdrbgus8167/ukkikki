@@ -84,9 +84,14 @@ const Header = () => {
           </>
         ) : userRole === 'company' ? (
           <>
+            {/* 데스크탑: 제안현황 버튼 추가 */}
+            <div className="items-center hidden space-x-6 md:flex">
+              <NavLink to="/proposal">제안 관리</NavLink>
+            </div>
+            {/* 공통: 프로필 드롭다운 (마이페이지, 로그아웃) */}
             <div className="relative">
-              <Link
-                to="/myprofile"
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="flex items-center space-x-2 focus:outline-none"
               >
                 <img
@@ -94,11 +99,32 @@ const Header = () => {
                   alt="프로필"
                   className="w-10 h-10 border border-gray-300 rounded-full"
                 />
-              </Link>
+              </button>
+              {isDropdownOpen && (
+                <div className="absolute right-0 z-50 w-40 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg">
+                  <Link
+                    to="/myprofile"
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    마이페이지
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsDropdownOpen(false);
+                    }}
+                    className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
+                  >
+                    로그아웃
+                  </button>
+                </div>
+              )}
             </div>
           </>
         ) : (
           <>
+            {/* 기존 유저(일반 사용자)용 네비게이션 */}
             {/* 데스크탑 네비게이션: md 이상에서만 보임 */}
             <div className="items-center hidden space-x-6 md:flex">
               <NavLink to="/search-room">전체여행방</NavLink>

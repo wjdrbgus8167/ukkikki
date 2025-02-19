@@ -43,19 +43,28 @@ const Sidebar = ({ onMenuClick }) => {
   };
 
   const menuItems =
-    userRole === 'company'
+    userRole === 'company' && location.pathname.includes('/proposal')
       ? [
+        {
+          label: '패키지 의뢰',
+          onClick: () => onMenuClick('receivedProposals'),
+          icon: <FaHistory />,
+          to: '/received-proposals', 
+        },
+        {
+          label: '제시 현황',
+          onClick: () => onMenuClick('ongoingProposals'),
+          icon: <FaHistory />,
+          to: '/ongoing-proposals', 
+        },
+      ]
+      : userRole === 'company'
+        ? [
           {
-            label: '패키지 의뢰',
-            onClick: () => onMenuClick('ReceivedProposals'),
+            label: '여행 성사 내역',
+            onClick: () => onMenuClick('AcceptedProposals'),
             icon: <FaHistory />,
-            to: '/received-proposals', 
-          },
-          {
-            label: '제시 현황',
-            onClick: () => onMenuClick('OngoingProposals'),
-            icon: <FaHistory />,
-            to: '/ongoing-proposals', 
+            to: '/accepted-proposals', 
           },
           { label: '프로필', onClick: () => onMenuClick('profile'), icon: <FaUser />, to: '/profile' },
           {
