@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -258,8 +259,14 @@ public class ProposalController {
     @PostMapping("/{proposalId}/meeting/connection")
     public ApiUtils.ApiResponse<?> getConnection(@PathVariable Integer proposalId,
                                                  @RequestBody GetConnectionRequest getConnectionRequest,
-                                                 @AuthenticationPrincipal MemberUserDetails memberDetails) {
-        getConnectionRequest.setMemberName(memberDetails.getName());
+                                                 @AuthenticationPrincipal UserDetails userDetails) {
+
+        // 분기 처리: userDetails의 타입에 따라 처리
+        if (userDetails instanceof MemberUserDetails memberDetails) {
+            getConnectionRequest.setMemberName(memberDetails.getName());
+        } else if (userDetails instanceof CompanyUserDetails companyDetails) {
+            getConnectionRequest.setMemberName(companyDetails.getCompanyName());
+        }
 
         String token = proposalService.generateToken(
                 proposalId,
