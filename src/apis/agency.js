@@ -28,9 +28,21 @@ export const AgencyProposalslist = async() => {
   };
 };
 
-export const AgencyProposalListDetail = async(proposalId)=>{
+//제안서 세부내용 (지우기)
+export const AgencyProposalListDetail = async(proposalId, travelPlanId)=>{
   try{
-      const response = await publicRequest.get(`api/v1/proposals/${proposalId}`);
+      const response = await publicRequest.get(`api/v1/travel-plans/${travelPlanId}/proposals/${proposalId}`);
+      console.log(`제안서 세부 내용 조회 `,response.data)
+      return response.data
+  }catch(error){
+    console.log(`Error`,error)
+  }
+};
+
+//제안서 세부내용 
+export const ProposalDetail = async(proposalId, travelPlanId)=>{
+  try{
+      const response = await publicRequest.get(`api/v1/travel-plans/${travelPlanId}/proposals/${proposalId}`);
       console.log(`제안서 세부 내용 조회 `,response.data)
       return response.data
   }catch(error){
@@ -40,7 +52,7 @@ export const AgencyProposalListDetail = async(proposalId)=>{
 
 //여행계획 세부 조회
 
-export const AgencyProposalDetail =  async(travelPlanId) => {
+export const TravelPlanDetail =  async(travelPlanId) => {
   try{
     const response = await publicRequest.get(`api/v1/travel-plans/${travelPlanId}`);
     console.log('여행계획 세부 조회 response.data:',response.data)
@@ -50,7 +62,7 @@ export const AgencyProposalDetail =  async(travelPlanId) => {
   };
 };
 
-//여행계획 제안서 (상세내용)
+//여행계획 제안서보내기 (상세내용)
 
 export const CreateTravelProposal = async(travelPlanId, payload) => {
   try {
@@ -62,14 +74,37 @@ export const CreateTravelProposal = async(travelPlanId, payload) => {
   };
 };
 
+//여행 계획 제안서 수정
+export const UpdateTravelProposal = async(travelPlanId,proposalId, payload) => {
+  try {
+    const response = await publicRequest.put(`api/v1/travel-plans/${travelPlanId}/proposals/${proposalId}`, payload);
+    console.log('여행 제안서 수정 완료:', response.data)
+    return response.data;
+  } catch(error) {
+    console.log(' 여행 제안서 수정 실패:', error)
+  };
+};
+
 //확정된 제안서의 여권 조회
 export const getPassport = async(proposalId) => {
   try {
     const response = await publicRequest.get(`api/v1/proposals/${proposalId}/passports`);
-    console.log(' 확정된 제안서의 여권 조회회:', response.data)
+    console.log(' 확정된 제안서의 여권 조회:', response.data)
     return response.data;
   } catch(error) {
     console.log('error:',error)
+  };
+};
+
+export const getTotalCount = async (travelPlanId,proposalId) => {
+  try {
+    console.log(travelPlanId);
+    const response = await publicRequest.get(`api/v1/travel-plans/${travelPlanId}/proposals/${proposalId}/total-count`);
+    console.log('전체 인원 조회:', response.data)
+    return response.data;
+
+  } catch (error) {
+    console.log('error',error)
   };
 };
 

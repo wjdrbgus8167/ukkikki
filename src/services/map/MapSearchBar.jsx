@@ -147,9 +147,8 @@ const MapSearchBar = ({
           <input
             type="text"
             placeholder="장소 검색"
-            className="w-full h-[44px] pl-4 pr-[48px] text-sm border border-gray-300 focus:outline-none"
-          />
-          <div className="absolute text-xl text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2">
+            className=" w-full h-12 pl-4 pr-12 text-base rounded-full focus:outline-none bg-transparent"/>
+          <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-xl text-gray-400">
             <FaSearch />
           </div>
         </div>

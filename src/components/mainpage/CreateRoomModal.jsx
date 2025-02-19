@@ -41,10 +41,20 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
     setRoomData({ ...roomData, [e.target.name]: e.target.value });
   };
 
-  // 1단계 → 2단계 이동
+  // 1단계 → 2단계 이동 핸들러
   const handleNextStep = () => {
-    if (!roomData.title || !roomData.minPeople || !roomData.maxPeople) {
+    // 모든 필수 항목이 입력되었는지 확인
+    if (
+      !roomData.title ||
+      roomData.minPeople === '' ||
+      roomData.maxPeople === ''
+    ) {
       Swal.fire('알림', '모든 항목을 입력해주세요.', 'warning');
+      return;
+    }
+    // 최소 인원과 최대 인원 비교 (숫자로 변환하여 비교)
+    if (parseInt(roomData.maxPeople, 10) < parseInt(roomData.minPeople, 10)) {
+      Swal.fire('알림', '최대 인원은 최소 인원 이상이어야 합니다.', 'warning');
       return;
     }
     setStep(2);
@@ -120,7 +130,7 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
 
     // 변환: 선택된 키워드 배열을 백엔드가 기대하는 형식으로 변환 (예: { keywordId: 1 })
     const keywordsPayload = roomData.selectedKeywords.map((item) => ({
-      keywordId: item.id,
+      keywordId: item.keywordId,
     }));
 
     const requestBody = {
@@ -213,22 +223,9 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
                     type="number"
                     name="minPeople"
                     value={roomData.minPeople}
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value, 10);
-                      if (value < 1) {
-                        Swal.fire(
-                          '알림',
-                          '최소 인원은 1명 이상이어야 합니다.',
-                          'warning',
-                        );
-                        return;
-                      }
-                      setRoomData((prev) => ({
-                        ...prev,
-                        minPeople: value,
-                        maxPeople: Math.max(value, prev.maxPeople),
-                      }));
-                    }}
+                    onChange={(e) =>
+                      setRoomData({ ...roomData, minPeople: e.target.value })
+                    }
                     className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300"
                     required
                   />
@@ -239,20 +236,30 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
                     type="number"
                     name="maxPeople"
                     value={roomData.maxPeople}
-                    onChange={(e) => {
+                    onChange={(e) =>
+                      setRoomData({ ...roomData, maxPeople: e.target.value })
+                    }
+                    onBlur={(e) => {
                       const value = parseInt(e.target.value, 10);
+                      if (value < 1) {
+                        Swal.fire(
+                          '알림',
+                          '최대 인원은 1명 이상이어야 합니다.',
+                          'warning',
+                        );
+                        return;
+                      }
                       if (value < roomData.minPeople) {
                         Swal.fire(
                           '알림',
                           '최대 인원은 최소 인원 이상이어야 합니다.',
                           'warning',
                         );
-                        return;
+                        setRoomData((prev) => ({
+                          ...prev,
+                          maxPeople: roomData.minPeople,
+                        }));
                       }
-                      setRoomData((prev) => ({
-                        ...prev,
-                        maxPeople: value,
-                      }));
                     }}
                     className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300"
                     required

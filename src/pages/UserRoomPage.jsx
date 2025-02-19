@@ -1,13 +1,12 @@
-import { useEffect, useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { publicRequest } from '../hooks/requestMethod';
 import InteractiveSection from '../components/userroom/InteractiveSection';
 import Header from '../components/layout/Header';
-import Footer from '../components/layout/Footer';
 import OverviewBar from '../components/userroom/OverviewBar';
 import FavoriteList from '../components/userroom/FavoriteList';
 import { LoadScript } from '@react-google-maps/api';
-import WebSocketComponent, { stompClient } from '../components/userroom/WebSocketComponent';
+import WebSocketComponent from '../components/userroom/WebSocketComponent';
 
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
@@ -15,35 +14,38 @@ const UserRoom = () => {
   const { travelPlanId: travelPlanIdFromUrl } = useParams();
   const location = useLocation();
   const initialSelectedCard = location.state?.selectedCard;
-  const [selectedCard, setSelectedCard] = useState(initialSelectedCard);
+  const [selectedCard, setSelectedCard] = useState(initialSelectedCard || {}); // 초기값 설정
   const [isLikeListOpen, setIsLikeListOpen] = useState(true);
   const [favorites, setFavorites] = useState([]);
   const libraries = ['places'];
 
-  const travelPlanId = initialSelectedCard?.travelPlanId || travelPlanIdFromUrl;
+  const travelPlanId = selectedCard?.travelPlanId || travelPlanIdFromUrl; // selectedCard.travelPlanId 또는 URL의 travelPlanId 사용
 
-  // fetchRoomData를 useCallback으로 메모이제이션
+  // disabled: planningStatus가 BIDDING, BOOKING, CONFIRMED이면 사용자 조작 차단 (OverviewBar 제외)
+  const disabled = ['BIDDING', 'BOOKING', 'CONFIRMED'].includes(
+    selectedCard.planningStatus,
+  );
+
+  // 여행방 데이터 가져오기
   const fetchRoomData = useCallback(async (id) => {
     console.log('📌 API 요청 ID:', id);
     if (!id) {
       console.error('🚨 ID가 없습니다');
       return;
     }
-
     try {
       const response = await publicRequest.get(
         `/api/v1/travel-plans/${id}/members`,
       );
       if (response.data?.data?.travelPlan) {
         const travelPlan = response.data.data.travelPlan;
-
         const mappedPlaces = (travelPlan.places || []).map((place) => ({
           ...place,
           isLiked: place.likeYn,
         }));
         setFavorites(mappedPlaces);
-
         console.log('✅ 여행방 데이터:', travelPlan);
+        setSelectedCard(travelPlan); // 여행방 데이터를 selectedCard에 업데이트
       }
     } catch (error) {
       console.error('🚨 여행방 데이터 가져오기 실패:', error);
@@ -77,7 +79,7 @@ const UserRoom = () => {
         console.error('🚨 Google Maps API script failed to load:', error)
       }
     >
-      {/* WebSocketComponent 추가 */}
+      {/* 웹소켓 연결 */}
       <WebSocketComponent
         travelPlanId={travelPlanId}
         fetchRoomData={fetchRoomData}
@@ -85,48 +87,53 @@ const UserRoom = () => {
         favorites={favorites}
       />
 
-      <div className="flex flex-col min-h-screen">
+      {/* 전체 화면 레이아웃 */}
+      <div className="flex flex-col h-screen overflow-hidden">
         <Header />
-        <OverviewBar selectedCard={selectedCard} />
-        <div className="relative flex flex-1">
-          <div
-            className={`absolute left-0 top-0 h-full transition-transform duration-300 ${isLikeListOpen ? 'translate-x-0' : '-translate-x-full'
-              }`}
-            style={{ width: '320px', zIndex: 10 }}
-          >
-            <div className="relative h-full bg-white">
-              <FavoriteList
-                selectedCard={selectedCard}
-                favorites={favorites}
-                setFavorites={setFavorites}
-              />
-              <button
-                onClick={() => setIsLikeListOpen(false)}
-                className="absolute top-1/2 right-[-40px] transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-r-lg"
-              >
-                ❮
-              </button>
-            </div>
+
+        {/* 지도 + 왼쪽 사이드바 + 오른쪽 OverviewBar */}
+        <div className="relative flex-1">
+          {/* 지도 (배경 레이어) */}
+          <div className="absolute inset-0 z-0 ">
+            <InteractiveSection
+              selectedCard={selectedCard}
+              favorites={favorites}
+              setFavorites={setFavorites}
+            />
           </div>
-          <div className="flex flex-1 h-full">
-            {!isLikeListOpen && (
+
+          <div className="relative flex h-full pointer-events-none">
+            {/* 왼쪽 사이드바 (즐겨찾기 목록) */}
+            <div
+              className={`transition-all duration-300 relative h-full ${
+                disabled ? 'pointer-events-none' : 'pointer-events-auto'
+              }`}
+              style={{ width: isLikeListOpen ? '320px' : '0px' }}
+            >
               <button
-                onClick={() => setIsLikeListOpen(true)}
-                className="absolute z-20 p-2 text-white transform -translate-y-1/2 bg-gray-800 rounded-lg top-1/2 left-2"
+                onClick={() => setIsLikeListOpen((prev) => !prev)}
+                className="absolute z-30 p-2 text-white transform -translate-y-1/2 bg-gray-800 rounded-full pointer-events-auto top-1/2 -right-4"
               >
-                ❯
+                {isLikeListOpen ? '❮' : '❯'}
               </button>
-            )}
-            <div className="flex-1">
-              <InteractiveSection
-                selectedCard={selectedCard}
-                favorites={favorites}
-                setFavorites={setFavorites}
-              />
+
+              {isLikeListOpen && (
+                <div className="h-full overflow-y-auto pointer-events-auto bg-white/70 backdrop-blur-sm">
+                  <FavoriteList
+                    selectedCard={selectedCard}
+                    favorites={favorites}
+                    setFavorites={setFavorites}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* 오른쪽: OverviewBar (사용자 조작 허용) */}
+            <div className="flex-1 overflow-auto bg-transparent m-2 z-20">
+              <OverviewBar selectedCard={selectedCard} />
             </div>
           </div>
         </div>
-        <Footer />
       </div>
     </LoadScript>
   );

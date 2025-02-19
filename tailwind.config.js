@@ -57,6 +57,8 @@ module.exports = {
         gold: '#FFD700',
         silver: '#C0C0C0',
         bronze: '#CD7F32',
+
+        airbnb: '#FF5A5F',
       },
       width: {},
     },

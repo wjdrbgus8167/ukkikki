@@ -1,6 +1,7 @@
 import React, { useContext, useState, useRef, useEffect } from "react";
 import { Autocomplete, useJsApiLoader } from '@react-google-maps/api';
-import ProposalDetailContext from '../../contexts/ProposalDetailContext';
+import TravelPlanDetailContext from "../../contexts/TravelPlanDetailContext";
+import ProposalDetailContext from "../../contexts/ProposalDetailContext";
 import SuggestedPlaceList from "./PlaceList/SuggestedPlaceList";
 import SearchPlace from "./PlaceList/SearchPlace";
 import { 
@@ -15,15 +16,26 @@ const libraries = ['places'];
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
 const PlaceSelection = ({ onSelectPlace }) => {
-    const { proposal, selectedDayId } = useContext(ProposalDetailContext);
+    // 두 컨텍스트 모두 사용
+    const travelPlanContext = useContext(TravelPlanDetailContext);
+    const proposalDetailContext = useContext(ProposalDetailContext);
+
+    // proposal은 두 컨텍스트 중 값이 있는 쪽 사용
+    const proposal = proposalDetailContext?.proposal || travelPlanContext?.proposal;
+
+    // selectedDayId: 두 컨텍스트 모두에서 가져옵니다.
+    const contextSelectedDayId =
+      proposalDetailContext?.selectedDayId !== undefined
+        ? proposalDetailContext.selectedDayId
+        : travelPlanContext?.selectedDayId;
+    const selectedDayId = contextSelectedDayId !== undefined ? contextSelectedDayId : 1;
+    
     const [isSearchMode, setIsSearchMode] = useState(false);
     const [searchedPlace, setSearchedPlace] = useState(null);
     const [enhancedPlaceList, setEnhancedPlaceList] = useState([]);
     const autocompleteRef = useRef(null);
-    // ref를 사용하여 enhancedPlaceList를 한 번만 생성하도록 함
     const enhancedPlacesRef = useRef(null);
     
-    // Google Map API 로드
     const { isLoaded } = useJsApiLoader({
         googleMapsApiKey: apiKey,
         libraries,
@@ -32,12 +44,35 @@ const PlaceSelection = ({ onSelectPlace }) => {
     if (!proposal) {
         return <div>로딩중</div>;
     }
-    const { travelPlan } = proposal.data;
-    const { places } = travelPlan;
+
+    // travelPlan 데이터: 생성 페이지의 경우 proposal.data.travelPlan, 수정 페이지의 경우 proposal 자체 사용
+    const travelPlan = proposal.data && proposal.data.travelPlan ? proposal.data.travelPlan : proposal;
+    const { startDate, endDate } = travelPlan;
+
+    // 기본 장소 목록 설정: travelPlan.places가 있으면 사용, 없으면 proposal.scheduleItems를 매핑하여 생성
+    const rawPlaces = travelPlan.places || (proposal.scheduleItems || []);
+
+    // 만약 rawPlaces가 proposal.scheduleItems에서 온 것이라면, 필요한 형태로 매핑해줍니다.
+    const places = rawPlaces.map((p) => {
+      if (p.placeId) {
+        return {
+          id: p.placeId, 
+          name: p.name,
+          address: p.address,
+          latitude: p.latitude,
+          longitude: p.longitude,
+          photoUrl: p.photoUrl || null,
+          rating: p.rating || null,
+        };
+      } else {
+        // travelPlan.places인 경우는 그대로 사용
+        return p;
+      }
+    });
+
     
     useEffect(() => {
         if (!isLoaded || !places || places.length === 0) return;
-        // 이미 enhancedPlaceList가 생성되어 있다면 재생성하지 않음
         if (enhancedPlacesRef.current) {
             setEnhancedPlaceList(enhancedPlacesRef.current);
             return;
@@ -48,7 +83,7 @@ const PlaceSelection = ({ onSelectPlace }) => {
         );
     
         Promise.all(
-          places.map((p, idx) => {
+          places.map((p) => {
             return new Promise((resolve) => {
               const query = `${p.name} ${p.address}`;
               const request = {
@@ -82,7 +117,6 @@ const PlaceSelection = ({ onSelectPlace }) => {
                   rating = placeResult.rating || null;
                 }
                 resolve({
-                  // p.id가 없다면 한 번만 uuidv4()로 id를 생성합니다.
                   id: p.id || uuidv4(),
                   ...p,
                   photoUrl,
@@ -131,15 +165,14 @@ const PlaceSelection = ({ onSelectPlace }) => {
             date: new Date(start.getTime() + i * 86400000)
                 .toISOString()
                 .split("T")[0],
-            selectedPlaces: [],
         }));
     };
 
-    const travelDays = getTravelDays(travelPlan.startDate, travelPlan.endDate);
+    const travelDays = getTravelDays(startDate, endDate);
     const selectedDay = travelDays.find((day) => day.id === selectedDayId);
 
-    console.log("onSelectDay prop 전달 값:", selectedDay.date);
-    
+    console.log("선택된 일자:", selectedDay);
+
     return (
         <StyledContainer>
             {selectedDay && (

@@ -5,6 +5,8 @@ import Header from '../components/layout/Header.jsx';
 import Footer from '../components/layout/Footer.jsx';
 import 'tailwindcss/tailwind.css';
 import { MainContent } from './style/AgencyRoomListPageStyle';
+import { getPassport } from '../apis/agency';
+import { getTotalCount } from '../apis/agency';
 
 const AgencyProposalDetail = () => {
   const { proposalId } = useParams();
@@ -13,7 +15,11 @@ const AgencyProposalDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [modalMessage, setModalMessage] = React.useState('');
-  
+  const [reservationList, setReservationList] = useState([]);
+  const [showReservationModal, setShowReservationModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [count, setTotalCount] = useState(false);
+
   useEffect(() => {
     const fetchProposalDetail = async () => {
       setLoading(true);
@@ -32,6 +38,36 @@ const AgencyProposalDetail = () => {
     fetchProposalDetail();
   }, [proposalId]);
 
+  useEffect(() => {
+    const fetchTotalCount = async () => {
+      const travelPlanId = proposal?.travelPlanId;
+      console.log('🛠️ travelPlanId 타입:', typeof proposal?.travelPlanId);
+      if (!travelPlanId) {
+        console.warn('travelPlanId가 존재하지 않습니다.');
+        return;
+      }
+  
+      try {
+        const response = await getTotalCount(travelPlanId, proposal?.proposalId);
+        console.log("Total Count Response:", response);
+      
+        if (response?.data?.count !== undefined) {
+          setTotalCount(response.data.count); 
+        } else {
+          setModalMessage("총 인원 수를 가져오는 데 실패했습니다.");
+        }
+      } catch (error) {
+        console.error("총 인원 수 가져오기 실패:", error);
+        setModalMessage("총 인원 수를 가져오는 중 오류가 발생했습니다.");
+      }
+      
+    };
+  
+    if (proposal?.travelPlanId) {
+      fetchTotalCount();
+    }
+  }, [proposal]);
+  
   const getStatusBadge = (status) => {
     const statusMap = {
       W: { text: '투표 전', className: 'bg-green-100 text-green-800' },
@@ -57,10 +93,30 @@ const AgencyProposalDetail = () => {
     });
   };
 
-  const renderDaySchedule = (dayNumber) => {
-    if (!proposal?.companyDaySchedules) return null;
+  const handleShowReservation = async () => {
+    setIsLoading(true);
+    try {
+      const response = await getPassport(proposalId);
+      console.log('여권 정보 응답:', response); // 디버깅용
+      
+      if (response?.data) {
+        setReservationList(response.data);
+        setShowReservationModal(true);
+      } else {
+        setModalMessage('여권 정보를 불러올 수 없습니다.');
+      }
+    } catch (error) {
+      console.error('여권 조회 실패:', error);
+      setModalMessage('여권 정보를 가져오는 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    const daySchedule = proposal.companyDaySchedules.find(
+  const renderDaySchedule = (dayNumber) => {
+    if (!proposal?.daySchedules) return null;
+
+    const daySchedule = proposal.daySchedules.find(
       (schedule) => schedule.dayNumber === parseInt(dayNumber),
     );
 
@@ -88,42 +144,17 @@ const AgencyProposalDetail = () => {
       </div>
     );
   };
-
-  const handleButtonClick = (action) => {
-    let message = '';
-    if (!proposal) {
-      message = '제안서 정보가 없습니다.';
-    } else {
-      switch (proposal.confirmStatus) {
-        case 'W':
-          if (action === 'edit' || action === 'delete') {
-            message = `${action === 'edit' ? '수정' : '삭제'} 작업이 가능합니다.`;
-          } else {
-            message = '문의하기 버튼을 클릭했습니다.';
-          }
-          break;
-        case 'A':
-          if (action === 'delete') {
-            message = '수락 후에는 삭제할 수 없습니다.';
-          } else if (action === 'edit') {
-            message = '수정이 가능합니다.';
-          }
-          break;
-        case 'D':
-          if (action === 'edit') {
-            message = '거절된 제안서는 수정할 수 없습니다.';
-          } else if (action === 'delete') {
-            message = '삭제가 가능합니다.';
-          }
-          break;
-        case 'V':
-          message = '투표 진행 중이므로 수정 및 삭제가 불가능합니다.';
-          break;
-        default:
-          message = '알 수 없는 상태입니다.';
-      }
+  
+  const handleButtonClick = async (action) => {
+    if (action === 'traveler') {
+      await handleShowReservation();
+    } else if (action === 'edit') {
+      console.log('수정하기 클릭');
+    } else if (action === 'delete') {
+      console.log('삭제하기 클릭');
+    } else if (action === 'inquire') {
+      console.log('문의하기 클릭');
     }
-    setModalMessage(message);
   };
 
   if (loading) return <p className="mt-10 text-center">로딩 중...</p>;
@@ -132,7 +163,7 @@ const AgencyProposalDetail = () => {
     return <p className="text-center">제안서 정보를 찾을 수 없습니다.</p>;
 
   const status = getStatusBadge(proposal.confirmStatus);
-  const dayTabs = proposal?.companyDaySchedules?.map(schedule => `${schedule.dayNumber}일차`) || [];
+  const dayTabs = proposal?.daySchedules?.map(schedule => `${schedule.dayNumber}일차`) || [];
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -152,6 +183,49 @@ const AgencyProposalDetail = () => {
           </div>
         )}
 
+        {showReservationModal && (
+          <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-[700px] h-[600px] overflow-auto">
+              <div className="flex justify-between mb-4">
+                <h2 className="text-xl font-bold">예약자 여권 정보</h2>
+                <button
+                  className="text-red-500 font-bold"
+                  onClick={() => setShowReservationModal(false)}
+                >
+                  X
+                </button>
+              </div>
+
+              {/* 검은 줄 추가 */}
+              <hr className="border-black mb-4" />
+
+              <div className="mb-4 font-semibold">
+                전체 인원: {count !== null ? count : '로딩 중...'} / 등록된 인원: {reservationList.length}
+              </div>
+              
+              <div className="space-y-2">
+                {isLoading ? (
+                  <p className="text-center">로딩 중...</p>
+                ) : reservationList && reservationList.length > 0 ? (
+                  reservationList.map((passport, index) => (
+                    <div key={index} className="p-4 bg-gray-50 rounded-lg mb-2">
+                      <p><strong>이름:</strong> {passport.koreanName}</p>
+                      <p><strong>영문이름:</strong> {passport.englishName}</p>
+                      <p><strong>여권 번호:</strong> {passport.passportNumber}</p>
+                      <p><strong>생년월일:</strong> {passport.birthDate}</p>
+                      <p><strong>만료일:</strong> {formatDateTime(passport.expirationDate)}</p>
+                      <p><strong>전화번호:</strong> {passport.phoneNumber}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center text-gray-500">등록된 여권 정보가 없습니다.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+          
         <div className="max-w-6xl mx-auto px-4 py-6">
           {/* Top Section */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
@@ -161,7 +235,7 @@ const AgencyProposalDetail = () => {
                 <p className="mb-2">
                   여행날짜: {proposal.startDate} ~ {proposal.endDate}
                 </p>
-                <p className="mb-2">최소 인원: {proposal.minPeople}명</p>
+                <p className="mb-2">최소 인원 : {proposal.minPeople}명 / 현재 인원 : {typeof count === 'number' ? `${count}명` : "로딩 중..."}</p>
                 <p className="mb-2">
                   예약금: {proposal.deposit.toLocaleString()}원
                 </p>
@@ -181,23 +255,23 @@ const AgencyProposalDetail = () => {
                     >
                       수정하기
                     </button>
-                    <button
+                    {/* <button
                       className="px-4 py-2 bg-white text-black rounded hover:bg-gray-100"
                       onClick={() => handleButtonClick('delete')}
                     >
                       삭제하기
-                    </button>
-                    <button
-                      className="px-4 py-2 bg-white text-black rounded hover:bg-gray-100"
-                      onClick={() => handleButtonClick('inquire')}
-                    >
-                      문의하기
-                    </button>
+                    </button> */}
                   </>
                 )}
                 
                 {proposal.confirmStatus === 'A' && (
                   <>
+                    <button
+                      className="px-4 py-2 bg-white text-black rounded hover:bg-gray-100"
+                      onClick={() => handleButtonClick('traveler')}
+                    >
+                      예약자 현황
+                    </button>
                     <button
                       className="px-4 py-2 bg-white text-black rounded hover:bg-gray-100"
                       onClick={() => handleButtonClick('edit')}
@@ -213,14 +287,14 @@ const AgencyProposalDetail = () => {
                   </>
                 )}
                 
-                {proposal.confirmStatus === 'D' && (
+                {/* {proposal.confirmStatus === 'D' && (
                   <button
                     className="px-4 py-2 bg-white text-black rounded hover:bg-gray-100"
                     onClick={() => handleButtonClick('delete')}
                   >
                     삭제하기
                   </button>
-                )}
+                )} */}
                 
                 {proposal.confirmStatus === 'V' && (
                   <button

@@ -55,75 +55,6 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
     setSelectedMarker({ ...marker });
   };
 
-  // const handleTagSubmit = async () => {
-  //   if (!newTag.trim()) return;
-  //   if (!selectedMarker || !selectedMarker.placeId) {
-  //     console.error('🚨 태그 추가 실패: 선택된 마커가 없습니다.');
-  //     return;
-  //   }
-
-  //   const placeId = selectedMarker.placeId;
-  //   const placeName = selectedMarker.name; // ✅ placeName 가져오기
-  //   const travelPlanId = selectedCard.travelPlanId;
-
-  //   try {
-  //     const response = await publicRequest.post(
-  //       `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/tags`,
-  //       { placeTagName: newTag.trim() },
-  //     );
-
-  //     if (stompClient && stompClient.connected) {
-  //       const wsData = {
-  //         action: 'ADD_TAG',
-  //         placeName, // ✅ placeName 추가
-  //         travelPlanId,
-  //       };
-
-  //       stompClient.publish({
-  //         destination: '/pub/actions',
-  //         body: JSON.stringify(wsData),
-  //       });
-  //       console.log('✅ InteractiveSection- 태그 추가 이벤트:', wsData);
-  //     }
-
-  //     if (response.status === 200) {
-  //       setFavorites((prev) =>
-  //         prev.map((fav) =>
-  //           fav.placeId === placeId
-  //             ? {
-  //                 ...fav,
-  //                 tags: [
-  //                   ...fav.tags,
-  //                   {
-  //                     placeTagId: response.data.id,
-  //                     name: newTag.trim(),
-  //                     isMyTag: true,
-  //                   },
-  //                 ],
-  //               }
-  //             : fav,
-  //         ),
-  //       );
-  //       setSelectedMarker((prev) => ({
-  //         ...prev,
-  //         tags: [
-  //           ...prev.tags,
-  //           {
-  //             placeTagId: response.data.id,
-  //             name: newTag.trim(),
-  //             isMyTag: true,
-  //           },
-  //         ],
-  //       }));
-  //       setNewTag('');
-  //       setShowTagInput(false);
-  //     }
-  //   } catch (error) {
-  //     console.error('🚨 태그 추가 실패:', error);
-  //     Swal.fire('알림', '태그 추가에 실패했습니다.', 'error');
-  //   }
-  // };
-
   const handleLikePlace = async (place) => {
     if (!place || !selectedCard || !selectedCard.travelPlanId) {
       console.error('🚨 장소 정보 또는 여행방 ID가 없습니다.');
@@ -134,7 +65,6 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
     const placeId = place.placeId;
     const isLiked = place.likeYn; // 기존 좋아요 상태
     const totalMember = selectedCard?.member?.totalParticipants || 0;
-
     const placeName = place.name;
     let actionType;
 
@@ -144,7 +74,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
       if (isLiked) {
         console.log('좋아요 삭제');
         await publicRequest.delete(
-          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
+          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`
         );
         updatedMarker = {
           ...place,
@@ -156,7 +86,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
       } else {
         console.log('좋아요 추가');
         await publicRequest.post(
-          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`,
+          `/api/v1/travel-plans/${travelPlanId}/places/${placeId}/likes`
         );
         updatedMarker = {
           ...place,
@@ -170,15 +100,16 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
       // ✅ 상태 업데이트 - 새로운 배열을 반환하여 리렌더링 유도
       setFavorites((prev) => {
         const newFavorites = prev.map((fav) =>
-          fav.placeId === placeId ? { ...updatedMarker } : fav,
+          fav.placeId === placeId ? { ...updatedMarker } : fav
         );
         return [...newFavorites]; // 새로운 배열을 반환해 참조 변경
       });
 
       // ✅ 현재 선택된 마커도 업데이트 (UI 즉시 반영)
       setSelectedMarker((prev) =>
-        prev && prev.placeId === placeId ? { ...updatedMarker } : prev,
+        prev && prev.placeId === placeId ? { ...updatedMarker } : prev
       );
+
       // ✅ WebSocket을 통해 실시간으로 마커 상태 변경 전송
       if (stompClient && stompClient.connected) {
         const wsData = {
@@ -212,7 +143,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
       if (result.isConfirmed) {
         try {
           const response = await publicRequest.delete(
-            `/api/v1/travel-plans/${selectedCard.travelPlanId}/tags/${tagId}`,
+            `/api/v1/travel-plans/${selectedCard.travelPlanId}/tags/${tagId}`
           );
           if (response.status === 200) {
             // 선택된 마커의 태그 업데이트
@@ -225,13 +156,13 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
               prev.map((marker) =>
                 marker.placeId === placeId
                   ? {
-                      ...marker,
-                      tags: marker.tags.filter(
-                        (tag) => tag.placeTagId !== tagId,
-                      ),
-                    }
-                  : marker,
-              ),
+                    ...marker,
+                    tags: marker.tags.filter(
+                      (tag) => tag.placeTagId !== tagId
+                    ),
+                  }
+                  : marker
+              )
             );
             Swal.fire('성공', '태그가 삭제되었습니다.', 'success');
           }
@@ -249,7 +180,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
     try {
       const response = await publicRequest.post(
         `/api/v1/travel-plans/${selectedCard.travelPlanId}/places/${selectedMarker.placeId}/tags`,
-        { placeTagName: newTag.trim() },
+        { placeTagName: newTag.trim() }
       );
       if (response.status === 200) {
         const newTagObj = {
@@ -257,19 +188,36 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
           name: newTag.trim(),
           isMyTag: true,
         };
-        // 선택된 마커의 태그 업데이트
+
+        // ✅ 선택된 마커의 태그 업데이트
         setSelectedMarker((prev) => ({
           ...prev,
           tags: [...(prev.tags || []), newTagObj],
         }));
-        // favorites 배열 내 해당 마커의 태그 업데이트
+
+        // ✅ favorites 배열 내 해당 마커의 태그 업데이트
         setFavorites((prev) =>
           prev.map((marker) =>
             marker.placeId === selectedMarker.placeId
               ? { ...marker, tags: [...(marker.tags || []), newTagObj] }
-              : marker,
-          ),
+              : marker
+          )
         );
+
+        // ✅ WebSocket을 통해 태그 추가 이벤트 전송
+        if (stompClient && stompClient.connected) {
+          const wsData = {
+            action: 'ADD_TAG', // ✅ Action Enum 값 전송
+            placeName: selectedMarker.name,
+            travelPlanId: selectedCard.travelPlanId,
+          };
+          stompClient.publish({
+            destination: '/pub/actions',
+            body: JSON.stringify(wsData),
+          });
+          console.log('✅ InteractiveSection 태그 추가 이벤트:', wsData);
+        }
+
         setNewTag('');
         setShowTagInput(false);
       }
@@ -278,9 +226,21 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
       Swal.fire('알림', '태그 추가에 실패했습니다.', 'error');
     }
   };
+
+  useEffect(() => {
+    if (selectedMarker) {
+      const updatedMarker = favorites.find((marker) => marker.placeId === selectedMarker.placeId);
+      if (updatedMarker) {
+        setSelectedMarker(updatedMarker);
+      }
+    }
+  }, [favorites]);
+
+
+
   return (
     <div className="relative w-full h-screen">
-      {/* ✅ 웹소켓 구독을 위한 WebSocketComponent 추가 */}
+      {/* 웹소켓 구독 */}
       <WebSocketComponent
         travelPlanId={selectedCard.travelPlanId}
         setFavorites={setFavorites}
@@ -290,6 +250,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
       {/* 지도 영역 */}
       <div className="w-full h-full">
         <GoogleMap
+          key={renderKey}
           mapContainerStyle={{ width: '100%', height: '100%' }}
           center={coordinates}
           zoom={12}
@@ -321,6 +282,7 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
               </div>
             </OverlayView>
           ))}
+
           {selectedMarker && (
             <InfoWindow
               position={{
@@ -337,7 +299,9 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
                 className="relative p-4"
                 style={{ width: '300px', minHeight: '200px' }}
               >
-                <h3 className="text-lg font-bold">{selectedMarker?.name}</h3>
+                <h3 className="text-lg font-bold">
+                  {selectedMarker?.name}
+                </h3>
                 {selectedMarker.address && (
                   <p className="text-sm text-gray-600">
                     {selectedMarker.address}
@@ -401,31 +365,22 @@ const InteractiveSection = ({ selectedCard, favorites, setFavorites }) => {
         </GoogleMap>
       </div>
 
-      {/* 채팅창 */}
-      <div
-        className={`absolute transition-all duration-300 overflow-hidden ${
-          isChatOpen
-            ? 'top-4 right-4 w-96 h-[500px] rounded-lg overflow-hidden'
-            : 'bottom-4 right-4 w-12 h-12 rounded-lg  overflow-visible'
-        }`}
-      >
+      {/* 채팅창/버튼: fixed로 화면 우측 하단에 고정 */}
+      <div className="fixed bottom-4 right-4 z-[9999] ">
         {isChatOpen ? (
-          <div className="relative w-full h-full bg-white rounded-lg shadow-lg">
+          <div className="relative w-96 h-[500px] rounded-lg bg-white shadow-lg overflow-y-auto">
             <Chat travelPlanId={selectedCard.travelPlanId} />
             <button
               onClick={() => setIsChatOpen(false)}
-              className="absolute p-2 text-white bg-gray-800 rounded-full top-2 right-2"
+              className="absolute top-2 right-2 p-2 text-white bg-gray-800 rounded-full"
             >
               ✕
             </button>
           </div>
         ) : (
           <button
-            onClick={() => {
-              console.log('채팅 열기 클릭됨');
-              setIsChatOpen(true);
-            }}
-            className="flex items-center justify-center w-full h-full text-white transition-all duration-300 bg-gray-800 rounded-full shadow-lg hover:scale-110"
+            onClick={() => setIsChatOpen(true)}
+            className="flex items-center justify-center w-12 h-12 text-white bg-gray-800 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
           >
             <RiChatSmileAiLine size={24} />
           </button>

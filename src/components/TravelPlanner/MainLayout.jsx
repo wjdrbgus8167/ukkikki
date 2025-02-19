@@ -1,11 +1,12 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
+import TravelPlanDetailContext from "../../contexts/TravelPlanDetailContext";
 import ProposalDetailContext from "../../contexts/ProposalDetailContext";
 import DateSidebar from "./DateSidebar";
 import MapDisplay from "./MapDisplay";
 import ScheduleByDate from "./ScheduleByDate";
 import PlaceSelection from "./PlaceSelection";
 import DetailForm from "./DetailForm";
-import { CreateTravelProposal } from "../../apis/agency";
+import { CreateTravelProposal, UpdateTravelProposal } from "../../apis/agency";
 import { 
   StyledMainLayout,
   StyledDateSidebar,
@@ -18,20 +19,28 @@ import {
 } from "./style/MainLayoutStyle";
 import Swal from 'sweetalert2';
 
-
 // 간단한 고유 ID 생성 함수
 const generateUniqueId = () => {
   return '_' + Math.random().toString(36).substr(2, 9);
 };
 
 const MainLayout = () => {
-  const { proposal, selectedDayId } = useContext(ProposalDetailContext);
+  const travelPlanContext = useContext(TravelPlanDetailContext);
+  const proposalContext = useContext(ProposalDetailContext);
   
-  const [ proposalData, setProposalData ] = useState({
+  // 수정 페이지일 경우 ProposalDetailContext, 생성 페이지일 경우 TravelPlanDetailContext 사용
+  const proposal = proposalContext?.proposal || travelPlanContext?.proposal;
+  const selectedDayId = proposalContext?.selectedDayId ?? travelPlanContext?.selectedDayId ?? 1;
+
+  const [selectedPlacesByDay, setSelectedPlacesByDay] = useState({});
+  const [showPlaceSelection, setShowPlaceSelection] = useState(false);
+  const [showDetailForm, setShowDetailForm] = useState(false);
+  
+  const [proposalData, setProposalData] = useState({
     name: '',
     startDate: '',
     endDate: '',
-    airline:'',
+    airline: '',
     departureAirportCode: '',
     departureAirportName: '',
     arrivalAirportCode: '',
@@ -41,7 +50,7 @@ const MainLayout = () => {
     endDateBoardingTime: '',
     endDateArrivalTime: '',
     deposit: 0,
-    minPeople:0,
+    minPeople: 0,
     guideIncluded: '',
     productIntroduction: '',
     refundPolicy: '',
@@ -49,20 +58,108 @@ const MainLayout = () => {
     proposalStatus: 'W',
   });
 
-  // 날짜별 선택된 장소들을 저장
-  const [selectedPlacesByDay, setSelectedPlacesByDay] = useState({});
-  console.log('ScheduleItems:', selectedPlacesByDay);
+  // proposal 데이터 디버깅용 콘솔 출력
+  useEffect(() => {
+    if (proposal) {
+      console.log("최종 proposal 상태:", proposal);
+    }
+  }, [proposal]);
+
+  // proposalData 초기화 (수정 페이지와 생성 페이지 구분)
+  useEffect(() => {
+    if (proposal && (proposal.proposalId || (proposal.data && proposal.data.travelPlan))) {
+      if (proposal.proposalId) {
+        // 수정 페이지
+        setProposalData({
+          name: proposal.name,
+          startDate: proposal.startDate,
+          endDate: proposal.endDate,
+          airline: proposal.airLine,
+          departureAirportCode: proposal.departureAirportCode,
+          departureAirportName: proposal.departureAirport,
+          arrivalAirportCode: proposal.arrivalAirportCode,
+          arrivalAirportName: proposal.arrivalAirport,
+          startDateBoardingTime: proposal.startDateBoardingTime,
+          startDateArrivalTime: proposal.startDateArrivalTime,
+          endDateBoardingTime: proposal.endDateBoardingTime,
+          endDateArrivalTime: proposal.endDateArrivalTime,
+          deposit: proposal.deposit,
+          minPeople: proposal.minPeople,
+          guideIncluded: proposal.guideIncluded,
+          productIntroduction: proposal.productInformation,
+          refundPolicy: proposal.refundPolicy,
+          insuranceIncluded: proposal.insuranceIncluded,
+          proposalStatus: proposal.proposalStatus,
+        });
+      } else if (proposal.data && proposal.data.travelPlan) {
+        // 생성 페이지
+        const travelPlan = proposal.data.travelPlan;
+        setProposalData({
+          name: travelPlan.name,
+          startDate: travelPlan.startDate,
+          endDate: travelPlan.endDate,
+          airline: travelPlan.airline,
+          departureAirportCode: travelPlan.departureAirportCode,
+          departureAirportName: travelPlan.departureAirportName,
+          arrivalAirportCode: travelPlan.arrivalAirportCode,
+          arrivalAirportName: travelPlan.arrivalAirportName,
+          startDateBoardingTime: travelPlan.startDateBoardingTime,
+          startDateArrivalTime: travelPlan.startDateArrivalTime,
+          endDateBoardingTime: travelPlan.endDateBoardingTime,
+          endDateArrivalTime: travelPlan.endDateArrivalTime,
+          deposit: travelPlan.deposit,
+          minPeople: travelPlan.minPeople,
+          guideIncluded: travelPlan.guideIncluded,
+          productIntroduction: travelPlan.productInformation,
+          refundPolicy: travelPlan.refundPolicy,
+          insuranceIncluded: travelPlan.insuranceIncluded,
+          proposalStatus: travelPlan.proposalStatus || 'W',
+        });
+      }
+    }
+  }, [proposal]);
+
+  // 수정 페이지: proposal에 기존 스케줄 데이터가 있다면 선택된 날짜에 해당하는 데이터를 초기화합니다.
+  useEffect(() => {
+    if (proposal) {
+      let initialSelectedPlacesByDay = {};
+      // 우선 scheduleItems가 존재하면 사용. 수정 페이지의 경우
+      const scheduleItems =
+        proposal.scheduleItems ||
+        (proposal.data &&
+          proposal.data.travelPlan &&
+          proposal.data.travelPlan.scheduleItems) ||
+        [];
   
-  
-  const [showPlaceSelection, setShowPlaceSelection] = useState(false);
-  // 상세 내용 페이지 표시 여부
-  const [showDetailForm, setShowDetailForm] = useState(false);
+      if (scheduleItems.length > 0) {
+        scheduleItems.forEach((item) => {
+          const day = item.dayNumber;
+          if (!initialSelectedPlacesByDay[day]) {
+            initialSelectedPlacesByDay[day] = [];
+          }
+          initialSelectedPlacesByDay[day].push(item);
+        });
+      } else if (proposal.daySchedules && proposal.daySchedules.length > 0) {
+        // scheduleItems가 없으면, daySchedules에서 추출 (수정 페이지의 경우)
+        proposal.daySchedules.forEach((ds) => {
+          const day = ds.dayNumber;
+          if (ds.schedules && ds.schedules.length > 0) {
+            initialSelectedPlacesByDay[day] = ds.schedules;
+          }
+        });
+      }
+      console.log("초기화된 selectedPlacesByDay:", initialSelectedPlacesByDay);
+      setSelectedPlacesByDay(initialSelectedPlacesByDay);
+    }
+  }, [proposal]);
 
   if (!proposal) {
     return <div>로딩중...</div>;
   }
 
-  const { arrivalCity } = proposal.data.travelPlan;
+  const arrivalCity = proposal.data && proposal.data.travelPlan
+    ? proposal.data.travelPlan.arrivalCity
+    : { name: proposal.arrivalAirport || "도착지 미정" };
 
   // 장소 추가 버튼 토글 함수
   const togglePlaceSelection = () => {
@@ -74,9 +171,8 @@ const MainLayout = () => {
     setShowDetailForm((prev) => !prev);
   };
 
-  // 선택된 장소를 현재 날짜(selectedDayId)에 추가
+  // PlaceSelection에서 선택한 장소를 현재 날짜(selectedDayId)에 추가
   const handleSelectPlace = (place) => {
-    // 고유 식별자가 없다면, generateUniqueId()를 이용해 생성합니다.
     const placeWithId = { 
       ...place, 
       placeId: place.placeId || generateUniqueId(), 
@@ -89,25 +185,23 @@ const MainLayout = () => {
     setShowPlaceSelection(false);
   };
 
-  // 현재 선택된 날짜의 장소 목록
   const currentDayPlaces = selectedPlacesByDay[selectedDayId] || [];
 
-  // 장소 삭제 
+  // 장소 삭제
   const handleDeletePlace = (placeId) => {
-    console.log("현재 장소 목록:", currentDayPlaces);
     const updatedPlaces = currentDayPlaces.filter(place => place.placeId !== placeId);
-    console.log("삭제 후 장소 목록:", updatedPlaces);
-    setSelectedPlacesByDay(prev => ({
+    setSelectedPlacesByDay((prev) => ({
       ...prev,
       [selectedDayId]: updatedPlaces
     }));
   };
 
+  // 시간 설정 (startTime, endTime 업데이트)
   const handleSetTime = (placeId, startTime, endTime) => {
     setSelectedPlacesByDay((prev) => {
       const updatedPlaces = (prev[selectedDayId] || []).map((place) => {
         if (place.placeId === placeId) {
-          return { ...place, startTime, endTime }; // 장소에 startTime과 endTime 추가
+          return { ...place, startTime, endTime };
         }
         return place;
       });
@@ -126,7 +220,7 @@ const MainLayout = () => {
       name: '여행 이름',
       startDate: '여행 시작일',
       endDate: '여행 종료일',
-      airline:'항공사',
+      airline: '항공사',
       departureAirportCode: '출발 공항 코드',
       departureAirportName: '출발 공항 이름',
       arrivalAirportCode: '도착 공항 코드',
@@ -136,7 +230,7 @@ const MainLayout = () => {
       endDateBoardingTime: '도착일 비행기 탑승 시간',
       endDateArrivalTime: '한국 도착 시간',
       deposit: '예약금',
-      minPeople:'최소인원',
+      minPeople: '최소인원',
       guideIncluded: '가이드 포함 여부',
       productIntroduction: '상품 소개',
       refundPolicy: '취소/환불 정책',
@@ -154,7 +248,7 @@ const MainLayout = () => {
       return !value;
     });
 
-    if (MissingFields.length >0 ) {
+    if (MissingFields.length > 0) {
       const MissingFielsNames = MissingFields.map((field) => requireFields[field]);
       Swal.fire({
         icon: 'warning',
@@ -163,14 +257,15 @@ const MainLayout = () => {
         confirmButtonText: '확인',
         confirmButtonColor: '#412B2B',
       });
-      return ;
+      return;
     }
 
-    const scheduleItems = Object.values(selectedPlacesByDay)
+    const schedules = Object.values(selectedPlacesByDay)
       .flat()
       .map(({ placeId, ...rest }) => rest);
+    console.log("POST 전송할 스케줄 데이터:", schedules);
     
-    const invalidScheduleItem = scheduleItems.find(item => {
+    const invalidScheduleItem = schedules.find(item => {
       return (
         !item.startTime ||
         (typeof item.startTime === 'string' && item.startTime.trim() === "") ||
@@ -191,14 +286,34 @@ const MainLayout = () => {
   
     const payload = {
       ...proposalData,
-      scheduleItems,
+      scheduleItems: schedules,
     };
   
     console.log("POST할 데이터:", payload);
   
     try {
-      const data = await CreateTravelProposal(proposal.data.travelPlan.travelPlanId, payload);
-      console.log("제출 성공:", data);
+      let data;
+      // travelPlanId를 조건에 따라 분기 처리
+      let travelPlanId;
+      if (proposal.data && proposal.data.travelPlan) {
+        travelPlanId = proposal.data.travelPlan.travelPlanId;
+      } else {
+        travelPlanId = proposal.travelPlanId;
+      }
+  
+      if (proposal.proposalId) {
+        data = await UpdateTravelProposal(
+          travelPlanId,
+          proposal.proposalId,
+          payload
+        );
+        console.log("수정 성공:", data);
+        
+      } else {
+        data = await CreateTravelProposal(travelPlanId, payload);
+        console.log("제출 성공:", data);
+      }
+      return data;
     } catch (error) {
       console.error("제출 오류:", error);
     }
@@ -209,30 +324,31 @@ const MainLayout = () => {
       {/* 사이드바 */}
       <StyledDateSidebar>
         <DateSidebar 
-        onToggleDetailForm={toggleDetailForm} 
-        onDaySelect={handleDaySelectFromSidebar}
-        onSubmit={handleSubmitProposal}
+          onToggleDetailForm={toggleDetailForm} 
+          onDaySelect={handleDaySelectFromSidebar}
+          onSubmit={handleSubmitProposal}
         />
       </StyledDateSidebar>
 
-      {/* 사이드바를 제외한 나머지 영역 */}
+      {/* 사이드바 제외 영역 */}
       <ContentArea>
         {showDetailForm ? (
-          // 상세 내용 버튼을 누르면 기존의 일정/지도 영역은 감추고 DetailForm을 채움
           <DetailFormWrapper>
             <DetailForm
-             proposalData={proposalData} 
-             setProposalData={setProposalData}
-             />
+              proposalData={proposalData} 
+              setProposalData={setProposalData}
+            />
           </DetailFormWrapper>
         ) : (
           <>
             <StyleScheduleByDate>
               <ScheduleByDate 
                 onTogglePlaceSelection={togglePlaceSelection} 
+                selectedDayNumber={selectedDayId}  
                 selectedPlaces={currentDayPlaces}
                 onDeletePlace={handleDeletePlace}
                 onAddTime={handleSetTime}
+                arrivalCity={arrivalCity}
               />
             </StyleScheduleByDate>
             <StyledMapDisplay>
