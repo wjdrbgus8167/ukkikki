@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { AgencyProposalslist } from "../../../apis/agency";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
+import ReactPaginate from "react-paginate"; // react-paginate import
 import { 
   Container, 
   CardWrapper, 
@@ -15,45 +16,52 @@ import {
   TableBody, 
   TableRow, 
   TableCell, 
-  Status 
+  Status,
+  PaginationWrapper, // styled-component로 정의된 페이지네이션 래퍼
 } from "./style/OngoingProposalsStyle";
 import { STATUS_PROPOSAL } from "../../../constants";
 
 // 필터 옵션 배열 정의
 const FILTER_OPTIONS = [
   { label: "전체보기", status: "" },
-  { label: STATUS_PROPOSAL.D, status: "D" },
-  { label: STATUS_PROPOSAL.A, status: "A" },
   { label: STATUS_PROPOSAL.W, status: "W" },
   { label: STATUS_PROPOSAL.V, status: "V" },
+  { label: STATUS_PROPOSAL.D, status: "D" },
 ];
 
 const OngoingProposals = () => {
   const [proposals, setProposals] = useState([]);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // 필터 상태 (기본값은 "전체보기")
   const [selectedFilter, setSelectedFilter] = useState(FILTER_OPTIONS[0]);
+  // 페이지네이션 상태 (0부터 시작)
+  const [currentPage, setCurrentPage] = useState(0);
+  const [proposalsPerPage] = useState(10);
+
+  // location.state에 필터 옵션이 있으면 사용할 수 있음 (선택사항)
+  // const filterOption = location.state?.filter || null;
 
   useEffect(() => {
     const getAgencyProposals = async () => {
       setError(null);
       try {
         const data = await AgencyProposalslist();
-        console.log(" 진행중인 목록 API 응답 데이터:", data);
+        console.log("진행중인 목록 API 응답 데이터:", data);
         setProposals(data);
       } catch (error) {
         setError("제안서를 불러오는 데 실패했습니다.");
         console.log("Error:", error);
       }
     };
-
     getAgencyProposals();
   }, []);
 
   const onhandleDetail = (proposal) => {
     navigate(`/agency-proposal-detail/${proposal.travelPlanId}/${proposal.proposalId}`);
   };
-  
 
   const statusMapping = {
     D: "거절",
@@ -64,14 +72,24 @@ const OngoingProposals = () => {
 
   const handleFilterChange = (option) => {
     setSelectedFilter(option);
+    setCurrentPage(0); // 필터 변경 시 첫 페이지로 리셋
   };
 
-  // 선택한 필터에 따라 제안 목록 필터링 (전체보기일 경우 전체 목록)
+  // 선택한 필터에 따라 제안 목록 필터링 (전체보기이면 전체 목록)
   const filteredProposals = selectedFilter.status
     ? proposals.filter(
         (proposal) => proposal.proposalStatus === selectedFilter.status
       )
     : proposals;
+
+  // 페이지네이션을 위한 데이터 분할 (필터된 결과에서)
+  const indexOfLastProposal = (currentPage + 1) * proposalsPerPage;
+  const indexOfFirstProposal = indexOfLastProposal - proposalsPerPage;
+  const currentProposals = filteredProposals.slice(indexOfFirstProposal, indexOfLastProposal);
+
+  const handlePageClick = (event) => {
+    setCurrentPage(event.selected);
+  };
 
   return (
     <Container>
@@ -83,7 +101,7 @@ const OngoingProposals = () => {
                 <button
                   key={option.label}
                   onClick={() => handleFilterChange(option)}
-                  className={`relative py-2 text-sm font-medium transition-colors  ${
+                  className={`relative py-2 text-sm font-medium transition-colors ${
                     selectedFilter.label === option.label
                       ? "text-brown"
                       : "text-gray-500 hover:text-brown"
@@ -109,13 +127,12 @@ const OngoingProposals = () => {
                 </TableHeadRow>
               </TableHead>
               <TableBody>
-                {filteredProposals && filteredProposals.length > 0 ? (
-                  filteredProposals.map((proposal) => (
+                {currentProposals.length > 0 ? (
+                  currentProposals.map((proposal) => (
                     <TableRow
                       key={proposal.proposalId}
                       onClick={() => onhandleDetail(proposal)}
                     >
-                      {/* 여행 제목 */}
                       <TableCell>
                         <div className="flex items-center">
                           <span className="text-[18px] font-semibold">
@@ -123,17 +140,13 @@ const OngoingProposals = () => {
                           </span>
                         </div>
                       </TableCell>
-                      {/* 경로 */}
                       <TableCell>
                         {proposal.departureAirportName} ➡ {proposal.arrivalAirportName}
                       </TableCell>
-                      {/* 항공사 */}
                       <TableCell>{proposal.airline}</TableCell>
-                      {/* 기간 */}
                       <TableCell>
                         {proposal.startDate} ~ {proposal.endDate}
                       </TableCell>
-                      {/* 상태 */}
                       <TableCell>
                         <Status status={proposal.proposalStatus}>
                           {statusMapping[proposal.proposalStatus] ||
@@ -153,6 +166,22 @@ const OngoingProposals = () => {
                 )}
               </TableBody>
             </Table>
+            <PaginationWrapper>
+              <ReactPaginate
+                previousLabel={"← 이전"}
+                nextLabel={"다음 →"}
+                breakLabel={"..."}
+                pageCount={Math.ceil(filteredProposals.length / proposalsPerPage)}
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={5}
+                onPageChange={handlePageClick}
+                containerClassName={"pagination"}
+                activeClassName={"active"}
+                pageClassName={"page-item"}
+                previousClassName={"previous-item"}
+                nextClassName={"next-item"}
+              />
+            </PaginationWrapper>
           </TableWrapper>
         </Card>
       </CardWrapper>
