@@ -4,7 +4,6 @@ import RoomModal from './RoomModal';
 import logo from '../../assets/loading-spinner.png';
 import { useNavigate } from 'react-router-dom';
 import { STATUS_MAP, THEME_COLORS, STATUS_STYLES } from '../../constants';
-import { useNavigate } from 'react-router-dom'; // ✅ 메인페이지 이동을 위한 useNavigate 추가
 import Swal from 'sweetalert2';
 
 const apiKey = import.meta.env.VITE_APP_UNSPLASH_API_KEY;
