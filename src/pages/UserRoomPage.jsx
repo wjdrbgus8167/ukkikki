@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { publicRequest } from '../hooks/requestMethod';
 import InteractiveSection from '../components/userroom/InteractiveSection';
 import Header from '../components/layout/Header';
@@ -19,6 +19,7 @@ const UserRoom = () => {
   const [isLikeListOpen, setIsLikeListOpen] = useState(true);
   const [favorites, setFavorites] = useState([]);
   const [mapCenter, setMapCenter] = useState({ lat: 35.6895, lng: 139.6917 });
+  const navigate = useNavigate();
 
   const libraries = ['places'];
 
@@ -40,30 +41,48 @@ const UserRoom = () => {
   }, []);
 
   // 여행방 데이터 가져오기
-  const fetchRoomData = useCallback(async (id) => {
-    console.log('📌 API 요청 ID:', id);
-    if (!id) {
-      console.error('🚨 ID가 없습니다');
-      return;
-    }
-    try {
-      const response = await publicRequest.get(
-        `/api/v1/travel-plans/${id}/members`,
-      );
-      if (response.data?.data?.travelPlan) {
-        const travelPlan = response.data.data.travelPlan;
-        const mappedPlaces = (travelPlan.places || []).map((place) => ({
-          ...place,
-          isLiked: place.likeYn,
-        }));
-        setFavorites(mappedPlaces);
-        console.log('✅ 여행방 데이터:', travelPlan);
-        setSelectedCard(travelPlan); // 여행방 데이터를 selectedCard에 업데이트
+  const fetchRoomData = useCallback(
+    async (id) => {
+      console.log('📌 API 요청 ID:', id);
+      if (!id) {
+        console.error('🚨 ID가 없습니다');
+        return;
       }
-    } catch (error) {
-      console.error('🚨 여행방 데이터 가져오기 실패:', error);
-    }
-  }, []);
+      try {
+        const response = await publicRequest.get(
+          `/api/v1/travel-plans/${id}/members`,
+        );
+        if (response.data?.data?.travelPlan) {
+          const travelPlan = response.data.data.travelPlan;
+          const mappedPlaces = (travelPlan.places || []).map((place) => ({
+            ...place,
+            isLiked: place.likeYn,
+          }));
+          setFavorites(mappedPlaces);
+          console.log('✅ 여행방 데이터:', travelPlan);
+          setSelectedCard(travelPlan); // 여행방 데이터를 selectedCard에 업데이트
+        }
+      } catch (error) {
+        console.error('🚨 여행방 데이터 가져오기 실패:', error);
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.error &&
+          error.response.data.error.code === 'TP001'
+        ) {
+          Swal.fire({
+            title: '오류',
+            text: '정상적인 경로가 아닙니다.',
+            icon: 'warning',
+            confirmButtonText: '확인',
+          }).then(() => {
+            navigate('/', { replace: true });
+          });
+        }
+      }
+    },
+    [navigate],
+  );
 
   // selectedCard가 업데이트될 때 도착 도시 좌표 가져오기
   useEffect(() => {
