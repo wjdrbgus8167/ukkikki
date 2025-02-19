@@ -1,13 +1,12 @@
-// src/placeList/SearchPlace.jsx
 import React from 'react';
 import { Autocomplete } from '@react-google-maps/api';
 
-const SearchPlace = ({ 
-  isLoaded, 
-  autocompleteRef, 
-  onPlaceChanged, 
+const SearchPlace = ({
+  isLoaded,
+  autocompleteRef,
+  onPlaceChanged,
   searchedPlace,
-  onSelectPlace, 
+  onSelectPlace,
 }) => {
   return (
     <>
@@ -18,7 +17,11 @@ const SearchPlace = ({
             onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)}
             onPlaceChanged={onPlaceChanged}
           >
-            <input type="text" placeholder="장소를 입력해주세요" />
+            <input
+              type="text"
+              placeholder="장소를 입력해주세요"
+              className="w-full p-2 border rounded"
+            />
           </Autocomplete>
         ) : (
           <p>지도 로딩중...</p>
@@ -26,15 +29,15 @@ const SearchPlace = ({
       </div>
 
       {searchedPlace && (
-        <div className="mt-4 p-3 border rounded-lg shadow flex items-center">
+        <div className="flex items-center p-3 mt-4 border rounded-lg shadow">
           {searchedPlace.photoUrl ? (
             <img
               src={searchedPlace.photoUrl}
               alt={searchedPlace.name}
-              className="w-24 h-24 object-cover aspect-square mr-4"
+              className="object-cover w-24 h-24 mr-4 aspect-square"
             />
           ) : (
-            <div className="w-24 h-24 bg-gray-200 flex items-center justify-center mr-4">
+            <div className="flex items-center justify-center w-24 h-24 mr-4 bg-gray-200">
               <span className="text-sm text-gray-600">No Image</span>
             </div>
           )}
@@ -48,14 +51,16 @@ const SearchPlace = ({
               </p>
             )}
           </div>
-          <button onClick={() => 
-            onSelectPlace({
-              scheduleName: searchedPlace.name,
-              latitude: searchedPlace.latitude,
-              longitude: searchedPlace.longitude,
-              imageUrl: searchedPlace.photoUrl,
-
-            })}>
+          <button
+            onClick={() =>
+              onSelectPlace({
+                scheduleName: searchedPlace.name,
+                latitude: searchedPlace.latitude,
+                longitude: searchedPlace.longitude,
+                imageUrl: searchedPlace.photoUrl,
+              })
+            }
+          >
             ✔️
           </button>
         </div>
