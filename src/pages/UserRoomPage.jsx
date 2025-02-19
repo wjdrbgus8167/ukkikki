@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { publicRequest } from '../hooks/requestMethod';
 import InteractiveSection from '../components/userroom/InteractiveSection';
@@ -6,7 +6,8 @@ import Header from '../components/layout/Header';
 import FavoriteList from '../components/userroom/FavoriteList';
 import { LoadScript } from '@react-google-maps/api';
 import WebSocketComponent from '../components/userroom/WebSocketComponent';
-import BoardingPass from '../components/common/BoardingPass';
+import BoardingPass from '../components/userroom/BoardingPass';
+import Draggable from 'react-draggable';
 
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
@@ -60,6 +61,26 @@ const UserRoom = () => {
     }
   }, [travelPlanId, fetchRoomData]);
 
+  const DraggableBoardingPass = ({ selectedCard, isLikeListOpen }) => {
+    const nodeRef = useRef(null);
+  
+    return (
+      <Draggable nodeRef={nodeRef}>
+        <div
+          ref={nodeRef}
+          className="fixed z-50 pointer-events-auto"
+          style={{
+            top: '80px',
+            left: isLikeListOpen ? '330px' : '0px',
+          }}
+        >
+          <BoardingPass selectedCard={selectedCard} />
+        </div>
+      </Draggable>
+    );
+  };
+  
+  
   if (!selectedCard) {
     return (
       <div className="p-10 text-center text-red-500">
@@ -67,7 +88,6 @@ const UserRoom = () => {
       </div>
     );
   }
-
   return (
     <LoadScript
       googleMapsApiKey={apiKey}
@@ -84,12 +104,12 @@ const UserRoom = () => {
         setFavorites={setFavorites}
         favorites={favorites}
       />
-
+  
       {/* 전체 화면 레이아웃 */}
-      <div className="flex flex-col h-screen overflow-hidden">
+      <div className="flex flex-col h-screen w-screen overflow-hidden">
         <Header />
-
-        {/* 지도 + 왼쪽 사이드바 */}
+  
+        {/* 지도 + 사이드바 및 BoardingPass */}
         <div className="relative flex-1">
           {/* 지도 (배경 레이어) */}
           <div className="absolute inset-0 z-0">
@@ -99,9 +119,9 @@ const UserRoom = () => {
               setFavorites={setFavorites}
             />
           </div>
-
-          {/* FavoriteList와 BoardingPass 배치 컨테이너 */}
-          <div className="relative flex h-full pointer-events-none">
+  
+          {/* [중요] 즐겨찾기 목록 + BoardingPass를 같은 flex 컨테이너로 묶기 */}
+          <div className="flex h-full pointer-events-none">
             {/* 왼쪽 사이드바 (즐겨찾기 목록) */}
             <div
               className={`transition-all duration-300 relative h-full ${
@@ -115,7 +135,7 @@ const UserRoom = () => {
               >
                 {isLikeListOpen ? '❮' : '❯'}
               </button>
-
+  
               {isLikeListOpen && (
                 <div className="h-full overflow-y-auto pointer-events-auto bg-white/70 backdrop-blur-sm">
                   <FavoriteList
@@ -127,16 +147,17 @@ const UserRoom = () => {
                 </div>
               )}
             </div>
-          </div>
-          <div className="fixed top-[60px] right-4 z-50 pointer-events-auto">
-            <div className="scale-[0.65] transform-origin-top-right">
-              <BoardingPass selectedCard={selectedCard} />
-            </div>
+
+
+            <DraggableBoardingPass selectedCard={selectedCard} isLikeListOpen={isLikeListOpen} />
+
           </div>
         </div>
       </div>
     </LoadScript>
   );
+  
+  
 };
 
 export default UserRoom;

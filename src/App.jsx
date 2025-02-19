@@ -9,7 +9,6 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import MyRoomsPage from './pages/MyRoomsPage';
-import BoardingPass from './components/common/BoardingPass';
 import MyProfile from './pages/MyProfilePage';
 import ProposalDetail from './pages/ProposalDetailPage';
 import UserVotePage from './pages/UserVotePage';
@@ -34,7 +33,6 @@ const App = () => {
     <Router>
       <LoadingSpinner /> {/* 전역 로딩 스피너 */}
       <Routes>
-        <Route path="/boarding-pass" element={<BoardingPass />} />
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/myroom" element={<MyRoomsPage />} />
@@ -53,9 +51,6 @@ const App = () => {
           path="/travel-plans/:travelPlanId/proposals/:proposalId?"
           element={<CreateTravel />}
         />
-
-        <Route path="/myprofile" element={<MyProfile />} />
-
         <Route path="/myprofile" element={<MyProfile />} />
         {/* 여행사 본인이 제시한 제안서 상세 조회 */}
         <Route
