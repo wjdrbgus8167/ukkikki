@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import { Client } from '@stomp/stompjs';
-import Swal from "sweetalert2";
+import Swal from 'sweetalert2';
 
 const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
 const wsProtocol = baseUrl.startsWith('https') ? 'wss' : 'ws';
@@ -23,17 +23,16 @@ const WebSocketComponent = ({ travelPlanId, setFavorites, favorites, fetchRoomDa
   });
 
   const handleUpdate = useCallback(async (message) => {
-    try {
-
-      if (typeof fetchRoomData === 'function') {
-        await fetchRoomData(travelPlanId);
-      } else {
-        console.error('fetchRoomData is not a function:', fetchRoomData);
-      }
-      const eventData = JSON.parse(message.body);
+      try {
+        if (typeof fetchRoomData === 'function') {
+          await fetchRoomData(travelPlanId);
+        } else {
+          console.error('fetchRoomData is not a function:', fetchRoomData);
+        }
+        const eventData = JSON.parse(message.body);
       console.log("📍 실시간 이벤트 수신:", eventData);
 
-      // ✅ 오른쪽 위에 알림(Toast) 띄우기
+        // ✅ 오른쪽 위에 알림(Toast) 띄우기
       Swal.mixin({
         toast: true,
         position: "top-end", 
@@ -42,17 +41,17 @@ const WebSocketComponent = ({ travelPlanId, setFavorites, favorites, fetchRoomDa
         timer: 5000, 
         timerProgressBar: true,
         didOpen: (toast) => {
-          toast.style.zIndex = 10000; 
-        }
-      }).fire({
+          toast.style.zIndex = 10000;
+          toast.addEventListener('click', () => {
+            Swal.close(); // 클릭 시 즉시 닫기
+          });
+        },
+        }).fire({
         title: `${eventData.memberName}님이 ${eventData.placeName ? eventData.placeName + ' ' : ''}${getActionText(eventData.action)}`
-      });
-      
-
-
-    } catch (error) {
-      console.error('Update handling error:', error);
-    }
+        });
+      } catch (error) {
+        console.error('Update handling error:', error);
+      }
   }, [travelPlanId, fetchRoomData]);
 
   const getActionText = (action) => {
@@ -91,20 +90,20 @@ const WebSocketComponent = ({ travelPlanId, setFavorites, favorites, fetchRoomDa
 
       stompClient.subscribe(
         `/sub/actions/travel-plan/${travelPlanId}`,
-        handleUpdate
+        handleUpdate,
       );
 
       if (stompClient && stompClient.connected) {
-              const wsData = {
-                action: "ENTER",
-                travelPlanId,
-              };
-              stompClient.publish({
-                destination: '/pub/actions',
-                body: JSON.stringify(wsData),
-              });
-              console.log('✅ WebSocketComponent 입장 이벤트:', wsData);
-        }
+        const wsData = {
+          action: 'ENTER',
+          travelPlanId,
+        };
+        stompClient.publish({
+          destination: '/pub/actions',
+          body: JSON.stringify(wsData),
+        });
+        console.log('✅ WebSocketComponent 입장 이벤트:', wsData);
+      }
       console.log('✅ STOMP 구독완료');
     };
 
@@ -122,7 +121,7 @@ const WebSocketComponent = ({ travelPlanId, setFavorites, favorites, fetchRoomDa
       if (stompClient.connected) {
         if (stompClient && stompClient.connected) {
           const wsData = {
-            action: "EXIT",
+            action: 'EXIT',
             travelPlanId,
           };
           stompClient.publish({
@@ -130,8 +129,8 @@ const WebSocketComponent = ({ travelPlanId, setFavorites, favorites, fetchRoomDa
             body: JSON.stringify(wsData),
           });
           console.log('✅ WebSocketComponent 퇴장 이벤트:', wsData);
-        stompClient.deactivate();
-        console.log('🛑 STOMP WebSocket 종료');
+          stompClient.deactivate();
+          console.log('🛑 STOMP WebSocket 종료');
         }
       }
     };

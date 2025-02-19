@@ -1,25 +1,21 @@
-import styled from 'styled-components'
-
+import styled from 'styled-components';
 
 export const DetailFormContainer = styled.div`
-  width: 90%;                 /* 전체 너비의 90%로 설정 */
-  max-width: 1300px;           /* 최대 너비를 1300px로 제한 */
+  width: 70%; /* 전체 너비의 70%로 설정 (90% → 70%로 변경) */
+  max-width: 900px; /* 최대 너비를 900px로 제한 (1300px → 900px로 변경) */
   height: 600px;
   margin: 10px auto;
   background-color: #fff;
-
-  overflow-y: auto;            /* 세로 스크롤 추가 */
+  overflow-y: auto; /* 세로 스크롤 추가 */
 
   .custom-hr {
     margin-top: 12px;
     margin-bottom: 12px;
-    border-top: 3.5px solid #d1d5db;  /* border-gray-300 */
-    width: 1150px;
+    border-top: 3.5px solid #d1d5db; /* border-gray-300 */
+    width: 100%; /* 너비를 100%로 변경하면 container 너비에 맞게 조정됨 */
     margin-left: auto;
     margin-right: auto;
-
-}
-
+  }
 `;
 
 export const Table = styled.table`
@@ -48,10 +44,9 @@ export const TableHeadCell = styled.th`
 //   border-radius: 4px; /* 둥근 모서리 */
 //   width: 100%;
 //   box-sizing: border-box;
-  
+
 //   &:focus {
 //     border: 1px solid #007BFF; /* 포커스 시 테두리 색상 변경 */
 //     outline: none; /* 포커스 시 기본 아웃라인 제거 */
 //   }
 // `;
-
