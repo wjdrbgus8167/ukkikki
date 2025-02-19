@@ -19,6 +19,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -249,5 +250,33 @@ public class ProposalController {
         TravelPlanCountResponse response = proposalService.getTravelPlanCount(travelPlanId);
 
         return ApiUtils.success(response);
+    }
+
+    /**
+     * 특정 제안서에 대한 OpenVidu 토큰(즉, Connection) 생성
+     */
+    @PostMapping("/{proposalId}/meeting/connection")
+    public ApiUtils.ApiResponse<?> getConnection(@PathVariable Integer proposalId,
+                                                 @RequestBody GetConnectionRequest getConnectionRequest,
+                                                 @AuthenticationPrincipal MemberUserDetails memberDetails) {
+        getConnectionRequest.setMemberName(memberDetails.getName());
+
+        String token = proposalService.generateToken(
+                proposalId,
+                getConnectionRequest.isHost(),
+                getConnectionRequest.getMemberName()
+        );
+
+        return ApiUtils.success(Collections.singletonMap("token", token));
+    }
+
+    /**
+     * 호스트 접속 여부 조회
+     */
+    @GetMapping("/{proposalId}/meeting/host-status")
+    public ApiUtils.ApiResponse<?> isHostConnected(@PathVariable Integer proposalId) {
+        boolean hostConnected = proposalService.isHostConnected(proposalId);
+
+        return ApiUtils.success(Collections.singletonMap("hostConnected", hostConnected));
     }
 }
