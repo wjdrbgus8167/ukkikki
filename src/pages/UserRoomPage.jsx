@@ -206,9 +206,9 @@ const UserRoom = () => {
           </div>
         </div>
       </div>
+      </div>
     </LoadScript>
   );
-  
   
 };
 
