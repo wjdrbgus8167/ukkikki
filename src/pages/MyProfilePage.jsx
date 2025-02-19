@@ -7,6 +7,7 @@ import OngoingProposals from '../components/mypage/company/OngoingProposals';
 import ReceivedProposals from '../components/mypage/company/ReceivedProposals'; 
 import useAuthStore from '../stores/authStore';
 import { TravelPlanProvider } from '../contexts/travelPlanContext';
+import { useLocation } from 'react-router';
 import { 
   MyProfileContainer, 
   MainContentWrapper, 
@@ -16,8 +17,9 @@ import {
 } from './style/MyProfilePageStyle';
 
 const MyProfile = () => {
+  const location = useLocation();
   const { userRole } = useAuthStore();
-  const [activeComponent, setActiveComponent] = useState('profile');
+  const [activeComponent, setActiveComponent] = useState(location.state?.activeComponent || 'profile');
 
   const renderContent = () => {
     if (activeComponent === 'profile') {

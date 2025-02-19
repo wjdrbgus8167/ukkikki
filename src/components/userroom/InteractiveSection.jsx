@@ -67,7 +67,7 @@ const InteractiveSection = ({
   };
   
   const handleLikePlace = async (place) => {
-    if (isInteractionDisabled()) {
+    if (isInteractionDisabled) {
       Swal.fire(
         '알림',
         '현재 상태에서는 이 기능을 사용할 수 없습니다.',
@@ -151,7 +151,7 @@ const InteractiveSection = ({
 
   // 태그 삭제 함수 (내가 쓴 태그인 경우 클릭하면 삭제)
   const handleTagDelete = async (placeId, tagId) => {
-    if (isInteractionDisabled()) {
+    if (isInteractionDisabled) {
       Swal.fire(
         '알림',
         '현재 상태에서는 이 기능을 사용할 수 없습니다.',
@@ -205,7 +205,7 @@ const InteractiveSection = ({
 
   // 태그 추가 함수
   const handleTagSubmit = async () => {
-    if (isInteractionDisabled()) {
+    if (isInteractionDisabled) {
       Swal.fire(
         '알림',
         '현재 상태에서는 이 기능을 사용할 수 없습니다.',
@@ -355,7 +355,7 @@ const InteractiveSection = ({
                     <h4 className="text-sm font-semibold">태그:</h4>
                     <button
                       onClick={() => {
-                        if (isInteractionDisabled()) {
+                        if (isInteractionDisabled) {
                           Swal.fire(
                             '알림',
                             '현재 상태에서는 이 기능을 사용할 수 없습니다.',
