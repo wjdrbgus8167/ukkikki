@@ -132,3 +132,35 @@ export const fetchAirportsAPI = async () => {
   }
   throw new Error('공항 목록을 불러오는데 실패했습니다.');
 };
+
+//여행사 문의 답변
+export const updateInquiryAnswer = async (
+  travelPlandId,
+  proposalId,
+  inquiryId,
+  payload,
+) => {
+  try {
+    const response = await publicRequest.put(
+      `api/v1/travel-plans/${travelPlandId}/proposals/${proposalId}/inquiries/${inquiryId}`,
+      payload,
+    );
+    console.log('여행사 문의 답변 성공:', response.data);
+    return response.data;
+  } catch (error) {
+    console.log('error:', error);
+  }
+};
+
+//문의하기 목록 조회
+export const getInquiries = async (travelPlanId, proposalId) => {
+  try {
+    const response = await publicRequest.get(
+      `api/v1/travel-plans/${travelPlanId}/proposals/${proposalId}/inquiries`,
+    );
+    console.log('문의하기 목록 조회:', response.data);
+    return response.data;
+  } catch (error) {
+    console.log('error:', error);
+  }
+};
