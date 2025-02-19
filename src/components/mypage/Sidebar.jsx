@@ -46,17 +46,21 @@ const Sidebar = ({ onMenuClick }) => {
     // 여행사인 경우
     userRole === 'company'
       ? [
-        {
-          label: '제시받은 목록',
-          onClick: () => onMenuClick('ReceivedProposals'),
-          icon: <FaHistory />,
-        },
-        {
-          label: '진행중인 목록',
-          onClick: () => onMenuClick('OngoingProposals'),
-          icon: <FaHistory />,
-        },
-        { label: '프로필', onClick: () => onMenuClick('profile'), icon: <FaUser /> },
+          {
+            label: '제시받은 목록',
+            onClick: () => onMenuClick('ReceivedProposals'),
+            icon: <FaHistory />,
+          },
+          {
+            label: '진행중인 목록',
+            onClick: () => onMenuClick('OngoingProposals'),
+            icon: <FaHistory />,
+          },
+          {
+            label: '프로필',
+            onClick: () => onMenuClick('profile'),
+            icon: <FaUser />,
+          },
           {
             label: '로그아웃',
             href: '/',
@@ -66,8 +70,7 @@ const Sidebar = ({ onMenuClick }) => {
         ]
       : [
           // 일반 사용자인 경우
-          { label: '내 여행', href: '/mypage/myroom', icon: <FaHistory /> },
-          { label: '프로필', href: '/mypage/profile', icon: <FaUser /> },
+          { label: '프로필', href: '/myprofile', icon: <FaUser /> },
           {
             label: '로그아웃',
             href: '/',
