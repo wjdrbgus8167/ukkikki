@@ -54,8 +54,6 @@ const App = () => {
         />
 
         <Route path="/myprofile" element={<MyProfile />} />
-
-        <Route path="/myprofile" element={<MyProfile />} />
         {/* 여행사 본인이 제시한 제안서 상세 조회 */}
         <Route
           path="/agency-proposal-detail/:travelPlanId/:proposalId"
