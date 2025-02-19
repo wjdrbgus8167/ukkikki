@@ -9,6 +9,8 @@ import {
     DayLabel,
     DayDate,
     TabButton,
+    StylePlaceDay,
+    DayContent,
 } from "./style/PlaceSelectionStyle";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -63,6 +65,7 @@ const PlaceSelection = ({ onSelectPlace }) => {
           longitude: p.longitude,
           photoUrl: p.photoUrl || null,
           rating: p.rating || null,
+          likeCount: p.likeCount,
         };
       } else {
         // travelPlan.places인 경우는 그대로 사용
@@ -175,26 +178,30 @@ const PlaceSelection = ({ onSelectPlace }) => {
 
     return (
         <StyledContainer>
+          <StylePlaceDay >
             {selectedDay && (
-                <>
-                    <DayLabel>{selectedDay.label}</DayLabel>
-                    <DayDate>_ [{selectedDay.date}]</DayDate>
-                </>
-            )}
-            <TabButton>
-                <button
-                    onClick={() => setIsSearchMode(false)}
-                    className={!isSearchMode ? "active" : "inactive"}
-                >
-                    제안 장소 목록
-                </button>
-                <button
-                    onClick={() => setIsSearchMode(true)}
-                    className={isSearchMode ? "active" : "inactive"}
-                >
-                    새로운 장소 검색
-                </button>
-            </TabButton>
+                  <DayContent>
+                      <DayLabel>{selectedDay.label}</DayLabel>
+                      <DayDate>_ [{selectedDay.date}]</DayDate>
+                  </DayContent>
+              )}
+              <TabButton>
+                  <button
+                      onClick={() => setIsSearchMode(false)}
+                      className={!isSearchMode ? "active" : "inactive"}
+                  >
+                      제안 장소 목록
+                  </button>
+                  <button
+                      onClick={() => setIsSearchMode(true)}
+                      className={isSearchMode ? "active" : "inactive"}
+                  >
+                      새로운 장소 검색
+                  </button>
+              </TabButton>
+          </StylePlaceDay >
+            
+
             <div className="place-list">
                 {!isSearchMode ? (
                     <SuggestedPlaceList 

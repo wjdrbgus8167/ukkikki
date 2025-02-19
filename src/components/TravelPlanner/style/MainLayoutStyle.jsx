@@ -30,7 +30,9 @@ export const StyledMapDisplay = styled.div`
 export const StyleScheduleByDate = styled.div`
   display: flex;
   width: 25%;
-
+  height: 100%;
+  min-width: 300px; 
+  max-width: 300px; /* 최대 너비 400px로 설정 */
 `;
 
 export const StyleMapContainer =  styled.div`
@@ -45,10 +47,12 @@ export const StylePlaceSelection = styled.div`
   top: 0;
   left: 0;
   z-index: 10; /* MapDisplay보다 높은 값으로 설정 */
-  width: 30%;
-  height: 100%;;
+  width: 25%;
+  height: 100%;
+  min-width: 380px; 
+  max-width: 400px; /* 최대 너비 400px로 설정 */
   /* 필요에 따라 배경색, 투명도 등 추가 스타일 적용 가능 */
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.8); 
   opacity: 1;
 
   @media (max-width: 1500px) {
