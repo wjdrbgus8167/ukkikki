@@ -101,9 +101,10 @@ public class TravelPlanController {
 
 	@GetMapping
 	public ApiUtils.ApiResponse<FetchAvailableTravelPlansResponse> fetchAvailableTravelPlans(
-			Pageable pageable) {
+			Pageable pageable,@AuthenticationPrincipal
+	MemberUserDetails memberUserDetails) {
 		Pageable tmpPageable = PageRequest.of(0, Integer.MAX_VALUE);
-		return ApiUtils.success(travelPlanServiceFacade.fetchAvailableTravelPlans(tmpPageable));
+		return ApiUtils.success(travelPlanServiceFacade.fetchAvailableTravelPlans(tmpPageable,memberUserDetails.getMemberId()));
 	}
 
 	@GetMapping("/{travelPlanId}")

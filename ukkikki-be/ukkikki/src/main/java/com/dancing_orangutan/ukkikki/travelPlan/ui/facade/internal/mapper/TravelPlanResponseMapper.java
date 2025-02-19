@@ -46,8 +46,8 @@ public class TravelPlanResponseMapper {
 	}
 
 	public FetchAvailableTravelPlansResponse fetchAvailableTravelPlansResponse(
-			final Page<TravelPlanEntity> page) {
-		return FetchAvailableTravelPlansResponse.fromEntities(page);
+			final Page<TravelPlanEntity> page, Integer memberId) {
+		return FetchAvailableTravelPlansResponse.fromEntities(page,memberId);
 	}
 
 	public FetchTravelPlanDetailsByCompanyResponse fetchTravelPlanDetailsResponse(

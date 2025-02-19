@@ -39,6 +39,7 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Component;
 
 
@@ -108,7 +109,8 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 	}
 
 	@Override
-	public void updatePlanningStatus(final UpdatePlanningStatusRequest request,final Integer travelPlanId) {
+	public void updatePlanningStatus(final UpdatePlanningStatusRequest request,
+			final Integer travelPlanId) {
 		UpdateTravelPlanStatusCommand command = UpdateTravelPlanStatusCommand.builder()
 				.status(request.planningStatus())
 				.travelPlanId(travelPlanId)
@@ -130,12 +132,14 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 	}
 
 	@Override
-	public FetchAvailableTravelPlansResponse fetchAvailableTravelPlans(final Pageable pageable) {
+	public FetchAvailableTravelPlansResponse fetchAvailableTravelPlans(final Pageable pageable,
+			final Integer memberId) {
+
 		return mapper.fetchAvailableTravelPlansResponse(
 				queryTravelPlanService.fetchAvailableTravelPlans(
 						FetchAvailableTravelPlanQuery.builder()
 								.pageable(pageable)
-								.build()));
+								.build()), memberId);
 	}
 
 	@Override
