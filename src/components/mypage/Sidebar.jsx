@@ -75,8 +75,8 @@ const Sidebar = ({ onMenuClick }) => {
           },
         ]
       : [
-          { label: '내 여행', to: '/mypage/myroom', icon: <FaHistory /> },
-          { label: '프로필', to: '/mypage/profile', icon: <FaUser /> },
+          // 일반 사용자인 경우
+          { label: '프로필', href: '/myprofile', icon: <FaUser /> },
           {
             label: '로그아웃',
             onClick: handleLogout,

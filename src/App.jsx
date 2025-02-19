@@ -52,6 +52,7 @@ const App = () => {
           path="/travel-plans/:travelPlanId/proposals/:proposalId?"
           element={<CreateTravel />}
         />
+
         <Route path="/myprofile" element={<MyProfile />} />
         {/* 여행사 본인이 제시한 제안서 상세 조회 */}
         {/* <Route
