@@ -49,7 +49,7 @@ export const Title = styled.h6`
 
 // 테이블 스타일
 export const TableWrapper = styled.div`
-  width: 870px;
+  width: 910px;
   padding: 0;
   overflow-x: auto;
   overflow-x: hidden;

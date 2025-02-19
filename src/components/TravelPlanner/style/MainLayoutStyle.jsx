@@ -4,15 +4,21 @@ import styled from 'styled-components';
 export const StyledMainLayout = styled.div`
   display: flex;
   width: 100%;
+  height: 100%;
   flex-direction: row; /* 수평 배열, 기본값이므로 생략 가능 */
   height: 100%;
 `;
 
 export const StyledDateSidebar = styled.div`
   display: flex;
-  width: 10%;
   justify-content: center; /* 가로 방향 가운데 정렬 */
   margin: 10px 0px;
+  overflow-y: scroll; /* 세로 스크롤을 가능하게 함 */
+  height: 680px;
+  width: 150px;
+  padding-bottom: 10px;
+  scrollbar-width: none;
+  
 `;
 
 export const StyledMapDisplay = styled.div`

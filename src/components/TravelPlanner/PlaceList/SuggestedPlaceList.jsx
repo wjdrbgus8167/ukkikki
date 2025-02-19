@@ -35,6 +35,7 @@ const SuggestedPlaceList = ({ places, onSelectPlace, onSelectDay }) => {
   return (
     <div>
       {places.map((place) => {
+          console.log('likeCount for', place.name, ':', place.likeCount);
         const key = place.id || uuidv4(); // ID가 없으면 uuid 생성
         return (
           <StylePlaceList key={key}>
@@ -54,7 +55,7 @@ const SuggestedPlaceList = ({ places, onSelectPlace, onSelectDay }) => {
                 <StylePlaceContent>
                   <p className="font-semibold">{place.name}</p>
                   <p className="text-sm text-gray-600">{place.address}</p>
-                  <p className="text-sm text-gray-600">좋아요 👍: {place.likeCount}</p>
+                  <p className="text-sm text-gray-600">❤️ {place.likeCount}</p>
                 </StylePlaceContent>
                 <button 
                   onClick={() => 
