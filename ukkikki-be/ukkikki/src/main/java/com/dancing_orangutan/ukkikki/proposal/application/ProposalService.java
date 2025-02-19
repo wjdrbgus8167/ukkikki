@@ -349,6 +349,9 @@ public class ProposalService {
                 .refundPolicy(proposal.getRefundPolicy())
                 .insuranceIncluded(proposal.isInsuranceIncluded())
                 .productInformation(proposal.getProductIntroduction())
+                .companyName(proposal.getCompany().getCompanyName())
+                .departureAirportCode(proposal.getDepartureAirport().getAirportCode())
+                .arrivalAirportCode(proposal.getArrivalAirport().getAirportCode())
                 .daySchedules(dayResponses)
                 .build();
     }
