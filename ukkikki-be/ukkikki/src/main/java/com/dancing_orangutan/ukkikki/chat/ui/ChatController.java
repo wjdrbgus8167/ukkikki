@@ -3,17 +3,21 @@ package com.dancing_orangutan.ukkikki.chat.ui;
 import com.dancing_orangutan.ukkikki.chat.application.ChatService;
 import com.dancing_orangutan.ukkikki.chat.application.command.SaveMessageCommand;
 import com.dancing_orangutan.ukkikki.chat.ui.request.EnterMessageRequest;
-import com.dancing_orangutan.ukkikki.chat.ui.request.FetchHistoryMessagesRequest;
 import com.dancing_orangutan.ukkikki.chat.ui.request.ActionRequest;
 import com.dancing_orangutan.ukkikki.chat.ui.request.MessageRequest;
 import com.dancing_orangutan.ukkikki.chat.ui.response.ActionResponse;
 import com.dancing_orangutan.ukkikki.chat.ui.response.EnterMessageResponse;
 import com.dancing_orangutan.ukkikki.chat.ui.response.FetchHistoryMessagesResponse;
 import com.dancing_orangutan.ukkikki.chat.ui.response.MessageResponse;
+import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 
@@ -79,14 +83,12 @@ public class ChatController {
 	/**
 	 * 이전 채팅 메시지 가져오기
 	 */
-	@MessageMapping("/chat/history")
-	public void fetchHistoryMessages(FetchHistoryMessagesRequest request) {
-		FetchHistoryMessagesResponse response = chatService.fetchHistoryMessages(
-				request.travelPlanId(), request.createdAtBefore(), 50
-		);
+	@GetMapping("/chat/{travelPlanId}/history")
+	public ApiUtils.ApiResponse<FetchHistoryMessagesResponse> fetchHistoryMessages(
+			@PathVariable(name = "travelPlanId") Integer travelPlanId,
+			@RequestParam(required = true) LocalDateTime createdAtBefore) {
 
-		simpMessagingTemplate.convertAndSend(
-				"/sub/chat/travel-plan/" + request.travelPlanId() + "/history",
-				response);
+		FetchHistoryMessagesResponse response = chatService.fetchHistoryMessages(travelPlanId, createdAtBefore, 50);
+		return ApiUtils.success(response);
 	}
 }
