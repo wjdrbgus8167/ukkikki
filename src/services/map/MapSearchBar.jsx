@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Autocomplete } from '@react-google-maps/api';
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaTimes } from 'react-icons/fa';
 import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
 import { stompClient } from '../../components/userroom/WebSocketComponent';
@@ -13,6 +13,8 @@ const MapSearchBar = ({
 }) => {
   const [searchedPlace, setSearchedPlace] = useState(null);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [inputValue, setInputValue] = useState(''); // 입력값 상태 추가
+
   const autocompleteRef = useRef(null);
 
   // Autocomplete 로드 시 ref 설정
@@ -143,7 +145,19 @@ const MapSearchBar = ({
       }
     }
   };
-
+  // "닫기" 버튼 클릭 시 입력값 및 검색 결과 초기화
+  const handleClearSearch = () => {
+    setInputValue('');
+    setSearchedPlace(null);
+    setIsRegistered(false);
+    if (autocompleteRef.current) {
+      // Autocomplete 인스턴스에 직접 입력값을 설정해도 됨
+      const input = document.querySelector('input[placeholder="장소 검색"]');
+      if (input) {
+        input.value = '';
+      }
+    }
+  };
   return (
     <div>
       <Autocomplete onLoad={handleLoad} onPlaceChanged={onPlaceChanged}>
@@ -151,11 +165,21 @@ const MapSearchBar = ({
           <input
             type="text"
             placeholder="장소 검색"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
             className="w-full h-12 pl-4 pr-12 text-base bg-transparent rounded-full focus:outline-none"
           />
           <div className="absolute inset-y-0 flex items-center text-xl text-gray-400 pointer-events-none right-4">
             <FaSearch />
           </div>
+          {inputValue && (
+            <button
+              className="absolute inset-y-0 flex items-center text-gray-500 right-10"
+              onClick={handleClearSearch}
+            >
+              <FaTimes />
+            </button>
+          )}
         </div>
       </Autocomplete>
 
