@@ -20,6 +20,7 @@ const UserRoom = () => {
   const [isLikeListOpen, setIsLikeListOpen] = useState(true);
   const [favorites, setFavorites] = useState([]);
   const [mapCenter, setMapCenter] = useState({ lat: 35.6895, lng: 139.6917 });
+  const [isInitialLoad, setIsInitialLoad] = useState(true); // 첫 로드 여부 상태 추가
 
   const libraries = ['places'];
 
@@ -68,7 +69,7 @@ const UserRoom = () => {
 
   // selectedCard가 업데이트될 때 도착 도시 좌표 가져오기
   useEffect(() => {
-    if (selectedCard && selectedCard.arrivalCity?.name) {
+    if (isInitialLoad && selectedCard && selectedCard.arrivalCity?.name) {
       const city = selectedCard.arrivalCity.name;
       const getCoordinates = async () => {
         const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${city}&key=${apiKey}`;
@@ -78,15 +79,15 @@ const UserRoom = () => {
           if (data.status === 'OK') {
             const { lat, lng } = data.results[0].geometry.location;
             setMapCenter({ lat, lng });
+            setIsInitialLoad(false); // 첫 로드 완료 후 상태 변경
           }
         } catch (error) {
           console.error('🚨 Geocoding 요청 실패:', error);
         }
       };
-
       getCoordinates();
     }
-  }, [selectedCard]);
+  }, [selectedCard, isInitialLoad]); // isInitialLoad를 의존성 배열에 추가
 
   useEffect(() => {
     if (travelPlanId) {
