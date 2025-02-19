@@ -33,12 +33,7 @@ const AgencyCard = ({ agency, onVote, onDetail, onJoinMeeting }) => {
         {/* 세션 참여 버튼 */}
         <button
           onClick={() => onJoinMeeting(agency)}
-          disabled={!agency.hostConnected}
-          className={`px-3 py-1 rounded ${
-            agency.hostConnected
-              ? 'bg-blue-500 text-white hover:bg-blue-600'
-              : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-          }`}
+          className="px-3 py-1 rounded bg-blue-500 text-white hover:bg-blue-600"
         >
           Live
         </button>
