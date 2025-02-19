@@ -242,7 +242,7 @@ public class ProposalController {
     }
 
     //방 총인원
-    @GetMapping("/total-count")
+    @GetMapping("/{proposalId}/total-count")
     public ApiUtils.ApiResponse<TravelPlanCountResponse> getTravelPlanCount(
             @PathVariable Integer travelPlanId)
     {
