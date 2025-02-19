@@ -32,14 +32,19 @@ public class ProposalDetailResponse {
     private String refundPolicy;
     private boolean insuranceIncluded;
     private ProposalStatus confirmStatus;
+    private String companyName;
+    private String departureAirportCode;
+    private String arrivalAirportCode;
     private List<DayResponse> daySchedules;
+
 
     @Builder
     public ProposalDetailResponse(Integer proposalId,Integer companyId,Integer travelPlanId, String name, LocalDate startDate, LocalDate endDate
             ,String airLine,String departureAirport,String arrivalAirport,LocalDateTime startDateBoardingTime
             ,LocalDateTime startDateArrivalTime, LocalDateTime endDateBoardingTime, LocalDateTime endDateArrivalTime
             , int deposit, int minPeople, boolean guideIncluded, String productInformation, String refundPolicy
-            , boolean insuranceIncluded, ProposalStatus confirmStatus, List<DayResponse> daySchedules) {
+            , boolean insuranceIncluded, ProposalStatus confirmStatus, String companyName
+            ,String departureAirportCode,String arrivalAirportCode,List<DayResponse> daySchedules) {
 
         this.proposalId = proposalId;
         this.companyId = companyId;
@@ -61,6 +66,9 @@ public class ProposalDetailResponse {
         this.refundPolicy = refundPolicy;
         this.insuranceIncluded = insuranceIncluded;
         this.confirmStatus = confirmStatus;
+        this.companyName = companyName;
+        this.departureAirportCode = departureAirportCode;
+        this.arrivalAirportCode = arrivalAirportCode;
         this.daySchedules = daySchedules;
 
     }
