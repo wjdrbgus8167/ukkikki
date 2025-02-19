@@ -59,4 +59,10 @@ public class GeographyController {
                 .build();
         return ApiUtils.success(geographyService.getAirports(query));
     }
+
+
+    @GetMapping("/airports")
+    public ApiUtils.ApiResponse<List<FetchAirportsResponse>> fetchAllAirports() {
+        return ApiUtils.success(geographyService.fetchAllAirports());
+    }
 }
