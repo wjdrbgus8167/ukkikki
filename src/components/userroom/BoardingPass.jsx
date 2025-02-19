@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaPlane } from 'react-icons/fa';
 import ProposalButton from './ProposalButton';
+import {THEME_COLORS} from '../../constants';
 
 const BoardingPass = ({ selectedCard, zoomLevel = 0.60 }) => {
   if (!selectedCard) return null;
@@ -141,14 +142,19 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.60 }) => {
           <div className="mt-4">
             <p className="text-xl text-gray-600 pb-2">테마</p>
             <div className="flex flex-wrap gap-2">
-              {(selectedCard.keywords || []).map((keyword, index) => (
-                <span
-                  key={index}
-                  className="px-2 py-1 rounded-full bg-gray-500 text-white text-xl font-medium"
-                >
-                  {keyword.name}
-                </span>
-              ))}
+              {(selectedCard.keywords || []).map((keyword, index) => {
+                // THEME_COLORS에서 해당 키워드의 색상을 가져오고, 없으면 기본 배경색 적용
+                const themeClass = THEME_COLORS[keyword.name] || "bg-gray-500 text-white";
+
+                return (
+                  <span
+                    key={index}
+                    className={`px-4 py-2 rounded-full text-xl font-medium ${themeClass}`}
+                  >
+                    {keyword.name}
+                  </span>
+                );
+              })}
             </div>
           </div>
         </div>
