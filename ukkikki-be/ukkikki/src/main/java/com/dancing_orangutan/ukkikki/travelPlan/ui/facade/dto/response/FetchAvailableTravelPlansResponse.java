@@ -23,10 +23,10 @@ public record FetchAvailableTravelPlansResponse(
 
 	}
 
-	public static FetchAvailableTravelPlansResponse fromEntities(Page<TravelPlanEntity> pages) {
+	public static FetchAvailableTravelPlansResponse fromEntities(Page<TravelPlanEntity> pages, Integer memberId) {
 
 		List<TravelPlanResponse> travelPlans = pages.getContent().stream()
-				.map(TravelPlanResponse::fromEntity)
+				.map(entity -> TravelPlanResponse.fromEntity(entity, memberId))
 				.toList();
 
 		return FetchAvailableTravelPlansResponse.
@@ -50,13 +50,14 @@ public record FetchAvailableTravelPlansResponse(
 			int minPeople,
 			int maxPeople,
 			int currentParticipants,
-			List<KeywordResponse> keywords
+			List<KeywordResponse> keywords,
+			boolean hasJoined
 	) {
 		@Builder
 		private TravelPlanResponse {}
 
 		private static TravelPlanResponse fromEntity(
-				TravelPlanEntity entity) {
+				TravelPlanEntity entity, Integer memberId) {
 			return TravelPlanResponse.builder()
 					.travelPlanId(entity.getTravelPlanId())
 					.name(entity.getName())
@@ -78,6 +79,8 @@ public record FetchAvailableTravelPlansResponse(
 											KeywordResponse.fromEntity(travelPlanKeywordEntity.getKeyword()))
 									.toList()
 					)
+					.hasJoined(entity.getMemberTravelPlans().stream()
+							.anyMatch(memberTravelEntity -> memberTravelEntity.hasJoined(memberId)))
 					.build();
 		}
 	}

@@ -40,7 +40,7 @@ public interface TravelPlanServiceFacade {
 	void updateCompanionCount(final UpdateCompanionCountRequest request, final Integer travelPlanId,
 			final Integer memberId);
 
-	FetchAvailableTravelPlansResponse fetchAvailableTravelPlans(final Pageable pageable);
+	FetchAvailableTravelPlansResponse fetchAvailableTravelPlans(final Pageable pageable,Integer memberId);
 
 	FetchTravelPlanDetailsByCompanyResponse fetchTravelPlanDetails(final Integer travelPlanId);
 
