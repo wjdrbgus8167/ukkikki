@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
 const apiKey = import.meta.env.VITE_APP_UNSPLASH_API_KEY;
 const statusMap = {
   IN_PROGRESS: '진행중',
-  BIDDING: '입찰중',
+  BIDDING: '제안받는중',
   BOOKING: '예약중',
   CONFIRMED: '확정됨',
 };
