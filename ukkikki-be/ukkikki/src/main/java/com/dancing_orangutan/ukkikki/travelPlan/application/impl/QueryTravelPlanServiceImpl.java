@@ -45,8 +45,8 @@ public class QueryTravelPlanServiceImpl implements QueryTravelPlanService {
 	}
 
 	@Override
-	public List<TravelPlanEntity> fetchSuggestedTravelPlans() {
-		return queryDslTravelPlanRepository.fetchSuggestedTravelPlans();
+	public List<TravelPlanEntity> fetchSuggestedTravelPlans(final Integer companyId) {
+		return queryDslTravelPlanRepository.fetchSuggestedTravelPlans(companyId);
 	}
 
 	@Override

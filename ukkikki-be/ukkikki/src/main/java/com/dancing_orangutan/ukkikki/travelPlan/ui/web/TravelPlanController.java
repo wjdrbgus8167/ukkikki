@@ -1,5 +1,6 @@
 package com.dancing_orangutan.ukkikki.travelPlan.ui.web;
 
+import com.dancing_orangutan.ukkikki.global.security.CompanyUserDetails;
 import com.dancing_orangutan.ukkikki.global.security.MemberUserDetails;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.constant.PlanningStatus;
@@ -64,8 +65,11 @@ public class TravelPlanController {
 	}
 
 	@GetMapping("/list")
-	public ApiUtils.ApiResponse<FetchSuggestedTravelPlansResponse> fetchSuggestedTravelPlans() {
-		return ApiUtils.success(travelPlanServiceFacade.fetchSuggestedTravelPlans());
+	public ApiUtils.ApiResponse<FetchSuggestedTravelPlansResponse> fetchSuggestedTravelPlans(
+			@AuthenticationPrincipal CompanyUserDetails companyUserDetails
+	) {
+
+		return ApiUtils.success(travelPlanServiceFacade.fetchSuggestedTravelPlans(companyUserDetails.getCompanyId()));
 	}
 
 	@PutMapping("/{travelPlanId}/comments")
