@@ -152,11 +152,14 @@ public class ProposalService {
                .build();
     }
 
-    // 제안서에 대한 화상 회의 세션 생성
+    /**
+     * 제안서에 대한 화상 회의 세션 생성
+     */
     @Transactional
     public void createSessionForProposal(Integer proposalId) {
         log.info("화상 회의 세션 생성 시작 - proposalId: {}", proposalId);
-        // 1) 세션 생성
+
+        // 1) 세션 생성 (원하는 SessionProperties 적용 가능)
         SessionProperties props = new SessionProperties.Builder().build();
         try {
             Session session = openVidu.createSession(props);
@@ -178,28 +181,70 @@ public class ProposalService {
     }
 
     /**
-     * proposalId를 받아서 세션이 이미 있으면 재사용, 없으면 생성.
-     * -> 화상 회의 페이지에서 토큰 요청 시 사용 가능
+     * proposalId를 받아서 세션이 이미 있으면 재사용하되, 실제 OpenVidu 서버에도
+     * 세션이 존재하는지 확인. 없으면 새로 생성.
      */
     @Transactional
     public String getOrCreateSession(Integer proposalId) {
         log.info("getOrCreateSession 호출 - proposalId: {}", proposalId);
-        synchronized (this) { // 동기화 블록 적용
-            return sessionRepository.findByProposalId(proposalId)
-                    .map(SessionEntity::getSessionId)
-                    .orElseGet(() -> {
-                        log.info("세션 없음 - 새 세션 생성 중 - proposalId: {}", proposalId);
-                        createSessionForProposal(proposalId);
-                        return sessionRepository.findByProposalId(proposalId)
-                                .orElseThrow(() -> {
-                                    log.error("새 세션 생성 실패 - proposalId: {}", proposalId);
-                                    return new RuntimeException("OpenVidu 세션 생성에 실패했습니다.");
-                                })
-                                .getSessionId();
-                    });
+
+        // 동기화 블록: 동시에 여러 요청이 들어와도 한 번만 세션 생성
+        synchronized (this) {
+            // DB에서 세션 기록 확인
+            SessionEntity sessionEntity = sessionRepository.findByProposalId(proposalId).orElse(null);
+
+            if (sessionEntity != null) {
+                String storedSessionId = sessionEntity.getSessionId();
+                log.info("DB에 sessionId={} 존재. 유효성 검증 중...", storedSessionId);
+
+                // OpenVidu에 실제로 세션이 살아 있는지 확인
+                Session activeSession = openVidu.getActiveSession(storedSessionId);
+                if (activeSession == null) {
+                    // OpenVidu 서버에는 세션이 없음 -> 새로 생성
+                    log.warn("세션 만료/재시작 등으로 OpenVidu에선 sessionId={} 없음. 새 세션 생성.", storedSessionId);
+                    return recreateSession(proposalId, sessionEntity);
+                } else {
+                    // 유효한 세션이면 재사용
+                    log.info("OpenVidu에 sessionId={}가 유효. 그대로 사용.", storedSessionId);
+                    return storedSessionId;
+                }
+            } else {
+                // DB에 세션 정보가 없으므로 새로 생성
+                log.info("DB에 세션 없음 -> 새 세션 생성 - proposalId={}", proposalId);
+                createSessionForProposal(proposalId);
+
+                SessionEntity newEntity = sessionRepository.findByProposalId(proposalId)
+                        .orElseThrow(() -> {
+                            log.error("세션 생성 직후 DB 조회 실패 - proposalId={}", proposalId);
+                            return new RuntimeException("OpenVidu 세션 생성에 실패했습니다.");
+                        });
+                return newEntity.getSessionId();
+            }
         }
     }
-    
+
+    /**
+     * 세션이 DB에는 있으나 OpenVidu에는 없는 경우(재시작/만료 등) - 새 세션 생성
+     */
+    private String recreateSession(Integer proposalId, SessionEntity sessionEntity) {
+        try {
+            Session session = openVidu.createSession();
+            String newSessionId = session.getSessionId();
+            log.info("recreateSession - 새 세션 생성됨. newSessionId={}", newSessionId);
+
+            // 기존 세션 ID를 새 것으로 업데이트
+            sessionEntity.setSessionId(newSessionId);
+            sessionRepository.save(sessionEntity);
+
+            log.info("세션 DB 업데이트 성공 - proposalId: {}, newSessionId: {}", proposalId, newSessionId);
+            return newSessionId;
+
+        } catch (OpenViduJavaClientException | OpenViduHttpException e) {
+            log.error("recreateSession 실패 - proposalId={}", proposalId, e);
+            throw new RuntimeException("OpenVidu 세션 재생성 실패", e);
+        }
+    }
+
     /**
      * 토큰 생성 로직
      * @param isHost = true -> PUBLISHER(여행사)
@@ -207,12 +252,14 @@ public class ProposalService {
      */
     public String generateToken(Integer proposalId, boolean isHost, String memberName) {
         try {
+            // 세션 ID 가져오기 (없으면 새로 생성, 있으면 유효성검증)
             String sessionId = getOrCreateSession(proposalId);
             log.info("토큰 생성 시작 - proposalId: {}, sessionId: {}, isHost: {}", proposalId, sessionId, isHost);
 
             // 활성 세션 확인
             Session session = openVidu.getActiveSession(sessionId);
             if (session == null) {
+                // 만약 여기서도 null이면, 한번 더 세션 재생성 시도 가능
                 log.warn("활성 세션 없음 - proposalId: {}, sessionId: {}. 새 세션 생성 시도", proposalId, sessionId);
                 sessionId = createNewSessionManually(proposalId);
                 log.info("새 세션 생성 후 sessionId: {}", sessionId);
@@ -225,6 +272,7 @@ public class ProposalService {
                 log.info("활성 세션 존재 - proposalId: {}, sessionId: {}", proposalId, sessionId);
             }
 
+            // PUBLISHER or SUBSCRIBER
             ConnectionProperties connectionProperties = new ConnectionProperties.Builder()
                     .role(isHost ? OpenViduRole.PUBLISHER : OpenViduRole.SUBSCRIBER)
                     .data(memberName)
@@ -232,27 +280,35 @@ public class ProposalService {
             log.info("ConnectionProperties 생성 - role: {}, memberName: {}",
                     isHost ? "PUBLISHER" : "SUBSCRIBER", memberName);
 
+            // 토큰 생성
             Connection connection = session.createConnection(connectionProperties);
             log.info("토큰 생성 성공 - proposalId: {}, token: {}", proposalId, connection.getToken());
             return connection.getToken();
+
         } catch (OpenViduJavaClientException | OpenViduHttpException e) {
             log.error("토큰 생성 실패 - proposalId: {}, memberName: {}", proposalId, memberName, e);
             throw new RuntimeException("토큰 생성에 실패했습니다.", e);
         }
     }
 
+    /**
+     * 만약 generateToken 중간에 세션이 없다고 판단된 경우,
+     * 새로 수동으로 세션을 만들고 DB 업데이트
+     */
     private String createNewSessionManually(Integer proposalId)
             throws OpenViduJavaClientException, OpenViduHttpException {
         log.info("createNewSessionManually 시작 - proposalId: {}", proposalId);
         Session session = openVidu.createSession();
         String newSessionId = session.getSessionId();
         log.info("새 세션 생성됨 - newSessionId: {}", newSessionId);
+
         // 기존 sessionId 업데이트
         SessionEntity sessionEntity = sessionRepository.findByProposalId(proposalId)
                 .orElseThrow(() -> new RuntimeException("세션 기록이 발견되지 않았습니다."));
         sessionEntity.setSessionId(newSessionId);
         sessionRepository.save(sessionEntity);
         log.info("세션 DB 업데이트 성공 - proposalId: {}, newSessionId: {}", proposalId, newSessionId);
+
         return newSessionId;
     }
 
@@ -268,9 +324,11 @@ public class ProposalService {
         }
         Session session = openVidu.getActiveSession(sessionEntity.getSessionId());
         if (session == null) {
-            log.info("호스트 접속 여부 체크: 활성 세션 없음 - proposalId: {}, sessionId: {}", proposalId, sessionEntity.getSessionId());
+            log.info("호스트 접속 여부 체크: 활성 세션 없음 - proposalId: {}, sessionId: {}",
+                    proposalId, sessionEntity.getSessionId());
             return false;
         }
+        // 연결된 Connection들 중 PUBLISHER 역할이 하나 이상 있으면 호스트 접속 중
         boolean hostConnected = session.getConnections().stream()
                 .anyMatch(connection -> connection.getRole() == OpenViduRole.PUBLISHER);
         log.info("호스트 접속 여부 체크 결과 - proposalId: {}, hostConnected: {}", proposalId, hostConnected);
