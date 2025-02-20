@@ -15,7 +15,7 @@ const BoardingPass = ({
   // 상태 레이블 매핑
   const statusKeyMapping = {
     IN_PROGRESS: '진행',
-    BIDDING: '입찰',
+    BIDDING: '검토',
     BOOKING: '예약',
     CONFIRMED: '확정',
   };
@@ -45,7 +45,7 @@ const BoardingPass = ({
       break;
   }
 
-  const statusLabels = ['진행', '입찰', '예약', '확정'];
+  const statusLabels = ['진행', '검토', '예약', '확정'];
 
   const departureCityName = selectedCard.departureCity?.name || '출발도시';
   const arrivalCityName = selectedCard.arrivalCity?.name || '도착도시';
