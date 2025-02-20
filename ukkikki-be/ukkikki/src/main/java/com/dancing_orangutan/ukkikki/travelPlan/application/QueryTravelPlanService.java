@@ -1,6 +1,7 @@
 package com.dancing_orangutan.ukkikki.travelPlan.application;
 
 import com.dancing_orangutan.ukkikki.proposal.domain.voteSurvey.VoteSurveyEntity;
+import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchAllTravelPlansQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchAvailableTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQueryByMember;
@@ -20,6 +21,8 @@ public interface QueryTravelPlanService {
 	List<TravelPlanEntity> fetchSuggestedTravelPlans();
 
 	Page<TravelPlanEntity> fetchAvailableTravelPlans(FetchAvailableTravelPlanQuery query);
+
+	Page<TravelPlanEntity> fetchAllTravelPlans(FetchAllTravelPlansQuery query);
 
 	TravelPlanEntity fetchTravelPlanDetails(FetchTravelPlanDetailsQuery query);
 
