@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import Header from "../components/layout/Header";
-import Footer from "../components/layout/Footer";
-import ProposalContent from "../components/agencyDetail/ProposalContent.jsx";
-import PlaceList from "../components/agencyDetail/PlaceList.jsx";
-import { TravelPlanDetailProvider } from "../contexts/TravelPlanDetailContext.jsx";
-import UserLocationMap from "../components/agencyDetail/UserLocationMap.jsx";
-import { useParams } from "react-router";
-import { useNavigate } from "react-router";
+import React, { useState } from 'react';
+import Header from '../components/layout/Header';
+import Footer from '../components/layout/Footer';
+import ProposalContent from '../components/agencyDetail/ProposalContent.jsx';
+import PlaceList from '../components/agencyDetail/PlaceList.jsx';
+import { TravelPlanDetailProvider } from '../contexts/TravelPlanDetailContext.jsx';
+import UserLocationMap from '../components/agencyDetail/UserLocationMap.jsx';
+import { useParams } from 'react-router';
+import { useNavigate } from 'react-router';
 import { IoIosArrowBack } from 'react-icons/io';
-import { 
+import {
   ProposalDetailContainer,
   ContentContainer,
   ProposalContentWrapper,
@@ -16,8 +16,8 @@ import {
   MapWrapper,
   PlaceListWrapper,
   AcceptButton,
-  ButtonPosition
-} from "./style/TravelPlanDetailPageStyle.jsx"; 
+  ButtonPosition,
+} from './style/TravelPlanDetailPageStyle.jsx';
 
 const TravelPlanDetail = () => {
   const { travelPlanId } = useParams();
@@ -38,32 +38,34 @@ const TravelPlanDetail = () => {
       <ProposalDetailContainer>
         <Header />
         <ContentContainer>
-        <div>
-          <button onClick={() => navigate(-1)} className="ml-[100px] text-brown">
-            <IoIosArrowBack size={32} className="text-3xl font-bold" />
-          </button>
-          <ProposalContentWrapper>
-            <ProposalContent />
-          </ProposalContentWrapper>
-          <MapAndPlaceWrapper>
-            <MapWrapper>
-              <UserLocationMap 
-                latitude={selectedPlace?.latitude} 
-                longitude={selectedPlace?.longitude} 
-              />
-            </MapWrapper>
-            <PlaceListWrapper>
-              <PlaceList handlePlaceClick={handlePlaceClick} />
-            </PlaceListWrapper>
-          </MapAndPlaceWrapper>
+          <div>
+            <button
+              onClick={() => navigate(-1)}
+              className="ml-[100px] text-brown"
+            >
+              <IoIosArrowBack size={32} className="text-3xl font-bold" />
+            </button>
+            <ProposalContentWrapper>
+              <ProposalContent />
+            </ProposalContentWrapper>
+            <ButtonPosition>
+              <AcceptButton onClick={onhandleCreatePlan}>수락</AcceptButton>
+            </ButtonPosition>
+            <MapAndPlaceWrapper>
+              <MapWrapper>
+                <UserLocationMap
+                  latitude={selectedPlace?.latitude}
+                  longitude={selectedPlace?.longitude}
+                />
+              </MapWrapper>
+              <PlaceListWrapper>
+                <PlaceList handlePlaceClick={handlePlaceClick} />
+              </PlaceListWrapper>
+            </MapAndPlaceWrapper>
           </div>
         </ContentContainer>
-        <ButtonPosition>
-          <AcceptButton onClick={onhandleCreatePlan}>
-            수락
-          </AcceptButton>
-        </ButtonPosition>
-          <Footer />
+
+        <Footer />
       </ProposalDetailContainer>
     </TravelPlanDetailProvider>
   );
