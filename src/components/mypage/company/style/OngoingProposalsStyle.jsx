@@ -1,5 +1,5 @@
 // ./styled/OngoingProposalsStyle.jsx
-import styled from "styled-components";
+import styled from 'styled-components';
 
 // 전체 컨테이너
 export const Container = styled.div`
@@ -94,11 +94,12 @@ export const TableRow = styled.tr`
 `;
 
 export const TableCell = styled.td`
-  padding: 1rem;
+  padding: 1rem; /* 패딩을 기존보다 키움 */
   text-align: center;
   background-color: transparent;
   border-bottom: 1px solid #e2e8f0;
   white-space: nowrap;
+  font-size: 1.2rem; /* 글자 크기를 키움 */
 `;
 
 export const Status = styled.span`
@@ -109,30 +110,30 @@ export const Status = styled.span`
   border-radius: 0.25rem;
   color: ${(props) => {
     switch (props.status) {
-      case "D":
-        return "#991B33";
-      case "A":
-        return "#3053B4";
-      case "W":
-        return "#1C6534";
-      case "V":
-        return "#995E1B";
+      case 'D':
+        return '#991B33';
+      case 'A':
+        return '#3053B4';
+      case 'W':
+        return '#1C6534';
+      case 'V':
+        return '#995E1B';
       default:
-        return "#FFFFFF";
+        return '#FFFFFF';
     }
   }};
   background-color: ${(props) => {
     switch (props.status) {
-      case "D":
-        return "#FEE2E2";
-      case "A":
-        return "#DBEAFE";
-      case "W":
-        return "#DCFCE7";
-      case "V":
-        return "#FEEDDB";
+      case 'D':
+        return '#FEE2E2';
+      case 'A':
+        return '#DBEAFE';
+      case 'W':
+        return '#DCFCE7';
+      case 'V':
+        return '#FEEDDB';
       default:
-        return "gray";
+        return 'gray';
     }
   }};
 `;
@@ -145,9 +146,9 @@ export const PaginationWrapper = styled.div`
     justify-content: center;
     flex-wrap: wrap;
     gap: 2px;
-    list-style: none;    /* ul 기본 스타일 제거 */
-    padding: 0;          /* ul 기본 패딩 제거 */
-    margin: 20px 0;      /* 필요하면 여백 설정 */
+    list-style: none; /* ul 기본 스타일 제거 */
+    padding: 0; /* ul 기본 패딩 제거 */
+    margin: 40px 0; /* 필요하면 여백 설정 */
   }
 
   /* 각 페이지 번호를 감싸는 li */
@@ -157,12 +158,12 @@ export const PaginationWrapper = styled.div`
 
   /* 각 페이지 번호의 링크(a 태그) */
   .page-item a {
-    background-color: #FFFFFF;
+    background-color: #ffffff;
     color: #412b2b;
     border: 1px solid #ddd;
     padding: 8px 16px;
     border-radius: 5px;
-    text-decoration: none;    /* 밑줄 제거 */
+    text-decoration: none; /* 밑줄 제거 */
     font-weight: bold;
     transition: background-color 0.3s, color 0.3s;
     cursor: pointer;
@@ -170,7 +171,7 @@ export const PaginationWrapper = styled.div`
 
   .page-item a:hover {
     background-color: #412b2b;
-    color: #FFD21C;
+    color: #ffd21c;
   }
 
   /* 비활성화된 버튼(이전, 다음이 없는 경우 등) */
@@ -184,6 +185,6 @@ export const PaginationWrapper = styled.div`
   /* 활성화된 페이지(현재 페이지) */
   .active a {
     background-color: #412b2b;
-    color: #FFD21C;
+    color: #ffd21c;
   }
 `;
