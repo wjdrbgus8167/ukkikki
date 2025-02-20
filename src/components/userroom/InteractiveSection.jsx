@@ -58,7 +58,7 @@ const InteractiveSection = ({
       setSelectedMarker({ ...marker });
     }, 10); // 약간의 딜레이 추가하여 InfoWindow 충돌 방지
   };
-  
+
   const handleLikePlace = async (place) => {
     if (isInteractionDisabled) {
       Swal.fire(

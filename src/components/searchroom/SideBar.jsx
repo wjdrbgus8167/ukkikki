@@ -16,7 +16,7 @@ const Sidebar = ({ onFilter }) => {
     '성지순례',
     '기차여행',
   ];
-  const roomStates = ['진행중', '입찰중', '예약중', '여행확정'];
+  const roomStates = ['진행중', '제안받는중', '예약중', '여행확정'];
 
   const [selectedThemes, setSelectedThemes] = useState(['전체보기']);
   const [selectedRoomStates, setSelectedRoomStates] = useState(['전체보기']);

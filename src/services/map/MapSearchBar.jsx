@@ -271,8 +271,17 @@ const MapSearchBar = ({
           <div className="text-lg font-bold">{searchedPlace.name}</div>
           <div className="text-sm text-gray-600">{searchedPlace.address}</div>
           {searchedPlace.rating !== null && (
-            <div className="mt-2 text-sm text-gray-700">
-              별점: {'⭐'.repeat(Math.round(searchedPlace.rating))}
+            <div className="flex items-center justify-between mt-2">
+              <div className="text-sm text-gray-700">
+                별점: {'⭐'.repeat(Math.round(searchedPlace.rating))}
+              </div>
+              <button
+                onClick={handleToggleBookmark}
+                className="px-3 font-semibold rounded cursor-pointer text-brown bg-yellow h-9"
+                disabled={isRegistered}
+              >
+                {isRegistered ? '등록 완료' : '장소 등록'}
+              </button>
             </div>
           )}
 
@@ -292,16 +301,6 @@ const MapSearchBar = ({
               ))}
             </div>
           )}
-
-          <div className="flex justify-end">
-            <button
-              onClick={handleToggleBookmark}
-              className="px-3 mt-2 font-semibold rounded cursor-pointer text-brown bg-yellow h-9"
-              disabled={isRegistered}
-            >
-              {isRegistered ? '등록 완료' : '장소 등록'}
-            </button>
-          </div>
         </Element>
       )}
     </div>
