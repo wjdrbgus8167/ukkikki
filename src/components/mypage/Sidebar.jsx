@@ -62,15 +62,15 @@ const Sidebar = ({ onMenuClick }) => {
             icon: <FaHistory />,
             to: '/ongoing-proposals',
           },
-        ]
-      : userRole === 'company'
-      ? [
           {
             label: '여행 성사 내역',
             onClick: () => onMenuClick('AcceptedProposals'),
             icon: <FaHistory />,
             to: '/accepted-proposals',
           },
+        ]
+      : userRole === 'company'
+      ? [
           {
             label: '프로필',
             onClick: () => onMenuClick('profile'),

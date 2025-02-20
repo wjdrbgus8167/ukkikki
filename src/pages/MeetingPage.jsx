@@ -5,7 +5,11 @@ import {
   useNavigate,
   useLocation,
 } from 'react-router-dom';
+<<<<<<< HEAD
 import Swal from 'sweetalert2';
+=======
+import Swal from 'sweetalert2'; // NEW: Swal 추가
+>>>>>>> fed85787fe4b1ff72a05fcae0b2f9727583abd9a
 import { OpenVidu } from 'openvidu-browser';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
@@ -162,6 +166,7 @@ function MeetingPage() {
       console.log('User confirmed to leave the session.');
       setShouldDisconnect(true);
       if (isHost) {
+<<<<<<< HEAD
         console.log('Navigating to proposal detail page for host.');
         navigate(`/proposal-detail/${travelPlanId}/${proposalId}`);
       } else {
@@ -170,6 +175,12 @@ function MeetingPage() {
       }
     } else {
       console.log('User cancelled leaving the session.');
+=======
+        navigate(`/proposal-detail/${travelPlanId}/${proposalId}`);
+      } else {
+        navigate(`/user-vote/${travelPlanId}`);
+      }
+>>>>>>> fed85787fe4b1ff72a05fcae0b2f9727583abd9a
     }
   };
 

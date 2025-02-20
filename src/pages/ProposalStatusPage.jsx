@@ -14,6 +14,7 @@ import {
   SidebarWrapper,
   ContentWrapper,
 } from './style/MyProfilePageStyle';
+import AcceptedProposals from '../components/mypage/company/AcceptedProposals';
 
 const ProposalStatus = () => {
   const navigate = useNavigate();
@@ -37,6 +38,13 @@ const ProposalStatus = () => {
       return (
         <TravelPlanProvider>
           <OngoingProposals />
+        </TravelPlanProvider>
+      );
+    }
+    if (activeComponent === 'AcceptedProposals') {
+      return (
+        <TravelPlanProvider>
+          <AcceptedProposals />
         </TravelPlanProvider>
       );
     }
