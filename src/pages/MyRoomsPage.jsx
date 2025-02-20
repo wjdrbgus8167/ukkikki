@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { publicRequest } from '../hooks/requestMethod';
 import MyRoomCard from '../components/mypage/myroom/MyRoomCard';
 import { STATUS_MAP } from '../constants';
-import { IoIosArrowBack } from 'react-icons/io';
 
 // 필터 옵션 정의
 const FILTER_OPTIONS = [
@@ -62,12 +61,6 @@ const MyRoomsPage = () => {
       {/* 메인 컨테이너 */}
       <div className="max-w-screen-xl px-6 py-10 mx-auto">
         <div className="flex items-center justify-between mb-8">
-          {/* 왼쪽 빈 공간 */}
-          <div className="flex justify-end w-10">
-            <button onClick={() => navigate(-1)} className="text-brown">
-              <IoIosArrowBack size={32} className="text-3xl font-bold" />
-            </button>
-          </div>
           {/* 가운데: 필터 옵션 */}
           <div className="flex justify-center space-x-8">
             {FILTER_OPTIONS.map((option) => (
@@ -95,10 +88,7 @@ const MyRoomsPage = () => {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           {rooms.length > 0 ? (
             rooms.map((room) => (
-              <MyRoomCard
-                key={room.travelPlanId}
-                room={room}
-              />
+              <MyRoomCard key={room.travelPlanId} room={room} />
             ))
           ) : (
             <div className="flex flex-col items-center justify-center mt-16 space-y-4 col-span-full">

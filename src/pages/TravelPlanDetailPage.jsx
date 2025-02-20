@@ -7,7 +7,6 @@ import { TravelPlanDetailProvider } from '../contexts/TravelPlanDetailContext.js
 import UserLocationMap from '../components/agencyDetail/UserLocationMap.jsx';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router';
-import { IoIosArrowBack } from 'react-icons/io';
 import {
   ProposalDetailContainer,
   ContentContainer,
@@ -39,12 +38,6 @@ const TravelPlanDetail = () => {
         <Header />
         <ContentContainer>
           <div>
-            <button
-              onClick={() => navigate(-1)}
-              className="ml-[100px] text-brown"
-            >
-              <IoIosArrowBack size={32} className="text-3xl font-bold" />
-            </button>
             <ProposalContentWrapper>
               <ProposalContent />
             </ProposalContentWrapper>

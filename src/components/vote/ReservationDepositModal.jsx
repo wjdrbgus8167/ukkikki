@@ -5,7 +5,6 @@ import Swal from 'sweetalert2';
 import KakaoPayTest from './KakaoPayTest';
 import { IoIosCloseCircle } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
-import { IoIosArrowBack } from 'react-icons/io';
 
 const ReservationDepositModal = ({ travelPlanId, proposalId, onClose }) => {
   const navigate = useNavigate();
@@ -277,12 +276,6 @@ const ReservationDepositModal = ({ travelPlanId, proposalId, onClose }) => {
         )}
         {step === 2 && (
           <div className="min-h-[500px] flex flex-col items-center justify-center">
-            {/* 뒤로가기 버튼 추가 */}
-            <div className="flex justify-start w-full mb-4">
-              <button onClick={() => setStep(1)} className="ml-4 text-brown">
-                <IoIosArrowBack size={32} className="text-3xl font-bold" />
-              </button>
-            </div>
             <KakaoPayTest onPaymentComplete={handlePaymentComplete} />
           </div>
         )}

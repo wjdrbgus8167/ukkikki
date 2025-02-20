@@ -6,7 +6,6 @@ import { publicRequest } from '../hooks/requestMethod';
 import ProposalDetailTimeline from '../components/ProposalDetailForUser/ProposalDetailTimeline';
 import ProposalDetailInfo from '../components/ProposalDetailForUser/ProposalDetailInfo';
 import ProposalDetailContact from '../components/ProposalDetailForUser/ProposalDetailContact';
-import { IoIosArrowBack } from 'react-icons/io';
 
 const ProposalDetailForUser = () => {
   const { travelPlanId, proposalId } = useParams();
@@ -83,9 +82,6 @@ const ProposalDetailForUser = () => {
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Header />
       <main className="flex-1 max-w-screen-xl px-4 py-6 mx-auto">
-        <button onClick={() => navigate(-1)} className=" text-brown">
-          <IoIosArrowBack size={32} className="text-3xl font-bold" />
-        </button>
         {/* 상단 섹션 */}
         <div className="p-6 mb-8 bg-white rounded-lg shadow-md">
           <div className="flex gap-6">

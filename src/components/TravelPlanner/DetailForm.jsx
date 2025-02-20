@@ -276,7 +276,7 @@ const DetailForm = ({ proposalData, setProposalData }) => {
             {/* 항공편 정보 - 출발 항공 (탑승/도착일시 한 줄 배치) */}
             <tr>
               <td className="py-2" style={{ width: '150px' }}>
-                출발 항공
+                출발 항공편
               </td>
               <td className="py-2">
                 <div className="flex items-center gap-4">
@@ -351,7 +351,7 @@ const DetailForm = ({ proposalData, setProposalData }) => {
             {/* 항공편 정보 - 도착 항공 (탑승/도착일시 한 줄 배치) */}
             <tr>
               <td className="py-2" style={{ width: '150px' }}>
-                도착 항공
+                도착 항공편
               </td>
               <td className="py-2">
                 <div className="flex items-center gap-4">
