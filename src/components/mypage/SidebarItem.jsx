@@ -18,7 +18,7 @@ const SidebarItem = ({ icon, label, to, active, onClick }) => {
         className={`flex w-full items-center px-4 py-2 rounded-md transition-colors text-lg 
           ${
             active
-              ? 'bg-gray-100 font-semibold text-[#412B2B]'
+              ? 'bg-gray-100 font-semibold text-[#FFCF0E]'
               : 'text-gray-600 hover:bg-gray-50'
           }`}
       >
