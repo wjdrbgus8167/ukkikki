@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2'; // NEW: Swal 추가
+import Swal from 'sweetalert2'; // Swal 추가
 import { OpenVidu } from 'openvidu-browser';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
@@ -13,16 +13,16 @@ function MeetingPage() {
   const isHost = searchParams.get('isHost') === 'true';
 
   const [session, setSession] = useState(null);
-  const [OV, setOV] = useState(null); // OpenVidu 인스턴스
+  const [OV, setOV] = useState(null);
   const [publisher, setPublisher] = useState(null);
   const [screenPublisher, setScreenPublisher] = useState(null);
   const [subscribers, setSubscribers] = useState([]);
   const [screenSharing, setScreenSharing] = useState(false);
 
-  // (1) 호스트 닉네임 저장
-  const [hostNickname, setHostNickname] = useState(''); 
+  // (1) 호스트 닉네임
+  const [hostNickname, setHostNickname] = useState('');
 
-  // NEW: 호스트가 "방송 종료"를 눌렀는지 여부
+  // “방송 종료” 혹은 “나가기”를 눌렀을 때만 disconnect
   const [shouldDisconnect, setShouldDisconnect] = useState(false);
 
   useEffect(() => {
@@ -31,24 +31,20 @@ function MeetingPage() {
       return;
     }
 
-    // (1) OpenVidu 인스턴스 생성
+    // 1) OpenVidu 인스턴스 생성
     const newOV = new OpenVidu();
     setOV(newOV);
 
-    // (2) 세션 초기화
+    // 2) 세션 초기화
     const newSession = newOV.initSession();
-
-    // --- 이벤트 리스너 설정 ---
 
     // 스트림 생성 시 subscribe
     newSession.on('streamCreated', (event) => {
       const subscriber = newSession.subscribe(event.stream, undefined);
       setSubscribers((prev) => [...prev, subscriber]);
 
-      // (1-1) 일반 사용자: 호스트 스트림이 들어오면 닉네임 저장
+      // (1-1) 일반 사용자: 호스트 스트림 닉네임 추론
       if (!isHost && !hostNickname) {
-        // 이 subscriber가 호스트일 가능성이 있음
-        // (실제론 role==PUBLISHER 검사 or data 파싱 등 필요)
         const maybeHostName = subscriber.stream.connection.data;
         setHostNickname(maybeHostName);
       }
@@ -81,74 +77,66 @@ function MeetingPage() {
               publishAudio: true,
             };
 
-        const localPublisher = newOV.initPublisher(
-          undefined,
-          pubOptions,
-          (error) => {
-            if (error) {
-              console.error('Error initializing publisher:', error);
-              return;
-            }
-            newSession.publish(localPublisher);
-            setPublisher(localPublisher);
-            setSession(newSession);
-
-            // (1-2) 호스트라면, 퍼블리셔 스트림에서 닉네임 가져오기
-            if (isHost) {
-              const myName = localPublisher.stream.connection.data;
-              setHostNickname(myName);
-            }
+        const localPublisher = newOV.initPublisher(undefined, pubOptions, (error) => {
+          if (error) {
+            console.error('Error initializing publisher:', error);
+            return;
           }
-        );
+          newSession.publish(localPublisher);
+          setPublisher(localPublisher);
+          setSession(newSession);
+
+          // (1-2) 호스트라면 닉네임 세팅
+          if (isHost) {
+            const myName = localPublisher.stream.connection.data;
+            setHostNickname(myName);
+          }
+        });
       })
       .catch((err) => {
         console.error('Error connecting to the session:', err);
       });
 
-    // NEW: 호스트일 때 beforeunload 사용
-    if (isHost) {
-      const handleBeforeUnload = (e) => {
-        e.preventDefault();
-        e.returnValue = '';
-      };
-      window.addEventListener('beforeunload', handleBeforeUnload);
+    // **onbeforeunload**: 페이지 닫힐 때 경고 (호스트/사용자 구분 없이)
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
 
-      return () => {
-        window.removeEventListener('beforeunload', handleBeforeUnload);
-        // unmount 시 disconnect 여부 결정
-        if (newSession && shouldDisconnect) {
-          newSession.disconnect();
-        }
-      };
-    } else {
-      // 일반 사용자 로직: 그대로
-      return () => {
-        if (newSession) {
-          newSession.disconnect();
-        }
-      };
-    }
+    // 언마운트(페이지 이탈) 시 disconnect할지 여부 체크
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      if (newSession && shouldDisconnect) {
+        newSession.disconnect();
+      }
+    };
   }, [token, isHost, hostNickname, shouldDisconnect]);
 
-  // NEW: "방송 종료"를 Swal로 묻기
+  // “나가기” (호스트일 땐 방송 종료, 일반 사용자에겐 단순 나가기)
   const leaveSession = async () => {
     if (!session) return;
+
+    const question = isHost
+      ? '방송을 종료하시겠습니까?'
+      : '회의에서 나가시겠습니까?';
+    const confirmText = isHost ? '네, 종료합니다' : '네, 나가기';
     const result = await Swal.fire({
-      title: '방송을 종료하시겠습니까?',
-      text: '확인하면 방송이 즉시 종료됩니다.',
+      title: question,
+      text: '확인하면 세션 연결이 해제됩니다.',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: '네, 종료합니다',
+      confirmButtonText: confirmText,
       cancelButtonText: '취소',
     });
     if (result.isConfirmed) {
       setShouldDisconnect(true);
-      // 예시: "some-other-page"로 이동
+      // 예시: 메인/목록 페이지로 이동 (마음대로 수정 가능)
       navigate('/some-other-page');
     }
   };
 
-  // 화면 공유 토글 함수
+  // 화면 공유 토글
   const toggleScreenShare = () => {
     if (!session || !OV) {
       console.error('Session or OV is not initialized.');
@@ -156,6 +144,7 @@ function MeetingPage() {
     }
 
     if (screenSharing) {
+      // 화면 공유 중지
       if (screenPublisher) {
         session.unpublish(screenPublisher);
         if (isHost && publisher) {
@@ -165,6 +154,7 @@ function MeetingPage() {
         setScreenPublisher(null);
       }
     } else {
+      // 화면 공유 시작
       if (isHost && publisher) {
         session.unpublish(publisher);
       }
@@ -207,23 +197,22 @@ function MeetingPage() {
     }
   };
 
-  // (3) 현재 참가자 수 (간단 계산: 호스트(1) + subscribers.length)
+  // (3) 현재 참가자 수: 호스트(1) + 구독자 수
   const participantCount = subscribers.length + 1;
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
 
-      {/* 메인 컨텐츠 */}
       <main className="flex-grow flex flex-col items-center justify-start p-4">
-        {/* (4) 제목을 hostNickname으로 표시 (없으면 proposalId 대체) */}
+        {/* 제목: 호스트 닉네임 or proposalId */}
         <h2 className="text-2xl font-bold mb-2">
           {hostNickname
             ? `Meeting with [${hostNickname}]`
             : `Meeting Page (proposalId: ${proposalId})`}
         </h2>
 
-        {/* (3) 호스트만 참가자 수 보기 */}
+        {/* 호스트: 현재 인원 수 표시 */}
         {isHost && (
           <p className="text-md text-gray-600 mb-2">
             참여 인원 수: {participantCount}명
@@ -232,8 +221,8 @@ function MeetingPage() {
 
         <p className="mb-4">{isHost ? '호스트 모드' : '참가자 모드'}</p>
 
-        {/* 호스트만 화면 공유 버튼 표시 */}
-        {isHost && (
+        {/* 호스트 전용: 화면 공유, 방송 종료 버튼 */}
+        {isHost ? (
           <div className="flex gap-3 mb-4">
             <button
               onClick={toggleScreenShare}
@@ -241,7 +230,6 @@ function MeetingPage() {
             >
               {screenSharing ? '화면 공유 중지' : '화면 공유 시작'}
             </button>
-            {/* NEW: 방송 종료 버튼 */}
             <button
               onClick={leaveSession}
               className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
@@ -249,9 +237,17 @@ function MeetingPage() {
               방송 종료
             </button>
           </div>
+        ) : (
+          // 일반 사용자도 나가기 버튼이 필요하다면:
+          <button
+            onClick={leaveSession}
+            className="mb-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+          >
+            나가기
+          </button>
         )}
 
-        {/* (1) 호스트 카메라: 화면 공유 중이 아닐 때만 표시 */}
+        {/* 호스트 카메라 (화면 공유 중 아닐 때만) */}
         {isHost && publisher && !screenSharing && (
           <div className="mb-4">
             <video
@@ -266,7 +262,7 @@ function MeetingPage() {
           </div>
         )}
 
-        {/* (2) 화면 공유 영역 (더 크게) */}
+        {/* 화면 공유 영역 */}
         {screenSharing && screenPublisher && (
           <div className="w-full flex flex-col items-center mb-4">
             <h3 className="text-lg font-semibold mb-2">Screen Sharing</h3>
@@ -282,7 +278,7 @@ function MeetingPage() {
           </div>
         )}
 
-        {/* Other Streams 영역 */}
+        {/* Other Streams 영역: 구독된 참가자 스트림들 */}
         <div className="w-full flex flex-wrap justify-center gap-4">
           {subscribers.map((sub, i) => (
             <div key={i} className="flex flex-col items-center">
