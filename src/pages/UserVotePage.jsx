@@ -41,8 +41,18 @@ const UserVotePage = () => {
               }
             }),
           );
-          setAgencies(proposalsWithStatus);
-          console.log('📦 제안 목록:', proposalsWithStatus);
+
+        const acceptedProposals = proposals.filter(
+          (proposal) => proposal.proposalStatus === 'A',
+          );
+          if (acceptedProposals.length > 0) {
+            setHasAcceptedProposal(true);
+            proposals = acceptedProposals;
+          } else {
+            setHasAcceptedProposal(false);
+          }
+          setAgencies(proposals);
+          console.log('📦 제안 목록:', proposals);
         }
       } catch (error) {
         if (
