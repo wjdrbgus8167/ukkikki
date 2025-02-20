@@ -4,7 +4,6 @@ import Swal from 'sweetalert2'; // Swal 추가
 import { OpenVidu } from 'openvidu-browser';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
-
 function MeetingPage() {
   const navigate = useNavigate();
   const { proposalId } = useParams();
@@ -19,6 +18,7 @@ function MeetingPage() {
   const [subscribers, setSubscribers] = useState([]);
   const [screenSharing, setScreenSharing] = useState(false);
 
+  // (1) 호스트 닉네임 저장
   // (1) 호스트 닉네임
   const [hostNickname, setHostNickname] = useState('');
 
@@ -53,7 +53,7 @@ function MeetingPage() {
     // 스트림 파괴 시 unsubscribe
     newSession.on('streamDestroyed', (event) => {
       setSubscribers((prev) =>
-        prev.filter((sub) => sub !== event.stream.streamManager)
+        prev.filter((sub) => sub !== event.stream.streamManager),
       );
     });
 
@@ -77,21 +77,25 @@ function MeetingPage() {
               publishAudio: true,
             };
 
-        const localPublisher = newOV.initPublisher(undefined, pubOptions, (error) => {
-          if (error) {
-            console.error('Error initializing publisher:', error);
-            return;
-          }
-          newSession.publish(localPublisher);
-          setPublisher(localPublisher);
-          setSession(newSession);
+        const localPublisher = newOV.initPublisher(
+          undefined,
+          pubOptions,
+          (error) => {
+            if (error) {
+              console.error('Error initializing publisher:', error);
+              return;
+            }
+            newSession.publish(localPublisher);
+            setPublisher(localPublisher);
+            setSession(newSession);
 
-          // (1-2) 호스트라면 닉네임 세팅
-          if (isHost) {
-            const myName = localPublisher.stream.connection.data;
-            setHostNickname(myName);
-          }
-        });
+            // (1-2) 호스트라면, 퍼블리셔 스트림에서 닉네임 가져오기
+            if (isHost) {
+              const myName = localPublisher.stream.connection.data;
+              setHostNickname(myName);
+            }
+          },
+        );
       })
       .catch((err) => {
         console.error('Error connecting to the session:', err);
@@ -192,7 +196,7 @@ function MeetingPage() {
           newScreenPub.once('accessDenied', () => {
             console.warn('Screen sharing access denied by the user.');
           });
-        }
+        },
       );
     }
   };
@@ -201,12 +205,22 @@ function MeetingPage() {
   const participantCount = subscribers.length + 1;
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      {/* 배경 동영상 */}
+      <video
+        className="absolute top-0 left-0 w-full h-full object-cover z-[-1]"
+        src="https://cdn.pixabay.com/video/2024/03/13/204006-923133925_large.mp4"
+        autoPlay
+        loop
+        muted
+      />
+
       <Header />
 
-      <main className="flex-grow flex flex-col items-center justify-start p-4">
-        {/* 제목: 호스트 닉네임 or proposalId */}
-        <h2 className="text-2xl font-bold mb-2">
+      {/* 메인 컨텐츠 */}
+      <main className="flex flex-col items-center justify-start flex-grow p-4">
+        {/* (4) 제목을 hostNickname으로 표시 (없으면 proposalId 대체) */}
+        <h2 className="mb-2 text-2xl font-bold">
           {hostNickname
             ? `[${hostNickname}]의 홍보 라이브 방송`
             : `Meeting Page (proposalId: ${proposalId})`}
@@ -214,7 +228,7 @@ function MeetingPage() {
 
         {/* 호스트: 현재 인원 수 표시 */}
         {isHost && (
-          <p className="text-md text-gray-600 mb-2">
+          <p className="mb-2 text-gray-600 text-md">
             참여 인원 수: {participantCount}명
           </p>
         )}
@@ -226,13 +240,13 @@ function MeetingPage() {
           <div className="flex gap-3 mb-4">
             <button
               onClick={toggleScreenShare}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
             >
               {screenSharing ? '화면 공유 중지' : '화면 공유 시작'}
             </button>
             <button
               onClick={leaveSession}
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
             >
               방송 종료
             </button>
@@ -241,7 +255,7 @@ function MeetingPage() {
           // 일반 사용자도 나가기 버튼이 필요하다면:
           <button
             onClick={leaveSession}
-            className="mb-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            className="px-4 py-2 mb-4 text-white bg-red-500 rounded hover:bg-red-600"
           >
             나가기
           </button>
@@ -252,7 +266,7 @@ function MeetingPage() {
           <div className="mb-4">
             <video
               autoPlay
-              className="border border-gray-300 w-full"
+              className="border border-gray-300 w-80"
               ref={(ref) => {
                 if (ref && publisher) {
                   publisher.addVideoElement(ref);
@@ -264,11 +278,11 @@ function MeetingPage() {
 
         {/* 화면 공유 영역 */}
         {screenSharing && screenPublisher && (
-          <div className="w-full flex flex-col items-center mb-4">
-            <h3 className="text-lg font-semibold mb-2">여행사 화면 공유</h3>
+          <div className="flex flex-col items-center w-full mb-4">
+            <h3 className="mb-2 text-lg font-semibold">Screen Sharing</h3>
             <video
               autoPlay
-              className="border border-gray-300 w-full max-w-screen-xl"
+              className="w-full max-w-screen-xl border border-gray-300"
               ref={(ref) => {
                 if (ref && screenPublisher) {
                   screenPublisher.addVideoElement(ref);
@@ -278,13 +292,13 @@ function MeetingPage() {
           </div>
         )}
 
-        {/* Other Streams 영역: 구독된 참가자 스트림들 */}
-        <div className="w-full flex flex-wrap justify-center gap-4">
+        {/* Other Streams 영역 */}
+        <div className="flex flex-wrap justify-center w-full gap-4">
           {subscribers.map((sub, i) => (
             <div key={i} className="flex flex-col items-center">
               <video
                 autoPlay
-                className="border border-gray-300 w-full max-w-sm"
+                className="w-full max-w-sm border border-gray-300"
                 ref={(ref) => {
                   if (ref) sub.addVideoElement(ref);
                 }}
