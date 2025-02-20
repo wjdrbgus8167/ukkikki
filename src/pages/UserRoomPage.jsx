@@ -22,8 +22,6 @@ const UserRoom = () => {
   const [mapCenter, setMapCenter] = useState({ lat: 35.6895, lng: 139.6917 });
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  // Draggable 위치 상태 추가
-  const [position, setPosition] = useState({ x: 0, y: 0 });
   // 추가 UI 상태 (예: isSmall) 관리
   const [isSmall, setIsSmall] = useState(false);
 
@@ -57,7 +55,7 @@ const UserRoom = () => {
         }));
         setFavorites(mappedPlaces);
         console.log('✅ 여행방 데이터:', travelPlan);
-        setSelectedCard(travelPlan); // 데이터만 업데이트, 위치는 유지
+        setSelectedCard(travelPlan);
       }
     } catch (error) {
       console.error('🚨 여행방 데이터 가져오기 실패:', error);
@@ -96,16 +94,9 @@ const UserRoom = () => {
   const DraggableBoardingPass = ({ selectedCard, isLikeListOpen }) => {
     const nodeRef = useRef(null);
 
-    // Draggable의 위치 변경 핸들러
-    const handleDrag = (e, data) => {
-      setPosition({ x: data.x, y: data.y });
-    };
-
     return (
       <Draggable
         nodeRef={nodeRef}
-        position={position} // 현재 위치 상태를 반영
-        onDrag={handleDrag} // 드래그 시 위치 업데이트
       >
         <div
           ref={nodeRef}
@@ -117,8 +108,8 @@ const UserRoom = () => {
         >
           <BoardingPass
             selectedCard={selectedCard}
-            isSmall={isSmall} // 추가 상태 전달
-            setIsSmall={setIsSmall} // 상태 업데이트 함수 전달
+            isSmall={isSmall}
+            setIsSmall={setIsSmall}
           />
         </div>
       </Draggable>
