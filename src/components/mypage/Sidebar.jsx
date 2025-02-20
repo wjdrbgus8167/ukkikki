@@ -71,7 +71,12 @@ const Sidebar = ({ onMenuClick }) => {
             icon: <FaHistory />,
             to: '/accepted-proposals',
           },
-          { label: '프로필', onClick: () => onMenuClick('profile'), icon: <FaUser />, to: '/profile' },
+          {
+            label: '프로필',
+            onClick: () => onMenuClick('profile'),
+            icon: <FaUser />,
+            to: '/profile',
+          },
           {
             label: '로그아웃',
             onClick: handleLogout,
@@ -90,7 +95,7 @@ const Sidebar = ({ onMenuClick }) => {
         ];
 
   return (
-    <aside className="w-full md:w-64 bg-white border-b md:border-b-0 md:border-r p-4">
+    <aside className="w-full p-4 bg-white border-b md:w-64 md:border-b-0">
       <nav>
         <ul className="flex flex-row items-center space-x-6 md:flex-col md:items-start md:space-x-0 md:space-y-6">
           {menuItems.map((item) => (
@@ -99,11 +104,10 @@ const Sidebar = ({ onMenuClick }) => {
               icon={item.icon}
               label={item.label}
               to={item.to}
-              active={activeItem === item.to}
-              onClick={() => {
-                setActiveItem(item.to);
-                if (item.onClick) item.onClick();
-              }}
+              active={
+                item.label !== '로그아웃' && location.pathname === item.to
+              }
+              onClick={item.onClick}
             />
           ))}
         </ul>

@@ -15,7 +15,7 @@ const LoginForm = ({ isCompany }) => {
 
     try {
       const loginEndpoint = isCompany
-        ? 'api/v1/auth/companies/login'
+        ? '/api/v1/auth/companies/login'
         : '/api/v1/auth/members/login';
 
       const response = await publicRequest.post(loginEndpoint, {
@@ -25,9 +25,9 @@ const LoginForm = ({ isCompany }) => {
 
       if (response.status === 200) {
         useAuthStore.getState().setUser(true, isCompany ? 'company' : 'member');
-        navigate('/');
-      }
-      else {
+        // 기업 로그인 성공 시 /proposal, 일반 회원 로그인 성공 시 /
+        navigate(isCompany ? '/proposal' : '/');
+      } else {
         setErrorMessage('로그인 실패');
       }
     } catch (error) {

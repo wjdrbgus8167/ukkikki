@@ -1,32 +1,32 @@
-import React, { useEffect, useState } from "react";
-import { AgencyProposalslist } from "../../../apis/agency";
-import { useNavigate, useLocation } from "react-router";
-import ReactPaginate from "react-paginate"; // react-paginate import
-import { 
-  Container, 
-  CardWrapper, 
-  Card, 
-  TitleWrapper, 
-  Title, 
-  TableWrapper, 
-  Table, 
-  TableHead, 
-  TableHeadRow, 
-  TableHeadCell, 
-  TableBody, 
-  TableRow, 
-  TableCell, 
+import React, { useEffect, useState } from 'react';
+import { AgencyProposalslist } from '../../../apis/agency';
+import { useNavigate, useLocation } from 'react-router';
+import ReactPaginate from 'react-paginate'; // react-paginate import
+import {
+  Container,
+  CardWrapper,
+  Card,
+  TitleWrapper,
+  Title,
+  TableWrapper,
+  Table,
+  TableHead,
+  TableHeadRow,
+  TableHeadCell,
+  TableBody,
+  TableRow,
+  TableCell,
   Status,
   PaginationWrapper, // styled-component로 정의된 페이지네이션 래퍼
-} from "./style/OngoingProposalsStyle";
-import { STATUS_PROPOSAL } from "../../../constants";
+} from './style/OngoingProposalsStyle';
+import { STATUS_PROPOSAL } from '../../../constants';
 
 // 필터 옵션 배열 정의
 const FILTER_OPTIONS = [
-  { label: "전체보기", status: "" },
-  { label: STATUS_PROPOSAL.W, status: "W" },
-  { label: STATUS_PROPOSAL.V, status: "V" },
-  { label: STATUS_PROPOSAL.D, status: "D" },
+  { label: '전체보기', status: '' },
+  { label: STATUS_PROPOSAL.W, status: 'W' },
+  { label: STATUS_PROPOSAL.V, status: 'V' },
+  { label: STATUS_PROPOSAL.D, status: 'D' },
 ];
 
 const OngoingProposals = () => {
@@ -34,7 +34,7 @@ const OngoingProposals = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // 필터 상태 (기본값은 "전체보기")
   const [selectedFilter, setSelectedFilter] = useState(FILTER_OPTIONS[0]);
   // 페이지네이션 상태 (0부터 시작)
@@ -49,25 +49,27 @@ const OngoingProposals = () => {
       setError(null);
       try {
         const data = await AgencyProposalslist();
-        console.log("진행중인 목록 API 응답 데이터:", data);
+        console.log('진행중인 목록 API 응답 데이터:', data);
         setProposals(data);
       } catch (error) {
-        setError("제안서를 불러오는 데 실패했습니다.");
-        console.log("Error:", error);
+        setError('제안서를 불러오는 데 실패했습니다.');
+        console.log('Error:', error);
       }
     };
     getAgencyProposals();
   }, []);
 
   const onhandleDetail = (proposal) => {
-    navigate(`/agency-proposal-detail/${proposal.travelPlanId}/${proposal.proposalId}`);
+    navigate(
+      `/agency-proposal-detail/${proposal.travelPlanId}/${proposal.proposalId}`,
+    );
   };
 
   const statusMapping = {
-    D: "거절",
-    A: "수락",
-    W: "투표전",
-    V: "투표중"
+    D: '거절',
+    A: '수락',
+    W: '투표전',
+    V: '투표중',
   };
 
   const handleFilterChange = (option) => {
@@ -78,14 +80,17 @@ const OngoingProposals = () => {
   // 선택한 필터에 따라 제안 목록 필터링 (전체보기이면 전체 목록)
   const filteredProposals = selectedFilter.status
     ? proposals.filter(
-        (proposal) => proposal.proposalStatus === selectedFilter.status
+        (proposal) => proposal.proposalStatus === selectedFilter.status,
       )
     : proposals;
 
   // 페이지네이션을 위한 데이터 분할 (필터된 결과에서)
   const indexOfLastProposal = (currentPage + 1) * proposalsPerPage;
   const indexOfFirstProposal = indexOfLastProposal - proposalsPerPage;
-  const currentProposals = filteredProposals.slice(indexOfFirstProposal, indexOfLastProposal);
+  const currentProposals = filteredProposals.slice(
+    indexOfFirstProposal,
+    indexOfLastProposal,
+  );
 
   const handlePageClick = (event) => {
     setCurrentPage(event.selected);
@@ -96,15 +101,15 @@ const OngoingProposals = () => {
       <CardWrapper>
         <Card>
           <TitleWrapper>
-            <div className="flex items-center justify-center space-x-8 mb-8">
+            <div className="flex items-center justify-center mb-8 space-x-8">
               {FILTER_OPTIONS.map((option) => (
                 <button
                   key={option.label}
                   onClick={() => handleFilterChange(option)}
                   className={`relative py-2 text-sm font-medium transition-colors ${
                     selectedFilter.label === option.label
-                      ? "text-brown"
-                      : "text-gray-500 hover:text-brown"
+                      ? 'text-brown'
+                      : 'text-gray-500 hover:text-brown'
                   }`}
                 >
                   {option.label}
@@ -141,7 +146,8 @@ const OngoingProposals = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        {proposal.departureAirportName} ➡ {proposal.arrivalAirportName}
+                        {proposal.departureAirportName} ➡{' '}
+                        {proposal.arrivalAirportName}
                       </TableCell>
                       <TableCell>{proposal.airline}</TableCell>
                       <TableCell>
@@ -159,8 +165,8 @@ const OngoingProposals = () => {
                   <TableRow>
                     <TableCell colSpan="5">
                       {selectedFilter.status
-                        ? "해당 상태의 제안이 없습니다."
-                        : "참여 중인 여행이 없습니다."}
+                        ? '해당 상태의 제안이 없습니다.'
+                        : '참여 중인 여행이 없습니다.'}
                     </TableCell>
                   </TableRow>
                 )}
@@ -168,18 +174,20 @@ const OngoingProposals = () => {
             </Table>
             <PaginationWrapper>
               <ReactPaginate
-                previousLabel={"← 이전"}
-                nextLabel={"다음 →"}
-                breakLabel={"..."}
-                pageCount={Math.ceil(filteredProposals.length / proposalsPerPage)}
+                previousLabel={'← 이전'}
+                nextLabel={'다음 →'}
+                breakLabel={'...'}
+                pageCount={Math.ceil(
+                  filteredProposals.length / proposalsPerPage,
+                )}
                 marginPagesDisplayed={2}
                 pageRangeDisplayed={5}
                 onPageChange={handlePageClick}
-                containerClassName={"pagination"}
-                activeClassName={"active"}
-                pageClassName={"page-item"}
-                previousClassName={"previous-item"}
-                nextClassName={"next-item"}
+                containerClassName={'pagination'}
+                activeClassName={'active'}
+                pageClassName={'page-item'}
+                previousClassName={'previous-item'}
+                nextClassName={'next-item'}
               />
             </PaginationWrapper>
           </TableWrapper>

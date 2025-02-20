@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { FaPlane, FaExpand, FaCompress } from 'react-icons/fa';
 import ProposalButton from './ProposalButton';
 import { THEME_COLORS } from '../../constants';
 
-const BoardingPass = ({ selectedCard, zoomLevel = 0.6, isSmall, toggleSize }) => {
+const BoardingPass = ({ selectedCard, zoomLevel = 0.6, isSmall, setIsSmall }) => {
   if (!selectedCard) return null;
 
   // 상태 레이블 매핑
@@ -43,15 +43,20 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.6, isSmall, toggleSize }) =>
   const departureCityName = selectedCard.departureCity?.name || '출발도시';
   const arrivalCityName = selectedCard.arrivalCity?.name || '도착도시';
 
+  // 크기 토글 함수
+  const toggleSize = () => {
+    setIsSmall((prev) => !prev);
+  };
+
   return (
     <div
       className="ticket-style relative overflow-hidden max-w-4xl mx-auto p-4"
       style={isSmall ? {} : { zoom: zoomLevel }} // 축소 시 zoom 제거, 확대 시 zoomLevel 적용
     >
-      {/* 크기 조절 버튼 (위치 조정: "서울 파리" 텍스트를 가리지 않도록) */}
+      {/* 크기 조절 버튼 */}
       <button
         onClick={toggleSize}
-        className="absolute top right-2 z-10 p-1.5 bg-white text-gray-800 rounded-full shadow-lg hover:bg-gray-100 hover:shadow-xl transition-all duration-300 border border-gray-200"
+        className="absolute top-2 right-2 z-10 p-1.5 bg-white text-gray-800 rounded-full shadow-lg hover:bg-gray-100 hover:shadow-xl transition-all duration-300 border border-gray-200"
       >
         {isSmall ? (
           <FaExpand className="text-lg" />
@@ -61,7 +66,7 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.6, isSmall, toggleSize }) =>
       </button>
 
       {!isSmall ? (
-        // 확대 상태 (현재 코드의 크기 상태 유지, zoomLevel = 0.6 적용)
+        // 확대 상태
         <div className="flex rounded-[54px] overflow-hidden shadow-md border border-gray-300">
           {/* 1) 왼쪽(노란색) 영역 */}
           <div className="w-1/2 bg-yellow py-8 pl-8 pr-4 text-black flex flex-col justify-start space-y-4">
@@ -70,26 +75,15 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.6, isSmall, toggleSize }) =>
             </h2>
 
             <div className="flex flex-col items-center space-y-4">
-              {/* 출발 도시 */}
-              <div className="text-4xl font-bold text-gray-800">
-                {departureCityName}
-              </div>
-
-              {/* 비행기 아이콘 */}
+              <div className="text-4xl font-bold text-gray-800">{departureCityName}</div>
               <FaPlane className="text-5xl text-gray-700" />
-
-              {/* 도착 도시 */}
-              <div className="text-4xl font-bold text-gray-900">
-                {arrivalCityName}
-              </div>
-
-              {/* 보조 텍스트 */}
+              <div className="text-4xl font-bold text-gray-900">{arrivalCityName}</div>
               <p className="text-base text-gray-500 uppercase tracking-wide">
                 {departureCityName} to {arrivalCityName}
               </p>
             </div>
 
-            {/* 바코드 영역 - 노란색 영역 하단에 추가 */}
+            {/* 바코드 영역 */}
             <div className="mt-8">
               <svg
                 className="w-full h-20"
@@ -140,15 +134,11 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.6, isSmall, toggleSize }) =>
             <div className="flex gap-4 mt-4">
               <div>
                 <p className="text-xl text-gray-600">최소인원</p>
-                <p className="text-2xl font-bold">
-                  {selectedCard.minPeople || 0}명
-                </p>
+                <p className="text-2xl font-bold">{selectedCard.minPeople || 0}명</p>
               </div>
               <div>
                 <p className="text-xl text-gray-600">최대인원</p>
-                <p className="text-2xl font-bold">
-                  {selectedCard.maxPeople || 0}명
-                </p>
+                <p className="text-2xl font-bold">{selectedCard.maxPeople || 0}명</p>
               </div>
               <div>
                 <p className="text-xl text-gray-600">현재인원</p>
@@ -225,9 +215,7 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.6, isSmall, toggleSize }) =>
               <h1 className="text-left text-4xl sm:text-5xl md:text-6xl mt-3 font-black">
                 {currentStatusLabel}
               </h1>
-              <p className="text-gray-600 text-xl sm:text-2xl">
-                {statusDescription}
-              </p>
+              <p className="text-gray-600 text-xl sm:text-2xl">{statusDescription}</p>
 
               <div className="flex-grow w-full">
                 <div className="border-t border-dashed border-gray-300"></div>
@@ -242,7 +230,6 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.6, isSmall, toggleSize }) =>
                 </ul>
               </div>
 
-              {/* 버튼이 아래쪽 남는 공간을 채우도록 수정 */}
               <div className="flex flex-1 justify-end">
                 <ProposalButton
                   selectedCard={selectedCard}
@@ -256,27 +243,19 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.6, isSmall, toggleSize }) =>
           </div>
         </div>
       ) : (
-        // 축소 상태 (사용자가 원하는 간결한 UI)
+        // 축소 상태
         <div
           className="bg-yellow p-4 rounded-lg shadow-md border border-gray-300 transition-all duration-300 flex items-center space-x-2"
           style={{ width: 'fit-content' }}
         >
-          {/* 출발 도시 */}
-          <div className="text-xl font-bold text-gray-800">
-            {departureCityName}
-          </div>
-
-          {/* 비행기 아이콘 */}
+          <div className="text-xl font-bold text-gray-800">{departureCityName}</div>
           <FaPlane className="text-2xl text-gray-700" />
-
-          {/* 도착 도시 */}
-          <div className="text-xl font-bold text-gray-900">
-            {arrivalCityName}
-          </div>
+          <div className="text-xl font-bold text-gray-900">{arrivalCityName}</div>
         </div>
       )}
     </div>
   );
 };
 
-export default BoardingPass;
+// React.memo로 감싸기 (선택 사항: props 변경 시에만 리렌더링)
+export default React.memo(BoardingPass);
