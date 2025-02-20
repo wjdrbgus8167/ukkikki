@@ -35,9 +35,9 @@ export const ButtonContainer = styled.div`
     padding: 8px 80px;
     transition: border-color 0.3s ease;
 
-    &:hover {
-      border-color: #ffd21c;
-    }
+    // &:hover {
+    //   border-color: #ffd21c;
+    // }
   }
 `;
 export const ScheduleContainer = styled.div`

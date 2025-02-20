@@ -235,6 +235,7 @@ const PlaceSelection = ({ onSelectPlace }) => {
             autocompleteRef={autocompleteRef}
             onPlaceChanged={onPlaceChanged}
             searchedPlace={searchedPlace}
+            setSearchedPlace={setSearchedPlace} // 이 부분을 추가해야 합니다.
             onSelectPlace={(place) => {
               console.log('onSelectPlace called with:', place);
               handleSelectPlace(place);

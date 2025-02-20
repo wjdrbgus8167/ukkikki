@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-import React, { useState, useEffect, useCallback } from 'react';
-import { useLocation, useParams, useNavigate } from 'react-router-dom';
-=======
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
->>>>>>> 8ed198770bda68db42541bf79f5f8fd291362885
 import { publicRequest } from '../hooks/requestMethod';
 import InteractiveSection from '../components/userroom/InteractiveSection';
 import Header from '../components/layout/Header';
@@ -25,11 +20,7 @@ const UserRoom = () => {
   const [isLikeListOpen, setIsLikeListOpen] = useState(true);
   const [favorites, setFavorites] = useState([]);
   const [mapCenter, setMapCenter] = useState({ lat: 35.6895, lng: 139.6917 });
-<<<<<<< HEAD
-  const navigate = useNavigate();
-=======
   const [isInitialLoad, setIsInitialLoad] = useState(true); // 첫 로드 여부 상태 추가
->>>>>>> 8ed198770bda68db42541bf79f5f8fd291362885
 
   const libraries = ['places'];
 
@@ -51,14 +42,6 @@ const UserRoom = () => {
   }, []);
 
   // 여행방 데이터 가져오기
-<<<<<<< HEAD
-  const fetchRoomData = useCallback(
-    async (id) => {
-      console.log('📌 API 요청 ID:', id);
-      if (!id) {
-        console.error('🚨 ID가 없습니다');
-        return;
-=======
   const fetchRoomData = useCallback(async (id) => {
     console.log('📌 API 요청 ID:', id);
     if (!id) {
@@ -78,43 +61,11 @@ const UserRoom = () => {
         setFavorites(mappedPlaces);
         console.log('✅ 여행방 데이터:', travelPlan);
         setSelectedCard(travelPlan);
->>>>>>> 8ed198770bda68db42541bf79f5f8fd291362885
       }
-      try {
-        const response = await publicRequest.get(
-          `/api/v1/travel-plans/${id}/members`,
-        );
-        if (response.data?.data?.travelPlan) {
-          const travelPlan = response.data.data.travelPlan;
-          const mappedPlaces = (travelPlan.places || []).map((place) => ({
-            ...place,
-            isLiked: place.likeYn,
-          }));
-          setFavorites(mappedPlaces);
-          console.log('✅ 여행방 데이터:', travelPlan);
-          setSelectedCard(travelPlan); // 여행방 데이터를 selectedCard에 업데이트
-        }
-      } catch (error) {
-        console.error('🚨 여행방 데이터 가져오기 실패:', error);
-        if (
-          error.response &&
-          error.response.data &&
-          error.response.data.error &&
-          error.response.data.error.code === 'TP001'
-        ) {
-          Swal.fire({
-            title: '오류',
-            text: '정상적인 경로가 아닙니다.',
-            icon: 'warning',
-            confirmButtonText: '확인',
-          }).then(() => {
-            navigate('/', { replace: true });
-          });
-        }
-      }
-    },
-    [navigate],
-  );
+    } catch (error) {
+      console.error('🚨 여행방 데이터 가져오기 실패:', error);
+    }
+  }, []);
 
   // selectedCard가 업데이트될 때 도착 도시 좌표 가져오기
   useEffect(() => {
@@ -148,7 +99,7 @@ const UserRoom = () => {
 
   const DraggableBoardingPass = ({ selectedCard, isLikeListOpen }) => {
     const nodeRef = useRef(null);
-  
+
     return (
       <Draggable nodeRef={nodeRef}>
         <div
@@ -164,8 +115,7 @@ const UserRoom = () => {
       </Draggable>
     );
   };
-  
-  
+
   if (!selectedCard) {
     return (
       <div className="p-10 text-center text-red-500">
@@ -189,11 +139,11 @@ const UserRoom = () => {
         setFavorites={setFavorites}
         favorites={favorites}
       />
-  
+
       {/* 전체 화면 레이아웃 */}
-      <div className="flex flex-col h-screen w-screen overflow-hidden">
+      <div className="flex flex-col w-screen h-screen overflow-hidden">
         <Header />
-  
+
         {/* 지도 + 사이드바 및 BoardingPass */}
         <div className="relative flex-1">
           {/* 지도 (배경 레이어) */}
@@ -214,52 +164,51 @@ const UserRoom = () => {
             />
           )}
           <div className="relative flex h-full pointer-events-none">
-  
-          {/* [중요] 즐겨찾기 목록 + BoardingPass를 같은 flex 컨테이너로 묶기 */}
-          <div className="flex h-full pointer-events-none">
-            {/* 왼쪽 사이드바 (즐겨찾기 목록) */}
-            <div
-              className={`transition-all duration-300 relative h-full ${
-                disabled ? 'pointer-events-none' : 'pointer-events-auto'
-              }`}
-              style={{ width: isLikeListOpen ? '320px' : '0px' }}
-            >
-              <button
-                onClick={() => setIsLikeListOpen((prev) => !prev)}
-                className="absolute z-30 p-2 text-white transform -translate-y-1/2 bg-gray-800 rounded-full pointer-events-auto top-1/2 -right-4"
+            {/* [중요] 즐겨찾기 목록 + BoardingPass를 같은 flex 컨테이너로 묶기 */}
+            <div className="flex h-full pointer-events-none">
+              {/* 왼쪽 사이드바 (즐겨찾기 목록) */}
+              <div
+                className={`transition-all duration-300 relative h-full ${
+                  disabled ? 'pointer-events-none' : 'pointer-events-auto'
+                }`}
+                style={{ width: isLikeListOpen ? '320px' : '0px' }}
               >
-                {isLikeListOpen ? '❮' : '❯'}
-              </button>
-  
-              {isLikeListOpen && (
-                <div className="h-full overflow-y-auto pointer-events-auto bg-white/70 backdrop-blur-sm">
-                  <FavoriteList
-                    selectedCard={selectedCard}
-                    favorites={favorites}
-                    setFavorites={setFavorites}
-                    setMapCenter={setMapCenter}
-                  />
-                  {disabled && (
-                    <div
-                      className="absolute inset-0 z-10"
-                      onClick={handleDisabledClick}
-                      style={{ cursor: 'not-allowed' }}
+                <button
+                  onClick={() => setIsLikeListOpen((prev) => !prev)}
+                  className="absolute z-30 p-2 text-white transform -translate-y-1/2 bg-gray-800 rounded-full pointer-events-auto top-1/2 -right-4"
+                >
+                  {isLikeListOpen ? '❮' : '❯'}
+                </button>
+
+                {isLikeListOpen && (
+                  <div className="h-full overflow-y-auto pointer-events-auto bg-white/70 backdrop-blur-sm">
+                    <FavoriteList
+                      selectedCard={selectedCard}
+                      favorites={favorites}
+                      setFavorites={setFavorites}
+                      setMapCenter={setMapCenter}
                     />
-                  )}
-                </div>
-              )}
+                    {disabled && (
+                      <div
+                        className="absolute inset-0 z-10"
+                        onClick={handleDisabledClick}
+                        style={{ cursor: 'not-allowed' }}
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <DraggableBoardingPass
+                selectedCard={selectedCard}
+                isLikeListOpen={isLikeListOpen}
+              />
             </div>
-
-
-            <DraggableBoardingPass selectedCard={selectedCard} isLikeListOpen={isLikeListOpen} />
-
           </div>
         </div>
       </div>
-      </div>
     </LoadScript>
   );
-  
 };
 
 export default UserRoom;
