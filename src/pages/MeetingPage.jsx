@@ -252,7 +252,7 @@ function MeetingPage() {
           <div className="mb-4">
             <video
               autoPlay
-              className="border border-gray-300 w-80"
+              className="border border-gray-300 w-full"
               ref={(ref) => {
                 if (ref && publisher) {
                   publisher.addVideoElement(ref);
@@ -268,7 +268,7 @@ function MeetingPage() {
             <h3 className="text-lg font-semibold mb-2">Screen Sharing</h3>
             <video
               autoPlay
-              className="border border-gray-300 w-[90%] max-w-screen-xl"
+              className="border border-gray-300 w-full max-w-screen-xl"
               ref={(ref) => {
                 if (ref && screenPublisher) {
                   screenPublisher.addVideoElement(ref);
@@ -284,7 +284,7 @@ function MeetingPage() {
             <div key={i} className="flex flex-col items-center">
               <video
                 autoPlay
-                className="border border-gray-300 w-80"
+                className="border border-gray-300 w-full max-w-sm"
                 ref={(ref) => {
                   if (ref) sub.addVideoElement(ref);
                 }}
