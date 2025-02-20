@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import {
+  useParams,
+  useSearchParams,
+  useNavigate,
+  useLocation,
+} from 'react-router-dom';
 import Swal from 'sweetalert2'; // NEW: Swal 추가
 import { OpenVidu } from 'openvidu-browser';
 import Header from '../components/layout/Header';
@@ -10,7 +15,8 @@ function MeetingPage() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const isHost = searchParams.get('isHost') === 'true';
-
+  const location = useLocation();
+  const { travelPlanId } = location.state || {};
   const [session, setSession] = useState(null);
   const [OV, setOV] = useState(null); // OpenVidu 인스턴스
   const [publisher, setPublisher] = useState(null);
@@ -142,8 +148,11 @@ function MeetingPage() {
     });
     if (result.isConfirmed) {
       setShouldDisconnect(true);
-      // 예시: "some-other-page"로 이동
-      navigate('/some-other-page');
+      if (isHost) {
+        navigate(`/proposal-detail/${travelPlanId}/${proposalId}`);
+      } else {
+        navigate(`/user-vote/${travelPlanId}`);
+      }
     }
   };
 

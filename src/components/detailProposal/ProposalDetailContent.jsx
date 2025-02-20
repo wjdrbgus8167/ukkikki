@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router';
 import { MainContent } from '../../pages/style/AgencyRoomListPageStyle';
 import ProposalDetailContext from '../../contexts/ProposalDetailContext';
 import 'tailwindcss/tailwind.css';
-import { getPassport, getTotalCount } from "../../apis/agency";
+import { getPassport, getTotalCount } from '../../apis/agency';
 import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
 import InquiryModal from './InquiryModal';
@@ -32,19 +32,26 @@ const ProposalDetailContent = () => {
       // Request Body: { "isHost": true }
       const response = await publicRequest.post(
         `/api/v1/travel-plans/${travelPlanId}/proposals/${proposalId}/meeting/connection`,
-        { isHost: true }
+        { isHost: true },
       );
       if (response.status === 200) {
         const { token } = response.data.data; // { token: '...' }
         // 회의 페이지로 이동, token을 state로 넘겨서 MeetingPage에서 사용
-        navigate(`/meeting/${proposalId}?token=${encodeURIComponent(token)}&isHost=true`);
+        navigate(
+          `/meeting/${proposalId}?token=${encodeURIComponent(
+            token,
+          )}&isHost=true`,
+          {
+            state: { travelPlanId },
+          },
+        );
       }
     } catch (error) {
       console.error('홍보 방송 시작 실패:', error);
       Swal.fire('오류', '홍보 방송 시작에 실패했습니다.', 'error');
     }
   };
-  
+
   useEffect(() => {
     const fetchTotalCount = async () => {
       const travelPlanIdValue = proposal?.travelPlanId;
@@ -311,18 +318,20 @@ const ProposalDetailContent = () => {
                   )}
 
                   {/* 투표 중 상태(V) → 홍보 방송 시작 버튼 */}
-                  {proposal.confirmStatus === "V" && (
+                  {proposal.confirmStatus === 'V' && (
                     <>
-                    <button
-                      className="px-4 py-2 bg-white text-black rounded hover:bg-gray-100"
-                      onClick={handleStartBroadcast}
-                    >
-                      홍보 라이브 세션 시작
-                    </button>
-                     <button className="px-4 py-2 bg-white text-black rounded hover:bg-gray-100" onClick={() => handleButtonClick("inquire")}>
-                      문의하기
-                    </button>
-
+                      <button
+                        className="px-4 py-2 text-black bg-white rounded hover:bg-gray-100"
+                        onClick={handleStartBroadcast}
+                      >
+                        홍보 라이브 세션 시작
+                      </button>
+                      <button
+                        className="px-4 py-2 text-black bg-white rounded hover:bg-gray-100"
+                        onClick={() => handleButtonClick('inquire')}
+                      >
+                        문의하기
+                      </button>
                     </>
                   )}
                 </div>
