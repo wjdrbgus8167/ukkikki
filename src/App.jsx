@@ -20,6 +20,7 @@ import AgencyProposalDetailPage from './pages/AgencyProposalDetailPage';
 import ProposalDetailForUser from './pages/ProposalDetailForUserPage';
 import ProposalDetail from './pages/ProposalDetailPage';
 import ProposalStatus from './pages/ProposalStatusPage';
+import EasterEgg from './pages/EasterEggPage';
 
 const App = () => {
   useEffect(() => {
@@ -65,6 +66,7 @@ const App = () => {
           element={<ProposalDetail />}
         />
         <Route path="/proposal" element={<ProposalStatus />} />
+        <Route path="/ukiki" element={<EasterEgg />} />
       </Routes>
     </Router>
   );

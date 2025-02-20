@@ -129,25 +129,31 @@ const ProposalDetailContent = () => {
       (schedule) => schedule.dayNumber === parseInt(dayNumber),
     );
     if (!daySchedule) return <p>해당 일자의 일정이 없습니다.</p>;
+    console.log('daySchedule', daySchedule);
+
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 w-[800px] min-h-[400px] overflow-hidden">
-        <div className="space-y-4">
-          <h2 className="text-xl font-bold">일정(schedule)</h2>
-          <div className="p-4 rounded-lg bg-gray-50">
-            <h3 className="text-lg font-semibold">
-              {daySchedule.dayNumber}일차
-            </h3>
-          </div>
-          <div className="ml-4">
-            {daySchedule.schedules.map((schedule, index) => (
-              <div key={index} className="p-4 rounded-lg bg-gray-50">
-                <h3 className="mb-2 font-bold">{schedule.scheduleName}</h3>
-                <br />
-                <p>시작: {formatDateTime(schedule.startTime)}</p>
-                <p>종료: {formatDateTime(schedule.endTime)}</p>
+      <div className="my-4">
+        <h2 className="mb-4 text-2xl font-bold">
+          {daySchedule.dayNumber}일차 일정
+        </h2>
+        <div className="relative pl-8">
+          {/* 타임라인 선 */}
+          <div className="absolute top-0 left-0 h-full border-l-4 border-blue-500"></div>
+          {daySchedule.schedules.map((schedule, index) => (
+            <div key={index} className="relative mb-6">
+              {/* 타임라인 마커 */}
+              <div className="absolute top-0 w-6 h-6 bg-blue-500 rounded-full -left-3"></div>
+              <div className="p-4 ml-4 rounded-lg shadow bg-gray-50">
+                <h3 className="text-lg font-bold">{schedule.scheduleName}</h3>
+                <p className="mt-1 text-sm text-gray-600">
+                  시작: {formatDateTime(schedule.startTime)}
+                </p>
+                <p className="text-sm text-gray-600">
+                  종료: {formatDateTime(schedule.endTime)}
+                </p>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     );
