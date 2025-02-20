@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2'; // NEW: Swal 추가
 import { OpenVidu } from 'openvidu-browser';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 
 function MeetingPage() {
+  const navigate = useNavigate();
   const { proposalId } = useParams();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
@@ -19,6 +21,9 @@ function MeetingPage() {
 
   // (1) 호스트 닉네임 저장
   const [hostNickname, setHostNickname] = useState(''); 
+
+  // NEW: 호스트가 "방송 종료"를 눌렀는지 여부
+  const [shouldDisconnect, setShouldDisconnect] = useState(false);
 
   useEffect(() => {
     if (!token) {
@@ -43,7 +48,6 @@ function MeetingPage() {
       // (1-1) 일반 사용자: 호스트 스트림이 들어오면 닉네임 저장
       if (!isHost && !hostNickname) {
         // 이 subscriber가 호스트일 가능성이 있음
-        // 단순히 "처음으로 들어온 영상 스트림"을 호스트로 간주
         // (실제론 role==PUBLISHER 검사 or data 파싱 등 필요)
         const maybeHostName = subscriber.stream.connection.data;
         setHostNickname(maybeHostName);
@@ -101,15 +105,50 @@ function MeetingPage() {
         console.error('Error connecting to the session:', err);
       });
 
-    // 언마운트 시 세션 해제
-    return () => {
-      if (newSession) {
-        newSession.disconnect();
-      }
-    };
-  }, [token, isHost, hostNickname]);
+    // NEW: 호스트일 때 beforeunload 사용
+    if (isHost) {
+      const handleBeforeUnload = (e) => {
+        e.preventDefault();
+        e.returnValue = '';
+      };
+      window.addEventListener('beforeunload', handleBeforeUnload);
 
-  // 화면 공유 토글 함수 (호스트 전용)
+      return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+        // unmount 시 disconnect 여부 결정
+        if (newSession && shouldDisconnect) {
+          newSession.disconnect();
+        }
+      };
+    } else {
+      // 일반 사용자 로직: 그대로
+      return () => {
+        if (newSession) {
+          newSession.disconnect();
+        }
+      };
+    }
+  }, [token, isHost, hostNickname, shouldDisconnect]);
+
+  // NEW: "방송 종료"를 Swal로 묻기
+  const leaveSession = async () => {
+    if (!session) return;
+    const result = await Swal.fire({
+      title: '방송을 종료하시겠습니까?',
+      text: '확인하면 방송이 즉시 종료됩니다.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: '네, 종료합니다',
+      cancelButtonText: '취소',
+    });
+    if (result.isConfirmed) {
+      setShouldDisconnect(true);
+      // 예시: "some-other-page"로 이동
+      navigate('/some-other-page');
+    }
+  };
+
+  // 화면 공유 토글 함수
   const toggleScreenShare = () => {
     if (!session || !OV) {
       console.error('Session or OV is not initialized.');
@@ -117,10 +156,8 @@ function MeetingPage() {
     }
 
     if (screenSharing) {
-      // 이미 화면 공유 중이라면 -> 중단
       if (screenPublisher) {
         session.unpublish(screenPublisher);
-        // 화면 공유 중단 시 카메라 퍼블리셔 다시 게시
         if (isHost && publisher) {
           session.publish(publisher);
         }
@@ -128,9 +165,7 @@ function MeetingPage() {
         setScreenPublisher(null);
       }
     } else {
-      // 화면 공유 시작
       if (isHost && publisher) {
-        // 호스트의 기존 카메라 퍼블리셔 언퍼블리시
         session.unpublish(publisher);
       }
 
@@ -155,7 +190,6 @@ function MeetingPage() {
             setScreenSharing(true);
             console.log('Screen sharing started successfully.');
 
-            // 시스템 UI에서 공유 중단 시
             newScreenPub.stream
               .getMediaStream()
               .getVideoTracks()[0]
@@ -200,12 +234,19 @@ function MeetingPage() {
 
         {/* 호스트만 화면 공유 버튼 표시 */}
         {isHost && (
-          <div className="mb-4">
+          <div className="flex gap-3 mb-4">
             <button
               onClick={toggleScreenShare}
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
               {screenSharing ? '화면 공유 중지' : '화면 공유 시작'}
+            </button>
+            {/* NEW: 방송 종료 버튼 */}
+            <button
+              onClick={leaveSession}
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            >
+              방송 종료
             </button>
           </div>
         )}
@@ -231,7 +272,6 @@ function MeetingPage() {
             <h3 className="text-lg font-semibold mb-2">Screen Sharing</h3>
             <video
               autoPlay
-              // 약 2.5배 커진 예시
               className="border border-gray-300 w-[90%] max-w-screen-xl"
               ref={(ref) => {
                 if (ref && screenPublisher) {

@@ -20,17 +20,15 @@ const UserRoom = () => {
   const [isLikeListOpen, setIsLikeListOpen] = useState(true);
   const [favorites, setFavorites] = useState([]);
   const [mapCenter, setMapCenter] = useState({ lat: 35.6895, lng: 139.6917 });
-  const [isInitialLoad, setIsInitialLoad] = useState(true); // 첫 로드 여부 상태 추가
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  // 추가 UI 상태 (예: isSmall) 관리
+  const [isSmall, setIsSmall] = useState(false);
 
   const libraries = ['places'];
+  const travelPlanId = selectedCard?.travelPlanId || travelPlanIdFromUrl;
 
-  const travelPlanId = selectedCard?.travelPlanId || travelPlanIdFromUrl; // selectedCard.travelPlanId 또는 URL의 travelPlanId 사용
-
-  // disabled: planningStatus가 BIDDING, BOOKING, CONFIRMED이면 사용자 조작 차단 (OverviewBar 제외)
-  const disabled = ['BIDDING', 'BOOKING', 'CONFIRMED'].includes(
-    selectedCard.planningStatus,
-  );
-  // 비활성 상태에서 사용자 조작 시 알림창 띄우기
+  const disabled = ['BIDDING', 'BOOKING', 'CONFIRMED'].includes(selectedCard.planningStatus);
   const handleDisabledClick = useCallback((e) => {
     e.stopPropagation();
     Swal.fire({
@@ -41,7 +39,6 @@ const UserRoom = () => {
     });
   }, []);
 
-  // 여행방 데이터 가져오기
   const fetchRoomData = useCallback(async (id) => {
     console.log('📌 API 요청 ID:', id);
     if (!id) {
@@ -49,9 +46,7 @@ const UserRoom = () => {
       return;
     }
     try {
-      const response = await publicRequest.get(
-        `/api/v1/travel-plans/${id}/members`,
-      );
+      const response = await publicRequest.get(`/api/v1/travel-plans/${id}/members`);
       if (response.data?.data?.travelPlan) {
         const travelPlan = response.data.data.travelPlan;
         const mappedPlaces = (travelPlan.places || []).map((place) => ({
@@ -67,7 +62,6 @@ const UserRoom = () => {
     }
   }, []);
 
-  // selectedCard가 업데이트될 때 도착 도시 좌표 가져오기
   useEffect(() => {
     if (isInitialLoad && selectedCard && selectedCard.arrivalCity?.name) {
       const city = selectedCard.arrivalCity.name;
@@ -79,7 +73,7 @@ const UserRoom = () => {
           if (data.status === 'OK') {
             const { lat, lng } = data.results[0].geometry.location;
             setMapCenter({ lat, lng });
-            setIsInitialLoad(false); // 첫 로드 완료 후 상태 변경
+            setIsInitialLoad(false);
           }
         } catch (error) {
           console.error('🚨 Geocoding 요청 실패:', error);
@@ -87,7 +81,7 @@ const UserRoom = () => {
       };
       getCoordinates();
     }
-  }, [selectedCard, isInitialLoad]); // isInitialLoad를 의존성 배열에 추가
+  }, [selectedCard, isInitialLoad]);
 
   useEffect(() => {
     if (travelPlanId) {
@@ -101,7 +95,9 @@ const UserRoom = () => {
     const nodeRef = useRef(null);
 
     return (
-      <Draggable nodeRef={nodeRef}>
+      <Draggable
+        nodeRef={nodeRef}
+      >
         <div
           ref={nodeRef}
           className="fixed z-50 pointer-events-auto"
@@ -110,7 +106,11 @@ const UserRoom = () => {
             left: isLikeListOpen ? '330px' : '0px',
           }}
         >
-          <BoardingPass selectedCard={selectedCard} />
+          <BoardingPass
+            selectedCard={selectedCard}
+            isSmall={isSmall}
+            setIsSmall={setIsSmall}
+          />
         </div>
       </Draggable>
     );
@@ -123,31 +123,24 @@ const UserRoom = () => {
       </div>
     );
   }
+
   return (
     <LoadScript
       googleMapsApiKey={apiKey}
       libraries={libraries}
       onLoad={() => console.log('Google Maps API script loaded!')}
-      onError={(error) =>
-        console.error('🚨 Google Maps API script failed to load:', error)
-      }
+      onError={(error) => console.error('🚨 Google Maps API script failed to load:', error)}
     >
-      {/* 웹소켓 연결 */}
       <WebSocketComponent
         travelPlanId={travelPlanId}
         fetchRoomData={fetchRoomData}
         setFavorites={setFavorites}
         favorites={favorites}
       />
-
-      {/* 전체 화면 레이아웃 */}
       <div className="flex flex-col w-screen h-screen overflow-hidden">
         <Header />
-
-        {/* 지도 + 사이드바 및 BoardingPass */}
         <div className="relative flex-1">
-          {/* 지도 (배경 레이어) */}
-          <div className="absolute inset-0 z-0 ">
+          <div className="absolute inset-0 z-0">
             <InteractiveSection
               selectedCard={selectedCard}
               favorites={favorites}
@@ -164,9 +157,7 @@ const UserRoom = () => {
             />
           )}
           <div className="relative flex h-full pointer-events-none">
-            {/* [중요] 즐겨찾기 목록 + BoardingPass를 같은 flex 컨테이너로 묶기 */}
             <div className="flex h-full pointer-events-none">
-              {/* 왼쪽 사이드바 (즐겨찾기 목록) */}
               <div
                 className={`transition-all duration-300 relative h-full ${
                   disabled ? 'pointer-events-none' : 'pointer-events-auto'
@@ -179,7 +170,6 @@ const UserRoom = () => {
                 >
                   {isLikeListOpen ? '❮' : '❯'}
                 </button>
-
                 {isLikeListOpen && (
                   <div className="h-full overflow-y-auto pointer-events-auto bg-white/70 backdrop-blur-sm">
                     <FavoriteList
@@ -198,7 +188,6 @@ const UserRoom = () => {
                   </div>
                 )}
               </div>
-
               <DraggableBoardingPass
                 selectedCard={selectedCard}
                 isLikeListOpen={isLikeListOpen}
