@@ -31,7 +31,7 @@ const UserVotePage = () => {
                   `/api/v1/travel-plans/${travelPlanId}/proposals/${proposal.proposalId}/meeting/host-status`,
                 );
                 // hostConnected 값을 proposal 객체에 추가
-                return { ...proposal, hostConnected: statusResponse.data.hostConnected };
+                return { ...proposal, hostConnected: statusResponse.data.data.hostConnected };
               } catch (error) {
                 console.error(
                   `Host status 조회 실패 - proposalId: ${proposal.proposalId}`,
