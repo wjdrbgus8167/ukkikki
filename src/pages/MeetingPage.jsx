@@ -103,7 +103,7 @@ function MeetingPage() {
       // 화면 공유 시작: 동기 방식으로 화면 공유 퍼블리셔 생성
       try {
         // 동기 방식으로 화면 공유 퍼블리셔 생성
-        const screenPub = OpenVidu.prototype.initPublisher(undefined, {
+        const screenPub = OV.initPublisher(undefined, {
           videoSource: 'screen',
           publishAudio: false, // 화면 공유 시 오디오 공유하지 않음 (필요 시 true로 변경)
           publishVideo: true,
