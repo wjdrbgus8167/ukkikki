@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { OpenVidu } from 'openvidu-browser';
 import Header from '../components/layout/Header';
@@ -11,11 +11,14 @@ function MeetingPage() {
   const isHost = searchParams.get('isHost') === 'true';
 
   const [session, setSession] = useState(null);
-  const [OV, setOV] = useState(null); // OpenVidu 인스턴스 따로 보관
+  const [OV, setOV] = useState(null); // OpenVidu 인스턴스
   const [publisher, setPublisher] = useState(null);
   const [screenPublisher, setScreenPublisher] = useState(null);
   const [subscribers, setSubscribers] = useState([]);
   const [screenSharing, setScreenSharing] = useState(false);
+
+  // (1) 호스트 닉네임 저장
+  const [hostNickname, setHostNickname] = useState(''); 
 
   useEffect(() => {
     if (!token) {
@@ -30,10 +33,21 @@ function MeetingPage() {
     // (2) 세션 초기화
     const newSession = newOV.initSession();
 
+    // --- 이벤트 리스너 설정 ---
+
     // 스트림 생성 시 subscribe
     newSession.on('streamCreated', (event) => {
       const subscriber = newSession.subscribe(event.stream, undefined);
       setSubscribers((prev) => [...prev, subscriber]);
+
+      // (1-1) 일반 사용자: 호스트 스트림이 들어오면 닉네임 저장
+      if (!isHost && !hostNickname) {
+        // 이 subscriber가 호스트일 가능성이 있음
+        // 단순히 "처음으로 들어온 영상 스트림"을 호스트로 간주
+        // (실제론 role==PUBLISHER 검사 or data 파싱 등 필요)
+        const maybeHostName = subscriber.stream.connection.data;
+        setHostNickname(maybeHostName);
+      }
     });
 
     // 스트림 파괴 시 unsubscribe
@@ -47,7 +61,6 @@ function MeetingPage() {
     newSession
       .connect(token)
       .then(() => {
-        // 호스트이면 비디오+오디오, 일반 유저이면 오디오만
         const pubOptions = isHost
           ? {
               videoSource: undefined, // 카메라
@@ -58,37 +71,45 @@ function MeetingPage() {
               frameRate: 30,
             }
           : {
-              videoSource: false, // 영상 꺼짐
-              audioSource: true,  // 마이크만 사용
+              videoSource: false,
+              audioSource: true,
               publishVideo: false,
               publishAudio: true,
             };
 
-        // initPublisher는 오래된 버전 호환성 위해 newOV에서 호출
-        const localPublisher = newOV.initPublisher(undefined, pubOptions, (error) => {
-          if (error) {
-            console.error('Error initializing publisher:', error);
-            return;
+        const localPublisher = newOV.initPublisher(
+          undefined,
+          pubOptions,
+          (error) => {
+            if (error) {
+              console.error('Error initializing publisher:', error);
+              return;
+            }
+            newSession.publish(localPublisher);
+            setPublisher(localPublisher);
+            setSession(newSession);
+
+            // (1-2) 호스트라면, 퍼블리셔 스트림에서 닉네임 가져오기
+            if (isHost) {
+              const myName = localPublisher.stream.connection.data;
+              setHostNickname(myName);
+            }
           }
-          // 발행
-          newSession.publish(localPublisher);
-          setPublisher(localPublisher);
-          setSession(newSession);
-        });
+        );
       })
       .catch((err) => {
         console.error('Error connecting to the session:', err);
       });
 
-    // 컴포넌트 언마운트 시 세션 해제
+    // 언마운트 시 세션 해제
     return () => {
       if (newSession) {
         newSession.disconnect();
       }
     };
-  }, [token, isHost]);
+  }, [token, isHost, hostNickname]);
 
-  // 화면 공유 토글 함수 (호스트 전용) - 콜백 방식 사용
+  // 화면 공유 토글 함수 (호스트 전용)
   const toggleScreenShare = () => {
     if (!session || !OV) {
       console.error('Session or OV is not initialized.');
@@ -98,9 +119,9 @@ function MeetingPage() {
     if (screenSharing) {
       // 이미 화면 공유 중이라면 -> 중단
       if (screenPublisher) {
-        session.unpublish(screenPublisher); // 공유 스트림 언퍼블리시
+        session.unpublish(screenPublisher);
+        // 화면 공유 중단 시 카메라 퍼블리셔 다시 게시
         if (isHost && publisher) {
-          // 호스트의 기존 카메라 퍼블리셔 다시 게시
           session.publish(publisher);
         }
         setScreenSharing(false);
@@ -113,7 +134,6 @@ function MeetingPage() {
         session.unpublish(publisher);
       }
 
-      // 화면 공유용 퍼블리셔를 *OpenVidu 인스턴스*에서 initPublisher
       const newScreenPub = OV.initPublisher(
         undefined,
         {
@@ -135,13 +155,13 @@ function MeetingPage() {
             setScreenSharing(true);
             console.log('Screen sharing started successfully.');
 
-            // 사용자가 시스템 UI에서 공유를 중단했을 때 이벤트
+            // 시스템 UI에서 공유 중단 시
             newScreenPub.stream
               .getMediaStream()
               .getVideoTracks()[0]
               .addEventListener('ended', () => {
                 console.log('Screen sharing ended by user.');
-                toggleScreenShare(); // 공유 중단 로직 호출
+                toggleScreenShare();
               });
           });
 
@@ -153,16 +173,29 @@ function MeetingPage() {
     }
   };
 
-  
+  // (3) 현재 참가자 수 (간단 계산: 호스트(1) + subscribers.length)
+  const participantCount = subscribers.length + 1;
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
 
-      {/* 메인 컨텐츠 영역 */}
+      {/* 메인 컨텐츠 */}
       <main className="flex-grow flex flex-col items-center justify-start p-4">
+        {/* (4) 제목을 hostNickname으로 표시 (없으면 proposalId 대체) */}
         <h2 className="text-2xl font-bold mb-2">
-          Meeting Page (proposalId: {proposalId})
+          {hostNickname
+            ? `Meeting with [${hostNickname}]`
+            : `Meeting Page (proposalId: ${proposalId})`}
         </h2>
+
+        {/* (3) 호스트만 참가자 수 보기 */}
+        {isHost && (
+          <p className="text-md text-gray-600 mb-2">
+            참여 인원 수: {participantCount}명
+          </p>
+        )}
+
         <p className="mb-4">{isHost ? '호스트 모드' : '참가자 모드'}</p>
 
         {/* 호스트만 화면 공유 버튼 표시 */}
@@ -177,10 +210,9 @@ function MeetingPage() {
           </div>
         )}
 
-        {/* 호스트인 경우만 My Stream(카메라) 표시 */}
-        {isHost && publisher && (
+        {/* (1) 호스트 카메라: 화면 공유 중이 아닐 때만 표시 */}
+        {isHost && publisher && !screenSharing && (
           <div className="mb-4">
-            <h3 className="text-lg font-semibold mb-2">My Stream (Camera)</h3>
             <video
               autoPlay
               className="border border-gray-300 w-80"
@@ -193,13 +225,14 @@ function MeetingPage() {
           </div>
         )}
 
-        {/* 화면 공유 영역 */}
+        {/* (2) 화면 공유 영역 (더 크게) */}
         {screenSharing && screenPublisher && (
           <div className="w-full flex flex-col items-center mb-4">
             <h3 className="text-lg font-semibold mb-2">Screen Sharing</h3>
             <video
               autoPlay
-              className="border border-gray-300 w-3/4 max-w-4xl"
+              // 약 2.5배 커진 예시
+              className="border border-gray-300 w-[90%] max-w-screen-xl"
               ref={(ref) => {
                 if (ref && screenPublisher) {
                   screenPublisher.addVideoElement(ref);
