@@ -27,8 +27,28 @@ const UserVotePage = () => {
         );
         if (response.status === 200) {
           const proposals = response.data.data;
+          
+          // 각 proposal에 대해 hostConnected 값을 가져오기 위한 Promise.all 사용
+          const proposalsWithStatus = await Promise.all(
+            proposals.map(async (proposal) => {
+              try {
+                const statusResponse = await publicRequest.get(
+                  `/api/v1/travel-plans/${travelPlanId}/proposals/${proposal.proposalId}/meeting/host-status`,
+                );
+                // hostConnected 값을 proposal 객체에 추가
+                return { ...proposal, hostConnected: statusResponse.data.data.hostConnected };
+              } catch (error) {
+                console.error(
+                  `Host status 조회 실패 - proposalId: ${proposal.proposalId}`,
+                  error,
+                );
+                return { ...proposal, hostConnected: false };
+              }
+            }),
+          );
+
           // 채택된 제안서 필터링
-          const acceptedProposals = proposals.filter(
+          const acceptedProposals = proposalsWithStatus.filter(
             (proposal) => proposal.proposalStatus === 'A',
           );
           if (acceptedProposals.length > 0) {
@@ -36,9 +56,9 @@ const UserVotePage = () => {
             setAgencies(acceptedProposals);
           } else {
             setHasAcceptedProposal(false);
-            setAgencies(proposals); // If no accepted proposal, show all
+            setAgencies(proposalsWithStatus); // If no accepted proposal, show all
           }
-          console.log('📦 제안 목록:', proposals);
+          console.log('📦 제안 목록:', proposalsWithStatus);
         }
       } catch (error) {
         if (
