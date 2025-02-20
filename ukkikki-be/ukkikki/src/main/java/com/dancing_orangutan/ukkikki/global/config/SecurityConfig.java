@@ -119,7 +119,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/travel-plans").hasRole("MEMBER")   // 여행계획 생성
                         .requestMatchers(HttpMethod.POST, "/travel-plans/*").hasRole("MEMBER")  // 여행계획 참가(join)
                         .requestMatchers(HttpMethod.GET, "/travel-plans/search").hasRole("MEMBER")
-                        .requestMatchers(HttpMethod.GET, "/travel-plans/list").hasRole("MEMBER")
+                        .requestMatchers(HttpMethod.GET, "/travel-plans/list").hasRole("COMPANY")
                         .requestMatchers(HttpMethod.PUT, "/travel-plans/*/comments").hasRole("MEMBER")
                         .requestMatchers(HttpMethod.PUT, "/travel-plans/*/closeTime").hasRole("MEMBER")
                         .requestMatchers(HttpMethod.PUT, "/travel-plans/*/companion").hasRole("MEMBER")
