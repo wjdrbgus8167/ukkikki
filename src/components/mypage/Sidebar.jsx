@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaUser, FaHistory, FaSignOutAlt } from 'react-icons/fa';
 import SidebarItem from './SidebarItem';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -10,6 +10,11 @@ const Sidebar = ({ onMenuClick }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { userRole } = useAuthStore();
+  const [activeItem, setActiveItem] = useState(location.pathname);
+
+  useEffect(() => {
+    setActiveItem(location.pathname);
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     try {
@@ -45,43 +50,42 @@ const Sidebar = ({ onMenuClick }) => {
   const menuItems =
     userRole === 'company' && location.pathname.includes('/proposal')
       ? [
-        {
-          label: '패키지 의뢰',
-          onClick: () => onMenuClick('receivedProposals'),
-          icon: <FaHistory />,
-          to: '/received-proposals', 
-        },
-        {
-          label: '제시 현황',
-          onClick: () => onMenuClick('ongoingProposals'),
-          icon: <FaHistory />,
-          to: '/ongoing-proposals', 
-        },
-      ]
+          {
+            label: '패키지 의뢰',
+            onClick: () => onMenuClick('receivedProposals'),
+            icon: <FaHistory />,
+            to: '/received-proposals',
+          },
+          {
+            label: '제시 현황',
+            onClick: () => onMenuClick('ongoingProposals'),
+            icon: <FaHistory />,
+            to: '/ongoing-proposals',
+          },
+        ]
       : userRole === 'company'
-        ? [
+      ? [
           {
             label: '여행 성사 내역',
             onClick: () => onMenuClick('AcceptedProposals'),
             icon: <FaHistory />,
-            to: '/accepted-proposals', 
+            to: '/accepted-proposals',
           },
           { label: '프로필', onClick: () => onMenuClick('profile'), icon: <FaUser />, to: '/profile' },
           {
             label: '로그아웃',
             onClick: handleLogout,
             icon: <FaSignOutAlt />,
-            to: '/', 
+            to: '/',
           },
         ]
       : [
-          // 일반 사용자인 경우
-          { label: '프로필', href: '/myprofile', icon: <FaUser /> },
+          { label: '프로필', to: '/myprofile', icon: <FaUser /> },
           {
             label: '로그아웃',
             onClick: handleLogout,
             icon: <FaSignOutAlt />,
-            to: '/', 
+            to: '/',
           },
         ];
 
@@ -94,9 +98,12 @@ const Sidebar = ({ onMenuClick }) => {
               key={item.label}
               icon={item.icon}
               label={item.label}
-              to={item.to} 
-              active={item.label !== '로그아웃' && location.pathname === item.to}
-              onClick={item.onClick}
+              to={item.to}
+              active={activeItem === item.to}
+              onClick={() => {
+                setActiveItem(item.to);
+                if (item.onClick) item.onClick();
+              }}
             />
           ))}
         </ul>
