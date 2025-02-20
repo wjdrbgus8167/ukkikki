@@ -13,6 +13,8 @@ const UserVotePage = () => {
   // location.state에서 전달받은 selectedCard를 사용
   const { selectedCard } = location.state || {};
   const [agencies, setAgencies] = useState([]);
+  const [hasAcceptedProposal, setHasAcceptedProposal] = useState(false);
+  const [showDepositModal, setShowDepositModal] = useState(false);
 
   // 제안 목록(API 호출) - 투표 시작 후 이 페이지에서 조회
   useEffect(() => {
