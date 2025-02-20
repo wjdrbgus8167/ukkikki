@@ -208,9 +208,8 @@ const UserVotePage = () => {
       {showDepositModal && (
         <ReservationDepositModal
           travelPlanId={travelPlanId}
-          agency={agencies[0]}  // 예시로 첫 번째 여행사를 선택
-          onClose={() => setShowDepositModal(false)} // 모달 닫기
-          onPayment={handlePayment} // 결제 처리
+          proposalId={agencies[0]?.proposalId}
+          onClose={() => setShowDepositModal(false)}
         />
       )}
     </div>
