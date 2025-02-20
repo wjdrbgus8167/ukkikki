@@ -13,6 +13,7 @@ const UserVotePage = () => {
   // location.state에서 전달받은 selectedCard를 사용
   const { selectedCard } = location.state || {};
   const [agencies, setAgencies] = useState([]);
+  const [hasAcceptedProposal, setHasAcceptedProposal] = useState(false); // Flag for accepted proposal
 
   // 제안 목록(API 호출) - 투표 시작 후 이 페이지에서 조회
   useEffect(() => {
@@ -23,26 +24,18 @@ const UserVotePage = () => {
         );
         if (response.status === 200) {
           const proposals = response.data.data;
-          // 각 proposal에 대해 hostConnected 값을 가져오기 위한 Promise.all 사용
-          const proposalsWithStatus = await Promise.all(
-            proposals.map(async (proposal) => {
-              try {
-                const statusResponse = await publicRequest.get(
-                  `/api/v1/travel-plans/${travelPlanId}/proposals/${proposal.proposalId}/meeting/host-status`,
-                );
-                // hostConnected 값을 proposal 객체에 추가
-                return { ...proposal, hostConnected: statusResponse.data.data.hostConnected };
-              } catch (error) {
-                console.error(
-                  `Host status 조회 실패 - proposalId: ${proposal.proposalId}`,
-                  error,
-                );
-                return { ...proposal, hostConnected: false };
-              }
-            }),
+          // 채택된 제안서 필터링
+          const acceptedProposals = proposals.filter(
+            (proposal) => proposal.proposalStatus === 'A'
           );
-          setAgencies(proposalsWithStatus);
-          console.log('📦 제안 목록:', proposalsWithStatus);
+          if (acceptedProposals.length > 0) {
+            setHasAcceptedProposal(true);
+            setAgencies(acceptedProposals);
+          } else {
+            setHasAcceptedProposal(false);
+            setAgencies(proposals); // If no accepted proposal, show all
+          }
+          console.log('📦 제안 목록:', proposals);
         }
       } catch (error) {
         if (
@@ -162,7 +155,7 @@ const UserVotePage = () => {
 
       <div className="max-w-4xl p-6 mx-auto">
         <h1 className="mb-6 text-2xl font-bold text-center text-gray-800">
-          제안받은 여행사
+          {hasAcceptedProposal ? '채택된 여행사' : '제안받은 여행사'}
         </h1>
 
         <AgencyList
