@@ -78,8 +78,8 @@ public class SecurityConfig {
                 .logout(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(permitAll).permitAll()
-                        .requestMatchers(permitMember).hasRole("MEMBER")
-                        .requestMatchers(permitCompany).hasRole("COMPANY")
+//                        .requestMatchers(permitMember).hasRole("MEMBER")
+//                        .requestMatchers(permitCompany).hasRole("COMPANY")
                         .anyRequest().authenticated()
                 ).exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint())
