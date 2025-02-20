@@ -317,7 +317,7 @@ const ProposalDetailContent = () => {
                       className="px-4 py-2 bg-white text-black rounded hover:bg-gray-100"
                       onClick={handleStartBroadcast}
                     >
-                      홍보 방송 시작
+                      홍보 라이브 세션 시작
                     </button>
                      <button className="px-4 py-2 bg-white text-black rounded hover:bg-gray-100" onClick={() => handleButtonClick("inquire")}>
                       문의하기

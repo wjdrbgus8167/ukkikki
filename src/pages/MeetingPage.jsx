@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { OpenVidu } from 'openvidu-browser';
+import Header from '../components/layout/Header';
+import Footer from '../components/layout/Footer';
 
 function MeetingPage() {
   const { proposalId } = useParams();
@@ -151,74 +153,82 @@ function MeetingPage() {
     }
   };
 
+  
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen p-4 bg-gray-100">
-      <h2 className="text-2xl font-bold mb-2">
-        Meeting Page (proposalId: {proposalId})
-      </h2>
-      <p className="mb-4">{isHost ? '호스트 모드' : '참가자 모드'}</p>
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Header />
 
-      {/* 호스트만 화면 공유 버튼 표시 */}
-      {isHost && (
-        <div className="mb-4">
-          <button
-            onClick={toggleScreenShare}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            {screenSharing ? '화면 공유 중지' : '화면 공유 시작'}
-          </button>
-        </div>
-      )}
+      {/* 메인 컨텐츠 영역 */}
+      <main className="flex-grow flex flex-col items-center justify-start p-4">
+        <h2 className="text-2xl font-bold mb-2">
+          Meeting Page (proposalId: {proposalId})
+        </h2>
+        <p className="mb-4">{isHost ? '호스트 모드' : '참가자 모드'}</p>
 
-      {/* 호스트인 경우만 My Stream(카메라) 표시 */}
-      {isHost && publisher && (
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold mb-2">My Stream (Camera)</h3>
-          <video
-            autoPlay
-            className="border border-gray-300 w-80"
-            ref={(ref) => {
-              if (ref && publisher) {
-                publisher.addVideoElement(ref);
-              }
-            }}
-          />
-        </div>
-      )}
+        {/* 호스트만 화면 공유 버튼 표시 */}
+        {isHost && (
+          <div className="mb-4">
+            <button
+              onClick={toggleScreenShare}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              {screenSharing ? '화면 공유 중지' : '화면 공유 시작'}
+            </button>
+          </div>
+        )}
 
-      {/* 화면 공유 영역 */}
-      {screenSharing && screenPublisher && (
-        <div className="w-full flex flex-col items-center mb-4">
-          <h3 className="text-lg font-semibold mb-2">Screen Sharing</h3>
-          <video
-            autoPlay
-            className="border border-gray-300 w-3/4 max-w-4xl"
-            ref={(ref) => {
-              if (ref && screenPublisher) {
-                screenPublisher.addVideoElement(ref);
-              }
-            }}
-          />
-        </div>
-      )}
-
-      {/* Other Streams 영역 */}
-      <div className="w-full flex flex-wrap justify-center gap-4">
-        {subscribers.map((sub, i) => (
-          <div key={i} className="flex flex-col items-center">
+        {/* 호스트인 경우만 My Stream(카메라) 표시 */}
+        {isHost && publisher && (
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold mb-2">My Stream (Camera)</h3>
             <video
               autoPlay
               className="border border-gray-300 w-80"
               ref={(ref) => {
-                if (ref) sub.addVideoElement(ref);
+                if (ref && publisher) {
+                  publisher.addVideoElement(ref);
+                }
               }}
             />
-            <p className="mt-2 text-sm text-gray-700">
-              {sub.stream.connection.data}
-            </p>
           </div>
-        ))}
-      </div>
+        )}
+
+        {/* 화면 공유 영역 */}
+        {screenSharing && screenPublisher && (
+          <div className="w-full flex flex-col items-center mb-4">
+            <h3 className="text-lg font-semibold mb-2">Screen Sharing</h3>
+            <video
+              autoPlay
+              className="border border-gray-300 w-3/4 max-w-4xl"
+              ref={(ref) => {
+                if (ref && screenPublisher) {
+                  screenPublisher.addVideoElement(ref);
+                }
+              }}
+            />
+          </div>
+        )}
+
+        {/* Other Streams 영역 */}
+        <div className="w-full flex flex-wrap justify-center gap-4">
+          {subscribers.map((sub, i) => (
+            <div key={i} className="flex flex-col items-center">
+              <video
+                autoPlay
+                className="border border-gray-300 w-80"
+                ref={(ref) => {
+                  if (ref) sub.addVideoElement(ref);
+                }}
+              />
+              <p className="mt-2 text-sm text-gray-700">
+                {sub.stream.connection.data}
+              </p>
+            </div>
+          ))}
+        </div>
+      </main>
+
+      <Footer />
     </div>
   );
 }
