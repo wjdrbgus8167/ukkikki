@@ -79,8 +79,8 @@ function MeetingPage() {
     };
   }, [token, isHost]);
 
-  // 화면 공유 토글 함수 (호스트 전용)
-  const toggleScreenShare = async () => {
+  // 화면 공유 토글 함수 (호스트 전용) - 콜백 방식 사용
+  const toggleScreenShare = () => {
     if (!session) {
       console.error('Session is not initialized.');
       return;
@@ -103,41 +103,49 @@ function MeetingPage() {
         // 호스트의 기존 카메라 퍼블리셔 언퍼블리시
         session.unpublish(publisher);
       }
-      try {
-        /**
-         * 기존 코드에서 `new OpenVidu()` 로 새 인스턴스를 만드는 대신
-         * 이미 연결된 `session` 객체를 통해 initPublisherAsync를 사용
-         */
-        const newScreenPublisher = await session.initPublisherAsync(undefined, {
+
+      // 화면 공유용 퍼블리셔를 콜백 방식으로 생성
+      const newScreenPublisher = session.initPublisher(
+        undefined,
+        {
           videoSource: 'screen',
           publishAudio: false,
           publishVideo: true,
           resolution: '1280x720',
           frameRate: 30,
-        });
+        },
+        (error) => {
+          if (error) {
+            console.error('Error during screen sharing initialization:', error);
+            return;
+          }
 
-        newScreenPublisher.once('accessAllowed', async () => {
-          await session.publish(newScreenPublisher);
-          setScreenPublisher(newScreenPublisher);
-          setScreenSharing(true);
-          console.log('Screen sharing started successfully.');
+          /**
+           * 여기서 accessAllowed, accessDenied 이벤트를 수신할 수 있습니다.
+           * 특정 브라우저 버전에서는 콜백 시점에 이미 'accessAllowed'가 처리됐을 수도 있음에 유의.
+           */
+          newScreenPublisher.once('accessAllowed', () => {
+            // 공유 스트림 발행
+            session.publish(newScreenPublisher);
+            setScreenPublisher(newScreenPublisher);
+            setScreenSharing(true);
+            console.log('Screen sharing started successfully.');
 
-          // 사용자가 시스템 UI에서 공유를 중단했을 때 이벤트
-          newScreenPublisher.stream
-            .getMediaStream()
-            .getVideoTracks()[0]
-            .addEventListener('ended', () => {
-              console.log('Screen sharing ended by user.');
-              toggleScreenShare();
-            });
-        });
+            // 사용자가 시스템 UI에서 공유를 중단했을 때 이벤트
+            newScreenPublisher.stream
+              .getMediaStream()
+              .getVideoTracks()[0]
+              .addEventListener('ended', () => {
+                console.log('Screen sharing ended by user.');
+                toggleScreenShare(); // 공유 중단 로직 호출
+              });
+          });
 
-        newScreenPublisher.once('accessDenied', () => {
-          console.warn('Screen sharing access denied.');
-        });
-      } catch (error) {
-        console.error('Error during screen sharing initialization:', error);
-      }
+          newScreenPublisher.once('accessDenied', () => {
+            console.warn('Screen sharing access denied by the user.');
+          });
+        }
+      );
     }
   };
 
