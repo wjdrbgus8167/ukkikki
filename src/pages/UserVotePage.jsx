@@ -5,6 +5,8 @@ import Header from '../components/layout/Header';
 import AgencyList from '../components/vote/AgencyList';
 import { publicRequest } from '../hooks/requestMethod';
 import Swal from 'sweetalert2';
+import ReservationDepositModal from '../components/vote/ReservationDepositModal'; // 예약금 결제 모달
+import { IoIosArrowBack } from 'react-icons/io';
 
 const UserVotePage = () => {
   const { travelPlanId } = useParams();
@@ -13,6 +15,8 @@ const UserVotePage = () => {
   // location.state에서 전달받은 selectedCard를 사용
   const { selectedCard } = location.state || {};
   const [agencies, setAgencies] = useState([]);
+  const [hasAcceptedProposal, setHasAcceptedProposal] = useState(false); // Flag for accepted proposal
+  const [showDepositModal, setShowDepositModal] = useState(false); // 예약금 결제 모달 표시 여부
 
   // 제안 목록(API 호출) - 투표 시작 후 이 페이지에서 조회
   useEffect(() => {
@@ -23,29 +27,18 @@ const UserVotePage = () => {
         );
         if (response.status === 200) {
           const proposals = response.data.data;
-          // 각 proposal에 대해 hostConnected 값을 가져오기 위한 Promise.all 사용
-          const proposalsWithStatus = await Promise.all(
-            proposals.map(async (proposal) => {
-              try {
-                const statusResponse = await publicRequest.get(
-                  `/api/v1/travel-plans/${travelPlanId}/proposals/${proposal.proposalId}/meeting/host-status`,
-                );
-                // hostConnected 값을 proposal 객체에 추가
-                return {
-                  ...proposal,
-                  hostConnected: statusResponse.data.data.hostConnected,
-                };
-              } catch (error) {
-                console.error(
-                  `Host status 조회 실패 - proposalId: ${proposal.proposalId}`,
-                  error,
-                );
-                return { ...proposal, hostConnected: false };
-              }
-            }),
+          // 채택된 제안서 필터링
+          const acceptedProposals = proposals.filter(
+            (proposal) => proposal.proposalStatus === 'A',
           );
-          setAgencies(proposalsWithStatus);
-          console.log('📦 제안 목록:', proposalsWithStatus);
+          if (acceptedProposals.length > 0) {
+            setHasAcceptedProposal(true);
+            setAgencies(acceptedProposals);
+          } else {
+            setHasAcceptedProposal(false);
+            setAgencies(proposals); // If no accepted proposal, show all
+          }
+          console.log('📦 제안 목록:', proposals);
         }
       } catch (error) {
         if (
@@ -140,13 +133,57 @@ const UserVotePage = () => {
     });
   };
 
+  // 예약금 결제 모달 띄우기
+  const handleDeposit = () => {
+    setShowDepositModal(true);
+  };
+
+  // 결제 처리 함수
+  const handlePayment = async (agencyId) => {
+    try {
+      const response = await publicRequest.post(
+        `/api/v1/travel-plans/${travelPlanId}/proposals/${agencyId}/deposit`,
+      );
+      if (response.status === 200) {
+        Swal.fire('결제 완료', '예약금이 결제되었습니다.', 'success');
+        setShowDepositModal(false); // 모달 닫기
+      }
+    } catch (error) {
+      console.error('결제 실패:', error);
+      Swal.fire('오류', '결제 중 오류가 발생했습니다.', 'error');
+    }
+  };
+
+  // 예약금 결제 모달 컴포넌트
+  const handleJoinMeeting = async (agency) => {
+    try {
+      // 백엔드로부터 참가자 권한 토큰을 발급
+      const response = await publicRequest.post(
+        `/api/v1/travel-plans/${travelPlanId}/proposals/${agency.proposalId}/meeting/connection`,
+        { isHost: false },
+      );
+      if (response.status === 200) {
+        const { token } = response.data.data;
+        // 쿼리 파라미터로 token, isHost를 넘겨서 이동
+        navigate(
+          `/meeting/${agency.proposalId}?token=${encodeURIComponent(
+            token,
+          )}&isHost=false`,
+        );
+      }
+    } catch (error) {
+      console.error('회의 참여 실패:', error);
+      Swal.fire('오류', '라이브 방송 참여에 실패했습니다.', 'error');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
 
       <div className="max-w-4xl p-6 mx-auto">
         <h1 className="mb-6 text-2xl font-bold text-center text-gray-800">
-          제안받은 여행사
+          {hasAcceptedProposal ? '채택된 여행사' : '제안받은 여행사'}
         </h1>
 
         <AgencyList
@@ -155,9 +192,30 @@ const UserVotePage = () => {
           onDetail={handleDetail}
           onJoinMeeting={handleJoinMeeting}
         />
+
+        {/* 예약금 결제 버튼 */}
+        {hasAcceptedProposal && (
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={handleDeposit}
+              className="px-8 py-3 rounded text-brown bg-yellow"
+            >
+              예약금 결제하러 가기
+            </button>
+          </div>
+        )}
       </div>
 
       <Footer />
+
+      {/* 예약금 결제 모달 */}
+      {showDepositModal && (
+        <ReservationDepositModal
+          travelPlanId={travelPlanId}
+          proposalId={agencies[0]?.proposalId}
+          onClose={() => setShowDepositModal(false)}
+        />
+      )}
     </div>
   );
 };
