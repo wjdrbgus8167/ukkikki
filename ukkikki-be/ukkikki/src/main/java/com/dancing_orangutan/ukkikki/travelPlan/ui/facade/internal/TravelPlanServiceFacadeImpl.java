@@ -198,9 +198,9 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 	}
 
 	@Override
-	public FetchSuggestedTravelPlansResponse fetchSuggestedTravelPlans() {
+	public FetchSuggestedTravelPlansResponse fetchSuggestedTravelPlans(final Integer companyId) {
 		return mapper.fetchSuggestedTravelPlansResponse(
-				queryTravelPlanService.fetchSuggestedTravelPlans());
+				queryTravelPlanService.fetchSuggestedTravelPlans(companyId));
 	}
 
 	@Override

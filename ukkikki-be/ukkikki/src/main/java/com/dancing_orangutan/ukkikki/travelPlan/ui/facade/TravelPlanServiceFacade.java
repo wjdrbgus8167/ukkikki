@@ -31,7 +31,7 @@ public interface TravelPlanServiceFacade {
 			final Integer departureCityId, final Integer arrivalCityId, final List<Integer> keywords,
 			final PlanningStatus planningStatus, final Integer memberId);
 
-	FetchSuggestedTravelPlansResponse fetchSuggestedTravelPlans();
+	FetchSuggestedTravelPlansResponse fetchSuggestedTravelPlans(final Integer companyId);
 
 	void writeComment(final WriteCommentRequest request, final Integer travelPlanId, final Integer memberId);
 
