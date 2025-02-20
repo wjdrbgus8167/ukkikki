@@ -97,59 +97,59 @@ public class ProposalService {
     @Transactional
     public CreateProposalResponse createProposal(CreateProposalCommand command){
 
-       Proposal domain= Proposal.builder()
-               .name(command.getName())
-               .startDate(command.getStartDate())
-               .endDate(command.getEndDate())
-               .airline(command.getAirline())
-               .departureAirportCode(command.getDepartureAirportCode())
-               .arrivalAirportCode(command.getArrivalAirportCode())
-               .startDateBoardingTime(command.getStartDateBoardingTime())
-               .endDateBoardingTime(command.getEndDateBoardingTime())
-               .startDateArrivalTime(command.getStartDateArrivalTime())
-               .endDateArrivalTime(command.getEndDateArrivalTime())
-               .deposit(command.getDeposit())
-               .minPeople(command.getMinPeople())
-               .guideIncluded(command.isGuideIncluded())
-               .productIntroduction(command.getProductIntroduction())
-               .refundPolicy(command.getRefundPolicy())
-               .insuranceIncluded(command.isInsuranceIncluded())
-               .proposalStatus(ProposalStatus.W)
-               .createTime(LocalDateTime.now())
-               .updateTime(LocalDateTime.now())
-               .companyId(command.getCompanyId())
-               .travelPlanId(command.getTravelPlanId())
-               .build();
+        Proposal domain= Proposal.builder()
+                .name(command.getName())
+                .startDate(command.getStartDate())
+                .endDate(command.getEndDate())
+                .airline(command.getAirline())
+                .departureAirportCode(command.getDepartureAirportCode())
+                .arrivalAirportCode(command.getArrivalAirportCode())
+                .startDateBoardingTime(command.getStartDateBoardingTime())
+                .endDateBoardingTime(command.getEndDateBoardingTime())
+                .startDateArrivalTime(command.getStartDateArrivalTime())
+                .endDateArrivalTime(command.getEndDateArrivalTime())
+                .deposit(command.getDeposit())
+                .minPeople(command.getMinPeople())
+                .guideIncluded(command.isGuideIncluded())
+                .productIntroduction(command.getProductIntroduction())
+                .refundPolicy(command.getRefundPolicy())
+                .insuranceIncluded(command.isInsuranceIncluded())
+                .proposalStatus(ProposalStatus.W)
+                .createTime(LocalDateTime.now())
+                .updateTime(LocalDateTime.now())
+                .companyId(command.getCompanyId())
+                .travelPlanId(command.getTravelPlanId())
+                .build();
 
-       Proposal savedProposal = proposalRepository.save(domain);
+        Proposal savedProposal = proposalRepository.save(domain);
 
-       log.info("Saved proposal {}", savedProposal.getProposalId());
+        log.info("Saved proposal {}", savedProposal.getProposalId());
 
-       List<Schedule> schedules = command.getScheduleItems().stream()
-               .map(scheduleCommand -> Schedule.builder()
-                       .scheduleName(scheduleCommand.getScheduleName())
-                       .startTime(scheduleCommand.getStartDate())
-                       .endTime(scheduleCommand.getEndDate())
-                       .imageUrl(scheduleCommand.getImageUrl())
-                       .longitude(scheduleCommand.getLongitude())
-                       .latitude(scheduleCommand.getLatitude())
-                       .dayNumber(scheduleCommand.getDayNumber())
-                       .proposalId(savedProposal.getProposalId()) // 저장된 Proposal ID 설정
-                       .build())
-               .collect(Collectors.toList());
+        List<Schedule> schedules = command.getScheduleItems().stream()
+                .map(scheduleCommand -> Schedule.builder()
+                        .scheduleName(scheduleCommand.getScheduleName())
+                        .startTime(scheduleCommand.getStartDate())
+                        .endTime(scheduleCommand.getEndDate())
+                        .imageUrl(scheduleCommand.getImageUrl())
+                        .longitude(scheduleCommand.getLongitude())
+                        .latitude(scheduleCommand.getLatitude())
+                        .dayNumber(scheduleCommand.getDayNumber())
+                        .proposalId(savedProposal.getProposalId()) // 저장된 Proposal ID 설정
+                        .build())
+                .collect(Collectors.toList());
 
-       // 새로운 일정 리스트 내부에서 중복 일정이 있는지 확인
-       if (Schedule.hasOverlappingSchedules(schedules)) {
-           throw new IllegalArgumentException("겹치는 일정이 존재합니다.");
-       }
+        // 새로운 일정 리스트 내부에서 중복 일정이 있는지 확인
+        if (Schedule.hasOverlappingSchedules(schedules)) {
+            throw new IllegalArgumentException("겹치는 일정이 존재합니다.");
+        }
 
-       // 일정 저장 (Batch insert)
-       List<Schedule> scheduleList =scheduleRepository.saveAll(schedules);
+        // 일정 저장 (Batch insert)
+        List<Schedule> scheduleList =scheduleRepository.saveAll(schedules);
 
-       return CreateProposalResponse.builder()
-               .proposal(savedProposal)
-               .schedules(scheduleList)
-               .build();
+        return CreateProposalResponse.builder()
+                .proposal(savedProposal)
+                .schedules(scheduleList)
+                .build();
     }
 
     /**
@@ -335,21 +335,30 @@ public class ProposalService {
         return hostConnected;
     }
 
-    // 제안서 목록 조회
     @Transactional
     public List<ProposalListResponse> getProposalList(ProposalListCommand command) {
 
         // 방에 있는 제안서 가져오기
         List<ProposalEntity> proposals = proposalRepository.findByTravelPlanId(command.getTravelPlanId());
 
+        // "A" 상태의 제안서가 하나라도 있는지 확인
+        boolean hasAStatus = proposals.stream()
+                .anyMatch(proposal -> ProposalStatus.A.equals(proposal.getProposalStatus()));
+
+        log.info("hasAStatus: {}", hasAStatus);
+
+        // 필터링할 상태 결정
+        ProposalStatus targetStatus = hasAStatus ? ProposalStatus.A : ProposalStatus.V;
+
         // 응답 리스트 만들기
         List<ProposalListResponse> proposalResponses = proposals.stream()
+                .filter(proposal -> targetStatus.equals(proposal.getProposalStatus())) // A가 있으면 A만, 없으면 V만 필터링
                 .map(proposal -> {
                     Integer proposalId = proposal.getProposalId();
 
                     // 해당 제안서에 대한 투표 정보 가져오기
                     List<VoteEntity> votes = voteRepository.findByProposal_ProposalId(proposalId)
-                            .orElseThrow(()-> new EntityNotFoundException("투표한 제안서가 없습니다"));
+                            .orElseThrow(() -> new EntityNotFoundException("투표한 제안서가 없습니다"));
 
                     // 투표한 멤버들의 id 가져오기
                     Set<Integer> votedMemberIds = votes.stream()
@@ -361,22 +370,20 @@ public class ProposalService {
 
                     // 투표한 멤버들의 여행 계획 정보 가져와서 voteCount 계산
                     int voteCount = votedMemberIds.stream()
-                            .map(votedMemberId-> {
-
+                            .map(votedMemberId -> {
                                 try {
                                     return memberTravelPlanFinder.findByTravelPlanIdAndMemberId(command.getTravelPlanId(), votedMemberId);
                                 } catch (EntityNotFoundException e) {
                                     log.warn("투표한 멤버가 여행 계획에 참여하지 않음: memberId={}, travelPlanId={}", votedMemberId, command.getTravelPlanId());
                                     return null; // 존재하지 않는 멤버는 제외
                                 }
-
                             })
                             .filter(Objects::nonNull) // null 값 제거
                             .mapToInt(mtp -> Math.min(mtp.getAdultCount() + mtp.getChildCount() + mtp.getInfantCount(), 10)) // 투표한 인원 수 합산
                             .sum();
 
                     // 회사 정보 가져오기
-                    String companyName =  companyFinder.getReferenceById(proposal.getCompany().getCompanyId()).getCompanyName();
+                    String companyName = companyFinder.getReferenceById(proposal.getCompany().getCompanyId()).getCompanyName();
 
                     // ProposalListResponse 생성
                     return ProposalListResponse.builder()
@@ -388,15 +395,15 @@ public class ProposalService {
                             .votedYn(votedYn)
                             .proposalStatus(proposal.getProposalStatus())
                             .build();
-
-                })// 제안서를 투표 순으로 나열
-                .sorted(Comparator.comparingInt(ProposalListResponse::getVoteCount).reversed())
+                })
+                .sorted(Comparator.comparingInt(ProposalListResponse::getVoteCount).reversed()) // 투표 순으로 정렬
                 .collect(Collectors.toList());
 
         return proposalResponses;
     }
 
-   // 제안서 상세 조회
+
+    // 제안서 상세 조회
     public ProposalDetailResponse getProposalDetail(Integer proposalId) {
 
         ProposalEntity proposal = proposalRepository.findById(proposalId);
@@ -454,7 +461,7 @@ public class ProposalService {
     //제안서 문의
     public CreateInquiryResponse createInquiry(CreateInquiryCommand command) {
 
-       // 사용자가 여행 계획에 참가하고 있는지 확인
+        // 사용자가 여행 계획에 참가하고 있는지 확인
         boolean isJoining = memberTravelPlanFinder.isJoiningTravelPlan(
                 command.getMemberId(), command.getTravelPlanId());
 
@@ -619,7 +626,7 @@ public class ProposalService {
     // 제안서 내 일정 등록
     public Schedule createSchedule(CreateScheduleCommand command,Integer proposalId) {
 
-       // 일정 등록 전 겹치는 일정이 있는지 확인
+        // 일정 등록 전 겹치는 일정이 있는지 확인
         ProposalEntity proposal = proposalRepository.findById(proposalId);
 
         List<Schedule> existingSchedules = scheduleFinder.findSchedulesByProposalId(proposal.getProposalId()).stream()
