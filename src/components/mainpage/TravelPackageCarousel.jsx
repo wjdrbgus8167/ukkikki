@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
@@ -29,60 +28,6 @@ const NextArrow = ({ onClick }) => (
 const TravelPackageCarousel = () => {
   const navigate = useNavigate();
   const [travelPlans, setTravelPlans] = useState([]);
-  const [imageUrls, setImageUrls] = useState({});
-
-  // ✅ 여행지 이미지 가져오기 (axios 사용)
-  useEffect(() => {
-    const fetchImages = async () => {
-      const imageRequests = travelPlans.map(async (plan) => {
-        const cityName = plan.arrivalCity?.name;
-
-        if (!cityName || !plan.arrivalCity.cityId) {
-          return null;
-        }
-
-        if (imageUrls[plan.arrivalCity.cityId]) {
-          return null;
-        }
-        try {
-          // ✅ S3 버킷에서 해당 도시에 맞는 이미지 URL 생성
-          const s3Url = `https://ukkikki-bucket.s3.ap-northeast-2.amazonaws.com/city/${plan.arrivalCity.cityId}.jpg`;
-
-          // ✅ 이미지가 존재하는지 확인
-          const response = await axios.head(s3Url);
-          if (response.status === 200) {
-            return { [plan.arrivalCity.cityId]: s3Url };
-          }
-        } catch (error) {
-          console.warn(
-            `⚠️ [경고] S3에서 이미지 없음, 기본 이미지 사용: ${cityName}`,
-          );
-          return {
-            [plan.arrivalCity.cityId]:
-              'https://ukkikki-bucket.s3.ap-northeast-2.amazonaws.com/placeholder.jpg',
-          }; // 기본 이미지
-        }
-      });
-
-      const results = await Promise.all(imageRequests);
-      console.log('🔄 [결과] 모든 요청 완료:', results);
-
-      const newImageUrls = results.reduce((acc, result) => {
-        return result ? { ...acc, ...result } : acc;
-      }, {});
-
-      console.log('🌟 [최종 상태 업데이트] 새로운 이미지 목록:', newImageUrls);
-
-      if (Object.keys(newImageUrls).length > 0) {
-        setImageUrls((prev) => {
-          console.log('📌 [이전 상태] 기존 이미지 목록:', prev);
-          return { ...prev, ...newImageUrls };
-        });
-      }
-    };
-
-    if (travelPlans.length > 0) fetchImages();
-  }, [travelPlans]);
 
   // ✅ API 호출하여 여행방 데이터를 가져오기
   useEffect(() => {
@@ -124,10 +69,6 @@ const TravelPackageCarousel = () => {
   const handleViewDetails = async () => {
     try {
       const response = await publicRequest.get('/api/v1/travel-plans');
-      console.log(
-        'response.data.data.travelPlans',
-        response.data.data.travelPlans,
-      );
       if (!response.data || !Array.isArray(response.data.data.travelPlans)) {
         throw new Error('🚨 API 응답이 올바르지 않습니다.');
       }
@@ -153,7 +94,6 @@ const TravelPackageCarousel = () => {
       {/* ✅ 컨텐츠 영역 */}
       <div className="relative flex flex-col items-center justify-between w-full px-8 py-16 md:flex-row">
         {/* 왼쪽 텍스트 */}
-
         <div className="w-full pl-16 text-center md:w-1/3 md:text-left text-brown">
           <h2 className="text-3xl font-bold leading-snug">
             색다른 여행을 떠날
@@ -173,10 +113,8 @@ const TravelPackageCarousel = () => {
             <Slider {...settings}>
               {travelPlans.map((plan) => {
                 const cityId = plan.arrivalCity?.cityId;
-                const imageUrl =
-                  (cityId && imageUrls[cityId]) ||
-                  'https://ukkikki-bucket.s3.ap-northeast-2.amazonaws.com/placeholder.jpg';
-
+                // S3에서 이미지 URL 생성
+                const imageUrl = `https://ukkikki-bucket.s3.ap-northeast-2.amazonaws.com/city/${cityId}.jpg`;
                 return (
                   <div key={plan.travelPlanId} className="p-4">
                     <div className="overflow-hidden bg-white rounded-lg shadow-lg">
@@ -184,6 +122,11 @@ const TravelPackageCarousel = () => {
                         src={imageUrl}
                         alt={plan.name}
                         className="object-cover w-full h-48"
+                        onError={(e) => {
+                          e.target.onerror = null; // 무한 반복 방지
+                          e.target.src =
+                            'https://ukkikki-bucket.s3.ap-northeast-2.amazonaws.com/placeholder.jpg';
+                        }}
                       />
                       <div className="p-4">
                         <h3 className="text-lg font-semibold text-gray-800">
