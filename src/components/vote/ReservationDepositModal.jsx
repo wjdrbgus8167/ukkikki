@@ -50,6 +50,14 @@ const ReservationDepositModal = ({ travelPlanId, proposalId, onClose }) => {
   // 1단계: 모든 여행자 정보가 올바르게 입력되었는지 확인한 후 결제 단계로 진행
   const handleNext = () => {
     for (let traveler of travelers) {
+      if (traveler.phoneNumber.length !== 11) {
+        Swal.fire(
+          '유효성 오류',
+          '전화번호는 11자리 숫자로 입력해주세요',
+          'warning',
+        );
+        return;
+      }
       if (
         !traveler.koreanName.trim() ||
         !traveler.englishName.trim() ||
@@ -236,14 +244,15 @@ const ReservationDepositModal = ({ travelPlanId, proposalId, onClose }) => {
                       type="text"
                       placeholder="전화번호"
                       value={traveler.phoneNumber}
-                      onChange={(e) =>
-                        handleTravelerChange(
-                          index,
-                          'phoneNumber',
-                          e.target.value,
-                        )
-                      }
+                      onChange={(e) => {
+                        // 숫자만 허용하고 11자리로 제한
+                        const value = e.target.value
+                          .replace(/[^0-9]/g, '')
+                          .slice(0, 11);
+                        handleTravelerChange(index, 'phoneNumber', value);
+                      }}
                       className="w-full p-2 border rounded"
+                      maxLength="11"
                     />
                   </div>
                 </div>

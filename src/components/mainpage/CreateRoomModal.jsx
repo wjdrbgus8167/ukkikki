@@ -118,6 +118,12 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
 
   // 방 만들기 완료 시: 선택된 키워드를 요청 바디에 포함하여 API 호출 후, 생성된 방으로 이동
   const handleRoomCreation = async () => {
+    // 방제목 20자 이하 체크
+    if (roomData.title.length > 20) {
+      Swal.fire('알림', '방 제목은 20자 이하로 입력해주세요.', 'warning');
+      return;
+    }
+
     // 총 인원 체크: 0명일 경우 alert를 띄우고 함수 실행 중단
     if (totalPeople === 0) {
       Swal.fire(

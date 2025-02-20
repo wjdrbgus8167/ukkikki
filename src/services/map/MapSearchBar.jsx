@@ -1,9 +1,58 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Autocomplete } from '@react-google-maps/api';
 import { FaSearch, FaTimes } from 'react-icons/fa';
+import Slider from 'react-slick';
 import { publicRequest } from '../../hooks/requestMethod';
 import Swal from 'sweetalert2';
 import { stompClient } from '../../components/userroom/WebSocketComponent';
+import { Element } from 'react-scroll';
+
+// 커스텀 슬라이더 화살표 (투명한 원형 버튼)
+const CustomNextArrow = (props) => {
+  const { className, style, onClick } = props;
+  return (
+    <div
+      className={className}
+      style={{
+        ...style,
+        display: 'block',
+        background: 'rgba(0, 0, 0, 0.3)',
+        borderRadius: '50%',
+        right: '10px',
+        zIndex: 2,
+      }}
+      onClick={onClick}
+    />
+  );
+};
+
+const CustomPrevArrow = (props) => {
+  const { className, style, onClick } = props;
+  return (
+    <div
+      className={className}
+      style={{
+        ...style,
+        display: 'block',
+        background: 'rgba(0, 0, 0, 0.3)',
+        borderRadius: '50%',
+        left: '10px',
+        zIndex: 2,
+      }}
+      onClick={onClick}
+    />
+  );
+};
+
+const sliderSettings = {
+  dots: false,
+  infinite: true,
+  speed: 300, // 300ms 전환 (더 빠름)
+  slidesToShow: 1,
+  slidesToScroll: 1,
+  nextArrow: <CustomNextArrow />,
+  prevArrow: <CustomPrevArrow />,
+};
 
 const MapSearchBar = ({
   onPlaceSelected,
@@ -13,8 +62,7 @@ const MapSearchBar = ({
 }) => {
   const [searchedPlace, setSearchedPlace] = useState(null);
   const [isRegistered, setIsRegistered] = useState(false);
-  const [inputValue, setInputValue] = useState(''); // 입력값 상태 추가
-
+  const [inputValue, setInputValue] = useState('');
   const autocompleteRef = useRef(null);
 
   // Autocomplete 로드 시 ref 설정
@@ -31,24 +79,30 @@ const MapSearchBar = ({
       return;
     }
     console.log('선택된 place:', place);
-    const photoUrl =
+    // 여러 장의 사진이 있으면 배열로 저장
+    const photos =
       place.photos && place.photos.length > 0
-        ? place.photos[0].getUrl({ maxWidth: 100, maxHeight: 100 })
-        : null;
+        ? place.photos.map((photo) =>
+            photo.getUrl({ maxWidth: 400, maxHeight: 400 }),
+          )
+        : [];
+    const photoUrl = photos.length > 0 ? photos[0] : null;
     const rating = place.rating || null;
+    const reviews = place.reviews || null; // 리뷰 데이터 (있으면)
     const newPlace = {
       name: place.name,
       address: place.formatted_address,
       latitude: place.geometry.location.lat(),
       longitude: place.geometry.location.lng(),
       photoUrl,
+      photos, // 전체 이미지 배열
       rating,
-      // 우선 구글의 placeId를 사용 (등록 후 DB에서 새 ID로 업데이트됨)
+      reviews, // 리뷰 배열
       placeId: place.place_id || Date.now().toString(),
     };
     console.log('새 장소 정보:', newPlace);
 
-    // 중복 등록 방지: favorites에 이미 같은 장소가 있는지 확인 (placeId 또는 name 기준)
+    // 중복 등록 방지
     const isDuplicate = favorites.some(
       (fav) => fav.placeId === newPlace.placeId || fav.name === newPlace.name,
     );
@@ -72,24 +126,17 @@ const MapSearchBar = ({
       Swal.fire('알림', '이미 등록된 장소입니다.', 'info');
       return;
     }
-
     const place = autocompleteRef.current.getPlace();
     const placeName = place.name;
-
     try {
-      // DB 저장 (API 호출)
       const response = await publicRequest.post(
         `/api/v1/travel-plans/${selectedTravelPlanId}/places`,
         searchedPlace,
       );
       if (response.status === 200) {
-        // 응답에서 DB의 고유 ID를 받아옴 (예: response.data.data.placeId)
         const dbPlaceId = response.data.data.placeId;
         console.log('DB 응답, 새 장소 ID:', dbPlaceId);
-        // 구글의 placeId 대신 DB에서 생성된 ID로 업데이트
         const updatedPlace = { ...searchedPlace, placeId: dbPlaceId };
-        // 부모의 onPlaceSelected를 통해 favorites 상태 업데이트
-        // 📌 중복 체크 후 추가 (favorites에 존재하는지 확인)
         if (
           !favorites.some(
             (fav) =>
@@ -100,21 +147,14 @@ const MapSearchBar = ({
         ) {
           onPlaceSelected(updatedPlace);
         }
-
         setSearchedPlace(updatedPlace);
         setIsRegistered(true);
-
-        const message = {
-          ...searchedPlace,
+        const wsData = {
+          action: 'ADD_PLACE',
+          placeName,
           travelPlanId: selectedTravelPlanId,
         };
-
         if (stompClient && stompClient.connected) {
-          const wsData = {
-            action: 'ADD_PLACE', // ✅ Action Enum 값 전송
-            placeName,
-            travelPlanId: selectedTravelPlanId,
-          };
           stompClient.publish({
             destination: '/pub/actions',
             body: JSON.stringify(wsData),
@@ -123,9 +163,10 @@ const MapSearchBar = ({
         } else {
           console.warn('⚠️ 웹소켓 연결이 끊어져 있어 이벤트를 발행하지 못함.');
         }
-
         Swal.fire('성공', '장소가 등록되었습니다.', 'success');
         console.log('등록된 장소:', updatedPlace);
+        // 등록 후 검색 결과 및 입력값 초기화
+        handleClearSearch();
       }
     } catch (error) {
       console.error('새 장소 등록 실패:', error);
@@ -145,19 +186,32 @@ const MapSearchBar = ({
       }
     }
   };
-  // "닫기" 버튼 클릭 시 입력값 및 검색 결과 초기화
+
+  // "닫기" 버튼 클릭 시 초기화
   const handleClearSearch = () => {
     setInputValue('');
     setSearchedPlace(null);
     setIsRegistered(false);
     if (autocompleteRef.current) {
-      // Autocomplete 인스턴스에 직접 입력값을 설정해도 됨
       const input = document.querySelector('input[placeholder="장소 검색"]');
       if (input) {
         input.value = '';
       }
     }
   };
+
+  // 검색 결과 변경 시 스크롤을 최상단으로 이동시키도록 수정
+  useEffect(() => {
+    if (searchedPlace) {
+      setTimeout(() => {
+        const container = document.getElementById('searchResultContainer');
+        if (container) {
+          container.scrollTop = 0; // 맨 위로 스크롤
+        }
+      }, 500);
+    }
+  }, [searchedPlace]);
+
   return (
     <div>
       <Autocomplete onLoad={handleLoad} onPlaceChanged={onPlaceChanged}>
@@ -184,35 +238,71 @@ const MapSearchBar = ({
       </Autocomplete>
 
       {searchedPlace && (
-        <div className="mt-2 flex flex-col border border-gray-300 rounded-md p-2 bg-white w-[320px]">
-          <div className="flex items-center">
-            {searchedPlace.photoUrl && (
-              <img
-                src={searchedPlace.photoUrl}
-                alt="Place"
-                className="w-[60px] h-[60px] rounded object-cover mr-2"
-              />
-            )}
-            <div className="flex-1">
-              <div className="font-bold">{searchedPlace.name}</div>
-              <div className="text-sm text-gray-600">
-                {searchedPlace.address}
-              </div>
-            </div>
-          </div>
-          {searchedPlace.rating !== null && (
-            <div className="mt-2 text-sm text-gray-700">
-              별점: {searchedPlace.rating}
+        <Element
+          name="searchResultContainer"
+          id="searchResultContainer"
+          className="mt-2 border border-gray-300 rounded-md bg-white w-[320px] max-h-[400px] overflow-y-auto p-2"
+        >
+          {/* 이미지 영역: 여러 이미지가 있으면 슬라이더로 */}
+          {searchedPlace.photos && searchedPlace.photos.length > 1 ? (
+            <Slider {...sliderSettings}>
+              {searchedPlace.photos.map((url, idx) => (
+                <div key={idx}>
+                  <img
+                    src={url}
+                    alt={`Place ${idx + 1}`}
+                    className="w-full h-[200px] object-cover rounded-md mb-2"
+                  />
+                </div>
+              ))}
+            </Slider>
+          ) : searchedPlace.photoUrl ? (
+            <img
+              src={searchedPlace.photoUrl}
+              alt="Place"
+              className="w-full h-[200px] object-cover rounded-md mb-2"
+            />
+          ) : (
+            <div className="w-full h-[200px] flex items-center justify-center bg-gray-200 mb-2">
+              <span className="text-sm text-gray-600">No Image</span>
             </div>
           )}
-          <button
-            onClick={handleToggleBookmark}
-            className="self-end px-3 mt-2 text-white bg-orange-400 rounded cursor-pointer h-9"
-            disabled={isRegistered}
-          >
-            {isRegistered ? '등록 완료' : '장소 등록'}
-          </button>
-        </div>
+
+          <div className="text-lg font-bold">{searchedPlace.name}</div>
+          <div className="text-sm text-gray-600">{searchedPlace.address}</div>
+          {searchedPlace.rating !== null && (
+            <div className="mt-2 text-sm text-gray-700">
+              별점: {'⭐'.repeat(Math.round(searchedPlace.rating))}
+            </div>
+          )}
+
+          {/* 리뷰 목록 렌더링 */}
+          {searchedPlace.reviews && searchedPlace.reviews.length > 0 && (
+            <div className="mt-4">
+              <h3 className="mb-2 font-semibold">리뷰</h3>
+              {searchedPlace.reviews.map((review, index) => (
+                <div
+                  key={index}
+                  className="p-2 mb-2 text-sm text-gray-700 border rounded"
+                >
+                  <p>
+                    <strong>{review.author_name}</strong>: {review.text}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="flex justify-end">
+            <button
+              onClick={handleToggleBookmark}
+              className="px-3 mt-2 font-semibold rounded cursor-pointer text-brown bg-yellow h-9"
+              disabled={isRegistered}
+            >
+              {isRegistered ? '등록 완료' : '장소 등록'}
+            </button>
+          </div>
+        </Element>
       )}
     </div>
   );
