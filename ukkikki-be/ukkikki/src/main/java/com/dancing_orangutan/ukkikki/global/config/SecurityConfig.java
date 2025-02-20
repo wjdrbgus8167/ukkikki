@@ -124,7 +124,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/travel-plans/*/closeTime").hasRole("MEMBER")
                         .requestMatchers(HttpMethod.PUT, "/travel-plans/*/companion").hasRole("MEMBER")
                         .requestMatchers(HttpMethod.GET, "/travel-plans").hasRole("MEMBER")
-                        .requestMatchers(HttpMethod.GET, "/travel-plans/*").hasRole("MEMBER")
+                        .requestMatchers(HttpMethod.GET, "/travel-plans/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/travel-plans/*/members").hasRole("MEMBER")
                         .requestMatchers(HttpMethod.GET, "/travel-plans/keywords").permitAll()  // 키워드는 인증 없이 접근 가능
                         .requestMatchers(HttpMethod.PUT, "/travel-plans/*/exit").hasRole("MEMBER")
