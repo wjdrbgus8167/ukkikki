@@ -183,25 +183,23 @@ public class ProposalService {
      */
     @Transactional
     public String getOrCreateSession(Integer proposalId) {
-        SessionEntity sessionEntity = sessionRepository.findByProposalId(proposalId)
-                .orElse(null);
-        if (sessionEntity != null) {
-            // 이미 세션이 존재
-            log.info("기존 세션 존재 - proposalId: {}, sessionId: {}", proposalId, sessionEntity.getSessionId());
-            return sessionEntity.getSessionId();
-        } else {
-            // 없으면 새로 생성
-            log.info("기존 세션 없음 - proposalId: {}. 새로 생성 시도", proposalId);
-            createSessionForProposal(proposalId);
-            // 다시 조회
-            sessionEntity = sessionRepository.findByProposalId(proposalId)
-                    .orElseThrow(() -> new RuntimeException("OpenVidu 세션 생성에 실패했습니다."));
-            log.info("새로 생성된 세션 정보 - proposalId: {}, sessionId: {}", proposalId, sessionEntity.getSessionId());
-
-            return sessionEntity.getSessionId();
+        log.info("getOrCreateSession 호출 - proposalId: {}", proposalId);
+        synchronized (this) { // 동기화 블록 적용
+            return sessionRepository.findByProposalId(proposalId)
+                    .map(SessionEntity::getSessionId)
+                    .orElseGet(() -> {
+                        log.info("세션 없음 - 새 세션 생성 중 - proposalId: {}", proposalId);
+                        createSessionForProposal(proposalId);
+                        return sessionRepository.findByProposalId(proposalId)
+                                .orElseThrow(() -> {
+                                    log.error("새 세션 생성 실패 - proposalId: {}", proposalId);
+                                    return new RuntimeException("OpenVidu 세션 생성에 실패했습니다.");
+                                })
+                                .getSessionId();
+                    });
         }
     }
-
+    
     /**
      * 토큰 생성 로직
      * @param isHost = true -> PUBLISHER(여행사)
