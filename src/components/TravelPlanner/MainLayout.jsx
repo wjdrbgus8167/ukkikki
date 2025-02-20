@@ -1,22 +1,22 @@
-import React, { useContext, useState, useEffect } from "react";
-import TravelPlanDetailContext from "../../contexts/TravelPlanDetailContext";
-import ProposalDetailContext from "../../contexts/ProposalDetailContext";
-import DateSidebar from "./DateSidebar";
-import MapDisplay from "./MapDisplay";
-import ScheduleByDate from "./ScheduleByDate";
-import PlaceSelection from "./PlaceSelection";
-import DetailForm from "./DetailForm";
-import { CreateTravelProposal, UpdateTravelProposal } from "../../apis/agency";
-import { 
+import React, { useContext, useState, useEffect } from 'react';
+import TravelPlanDetailContext from '../../contexts/TravelPlanDetailContext';
+import ProposalDetailContext from '../../contexts/ProposalDetailContext';
+import DateSidebar from './DateSidebar';
+import MapDisplay from './MapDisplay';
+import ScheduleByDate from './ScheduleByDate';
+import PlaceSelection from './PlaceSelection';
+import DetailForm from './DetailForm';
+import { CreateTravelProposal, UpdateTravelProposal } from '../../apis/agency';
+import {
   StyledMainLayout,
   StyledDateSidebar,
   StyledMapDisplay,
   StyleScheduleByDate,
   StyleMapContainer,
   StylePlaceSelection,
-  DetailFormWrapper, 
+  DetailFormWrapper,
   ContentArea,
-} from "./style/MainLayoutStyle";
+} from './style/MainLayoutStyle';
 import Swal from 'sweetalert2';
 
 // 간단한 고유 ID 생성 함수
@@ -27,15 +27,16 @@ const generateUniqueId = () => {
 const MainLayout = () => {
   const travelPlanContext = useContext(TravelPlanDetailContext);
   const proposalContext = useContext(ProposalDetailContext);
-  
+
   // 수정 페이지일 경우 ProposalDetailContext, 생성 페이지일 경우 TravelPlanDetailContext 사용
   const proposal = proposalContext?.proposal || travelPlanContext?.proposal;
-  const selectedDayId = proposalContext?.selectedDayId ?? travelPlanContext?.selectedDayId ?? 1;
+  const selectedDayId =
+    proposalContext?.selectedDayId ?? travelPlanContext?.selectedDayId ?? 1;
 
   const [selectedPlacesByDay, setSelectedPlacesByDay] = useState({});
   const [showPlaceSelection, setShowPlaceSelection] = useState(false);
   const [showDetailForm, setShowDetailForm] = useState(false);
-  
+
   const [proposalData, setProposalData] = useState({
     name: '',
     startDate: '',
@@ -61,13 +62,16 @@ const MainLayout = () => {
   // proposal 데이터 디버깅용 콘솔 출력
   useEffect(() => {
     if (proposal) {
-      console.log("최종 proposal 상태:", proposal);
+      console.log('최종 proposal 상태:', proposal);
     }
   }, [proposal]);
 
   // proposalData 초기화 (수정 페이지와 생성 페이지 구분)
   useEffect(() => {
-    if (proposal && (proposal.proposalId || (proposal.data && proposal.data.travelPlan))) {
+    if (
+      proposal &&
+      (proposal.proposalId || (proposal.data && proposal.data.travelPlan))
+    ) {
       if (proposal.proposalId) {
         // 수정 페이지
         setProposalData({
@@ -130,7 +134,7 @@ const MainLayout = () => {
           proposal.data.travelPlan &&
           proposal.data.travelPlan.scheduleItems) ||
         [];
-  
+
       if (scheduleItems.length > 0) {
         scheduleItems.forEach((item) => {
           const day = item.dayNumber;
@@ -148,7 +152,7 @@ const MainLayout = () => {
           }
         });
       }
-      console.log("초기화된 selectedPlacesByDay:", initialSelectedPlacesByDay);
+      console.log('초기화된 selectedPlacesByDay:', initialSelectedPlacesByDay);
       setSelectedPlacesByDay(initialSelectedPlacesByDay);
     }
   }, [proposal]);
@@ -157,9 +161,12 @@ const MainLayout = () => {
     return <div>로딩중...</div>;
   }
 
-  const arrivalCity = proposal.data && proposal.data.travelPlan
-    ? proposal.data.travelPlan.arrivalCity
-    : { name: proposal.arrivalAirport || "도착지 미정" };
+  const arrivalCity =
+    proposal.data && proposal.data.travelPlan
+      ? proposal.data.travelPlan.arrivalCity
+      : { name: proposal.arrivalAirport || '도착지 미정' };
+
+  console.log('arrivalCity:', arrivalCity);
 
   // 장소 추가 버튼 토글 함수
   const togglePlaceSelection = () => {
@@ -173,26 +180,28 @@ const MainLayout = () => {
 
   // PlaceSelection에서 선택한 장소를 현재 날짜(selectedDayId)에 추가
   const handleSelectPlace = (place) => {
-    const placeWithId = { 
-      ...place, 
-      placeId: place.placeId || generateUniqueId(), 
-      dayNumber: selectedDayId
+    const placeWithId = {
+      ...place,
+      placeId: place.placeId || generateUniqueId(),
+      dayNumber: selectedDayId,
     };
     setSelectedPlacesByDay((prev) => ({
       ...prev,
       [selectedDayId]: [...(prev[selectedDayId] || []), placeWithId],
     }));
-    setShowPlaceSelection(false);
+    // setShowPlaceSelection(false);
   };
 
   const currentDayPlaces = selectedPlacesByDay[selectedDayId] || [];
 
   // 장소 삭제
   const handleDeletePlace = (placeId) => {
-    const updatedPlaces = currentDayPlaces.filter(place => place.placeId !== placeId);
+    const updatedPlaces = currentDayPlaces.filter(
+      (place) => place.placeId !== placeId,
+    );
     setSelectedPlacesByDay((prev) => ({
       ...prev,
-      [selectedDayId]: updatedPlaces
+      [selectedDayId]: updatedPlaces,
     }));
   };
 
@@ -240,7 +249,7 @@ const MainLayout = () => {
     const MissingFields = Object.keys(requireFields).filter((field) => {
       const value = proposalData[field];
       if (typeof value === 'string') {
-        return value.trim() === "";
+        return value.trim() === '';
       }
       if (typeof value === 'number') {
         return value === 0;
@@ -249,11 +258,13 @@ const MainLayout = () => {
     });
 
     if (MissingFields.length > 0) {
-      const MissingFielsNames = MissingFields.map((field) => requireFields[field]);
+      const MissingFielsNames = MissingFields.map(
+        (field) => requireFields[field],
+      );
       Swal.fire({
         icon: 'warning',
         title: '필수 항목이 누락되었습니다.',
-        text: `다음 항목을 채워주세요 => ${MissingFielsNames.join(",")}`,
+        text: `다음 항목을 채워주세요 => ${MissingFielsNames.join(',')}`,
         confirmButtonText: '확인',
         confirmButtonColor: '#412B2B',
       });
@@ -263,14 +274,14 @@ const MainLayout = () => {
     const schedules = Object.values(selectedPlacesByDay)
       .flat()
       .map(({ placeId, ...rest }) => rest);
-    console.log("POST 전송할 스케줄 데이터:", schedules);
-    
-    const invalidScheduleItem = schedules.find(item => {
+    console.log('POST 전송할 스케줄 데이터:', schedules);
+
+    const invalidScheduleItem = schedules.find((item) => {
       return (
         !item.startTime ||
-        (typeof item.startTime === 'string' && item.startTime.trim() === "") ||
+        (typeof item.startTime === 'string' && item.startTime.trim() === '') ||
         !item.endTime ||
-        (typeof item.endTime === 'string' && item.endTime.trim() === "")
+        (typeof item.endTime === 'string' && item.endTime.trim() === '')
       );
     });
 
@@ -283,14 +294,14 @@ const MainLayout = () => {
       });
       return;
     }
-  
+
     const payload = {
       ...proposalData,
       scheduleItems: schedules,
     };
-  
-    console.log("POST할 데이터:", payload);
-  
+
+    console.log('POST할 데이터:', payload);
+
     try {
       let data;
       // travelPlanId를 조건에 따라 분기 처리
@@ -300,22 +311,21 @@ const MainLayout = () => {
       } else {
         travelPlanId = proposal.travelPlanId;
       }
-  
+
       if (proposal.proposalId) {
         data = await UpdateTravelProposal(
           travelPlanId,
           proposal.proposalId,
-          payload
+          payload,
         );
-        console.log("수정 성공:", data);
-        
+        console.log('수정 성공:', data);
       } else {
         data = await CreateTravelProposal(travelPlanId, payload);
-        console.log("제출 성공:", data);
+        console.log('제출 성공:', data);
       }
       return data;
     } catch (error) {
-      console.error("제출 오류:", error);
+      console.error('제출 오류:', error);
     }
   };
 
@@ -323,8 +333,8 @@ const MainLayout = () => {
     <StyledMainLayout>
       {/* 사이드바 */}
       <StyledDateSidebar>
-        <DateSidebar 
-          onToggleDetailForm={toggleDetailForm} 
+        <DateSidebar
+          onToggleDetailForm={toggleDetailForm}
           onDaySelect={handleDaySelectFromSidebar}
           onSubmit={handleSubmitProposal}
         />
@@ -335,16 +345,16 @@ const MainLayout = () => {
         {showDetailForm ? (
           <DetailFormWrapper>
             <DetailForm
-              proposalData={proposalData} 
+              proposalData={proposalData}
               setProposalData={setProposalData}
             />
           </DetailFormWrapper>
         ) : (
           <>
             <StyleScheduleByDate>
-              <ScheduleByDate 
-                onTogglePlaceSelection={togglePlaceSelection} 
-                selectedDayNumber={selectedDayId}  
+              <ScheduleByDate
+                onTogglePlaceSelection={togglePlaceSelection}
+                selectedDayNumber={selectedDayId}
                 selectedPlaces={currentDayPlaces}
                 onDeletePlace={handleDeletePlace}
                 onAddTime={handleSetTime}
@@ -353,7 +363,7 @@ const MainLayout = () => {
             </StyleScheduleByDate>
             <StyledMapDisplay>
               <StyleMapContainer>
-                <MapDisplay 
+                <MapDisplay
                   arrivalCity={arrivalCity.name}
                   selectedPlaces={currentDayPlaces}
                   day={selectedDayId}

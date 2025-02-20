@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import useRoomModal from './useRoomModal'; // ➀ 커스텀 훅 import
+import React from 'react';
+import useRoomModal from './useRoomModal';
 import RoomModal from './RoomModal';
 import logo from '../../assets/loading-spinner.png';
-import { useNavigate } from 'react-router-dom'; // ✅ 메인페이지 이동을 위한 useNavigate 추가
+import { useNavigate } from 'react-router-dom';
+import { STATUS_MAP, THEME_COLORS, STATUS_STYLES } from '../../constants';
 import Swal from 'sweetalert2';
 
 const apiKey = import.meta.env.VITE_APP_UNSPLASH_API_KEY;
@@ -32,37 +33,9 @@ const getThemeColor = (theme) => {
 };
 
 const CardList = ({ cards }) => {
-  const [imageUrls, setImageUrls] = useState({});
-  const navigate = useNavigate(); // ✅ 메인페이지 이동을 위한 훅 사용
+  const navigate = useNavigate();
 
-  // ✅ useEffect를 실행 전에 항상 실행되도록 유지
-  useEffect(() => {
-    const fetchImages = async () => {
-      if (!Array.isArray(cards) || cards.length === 0) return;
-
-      const newImages = {};
-      for (const card of cards) {
-        if (!newImages[card.country]) {
-          try {
-            const response = await fetch(
-              `https://api.unsplash.com/photos/random?query=${card.country}&client_id=${apiKey}`,
-            );
-            const data = await response.json();
-            newImages[card.country] =
-              data?.urls?.regular || '/default-image.jpg';
-          } catch (error) {
-            console.error('이미지 불러오기 실패:', error);
-            newImages[card.country] = '/default-image.jpg';
-          }
-        }
-      }
-      setImageUrls((prev) => ({ ...prev, ...newImages }));
-    };
-
-    fetchImages();
-  }, [cards]); // ✅ `apiKey` 제거 (변경되지 않는 값이므로)
-
-  // ➁ useRoomModal 훅 사용
+  // useRoomModal 커스텀 훅 사용
   const {
     isModalOpen,
     currentStep,
@@ -78,7 +51,6 @@ const CardList = ({ cards }) => {
     handleComplete,
   } = useRoomModal();
 
-  // ✅ 조기 return을 useEffect 이후로 이동
   if (!Array.isArray(cards) || cards.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center w-full h-full mt-16 space-y-4">
@@ -109,23 +81,21 @@ const CardList = ({ cards }) => {
             <div className="relative">
               <span
                 className={`absolute top-6 left-2 px-3 py-1 rounded-full text-sm font-semibold ${
-                  statusMap[card.planningStatus]
-                    ? {
-                        IN_PROGRESS: 'bg-progress text-white',
-                        BIDDING: 'bg-proposal text-white',
-                        BOOKING: 'bg-reservation text-white',
-                        CONFIRMED: 'bg-confirmed text-white',
-                      }[card.planningStatus]
-                    : 'bg-gray-400 text-white'
+                  STATUS_STYLES[card.planningStatus] || 'bg-gray-400 text-white'
                 }`}
               >
-                {statusMap[card.planningStatus] || '상태 없음'}
+                {STATUS_MAP[card.planningStatus] || '상태 없음'}
               </span>
 
               <img
-                src={imageUrls[card.country] || '/default-image.jpg'}
+                src={`https://ukkikki-bucket.s3.ap-northeast-2.amazonaws.com/city/${card.arrivalCity.cityId}.jpg`}
                 alt={card.country}
                 className="object-cover w-full h-64 mt-4 rounded-lg shadow-md"
+                onError={(e) => {
+                  e.target.onerror = null; // 무한 반복 방지
+                  e.target.src =
+                    'https://ukkikki-bucket.s3.ap-northeast-2.amazonaws.com/placeholder.jpg';
+                }}
               />
             </div>
 
@@ -144,7 +114,7 @@ const CardList = ({ cards }) => {
                           ? Math.min(
                               (card.currentParticipants / card.minPeople) * 100,
                               100,
-                            ) // 100% 초과 방지
+                            )
                           : 0
                       }%`,
                     }}
@@ -165,16 +135,16 @@ const CardList = ({ cards }) => {
                 <strong>여행 날짜:</strong> {card.startDate} ~ {card.endDate}
               </p>
 
-              {/* 여행 테마 (키워드 ID 표시) */}
+              {/* 여행 테마 (키워드) */}
               <div className="flex flex-wrap gap-2 mb-4">
                 <strong>여행 테마:</strong>
                 {card.keywords && card.keywords.length > 0 ? (
                   card.keywords.map((keyword, idx) => (
                     <span
                       key={idx}
-                      className={`px-3 py-1 text-sm font-semibold rounded-full ${getThemeColor(
-                        keyword.name,
-                      )}`}
+                      className={`px-3 py-1 text-sm font-semibold rounded-full ${
+                        THEME_COLORS[keyword.name] || 'bg-gray-500 text-white'
+                      }`}
                     >
                       {keyword.name}
                     </span>
@@ -191,9 +161,6 @@ const CardList = ({ cards }) => {
             <button
               className="px-4 py-2 mt-4 text-white rounded-md bg-brown hover:bg-yellow hover:text-brown hover:font-bold"
               onClick={() => {
-                console.log('선택된 카드:', card); // 카드 콘솔 출력
-
-                // 이미 참여 중인 방이라면 바로 입장 처리
                 if (card.hasJoined) {
                   navigate(`/user-room/${card.travelPlanId}`, {
                     state: { selectedCard: card },

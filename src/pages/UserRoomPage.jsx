@@ -1,13 +1,19 @@
+<<<<<<< HEAD
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
+=======
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useLocation, useParams } from 'react-router-dom';
+>>>>>>> 8ed198770bda68db42541bf79f5f8fd291362885
 import { publicRequest } from '../hooks/requestMethod';
 import InteractiveSection from '../components/userroom/InteractiveSection';
 import Header from '../components/layout/Header';
-import OverviewBar from '../components/userroom/OverviewBar';
 import FavoriteList from '../components/userroom/FavoriteList';
 import { LoadScript } from '@react-google-maps/api';
 import WebSocketComponent from '../components/userroom/WebSocketComponent';
 import Swal from 'sweetalert2';
+import BoardingPass from '../components/userroom/BoardingPass';
+import Draggable from 'react-draggable';
 
 const apiKey = import.meta.env.VITE_APP_GOOGLE_API_KEY;
 
@@ -15,16 +21,20 @@ const UserRoom = () => {
   const { travelPlanId: travelPlanIdFromUrl } = useParams();
   const location = useLocation();
   const initialSelectedCard = location.state?.selectedCard;
-  const [selectedCard, setSelectedCard] = useState(initialSelectedCard || {}); // 초기값 설정
+  const [selectedCard, setSelectedCard] = useState(initialSelectedCard || {});
   const [isLikeListOpen, setIsLikeListOpen] = useState(true);
   const [favorites, setFavorites] = useState([]);
   const [mapCenter, setMapCenter] = useState({ lat: 35.6895, lng: 139.6917 });
+<<<<<<< HEAD
   const navigate = useNavigate();
+=======
+  const [isInitialLoad, setIsInitialLoad] = useState(true); // 첫 로드 여부 상태 추가
+>>>>>>> 8ed198770bda68db42541bf79f5f8fd291362885
 
   const libraries = ['places'];
 
   const travelPlanId = selectedCard?.travelPlanId || travelPlanIdFromUrl; // selectedCard.travelPlanId 또는 URL의 travelPlanId 사용
-  console.log('📌 uuu-selectedCard:', selectedCard.planningStatus);
+
   // disabled: planningStatus가 BIDDING, BOOKING, CONFIRMED이면 사용자 조작 차단 (OverviewBar 제외)
   const disabled = ['BIDDING', 'BOOKING', 'CONFIRMED'].includes(
     selectedCard.planningStatus,
@@ -41,12 +51,34 @@ const UserRoom = () => {
   }, []);
 
   // 여행방 데이터 가져오기
+<<<<<<< HEAD
   const fetchRoomData = useCallback(
     async (id) => {
       console.log('📌 API 요청 ID:', id);
       if (!id) {
         console.error('🚨 ID가 없습니다');
         return;
+=======
+  const fetchRoomData = useCallback(async (id) => {
+    console.log('📌 API 요청 ID:', id);
+    if (!id) {
+      console.error('🚨 ID가 없습니다');
+      return;
+    }
+    try {
+      const response = await publicRequest.get(
+        `/api/v1/travel-plans/${id}/members`,
+      );
+      if (response.data?.data?.travelPlan) {
+        const travelPlan = response.data.data.travelPlan;
+        const mappedPlaces = (travelPlan.places || []).map((place) => ({
+          ...place,
+          isLiked: place.likeYn,
+        }));
+        setFavorites(mappedPlaces);
+        console.log('✅ 여행방 데이터:', travelPlan);
+        setSelectedCard(travelPlan);
+>>>>>>> 8ed198770bda68db42541bf79f5f8fd291362885
       }
       try {
         const response = await publicRequest.get(
@@ -86,7 +118,7 @@ const UserRoom = () => {
 
   // selectedCard가 업데이트될 때 도착 도시 좌표 가져오기
   useEffect(() => {
-    if (selectedCard && selectedCard.arrivalCity?.name) {
+    if (isInitialLoad && selectedCard && selectedCard.arrivalCity?.name) {
       const city = selectedCard.arrivalCity.name;
       const getCoordinates = async () => {
         const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${city}&key=${apiKey}`;
@@ -96,26 +128,44 @@ const UserRoom = () => {
           if (data.status === 'OK') {
             const { lat, lng } = data.results[0].geometry.location;
             setMapCenter({ lat, lng });
+            setIsInitialLoad(false); // 첫 로드 완료 후 상태 변경
           }
         } catch (error) {
           console.error('🚨 Geocoding 요청 실패:', error);
         }
       };
-
       getCoordinates();
     }
-  }, [selectedCard]);
+  }, [selectedCard, isInitialLoad]); // isInitialLoad를 의존성 배열에 추가
 
   useEffect(() => {
     if (travelPlanId) {
       fetchRoomData(travelPlanId);
     } else {
-      console.error(
-        '🚨 travelPlanId가 없습니다. 올바른 ID를 전달했는지 확인하세요.',
-      );
+      console.error('🚨 travelPlanId가 없습니다.');
     }
   }, [travelPlanId, fetchRoomData]);
 
+  const DraggableBoardingPass = ({ selectedCard, isLikeListOpen }) => {
+    const nodeRef = useRef(null);
+  
+    return (
+      <Draggable nodeRef={nodeRef}>
+        <div
+          ref={nodeRef}
+          className="fixed z-50 pointer-events-auto"
+          style={{
+            top: '80px',
+            left: isLikeListOpen ? '330px' : '0px',
+          }}
+        >
+          <BoardingPass selectedCard={selectedCard} />
+        </div>
+      </Draggable>
+    );
+  };
+  
+  
   if (!selectedCard) {
     return (
       <div className="p-10 text-center text-red-500">
@@ -123,7 +173,6 @@ const UserRoom = () => {
       </div>
     );
   }
-
   return (
     <LoadScript
       googleMapsApiKey={apiKey}
@@ -140,12 +189,12 @@ const UserRoom = () => {
         setFavorites={setFavorites}
         favorites={favorites}
       />
-
+  
       {/* 전체 화면 레이아웃 */}
-      <div className="flex flex-col h-screen overflow-hidden">
+      <div className="flex flex-col h-screen w-screen overflow-hidden">
         <Header />
-
-        {/* 지도 + 왼쪽 사이드바 + 오른쪽 OverviewBar */}
+  
+        {/* 지도 + 사이드바 및 BoardingPass */}
         <div className="relative flex-1">
           {/* 지도 (배경 레이어) */}
           <div className="absolute inset-0 z-0 ">
@@ -165,6 +214,9 @@ const UserRoom = () => {
             />
           )}
           <div className="relative flex h-full pointer-events-none">
+  
+          {/* [중요] 즐겨찾기 목록 + BoardingPass를 같은 flex 컨테이너로 묶기 */}
+          <div className="flex h-full pointer-events-none">
             {/* 왼쪽 사이드바 (즐겨찾기 목록) */}
             <div
               className={`transition-all duration-300 relative h-full ${
@@ -178,7 +230,7 @@ const UserRoom = () => {
               >
                 {isLikeListOpen ? '❮' : '❯'}
               </button>
-
+  
               {isLikeListOpen && (
                 <div className="h-full overflow-y-auto pointer-events-auto bg-white/70 backdrop-blur-sm">
                   <FavoriteList
@@ -198,15 +250,16 @@ const UserRoom = () => {
               )}
             </div>
 
-            {/* 오른쪽: OverviewBar (사용자 조작 허용) */}
-            <div className="z-20 flex-1 m-2 overflow-auto bg-transparent">
-              <OverviewBar selectedCard={selectedCard} />
-            </div>
+
+            <DraggableBoardingPass selectedCard={selectedCard} isLikeListOpen={isLikeListOpen} />
+
           </div>
         </div>
       </div>
+      </div>
     </LoadScript>
   );
+  
 };
 
 export default UserRoom;
