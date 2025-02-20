@@ -1,5 +1,6 @@
 package com.dancing_orangutan.ukkikki.travelPlan.infrastructure.travelPlan;
 
+import com.dancing_orangutan.ukkikki.proposal.domain.proposal.QProposalEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchMyTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.SearchTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.constant.PlanningStatus;
@@ -7,6 +8,7 @@ import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.QTravelPlanEnt
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlanKeyword.QTravelPlanKeywordEntity;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -49,21 +51,33 @@ public class QueryDslTravelPlanRepository {
 				.fetch();
 	}
 
-	public List<TravelPlanEntity> fetchSuggestedTravelPlans(
-	) {
-		QTravelPlanEntity entity = QTravelPlanEntity.travelPlanEntity;
+	public List<TravelPlanEntity> fetchSuggestedTravelPlans(Integer companyId) {
+		QTravelPlanEntity travelPlan = QTravelPlanEntity.travelPlanEntity;
+		QProposalEntity proposal = QProposalEntity.proposalEntity;
 		BooleanBuilder booleanBuilder = new BooleanBuilder();
 
-		booleanBuilder.and(entity.planningStatus.eq(PlanningStatus.BIDDING));
+		// 입찰 중인 여행 계획만 조회
+		booleanBuilder.and(travelPlan.planningStatus.eq(PlanningStatus.BIDDING));
+
+		// 해당 여행사가 제안서를 작성하지 않은 TravelPlan만 조회
+		booleanBuilder.and(
+				JPAExpressions
+						.selectOne()
+						.from(proposal)
+						.where(proposal.travelPlan.travelPlanId.eq(travelPlan.travelPlanId)
+								.and(proposal.company.companyId.eq(companyId))) // 특정 여행사가 제안했는지 확인
+						.notExists()
+		);
 
 		return queryFactory
-				.selectFrom(entity)
+				.selectFrom(travelPlan)
 				.where(booleanBuilder)
 				.distinct()
 				.fetch();
 	}
 
-	public List<TravelPlanEntity> searchMyTravelPlan(SearchMyTravelPlanQuery query){
+
+	public List<TravelPlanEntity> searchMyTravelPlan(SearchMyTravelPlanQuery query) {
 		QTravelPlanEntity entity = QTravelPlanEntity.travelPlanEntity;
 		QTravelPlanKeywordEntity keywordEntity = QTravelPlanKeywordEntity.travelPlanKeywordEntity;
 		BooleanBuilder booleanBuilder = new BooleanBuilder();

@@ -18,7 +18,7 @@ public interface QueryTravelPlanService {
 
 	List<TravelPlanEntity> searchTravelPlans(SearchTravelPlanQuery query);
 
-	List<TravelPlanEntity> fetchSuggestedTravelPlans();
+	List<TravelPlanEntity> fetchSuggestedTravelPlans(Integer companyId);
 
 	Page<TravelPlanEntity> fetchAvailableTravelPlans(FetchAvailableTravelPlanQuery query);
 
