@@ -148,14 +148,15 @@ const ProposalButton = ({
         const minutes = totalMinutes % 60;
         return (
           <button disabled className="px-4 py-2 text-white bg-gray-400 rounded">
-            여행사 제안을 받기까지 {hours}시간 {minutes}분 남았습니다.
+            여행사가 제안을 작성 중입니다. 투표 시작이 {hours}시간 {minutes}분
+            남았습니다.
           </button>
         );
       } else {
         const diffDays = Math.ceil(remainingMs / oneDayMs);
         return (
           <button disabled className="px-4 py-2 text-white bg-gray-400 rounded">
-            여행사 제안을 받기까지 {diffDays}일 남았습니다.
+            여행사가 제안을 작성 중입니다. 투표 시작이 {diffDays}일 남았습니다.
           </button>
         );
       }
@@ -188,7 +189,7 @@ const ProposalButton = ({
   };
 
   return (
-    <div className="w-full sm:w-auto bg-yellow-100 font-bold rounded-lg text-xl sm:text-2xl">
+    <div className="w-full text-xl font-bold bg-yellow-100 rounded-lg sm:w-auto sm:text-2xl">
       {!selectedCard.closeTime ? (
         // 방장인 경우에만 '여행사에 제안하기' 버튼 표시, 그렇지 않으면 대기 메시지 표시
         selectedCard.member?.isHost ? (
