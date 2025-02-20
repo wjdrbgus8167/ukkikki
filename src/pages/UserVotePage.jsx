@@ -29,7 +29,7 @@ const UserVotePage = () => {
           const proposals = response.data.data;
           // 채택된 제안서 필터링
           const acceptedProposals = proposals.filter(
-            (proposal) => proposal.proposalStatus === 'A'
+            (proposal) => proposal.proposalStatus === 'A',
           );
           if (acceptedProposals.length > 0) {
             setHasAcceptedProposal(true);
@@ -142,7 +142,7 @@ const UserVotePage = () => {
   const handlePayment = async (agencyId) => {
     try {
       const response = await publicRequest.post(
-        `/api/v1/travel-plans/${travelPlanId}/proposals/${agencyId}/deposit`
+        `/api/v1/travel-plans/${travelPlanId}/proposals/${agencyId}/deposit`,
       );
       if (response.status === 200) {
         Swal.fire('결제 완료', '예약금이 결제되었습니다.', 'success');
@@ -160,12 +160,16 @@ const UserVotePage = () => {
       // 백엔드로부터 참가자 권한 토큰을 발급
       const response = await publicRequest.post(
         `/api/v1/travel-plans/${travelPlanId}/proposals/${agency.proposalId}/meeting/connection`,
-        { isHost: false }
+        { isHost: false },
       );
       if (response.status === 200) {
         const { token } = response.data.data;
         // 쿼리 파라미터로 token, isHost를 넘겨서 이동
-        navigate(`/meeting/${agency.proposalId}?token=${encodeURIComponent(token)}&isHost=false`);
+        navigate(
+          `/meeting/${agency.proposalId}?token=${encodeURIComponent(
+            token,
+          )}&isHost=false`,
+        );
       }
     } catch (error) {
       console.error('회의 참여 실패:', error);
@@ -186,7 +190,7 @@ const UserVotePage = () => {
           agencies={agencies}
           onVote={handleVote}
           onDetail={handleDetail}
-          onJoinMeeting={handleJoinMeeting} 
+          onJoinMeeting={handleJoinMeeting}
         />
 
         {/* 예약금 결제 버튼 */}

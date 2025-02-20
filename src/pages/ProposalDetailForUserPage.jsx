@@ -6,7 +6,6 @@ import { publicRequest } from '../hooks/requestMethod';
 import ProposalDetailTimeline from '../components/ProposalDetailForUser/ProposalDetailTimeline';
 import ProposalDetailInfo from '../components/ProposalDetailForUser/ProposalDetailInfo';
 import ProposalDetailContact from '../components/ProposalDetailForUser/ProposalDetailContact';
-import { IoIosArrowBack } from 'react-icons/io';
 
 const ProposalDetailForUser = () => {
   const { travelPlanId, proposalId } = useParams();
@@ -82,20 +81,10 @@ const ProposalDetailForUser = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Header />
-      <main className="flex-1 max-w-6xl px-4 py-6 mx-auto">
-        <button onClick={() => navigate(-1)} className=" text-brown">
-          <IoIosArrowBack size={32} className="text-3xl font-bold" />
-        </button>
+      <main className="flex-1 max-w-screen-xl px-4 py-6 mx-auto">
         {/* 상단 섹션 */}
         <div className="p-6 mb-8 bg-white rounded-lg shadow-md">
           <div className="flex gap-6">
-            {/* <div className="w-1/3">
-              <img
-                src={proposal.imageUrl || '/api/placeholder/400/300'}
-                alt="여행 상품"
-                className="object-cover w-full h-48 rounded-lg"
-              />
-            </div> */}
             <div>
               <h1 className="mb-4 text-2xl font-bold">
                 {proposal.companyName}

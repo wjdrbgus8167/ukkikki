@@ -198,7 +198,7 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
           {/* 모달 헤더 */}
           <div className="flex items-center justify-between pb-2 mb-5 border-b-2">
             <h1 className="pb-2 text-xl font-semibold border-gray-300">
-              {step === 1 ? '방 만들기 - 기본 정보' : '방 만들기 - 인원 설정'}
+              {step === 1 ? '방 만들기' : '동행인원'}
             </h1>
             <button
               onClick={handleModalClose}
@@ -356,7 +356,7 @@ const CreateRoomModal = ({ isOpen, onClose, travelData }) => {
                   onClick={handleRoomCreation}
                   className="px-6 py-3 text-white transition rounded-lg bg-dark-green hover:bg-blue-600"
                 >
-                  방 만들기 완료
+                  입장하기
                 </button>
               </div>
             </div>

@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
 const apiKey = import.meta.env.VITE_APP_UNSPLASH_API_KEY;
 const statusMap = {
   IN_PROGRESS: '진행중',
-  BIDDING: '제안받는중',
+  BIDDING: '검토',
   BOOKING: '예약중',
   CONFIRMED: '확정됨',
 };
@@ -121,9 +121,12 @@ const CardList = ({ cards }) => {
                   />
                 </div>
                 <div className="flex items-center justify-between text-sm font-medium text-gray-600">
-                  <span>현재 인원: {card.maxPeople}명</span>
-                  <span>최소 모집인원: {card.minPeople}명</span>
+                  <span>최소 인원: {card.minPeople}명</span>
+                  <span>최대 인원: {card.maxPeople}명</span>
                 </div>
+                <span className="text-sm font-medium text-gray-600">
+                  현재 인원: {card.currentParticipants}명
+                </span>
               </div>
 
               {/* 여행 도시 */}

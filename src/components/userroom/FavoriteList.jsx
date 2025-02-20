@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { CiCirclePlus } from 'react-icons/ci';
 import Swal from 'sweetalert2';
 import { stompClient } from '../../components/userroom/WebSocketComponent';
@@ -14,7 +14,9 @@ const FavoriteList = ({
   const [expandedPlaceId, setExpandedPlaceId] = useState(null);
   const [showTagInput, setShowTagInput] = useState(false);
   const [newTag, setNewTag] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false); // 중복 제출 방지 상태
   const travelPlanId = selectedCard.travelPlanId;
+  const inputRef = useRef(null);
 
   useEffect(() => {
     if (stompClient && stompClient.connected) {
@@ -205,11 +207,13 @@ const FavoriteList = ({
 
   const handleTagSubmit = async (e) => {
     e.stopPropagation();
-    if (newTag.trim() === '') return;
+    if (newTag.trim() === '' || isSubmitting) return; // 빈 값 또는 제출 중이면 리턴
+    setIsSubmitting(true); // 제출 시작
 
     const place = favorites.find((fav) => fav.placeId === expandedPlaceId);
     if (!place) {
       console.error('🚨 태그 추가 실패: 해당 장소를 찾을 수 없습니다.');
+      setIsSubmitting(false);
       return;
     }
 
@@ -253,11 +257,16 @@ const FavoriteList = ({
           ),
         );
         setNewTag('');
-        setShowTagInput(false);
+        // 입력창은 유지한 채 포커스를 재설정
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
       }
     } catch (error) {
       console.error('태그 추가 실패:', error);
       Swal.fire('알림', '태그 추가에 실패했습니다.', 'error');
+    } finally {
+      setIsSubmitting(false); // 제출 완료
     }
   };
 
@@ -345,9 +354,16 @@ const FavoriteList = ({
                           type="text"
                           value={newTag}
                           onChange={handleTagInputChange}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleTagSubmit(e);
+                            }
+                          }}
                           placeholder="태그를 입력해주세요."
                           className="px-2 py-1 border rounded"
                           maxLength={20}
+                          ref={inputRef}
                         />
                         <button
                           onClick={(e) => {

@@ -28,12 +28,14 @@ const UserRoom = () => {
   const libraries = ['places'];
   const travelPlanId = selectedCard?.travelPlanId || travelPlanIdFromUrl;
 
-  const disabled = ['BIDDING', 'BOOKING', 'CONFIRMED'].includes(selectedCard.planningStatus);
+  const disabled = ['BIDDING', 'BOOKING', 'CONFIRMED'].includes(
+    selectedCard.planningStatus,
+  );
   const handleDisabledClick = useCallback((e) => {
     e.stopPropagation();
     Swal.fire({
       title: '기능 제한',
-      html: '현재 여행방 상태가 제안받는중, 예약중, 또는 여행확정 상태이므로 <br>일부 기능은 제한됩니다.',
+      html: '현재 여행방 상태가 검토, 예약중, 또는 여행확정 상태이므로 <br>일부 기능은 제한됩니다.',
       icon: 'warning',
       confirmButtonText: '확인',
     });
@@ -46,7 +48,9 @@ const UserRoom = () => {
       return;
     }
     try {
-      const response = await publicRequest.get(`/api/v1/travel-plans/${id}/members`);
+      const response = await publicRequest.get(
+        `/api/v1/travel-plans/${id}/members`,
+      );
       if (response.data?.data?.travelPlan) {
         const travelPlan = response.data.data.travelPlan;
         const mappedPlaces = (travelPlan.places || []).map((place) => ({
@@ -95,9 +99,7 @@ const UserRoom = () => {
     const nodeRef = useRef(null);
 
     return (
-      <Draggable
-        nodeRef={nodeRef}
-      >
+      <Draggable nodeRef={nodeRef}>
         <div
           ref={nodeRef}
           className="fixed z-50 pointer-events-auto"
@@ -129,7 +131,9 @@ const UserRoom = () => {
       googleMapsApiKey={apiKey}
       libraries={libraries}
       onLoad={() => console.log('Google Maps API script loaded!')}
-      onError={(error) => console.error('🚨 Google Maps API script failed to load:', error)}
+      onError={(error) =>
+        console.error('🚨 Google Maps API script failed to load:', error)
+      }
     >
       <WebSocketComponent
         travelPlanId={travelPlanId}

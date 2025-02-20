@@ -112,8 +112,8 @@ const ScheduleByDate = ({
     return baseDate.toISOString().split('.')[0];
   };
 
-  const handleSaveTime = (placeId, dayNumber) => {
-    const rawData = timeData[placeId];
+  const handleSaveTime = (placeId, dayNumber, rawDataParam = null) => {
+    const rawData = rawDataParam || timeData[placeId];
     if (!rawData || !rawData.startTime || !rawData.endTime) return;
     const fullStartTime = computeFullTime(dayNumber, rawData.startTime);
     const fullEndTime = computeFullTime(dayNumber, rawData.endTime);
@@ -121,19 +121,32 @@ const ScheduleByDate = ({
     console.log('시간 저장 완료:', { placeId, fullStartTime, fullEndTime });
     setShowTimeInput(null);
   };
-
   const handleTimeInputToggle = (placeId) => {
     setShowTimeInput(showTimeInput === placeId ? null : placeId);
   };
 
   const handleTimeChange = (placeId, type, value) => {
-    setTimeData((prevData) => ({
-      ...prevData,
-      [placeId]: {
-        ...prevData[placeId],
-        [type]: value,
-      },
-    }));
+    setTimeData((prevData) => {
+      const newData = {
+        ...prevData,
+        [placeId]: {
+          ...prevData[placeId],
+          [type]: value,
+        },
+      };
+      // endTime이 완전하게 입력되었고(startTime이 존재하면) 자동으로 저장 처리
+      if (
+        type === 'endTime' &&
+        value.trim() !== '' &&
+        value.length === 5 && // "HH:mm" 형식 검사
+        newData[placeId] &&
+        newData[placeId].startTime &&
+        newData[placeId].startTime.trim() !== ''
+      ) {
+        handleSaveTime(placeId, selectedDayNumber, newData[placeId]);
+      }
+      return newData;
+    });
   };
 
   return (

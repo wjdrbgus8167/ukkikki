@@ -53901,7 +53901,7 @@ const RQ = ({ travelPlanId: e }) => {
   BQ = 'K72ByYy0Yii8p7tiLxw5LHqrn7rzzbJkcRv0BzL5_UM',
   gL = {
     IN_PROGRESS: '진행중',
-    BIDDING: '제안받는중',
+    BIDDING: '검토',
     BOOKING: '예약중',
     CONFIRMED: '확정됨',
   },
@@ -54325,7 +54325,7 @@ function VQ({
 const FQ = 'K72ByYy0Yii8p7tiLxw5LHqrn7rzzbJkcRv0BzL5_UM',
   yL = {
     IN_PROGRESS: '진행중',
-    BIDDING: '제안받는중',
+    BIDDING: '검토',
     BOOKING: '예약중',
     CONFIRMED: '확정됨',
   },
@@ -54579,7 +54579,7 @@ const FQ = 'K72ByYy0Yii8p7tiLxw5LHqrn7rzzbJkcRv0BzL5_UM',
         '성지순례',
         '기차여행',
       ],
-      n = ['진행중', '제안받는중', '예약중', '여행확정'],
+      n = ['진행중', '검토', '예약중', '여행확정'],
       [r, i] = y.useState(['전체보기']),
       [s, l] = y.useState(['전체보기']),
       c = (d) => {
@@ -54670,7 +54670,7 @@ const FQ = 'K72ByYy0Yii8p7tiLxw5LHqrn7rzzbJkcRv0BzL5_UM',
     const [n, r] = y.useState(t),
       i = {
         IN_PROGRESS: '진행중',
-        BIDDING: '제안받는중',
+        BIDDING: '검토',
         BOOKING: '예약중',
         CONFIRMED: '여행확정',
       },
@@ -57397,26 +57397,21 @@ const nZ = Oe.div`
                       className: 'mb-4 text-lg font-semibold',
                       children: '필터',
                     }),
-                    [
-                      '전체보기',
-                      '진행중',
-                      '제안받는중',
-                      '예약중',
-                      '여행 확정',
-                    ].map((c) =>
-                      E.jsx(
-                        'button',
-                        {
-                          onClick: () => l(c),
-                          className: `block w-full text-left px-4 py-2 mb-2 rounded ${
-                            i === c
-                              ? 'bg-brown text-white'
-                              : 'text-gray-700 hover:bg-gray-200'
-                          }`,
-                          children: c,
-                        },
-                        c,
-                      ),
+                    ['전체보기', '진행중', '검토', '예약중', '여행 확정'].map(
+                      (c) =>
+                        E.jsx(
+                          'button',
+                          {
+                            onClick: () => l(c),
+                            className: `block w-full text-left px-4 py-2 mb-2 rounded ${
+                              i === c
+                                ? 'bg-brown text-white'
+                                : 'text-gray-700 hover:bg-gray-200'
+                            }`,
+                            children: c,
+                          },
+                          c,
+                        ),
                     ),
                   ],
                 }),

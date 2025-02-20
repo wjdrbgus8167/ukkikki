@@ -1,7 +1,6 @@
 import React, { useContext, useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { IoIosArrowBack } from 'react-icons/io'; // 뒤로가기 아이콘 임포트
 import TravelPlanDetailContext from '../../contexts/TravelPlanDetailContext';
 import ProposalDetailContext from '../../contexts/ProposalDetailContext';
 import {
@@ -141,13 +140,6 @@ const DateSidebar = ({ onToggleDetailForm, onDaySelect, onSubmit }) => {
 
   return (
     <SidebarContainer>
-      {/* 뒤로가기 버튼 */}
-      <div style={{ padding: '8px 0', display: 'flex', alignItems: 'center' }}>
-        <button onClick={() => navigate(-1)} className="ml-4 text-brown">
-          <IoIosArrowBack size={32} className="text-3xl font-bold" />
-        </button>
-      </div>
-
       {/* 날짜 버튼 리스트 */}
       <ButtonList>
         {travelDays.map((day) => (
