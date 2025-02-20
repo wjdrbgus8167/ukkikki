@@ -31,7 +31,10 @@ const UserVotePage = () => {
                   `/api/v1/travel-plans/${travelPlanId}/proposals/${proposal.proposalId}/meeting/host-status`,
                 );
                 // hostConnected 값을 proposal 객체에 추가
-                return { ...proposal, hostConnected: statusResponse.data.data.hostConnected };
+                return {
+                  ...proposal,
+                  hostConnected: statusResponse.data.data.hostConnected,
+                };
               } catch (error) {
                 console.error(
                   `Host status 조회 실패 - proposalId: ${proposal.proposalId}`,
@@ -137,25 +140,6 @@ const UserVotePage = () => {
     });
   };
 
-  // 홍보 미팅 참여 함수
-  const handleJoinMeeting = async (agency) => {
-    try {
-      // 백엔드로부터 참가자 권한 토큰을 발급
-      const response = await publicRequest.post(
-        `/api/v1/travel-plans/${travelPlanId}/proposals/${agency.proposalId}/meeting/connection`,
-        { isHost: false }
-      );
-      if (response.status === 200) {
-        const { token } = response.data.data;
-        // 쿼리 파라미터로 token, isHost를 넘겨서 이동
-        navigate(`/meeting/${agency.proposalId}?token=${encodeURIComponent(token)}&isHost=false`);
-      }
-    } catch (error) {
-      console.error('회의 참여 실패:', error);
-      Swal.fire('오류', '라이브 방송 참여에 실패했습니다.', 'error');
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -169,7 +153,7 @@ const UserVotePage = () => {
           agencies={agencies}
           onVote={handleVote}
           onDetail={handleDetail}
-          onJoinMeeting={handleJoinMeeting} 
+          onJoinMeeting={handleJoinMeeting}
         />
       </div>
 
