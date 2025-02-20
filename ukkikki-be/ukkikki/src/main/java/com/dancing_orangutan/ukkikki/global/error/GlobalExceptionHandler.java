@@ -3,6 +3,8 @@ package com.dancing_orangutan.ukkikki.global.error;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -17,6 +19,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(ex.getErrorCode().getStatus())
                 .body(ApiUtils.error(ex.getErrorCode()));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiUtils.ApiResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex){
+
+        FieldError error = (FieldError) ex.getBindingResult().getAllErrors().stream().findFirst().orElse(null);
+        ErrorCode errorCode = getErrorCodeFromError(error);
+        return ResponseEntity
+                .status(errorCode.getStatus())
+                .body(ApiUtils.error(errorCode));
     }
 
     @ExceptionHandler(RuntimeException.class)
@@ -34,5 +46,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(status)
                 .body(ApiUtils.error(status.name(), ex, status));
+    }
+
+    private ErrorCode getErrorCodeFromError(FieldError error) {
+        if (error == null || error.getDefaultMessage() == null) {
+            return ErrorCode.INVALID_INPUT_PARAMETER;
+        }
+
+        try {
+            return ErrorCode.valueOf(error.getDefaultMessage());
+        } catch (IllegalArgumentException e) {
+            return ErrorCode.INVALID_INPUT_PARAMETER;
+        }
     }
 }

@@ -1,28 +1,26 @@
 package com.dancing_orangutan.ukkikki.proposal.ui;
 
+import com.dancing_orangutan.ukkikki.event.eventPublisher.SpringEventPublisher;
 import com.dancing_orangutan.ukkikki.global.security.CompanyUserDetails;
 import com.dancing_orangutan.ukkikki.global.security.MemberUserDetails;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.proposal.application.ProposalService;
 import com.dancing_orangutan.ukkikki.proposal.application.command.*;
-import com.dancing_orangutan.ukkikki.proposal.domain.proposal.Proposal;
 import com.dancing_orangutan.ukkikki.proposal.domain.schedule.Schedule;
 import com.dancing_orangutan.ukkikki.proposal.domain.traveler.Traveler;
-import com.dancing_orangutan.ukkikki.proposal.domain.traveler.TravelerEntity;
 import com.dancing_orangutan.ukkikki.proposal.ui.request.*;
-import com.dancing_orangutan.ukkikki.proposal.ui.response.CreateInquiryResponse;
-import com.dancing_orangutan.ukkikki.proposal.ui.response.CreateVoteSurveyResponse;
-import com.dancing_orangutan.ukkikki.proposal.ui.response.InquiryListResponse;
-import com.dancing_orangutan.ukkikki.proposal.ui.response.ProposalDetailResponse;
+import com.dancing_orangutan.ukkikki.proposal.ui.response.*;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,23 +32,36 @@ import java.util.stream.Collectors;
 public class ProposalController {
 
     private final ProposalService proposalService;
+    private final SpringEventPublisher eventPublisher;
 
     // 제안서 작성
     @PostMapping
-    public ApiUtils.ApiResponse<Proposal> createProposal(
+    public ApiUtils.ApiResponse<CreateProposalResponse> createProposal(
             @PathVariable Integer travelPlanId,
             @AuthenticationPrincipal CompanyUserDetails companyUserDetails,
-            @Validated @RequestBody CreateProposalRequest request){
-
-        if (request == null || request.getProposalRequest() == null) {
-            throw new IllegalArgumentException("Request body or proposalRequest is missing!");
-        }
+            @RequestBody CreateProposalRequest request){
 
         CreateProposalCommand command = request.toCommand(travelPlanId, companyUserDetails.getCompanyId());
 
         return ApiUtils.success(proposalService.createProposal(command));
     }
 
+    // 제안서 목록 조회
+    @GetMapping
+    public ApiUtils.ApiResponse<List<ProposalListResponse>> getProposalList(
+            @PathVariable Integer travelPlanId,
+            @AuthenticationPrincipal MemberUserDetails memberUserDetails
+    ){
+
+        ProposalListCommand command = ProposalListCommand.builder()
+                .travelPlanId(travelPlanId)
+                .memberId(memberUserDetails.getMemberId())
+                .build();
+
+        List<ProposalListResponse> response = proposalService.getProposalList(command);
+
+        return ApiUtils.success(response);
+    }
     // 제안서 상세 조회
     @GetMapping("/{proposalId}")
     public ApiUtils.ApiResponse<ProposalDetailResponse> getProposalDetail(
@@ -67,13 +78,27 @@ public class ProposalController {
             @PathVariable Integer travelPlanId,
             @PathVariable Integer proposalId,
             @AuthenticationPrincipal MemberUserDetails memberUserDetails,
-            @Validated @RequestBody CreateInquiryRequest request) {
+            @RequestBody CreateInquiryRequest request) {
 
         CreateInquiryCommand command = request.requestToDomain(proposalId,travelPlanId,memberUserDetails.getMemberId());
 
         return ApiUtils.success(proposalService.createInquiry(command));
     }
 
+    //제안서 문의 답변
+    @PutMapping("/{proposalId}/inquiries/{inquiryId}")
+    public ApiUtils.ApiResponse<CreateInquiryAnswerResponse> createInquiryAnswer(
+            @PathVariable Integer travelPlanId,
+            @PathVariable Integer proposalId,
+            @PathVariable Integer inquiryId,
+            @RequestBody CreateInquiryAnswerRequest request
+    ){
+        CreateInquiryAnswerCommand command = request.toCommand(proposalId,travelPlanId,inquiryId);
+
+        CreateInquiryAnswerResponse response = proposalService.createInquiryAnswer(command);
+
+        return ApiUtils.success(response);
+    }
     // 제안서 문의 목록 조회
     @GetMapping("/{proposalId}/inquiries")
     public ApiUtils.ApiResponse<List<InquiryListResponse>> getInquiryList(
@@ -89,12 +114,12 @@ public class ProposalController {
     public ApiUtils.ApiResponse<Schedule> createSchedule(
         @PathVariable Integer proposalId,
         @AuthenticationPrincipal CompanyUserDetails companyUserDetails,
-        @Validated @RequestBody CreateScheduleRequest request
+        @RequestBody CreateScheduleRequest request
     ){
 
-        CreateScheduleCommand command = request.requestToDomain(proposalId);
+        CreateScheduleCommand command = request.toCommand();
 
-        return ApiUtils.success(proposalService.createSchedule(command));
+        return ApiUtils.success(proposalService.createSchedule(command,proposalId));
     }
 
     // 일정 삭제
@@ -124,7 +149,7 @@ public class ProposalController {
     public ApiUtils.ApiResponse<?> updateSchedule(
             @PathVariable Integer proposalId,
             @PathVariable Integer scheduleId,
-            @Validated @RequestBody UpdateScheduleRequest request
+            @RequestBody UpdateScheduleRequest request
     ){
 
        UpdateScheduleCommand command = request.requestToDomain(proposalId,scheduleId);
@@ -134,32 +159,67 @@ public class ProposalController {
        return ApiUtils.success("일정이 변경되었습니다");
     }
 
+    @PutMapping("/{proposalId}")
+    public ApiUtils.ApiResponse<?> updateProposal(
+            @PathVariable Integer travelPlanId,
+            @PathVariable Integer proposalId,
+            @AuthenticationPrincipal CompanyUserDetails companyUserDetails,
+            @RequestBody UpdateProposalRequest request
+    ){
+        UpdateProposalCommand command = request.toCommand(travelPlanId,companyUserDetails.getCompanyId(),proposalId);
+
+        proposalService.updateProposal(command);
+
+        return ApiUtils.success("제안서 수정이 완료되었습니다.");
+    }
     // 투표 시작하기
     @PostMapping("/{proposalId}/vote-survey")
-    public ApiUtils.ApiResponse<CreateVoteSurveyResponse> voteSurvey(
+    public ApiUtils.ApiResponse<?> voteSurvey(
             @PathVariable Integer travelPlanId,
             @PathVariable Integer proposalId,
             @AuthenticationPrincipal MemberUserDetails memberUserDetails
     ){
-        CreateVoteSurveyCommand command =CreateVoteSurveyCommand.builder()
-                .surveyStartTime(LocalDateTime.now())
-                .surveyEndTime(LocalDateTime.now().plusHours(72))
-                .travelPlanId(travelPlanId)
+
+        return ApiUtils.success("투표시작 ");
+    }
+
+    // 투표하기
+    @PostMapping("/{proposalId}/vote-survey/{voteSurveyId}")
+    public ApiUtils.ApiResponse<VoteProposalResponse> voteSurvey(
+            @PathVariable Integer travelPlanId,
+            @PathVariable Integer proposalId,
+            @PathVariable Integer voteSurveyId,
+            @AuthenticationPrincipal MemberUserDetails memberUserDetails
+    ){
+        VoteProposalCommand command = VoteProposalCommand.builder()
+                .travelerId(travelPlanId)
                 .proposalId(proposalId)
                 .memberId(memberUserDetails.getMemberId())
+                .voteSurveyId(voteSurveyId)
                 .build();
 
-        CreateVoteSurveyResponse response = proposalService.createVoteSurvey(command);
+        VoteProposalResponse response = proposalService.voteProposal(command);
 
         return ApiUtils.success(response);
     }
+
+    // 제안서 확정하기
+    @PutMapping("/{proposalId}/confirm")
+    public ApiUtils.ApiResponse<ConfirmProposalResponse> confirm(
+            @PathVariable Integer travelPlanId
+    ){
+        ConfirmProposalResponse response = proposalService.confirmProposal(travelPlanId);
+
+        return ApiUtils.success(response);
+    }
+
     // 확정 제안서에 관한 여행자 등록
     @PostMapping("/{proposalId}/travelers")
     public ApiUtils.ApiResponse<List<Traveler>> createTravelers(
             @PathVariable Integer travelPlanId,
             @PathVariable Integer proposalId,
             @AuthenticationPrincipal MemberUserDetails memberUserDetails,
-            @Validated @RequestBody List<CreateTravelerRequest> requests) {
+            @RequestBody List<CreateTravelerRequest> requests) {
 
         // 요청된 모든 여행자 정보를 CreateTravelerCommand로 변환
         List<CreateTravelerCommand> command = requests.stream()
@@ -170,5 +230,59 @@ public class ProposalController {
         List<Traveler> travelers = proposalService.createTravelers(command);
 
         return ApiUtils.success(travelers);
+    }
+
+    // 투표 상태 가져오기
+    @GetMapping("/schedules/vote-survey")
+    public ApiUtils.ApiResponse<VoteSurveyStatusResponse> getVoteSurveyStatus(
+            @PathVariable Integer travelPlanId
+    ){
+        VoteSurveyStatusResponse response = proposalService.getVoteSurveyStatus(travelPlanId);
+
+        return ApiUtils.success(response);
+    }
+
+    //방 총인원
+    @GetMapping("/{proposalId}/total-count")
+    public ApiUtils.ApiResponse<TravelPlanCountResponse> getTravelPlanCount(
+            @PathVariable Integer travelPlanId)
+    {
+        TravelPlanCountResponse response = proposalService.getTravelPlanCount(travelPlanId);
+
+        return ApiUtils.success(response);
+    }
+
+    /**
+     * 특정 제안서에 대한 OpenVidu 토큰(즉, Connection) 생성
+     */
+    @PostMapping("/{proposalId}/meeting/connection")
+    public ApiUtils.ApiResponse<?> getConnection(@PathVariable Integer proposalId,
+                                                 @RequestBody GetConnectionRequest getConnectionRequest,
+                                                 @AuthenticationPrincipal UserDetails userDetails) {
+
+        // 분기 처리: userDetails의 타입에 따라 처리
+        if (userDetails instanceof MemberUserDetails memberDetails) {
+            getConnectionRequest.setMemberName(memberDetails.getName());
+        } else if (userDetails instanceof CompanyUserDetails companyDetails) {
+            getConnectionRequest.setMemberName(companyDetails.getCompanyName());
+        }
+
+        String token = proposalService.generateToken(
+                proposalId,
+                getConnectionRequest.isHost(),
+                getConnectionRequest.getMemberName()
+        );
+
+        return ApiUtils.success(Collections.singletonMap("token", token));
+    }
+
+    /**
+     * 호스트 접속 여부 조회
+     */
+    @GetMapping("/{proposalId}/meeting/host-status")
+    public ApiUtils.ApiResponse<?> isHostConnected(@PathVariable Integer proposalId) {
+        boolean hostConnected = proposalService.isHostConnected(proposalId);
+
+        return ApiUtils.success(Collections.singletonMap("hostConnected", hostConnected));
     }
 }

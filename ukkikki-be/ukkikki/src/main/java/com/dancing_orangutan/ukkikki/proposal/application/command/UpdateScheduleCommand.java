@@ -14,9 +14,13 @@ public class UpdateScheduleCommand {
     LocalDateTime startDate;
     LocalDateTime endDate;
     String imageUrl;
+    String dayNumber;
+    double latitude;
+    double longitude;
 
     @Builder
-    public UpdateScheduleCommand(Integer proposalId, Integer scheduleId, String scheduleName, LocalDateTime startDate, LocalDateTime endDate, String imageUrl) {
+    public UpdateScheduleCommand(Integer proposalId, Integer scheduleId, String scheduleName, LocalDateTime startDate, LocalDateTime endDate, String imageUrl
+    , String dayNumber, double latitude, double longitude) {
 
         this.proposalId = proposalId;
         this.scheduleId = scheduleId;
@@ -24,5 +28,9 @@ public class UpdateScheduleCommand {
         this.startDate = startDate;
         this.endDate = endDate;
         this.imageUrl = imageUrl;
+        this.dayNumber = dayNumber;
+        this.latitude = latitude;
+        this.longitude = longitude;
+
     }
 }

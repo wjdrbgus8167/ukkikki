@@ -9,15 +9,24 @@ import java.time.LocalDateTime;
 public class ScheduleResponse {
 
     private String scheduleName;
+    private Integer scheduleId;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String imageUrl;
+    private String dayNumber;
+    private double latitude;
+    private double longitude;
 
     @Builder
-    public ScheduleResponse(String scheduleName, LocalDateTime startTime, LocalDateTime endTime, String imageUrl) {
+    public ScheduleResponse(String scheduleName, LocalDateTime startTime, LocalDateTime endTime, String imageUrl
+    ,String dayNumber, double latitude, double longitude,Integer scheduleId) {
         this.scheduleName = scheduleName;
         this.startTime = startTime;
         this.endTime = endTime;
         this.imageUrl = imageUrl;
+        this.dayNumber = dayNumber;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.scheduleId = scheduleId;
     }
 }

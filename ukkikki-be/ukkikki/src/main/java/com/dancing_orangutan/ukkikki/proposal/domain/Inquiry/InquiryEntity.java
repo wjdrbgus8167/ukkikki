@@ -1,7 +1,7 @@
 package com.dancing_orangutan.ukkikki.proposal.domain.Inquiry;
 
 import com.dancing_orangutan.ukkikki.proposal.domain.proposal.ProposalEntity;
-import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravelPlan.MemberTravelPlanEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -61,5 +61,10 @@ public class InquiryEntity {
 		this.completedTIme = completedTIme;
 		this.proposal = proposal;
 		this.memberTravelPlan = memberTravelPlan;
+	}
+
+	public void updateAnswer(String answer,LocalDateTime completedTIme) {
+		this.answer = answer;
+		this.completedTIme = completedTIme;
 	}
 }

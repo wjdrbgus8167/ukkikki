@@ -5,14 +5,19 @@ import com.dancing_orangutan.ukkikki.global.security.MemberUserDetails;
 import com.dancing_orangutan.ukkikki.global.util.ApiUtils;
 import com.dancing_orangutan.ukkikki.place.application.PlaceService;
 import com.dancing_orangutan.ukkikki.place.application.command.*;
+import com.dancing_orangutan.ukkikki.place.domain.like.LikeEntity;
+import com.dancing_orangutan.ukkikki.place.ui.reponse.CreatePlaceLikeResponse;
+import com.dancing_orangutan.ukkikki.place.ui.reponse.CreatePlaceResponse;
 import com.dancing_orangutan.ukkikki.place.ui.request.CreatePlaceRequest;
 import com.dancing_orangutan.ukkikki.place.ui.request.CreatePlaceTagRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(("/travel-plans/{travelPlanId}"))
@@ -24,7 +29,7 @@ public class PlaceController {
 
     @PostMapping("/places")
     public ApiUtils.ApiResponse<?> createPlace(@PathVariable Integer travelPlanId,
-                                               @RequestBody CreatePlaceRequest createPlaceRequest) {
+                                               @RequestBody @Valid CreatePlaceRequest createPlaceRequest) {
 
         CreatePlaceCommand command = CreatePlaceCommand.builder()
                 .travelPlanId(travelPlanId)
@@ -40,11 +45,13 @@ public class PlaceController {
         try {
             // PlaceService 호출 로깅
             log.info("PlaceService의 createPlace 호출 - {}", command);
-            placeService.createPlace(command);
+            Integer placeId = placeService.createPlace(command);
 
             // 성공 응답 로깅
             log.info("여행 계획 장소 등록 성공 - travelPlanId: {}, 장소 이름: {}", travelPlanId, createPlaceRequest.getName());
-            return ApiUtils.success("여행 계획 장소를 등록하였습니다.");
+            return ApiUtils.success(CreatePlaceResponse.builder()
+                    .placeId(placeId)
+                    .build());
 
         } catch (Exception e) {
             // 에러 발생 로깅
@@ -59,7 +66,7 @@ public class PlaceController {
     public ApiUtils.ApiResponse<?> createPlaceTag(@PathVariable Integer travelPlanId,
                                                   @PathVariable Integer placeId,
                                                   @AuthenticationPrincipal MemberUserDetails userDetails,
-                                                  @RequestBody CreatePlaceTagRequest createPlaceTagRequest) {
+                                                  @RequestBody @Valid CreatePlaceTagRequest createPlaceTagRequest) {
 
         CreatePlaceTagCommand command = CreatePlaceTagCommand.builder()
                 .travelPlanId(travelPlanId)
@@ -105,8 +112,8 @@ public class PlaceController {
 
     @PostMapping("/places/{placeId}/likes")
     public ApiUtils.ApiResponse<?> createPlaceLike(@PathVariable Integer travelPlanId,
-                                                   @PathVariable Integer placeId,
-                                                   @AuthenticationPrincipal MemberUserDetails userDetails) {
+                                                                         @PathVariable Integer placeId,
+                                                                         @AuthenticationPrincipal MemberUserDetails userDetails) {
 
         CreatePlaceLikeCommand command = CreatePlaceLikeCommand.builder()
                 .placeId(placeId)
@@ -117,12 +124,13 @@ public class PlaceController {
         try{
             // PlaceService 호출 로깅
             log.info("PlaceService의 createPlaceLike 호출 - {}", command);
-            placeService.createPlaceLike(command);
+            List<LikeEntity> likeEntities = placeService.createPlaceLike(command);
 
             // 성공 응답 로깅
             log.info("여행 계획 장소 좋아요 등록 성공 - travelPlanId: {}, placeId: {}, memberName: {}",
                     travelPlanId, placeId, userDetails.getUsername());
-            return ApiUtils.success("여행 계획 장소 좋아요를 등록하였습니다.");
+
+            return ApiUtils.success(CreatePlaceLikeResponse.toResponse(likeEntities));
         } catch (Exception e) {
             // 에러 발생 로깅
             log.error("여행 계획 장소 좋아요 등록 중 오류 발생 - travelPlanId: {}, placeId: {}, memberName: {}",

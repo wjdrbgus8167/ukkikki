@@ -13,6 +13,8 @@ public interface ScheduleMapper {
 
     @Mapping(target = "proposalId", source = "proposal" , qualifiedByName = "proposalToId")
     Schedule entityToDomain(ScheduleEntity entity);
+
+   @Mapping(target = "proposal.proposalId", source = "proposalId")
     ScheduleEntity domainToEntity(Schedule domain);
 
     @Named("proposalToId")

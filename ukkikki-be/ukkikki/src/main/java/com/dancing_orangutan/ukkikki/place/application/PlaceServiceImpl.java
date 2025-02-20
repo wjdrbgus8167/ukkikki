@@ -13,7 +13,7 @@ import com.dancing_orangutan.ukkikki.place.infrastructure.*;
 import com.dancing_orangutan.ukkikki.place.mapper.PlaceLikeMapper;
 import com.dancing_orangutan.ukkikki.place.mapper.PlaceMapper;
 import com.dancing_orangutan.ukkikki.place.mapper.PlaceTagMapper;
-import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravelPlan.MemberTravelPlanEntity;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class PlaceServiceImpl implements PlaceService {
     private final MemberFinder memberFinder;
 
     @Override
-    public void createPlace(CreatePlaceCommand command) {
+    public Integer createPlace(CreatePlaceCommand command) {
 
         Place place = Place.builder()
                 .name(command.getName())
@@ -47,17 +47,33 @@ public class PlaceServiceImpl implements PlaceService {
                 .travelPlanId(command.getTravelPlanId())
                 .build();
 
-        Optional<TravelPlanEntity> travelPlanEntity =
+        Optional<TravelPlanEntity> OptionalTravelPlanEntity =
                 travelPlanFinder.findByTravelPlanId(command.getTravelPlanId());
 
-        if(travelPlanEntity.isEmpty()) {
+        if(OptionalTravelPlanEntity.isEmpty()) {
             logger.error("TravelPlanEntity not found for id: {}",
                     command.getTravelPlanId());
             throw new IllegalArgumentException("No TravelPlanEntity found for id: "
                     + command.getTravelPlanId());
         } else {
-            PlaceEntity placeEntity = PlaceMapper.mapToEntity(place, travelPlanEntity.get());
-            placeRepository.save(placeEntity);
+            TravelPlanEntity travelPlanEntity = OptionalTravelPlanEntity.get();
+
+            // 비즈니스 로직 수행
+            // 기존 여행지 조회
+            List<PlaceEntity> existingPlacesEntities = placeRepository.findByTravelPlan(travelPlanEntity);
+            List<Place> existingPlaces = existingPlacesEntities.stream()
+                    .map(PlaceMapper::mapToDomain)
+                    .toList();
+
+            // 여행 계획 내에 같은 여행지가 이미 등록되었는지 중복 검사
+            if(place.hasDuplicatePlace(existingPlaces)) {
+                throw new IllegalArgumentException("중복 여행지: 이미 여행 계획에 등록된 여행지입니다. ");
+            }
+
+
+            PlaceEntity placeEntity = PlaceMapper.mapToEntity(place, travelPlanEntity);
+            PlaceEntity save = placeRepository.save(placeEntity);
+            return placeEntity.getPlaceId();
         }
     }
 
@@ -113,7 +129,7 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Transactional
     @Override
-    public void createPlaceLike(CreatePlaceLikeCommand command) {
+    public List<LikeEntity> createPlaceLike(CreatePlaceLikeCommand command) {
 
         // Like 도메인 객체 생성
         Like like = Like.builder()
@@ -129,7 +145,7 @@ public class PlaceServiceImpl implements PlaceService {
                 .map(PlaceLikeMapper::mapToDomain)
                 .toList();
 
-        // 중복 체크
+        // 대상 사용자가 해당 여향지에 대해 이미 좋아요를 했는지 중복 검사
         if (Like.hasDuplicateLike(like.getCreatorId(), like.getPlaceId(), existingLikes)) {
             throw new IllegalStateException("중복 좋아요: 해당 사용자가 이미 이 장소를 좋아요 했습니다.");
         }
@@ -148,6 +164,11 @@ public class PlaceServiceImpl implements PlaceService {
 
         // PlaceLike save
         placeLikeRepository.save(likeEntity);
+
+        // 위의 좋아요를 반영한 해당 사용자의 좋아요 목록 조회
+        List<LikeEntity> likeEntities = placeLikeRepository.findByLikeId_MemberId(like.getCreatorId());
+
+        return likeEntities;
     }
 
     @Override

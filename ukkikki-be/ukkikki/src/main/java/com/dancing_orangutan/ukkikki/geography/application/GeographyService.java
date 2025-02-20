@@ -3,8 +3,9 @@ package com.dancing_orangutan.ukkikki.geography.application;
 import com.dancing_orangutan.ukkikki.geography.application.query.FetchAirportsQuery;
 import com.dancing_orangutan.ukkikki.geography.application.query.FetchCitiesQuery;
 import com.dancing_orangutan.ukkikki.geography.application.query.FetchCountriesQuery;
-import com.dancing_orangutan.ukkikki.geography.domain.Airport;
-import com.dancing_orangutan.ukkikki.geography.domain.City;
+import com.dancing_orangutan.ukkikki.geography.domain.airport.Airport;
+import com.dancing_orangutan.ukkikki.geography.domain.airport.AirportRepository;
+import com.dancing_orangutan.ukkikki.geography.domain.city.City;
 import com.dancing_orangutan.ukkikki.geography.domain.Country;
 import com.dancing_orangutan.ukkikki.geography.infrastructure.GeographyRepository;
 import com.dancing_orangutan.ukkikki.geography.mapper.AirportMapper;
@@ -29,6 +30,7 @@ public class GeographyService {
     private final CountryMapper countryMapper;
     private final CityMapper cityMapper;
     private final AirportMapper airportMapper;
+    private final AirportRepository airportRepository;
 
     public List<FetchContinentsResponse> getContinents() {
         return continentMapper.domainsToResponses(geographyRepository.getContinents());
@@ -48,4 +50,16 @@ public class GeographyService {
         Airport domain = query.queryToDomain();
         return airportMapper.domainsToResponse(geographyRepository.getAirports(domain));
     }
+
+
+    public List<FetchAirportsResponse> fetchAllAirports() {
+        return airportRepository.findAll().stream()
+                .map(airport -> FetchAirportsResponse.
+                        builder()
+                        .name(airport.getAirportName())
+                        .airportCode(airport.getAirportCode())
+                        .build()
+                ).toList();
+    }
+
 }

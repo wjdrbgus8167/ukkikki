@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.travelPlan.application.query;
 
-import com.dancing_orangutan.ukkikki.travelPlan.constant.PlanningStatus;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.constant.PlanningStatus;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;

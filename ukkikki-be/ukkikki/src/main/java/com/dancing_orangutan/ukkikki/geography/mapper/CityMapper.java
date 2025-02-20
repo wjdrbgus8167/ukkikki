@@ -1,8 +1,8 @@
 package com.dancing_orangutan.ukkikki.geography.mapper;
 
-import com.dancing_orangutan.ukkikki.geography.domain.CityEntity;
+import com.dancing_orangutan.ukkikki.geography.domain.city.CityEntity;
 import com.dancing_orangutan.ukkikki.geography.application.query.FetchCitiesQuery;
-import com.dancing_orangutan.ukkikki.geography.domain.City;
+import com.dancing_orangutan.ukkikki.geography.domain.city.City;
 import com.dancing_orangutan.ukkikki.geography.ui.response.FetchCitiesResponse;
 import java.util.List;
 import org.springframework.stereotype.Component;

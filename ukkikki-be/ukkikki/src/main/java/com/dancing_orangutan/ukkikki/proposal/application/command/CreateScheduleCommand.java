@@ -9,19 +9,25 @@ import java.time.LocalDateTime;
 @Getter
 public class CreateScheduleCommand {
 
-    Integer proposalId;
     String scheduleName;
     LocalDateTime startDate;
     LocalDateTime endDate;
     String imageUrl;
-    @Builder
-    public CreateScheduleCommand(Integer proposalId, String scheduleName, LocalDateTime startDate, LocalDateTime endDate, String imageUrl) {
+    double latitude;
+    double longitude;
+    String dayNumber;
 
-        this.proposalId = proposalId;
+    @Builder
+    public CreateScheduleCommand(String scheduleName, LocalDateTime startDate, LocalDateTime endDate, String imageUrl
+    , double latitude, double longitude, String dayNumber) {
+
         this.scheduleName = scheduleName;
         this.startDate = startDate;
         this.endDate = endDate;
         this.imageUrl = imageUrl;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.dayNumber = dayNumber;
     }
 
 }

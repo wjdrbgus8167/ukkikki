@@ -15,14 +15,22 @@ public class UpdateScheduleRequest {
     LocalDateTime startTime;
     LocalDateTime endTime;
     String imageUrl;
-
+    Integer scheduleId;
+    String dayNumber;
+    double latitude;
+    double longitude;
     @Builder
-    public UpdateScheduleRequest(String scheduleName, LocalDateTime startTime, LocalDateTime endTime, String imageUrl) {
+    public UpdateScheduleRequest(String scheduleName, LocalDateTime startTime, LocalDateTime endTime, String imageUrl,Integer scheduleId
+    ,String dayNumber, double latitude, double longitude) {
 
         this.scheduleName = scheduleName;
         this.startTime = startTime;
         this.endTime = endTime;
         this.imageUrl = imageUrl;
+        this.scheduleId = scheduleId;
+        this.dayNumber = dayNumber;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public UpdateScheduleCommand requestToDomain(Integer proposalId,Integer scheduleId) {
@@ -35,6 +43,24 @@ public class UpdateScheduleRequest {
                 .startDate(startTime)
                 .endDate(endTime)
                 .imageUrl(imageUrl)
+                .dayNumber(dayNumber)
+                .latitude(latitude)
+                .longitude(longitude)
+                .build();
+    }
+
+    public UpdateScheduleCommand toCommand() {
+
+        return UpdateScheduleCommand
+                .builder()
+                .scheduleId(scheduleId)
+                .scheduleName(scheduleName)
+                .startDate(startTime)
+                .endDate(endTime)
+                .imageUrl(imageUrl)
+                .dayNumber(dayNumber)
+                .latitude(latitude)
+                .longitude(longitude)
                 .build();
     }
 

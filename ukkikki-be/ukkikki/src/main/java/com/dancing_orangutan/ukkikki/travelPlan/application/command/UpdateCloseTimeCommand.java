@@ -3,7 +3,8 @@ package com.dancing_orangutan.ukkikki.travelPlan.application.command;
 import java.time.LocalDateTime;
 import lombok.Builder;
 
-public record UpdateCloseTimeCommand(Integer travelPlanId, LocalDateTime closeTime) {
+public record UpdateCloseTimeCommand(Integer travelPlanId, Integer memberId,
+									 LocalDateTime closeTime) {
 
 
 	@Builder

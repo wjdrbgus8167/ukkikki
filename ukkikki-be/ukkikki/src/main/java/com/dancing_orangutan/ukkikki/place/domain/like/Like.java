@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.place.domain.like;
 
-import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravelPlan.MemberTravelPlanEntity;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,19 +36,23 @@ public class Like {
         totalCount += memberTravelPlanEntity.getAdultCount();
         totalCount += memberTravelPlanEntity.getChildCount();
         totalCount += memberTravelPlanEntity.getInfantCount();
-        this.likeCount = totalCount;
+        this.likeCount = Math.min(totalCount, 10);
     }
 
     /**
-     * Checks whether a specific member has already liked a specific place.
+     * 주어진 작성자 ID와 장소 ID를 기준으로 제공된 좋아요 목록에서
+     * 중복 좋아요가 있는지 확인
      *
-     * @param creatorId The ID of the member.
-     * @param placeId   The ID of the place.
-     * @return true if the member has already liked the place, false otherwise.
+     * @param creatorId     확인할 작성자 ID
+     * @param placeId       확인할 장소 ID
+     * @param existingLikes 중복 여부를 검색할 좋아요 목록
+     * @return 중복 좋아요가 존재하면 true, 그렇지 않으면 false
      */
-    public static boolean hasDuplicateLike(Integer creatorId, Integer placeId, List<Like> existingLikes) {
+    public static boolean hasDuplicateLike(Integer creatorId, Integer placeId,
+                                           List<Like> existingLikes) {
         return existingLikes.stream()
-                .anyMatch(like -> like.getCreatorId().equals(creatorId) && like.getPlaceId().equals(placeId));
+                .anyMatch(like -> like.getCreatorId().equals(creatorId)
+                        && like.getPlaceId().equals(placeId));
     }
 
 }

@@ -1,6 +1,6 @@
 package com.dancing_orangutan.ukkikki.proposal.domain.proposal;
 
-import com.dancing_orangutan.ukkikki.geography.domain.AirportEntity;
+import com.dancing_orangutan.ukkikki.geography.domain.airport.AirportEntity;
 import com.dancing_orangutan.ukkikki.member.domain.company.CompanyEntity;
 import com.dancing_orangutan.ukkikki.proposal.constant.ProposalStatus;
 import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
@@ -104,6 +104,43 @@ public class ProposalEntity {
 	, String refundPolicy, boolean insuranceIncluded, ProposalStatus proposalStatus, LocalDateTime createTime
 	, LocalDateTime updateTime, CompanyEntity company, TravelPlanEntity travelPlan, AirportEntity departureAirport, AirportEntity arrivalAirport) {
 
+		this.proposalId = proposalId;
+		this.name = name;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.airline = airline;
+		this.startDateBoardingTime = startDateBoardingTime;
+		this.startDateArrivalTime = startDateArrivalTime;
+		this.endDateBoardingTime = endDateBoardingTime;
+		this.endDateArrivalTime = endDateArrivalTime;
+		this.deposit = deposit;
+		this.minPeople = minPeople;
+		this.guideIncluded = guideIncluded;
+		this.productIntroduction = productIntroduction;
+		this.refundPolicy = refundPolicy;
+		this.insuranceIncluded = insuranceIncluded;
+		this.proposalStatus = proposalStatus;
+		this.createTime = createTime;
+		this.updateTime = updateTime;
+		this.company = company;
+		this.travelPlan = travelPlan;
+		this.departureAirport = departureAirport;
+		this.arrivalAirport = arrivalAirport;
+	}
+
+	public void updateStatus(boolean isTopProposal) {
+		this.proposalStatus = isTopProposal ? ProposalStatus.A : ProposalStatus.D;
+	}
+
+	public void updateVotingStatus() {
+		this.proposalStatus = ProposalStatus.V;
+	}
+
+	public void updateProposal(Integer proposalId, String name, LocalDate startDate, LocalDate endDate, String airline
+			, LocalDateTime startDateBoardingTime, LocalDateTime startDateArrivalTime, LocalDateTime endDateBoardingTime
+			, LocalDateTime endDateArrivalTime, int deposit, int minPeople, boolean guideIncluded, String productIntroduction
+			, String refundPolicy, boolean insuranceIncluded, ProposalStatus proposalStatus, LocalDateTime createTime
+			, LocalDateTime updateTime, CompanyEntity company, TravelPlanEntity travelPlan, AirportEntity departureAirport, AirportEntity arrivalAirport){
 		this.proposalId = proposalId;
 		this.name = name;
 		this.startDate = startDate;

@@ -4,7 +4,7 @@ import com.dancing_orangutan.ukkikki.global.oauth.CustomOAuth2UserService;
 import com.dancing_orangutan.ukkikki.global.oauth.OAuth2SuccessHandler;
 import com.dancing_orangutan.ukkikki.global.security.*;
 import com.dancing_orangutan.ukkikki.global.jwt.JwtTokenProvider;
-import com.dancing_orangutan.ukkikki.member.infrastructure.member.MemberRepository;
+import com.dancing_orangutan.ukkikki.member.infrastructure.member.JpaMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,10 +28,9 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final MemberRepository memberRepository;
+    private final JpaMemberRepository jpaMemberRepository;
     private final CorsFilter corsFilter;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
-
     /**
      * 비밀번호 암호화 설정
      */
@@ -50,7 +49,7 @@ public class SecurityConfig {
 
     @Bean
     public OAuth2SuccessHandler oAuth2SuccessHandler() {
-        return new OAuth2SuccessHandler(jwtTokenProvider, memberRepository, appConfig);
+        return new OAuth2SuccessHandler(jwtTokenProvider, jpaMemberRepository, appConfig);
     }
 
     @Bean
@@ -78,7 +77,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/oauth2/**", "/swagger-ui/**", "/login/oauth2/code/**").permitAll()
+                        .requestMatchers("/auth/**", "/oauth2/**", "/swagger-ui/**", "/login/oauth2/code/**", "/geography/**", "/travel-plans", "/ws/**", "/sessions/**").permitAll()
                         .anyRequest().authenticated()
                 ) .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint())

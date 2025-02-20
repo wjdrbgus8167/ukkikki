@@ -1,7 +1,7 @@
 package com.dancing_orangutan.ukkikki.place.domain.placeTag;
 
 import com.dancing_orangutan.ukkikki.place.domain.place.PlaceEntity;
-import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravel.MemberTravelPlanEntity;
+import com.dancing_orangutan.ukkikki.travelPlan.domain.memberTravelPlan.MemberTravelPlanEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -38,6 +38,10 @@ public class PlaceTagEntity {
 		this.placeTagName = placeTagName;
 		this.placeEntity = placeEntity;
 		this.memberTravelPlan = memberTravelPlan;
+	}
+
+	public boolean isMyTag(Integer memberId) {
+		return memberTravelPlan.getMember().getMemberId().equals(memberId);
 	}
 
 }

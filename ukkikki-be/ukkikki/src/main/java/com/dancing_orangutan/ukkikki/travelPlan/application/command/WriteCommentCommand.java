@@ -2,7 +2,7 @@ package com.dancing_orangutan.ukkikki.travelPlan.application.command;
 
 import lombok.Builder;
 
-public record WriteCommentCommand(String hostComment, Integer travelPlanId) {
+public record WriteCommentCommand(String hostComment, Integer travelPlanId, Integer memberId) {
 
 	@Builder
 	public WriteCommentCommand {
