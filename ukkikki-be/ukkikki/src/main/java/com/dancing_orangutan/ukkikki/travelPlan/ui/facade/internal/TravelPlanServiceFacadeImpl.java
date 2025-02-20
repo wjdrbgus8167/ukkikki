@@ -10,6 +10,7 @@ import com.dancing_orangutan.ukkikki.travelPlan.application.UpdateCompanionCount
 import com.dancing_orangutan.ukkikki.travelPlan.application.UpdatePlanningStatusService;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.ExitTravelPlanCommand;
 import com.dancing_orangutan.ukkikki.travelPlan.application.command.UpdateTravelPlanStatusCommand;
+import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchAllTravelPlansQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchAvailableTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQueryByMember;
@@ -140,6 +141,16 @@ public class TravelPlanServiceFacadeImpl implements TravelPlanServiceFacade {
 						FetchAvailableTravelPlanQuery.builder()
 								.pageable(pageable)
 								.build()), memberId);
+	}
+
+	@Override
+	public FetchAllTravelPlansResponse fetchAllTravelPlans(final Pageable pageable) {
+		return mapper.fetchAllTravelPlansResponse(queryTravelPlanService.fetchAllTravelPlans(
+				FetchAllTravelPlansQuery.
+						builder()
+						.pageable(pageable)
+						.build()
+		));
 	}
 
 	@Override

@@ -42,8 +42,9 @@ public interface TravelPlanServiceFacade {
 
 	FetchAvailableTravelPlansResponse fetchAvailableTravelPlans(final Pageable pageable,Integer memberId);
 
-	FetchTravelPlanDetailsByCompanyResponse fetchTravelPlanDetails(final Integer travelPlanId);
+	FetchAllTravelPlansResponse fetchAllTravelPlans(final Pageable pageable);
 
+	FetchTravelPlanDetailsByCompanyResponse fetchTravelPlanDetails(final Integer travelPlanId);
 
 	FetchTravelPlanDetailsByMemberResponse fetchTravelPlanDetailsByMember(
 			final Integer travelPlanId, final Integer memberId);
