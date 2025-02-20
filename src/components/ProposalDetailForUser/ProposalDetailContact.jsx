@@ -72,14 +72,6 @@ const ProposalDetailContact = () => {
           >
             문의하기
           </button>
-          <button
-            onClick={() =>
-              Swal.fire('화상채팅', '화상채팅 기능은 곧 제공됩니다.', 'info')
-            }
-            className="px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600"
-          >
-            화상채팅하기
-          </button>
         </div>
       </div>
       {/* 문의 작성 폼 */}

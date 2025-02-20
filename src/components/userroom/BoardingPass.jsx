@@ -9,11 +9,12 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.6 }) => {
   // 상태 레이블 매핑
   const statusKeyMapping = {
     IN_PROGRESS: '진행',
-    BIDDING: '입찰',
+    BIDDING: '제안받는중',
     BOOKING: '예약',
     CONFIRMED: '확정',
   };
-  const currentStatusLabel = statusKeyMapping[selectedCard.planningStatus] || '';
+  const currentStatusLabel =
+    statusKeyMapping[selectedCard.planningStatus] || '';
 
   let statusDescription = '';
   let todoItems = ['☐ 여행지 추가하기', '☐ 좋아요로 관심 표시하기'];
@@ -38,7 +39,7 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.6 }) => {
       break;
   }
 
-  const statusLabels = ['진행', '입찰', '예약', '확정'];
+  const statusLabels = ['진행', '제안', '예약', '확정'];
 
   const departureCityName = selectedCard.departureCity?.name || '출발도시';
   const arrivalCityName = selectedCard.arrivalCity?.name || '도착도시';
@@ -53,7 +54,7 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.6 }) => {
 
   return (
     <div
-      className="ticket-style relative overflow-hidden max-w-4xl mx-auto p-4"
+      className="relative max-w-4xl p-4 mx-auto overflow-hidden ticket-style"
       style={isSmall ? {} : { zoom: zoomLevel }} // 축소 시 zoom 제거, 확대 시 zoomLevel 적용
     >
       {/* 크기 조절 버튼 (위치 조정: "서울 파리" 텍스트를 가리지 않도록) */}
@@ -72,8 +73,8 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.6 }) => {
         // 확대 상태 (현재 코드의 크기 상태 유지, zoomLevel = 0.6 적용)
         <div className="flex rounded-[54px] overflow-hidden shadow-md border border-gray-300">
           {/* 1) 왼쪽(노란색) 영역 */}
-          <div className="w-1/2 bg-yellow py-8 pl-8 pr-4 text-black flex flex-col justify-start space-y-4">
-            <h2 className="font-bold leading-normal text-left text-xl sm:text-base md:text-3xl mb-6">
+          <div className="flex flex-col justify-start w-1/2 py-8 pl-8 pr-4 space-y-4 text-black bg-yellow">
+            <h2 className="mb-6 text-xl font-bold leading-normal text-left sm:text-base md:text-3xl">
               {selectedCard.name || '방 이름 없음'}
             </h2>
 
@@ -92,7 +93,7 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.6 }) => {
               </div>
 
               {/* 보조 텍스트 */}
-              <p className="text-base text-gray-500 uppercase tracking-wide">
+              <p className="text-base tracking-wide text-gray-500 uppercase">
                 {departureCityName} to {arrivalCityName}
               </p>
             </div>
@@ -141,8 +142,8 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.6 }) => {
           </div>
 
           {/* 2) 오른쪽(흰색) 영역 */}
-          <div className="w-2/3 bg-white py-8 px-4 flex flex-col">
-            <p className="text-xl sm:text-base md:text-xl font-semibold">
+          <div className="flex flex-col w-2/3 px-4 py-8 bg-white">
+            <p className="text-xl font-semibold sm:text-base md:text-xl">
               {selectedCard.startDate} → {selectedCard.endDate}
             </p>
             <div className="flex gap-4 mt-4">
@@ -166,7 +167,7 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.6 }) => {
               </div>
             </div>
 
-            <div className="border-t border-dashed border-gray-300 my-4"></div>
+            <div className="my-4 border-t border-gray-300 border-dashed"></div>
 
             <div className="flex gap-4 mt-4">
               <div>
@@ -183,10 +184,10 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.6 }) => {
               </div>
             </div>
 
-            <div className="border-t border-dashed border-gray-300 my-4"></div>
+            <div className="my-4 border-t border-gray-300 border-dashed"></div>
 
             <div className="mt-4">
-              <p className="text-xl text-gray-600 pb-2">테마</p>
+              <p className="pb-2 text-xl text-gray-600">테마</p>
               <div className="flex flex-wrap gap-2">
                 {(selectedCard.keywords || []).map((keyword, index) => {
                   const themeClass =
@@ -210,8 +211,8 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.6 }) => {
           </div>
 
           {/* 4) 진행 상태 및 추가 정보 영역 */}
-          <div className="w-2/3 bg-white py-8 px-4 flex flex-col min-h-full">
-            <div className="text-xl sm:text-2xl font-normal flex items-center">
+          <div className="flex flex-col w-2/3 min-h-full px-4 py-8 bg-white">
+            <div className="flex items-center text-xl font-normal sm:text-2xl">
               {statusLabels.map((label, idx) => (
                 <React.Fragment key={label}>
                   <span
@@ -224,26 +225,26 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.6 }) => {
                     {label}
                   </span>
                   {idx < statusLabels.length - 1 && (
-                    <span className="text-gray-500 mx-2">-</span>
+                    <span className="mx-2 text-gray-500">-</span>
                   )}
                 </React.Fragment>
               ))}
             </div>
-            <div className="flex flex-col items-start space-y-4 flex-1 h-full">
-              <h1 className="text-left text-4xl sm:text-5xl md:text-6xl mt-3 font-black">
+            <div className="flex flex-col items-start flex-1 h-full space-y-4">
+              <h1 className="mt-3 text-4xl font-black text-left sm:text-5xl md:text-6xl">
                 {currentStatusLabel}
               </h1>
-              <p className="text-gray-600 text-xl sm:text-2xl">
+              <p className="text-xl text-gray-600 sm:text-2xl">
                 {statusDescription}
               </p>
 
               <div className="flex-grow w-full">
-                <div className="border-t border-dashed border-gray-300"></div>
+                <div className="border-t border-gray-300 border-dashed"></div>
               </div>
 
               <div>
-                <h2 className="text-xl font-bold py-1">Todo</h2>
-                <ul className="text-2xl font-medium text-gray-600 space-y-1">
+                <h2 className="py-1 text-xl font-bold">Todo</h2>
+                <ul className="space-y-1 text-2xl font-medium text-gray-600">
                   {todoItems.map((item, idx) => (
                     <li key={idx}>{item}</li>
                   ))}
@@ -251,7 +252,7 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.6 }) => {
               </div>
 
               {/* 버튼이 아래쪽 남는 공간을 채우도록 수정 */}
-              <div className="flex flex-1 justify-end">
+              <div className="flex justify-end flex-1">
                 <ProposalButton
                   selectedCard={selectedCard}
                   travelPlanId={selectedCard.travelPlanId}
@@ -266,7 +267,7 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.6 }) => {
       ) : (
         // 축소 상태 (사용자가 원하는 간결한 UI)
         <div
-          className="bg-yellow p-4 rounded-lg shadow-md border border-gray-300 transition-all duration-300 flex items-center space-x-2"
+          className="flex items-center p-4 space-x-2 transition-all duration-300 border border-gray-300 rounded-lg shadow-md bg-yellow"
           style={{ width: 'fit-content' }}
         >
           {/* 출발 도시 */}
