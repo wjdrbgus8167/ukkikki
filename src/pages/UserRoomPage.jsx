@@ -99,7 +99,7 @@ const UserRoom = () => {
 
   const DraggableBoardingPass = ({ selectedCard, isLikeListOpen }) => {
     const nodeRef = useRef(null);
-  
+
     return (
       <Draggable nodeRef={nodeRef}>
         <div
@@ -115,8 +115,7 @@ const UserRoom = () => {
       </Draggable>
     );
   };
-  
-  
+
   if (!selectedCard) {
     return (
       <div className="p-10 text-center text-red-500">
@@ -140,11 +139,11 @@ const UserRoom = () => {
         setFavorites={setFavorites}
         favorites={favorites}
       />
-  
+
       {/* 전체 화면 레이아웃 */}
-      <div className="flex flex-col h-screen w-screen overflow-hidden">
+      <div className="flex flex-col w-screen h-screen overflow-hidden">
         <Header />
-  
+
         {/* 지도 + 사이드바 및 BoardingPass */}
         <div className="relative flex-1">
           {/* 지도 (배경 레이어) */}
@@ -165,52 +164,51 @@ const UserRoom = () => {
             />
           )}
           <div className="relative flex h-full pointer-events-none">
-  
-          {/* [중요] 즐겨찾기 목록 + BoardingPass를 같은 flex 컨테이너로 묶기 */}
-          <div className="flex h-full pointer-events-none">
-            {/* 왼쪽 사이드바 (즐겨찾기 목록) */}
-            <div
-              className={`transition-all duration-300 relative h-full ${
-                disabled ? 'pointer-events-none' : 'pointer-events-auto'
-              }`}
-              style={{ width: isLikeListOpen ? '320px' : '0px' }}
-            >
-              <button
-                onClick={() => setIsLikeListOpen((prev) => !prev)}
-                className="absolute z-30 p-2 text-white transform -translate-y-1/2 bg-gray-800 rounded-full pointer-events-auto top-1/2 -right-4"
+            {/* [중요] 즐겨찾기 목록 + BoardingPass를 같은 flex 컨테이너로 묶기 */}
+            <div className="flex h-full pointer-events-none">
+              {/* 왼쪽 사이드바 (즐겨찾기 목록) */}
+              <div
+                className={`transition-all duration-300 relative h-full ${
+                  disabled ? 'pointer-events-none' : 'pointer-events-auto'
+                }`}
+                style={{ width: isLikeListOpen ? '320px' : '0px' }}
               >
-                {isLikeListOpen ? '❮' : '❯'}
-              </button>
-  
-              {isLikeListOpen && (
-                <div className="h-full overflow-y-auto pointer-events-auto bg-white/70 backdrop-blur-sm">
-                  <FavoriteList
-                    selectedCard={selectedCard}
-                    favorites={favorites}
-                    setFavorites={setFavorites}
-                    setMapCenter={setMapCenter}
-                  />
-                  {disabled && (
-                    <div
-                      className="absolute inset-0 z-10"
-                      onClick={handleDisabledClick}
-                      style={{ cursor: 'not-allowed' }}
+                <button
+                  onClick={() => setIsLikeListOpen((prev) => !prev)}
+                  className="absolute z-30 p-2 text-white transform -translate-y-1/2 bg-gray-800 rounded-full pointer-events-auto top-1/2 -right-4"
+                >
+                  {isLikeListOpen ? '❮' : '❯'}
+                </button>
+
+                {isLikeListOpen && (
+                  <div className="h-full overflow-y-auto pointer-events-auto bg-white/70 backdrop-blur-sm">
+                    <FavoriteList
+                      selectedCard={selectedCard}
+                      favorites={favorites}
+                      setFavorites={setFavorites}
+                      setMapCenter={setMapCenter}
                     />
-                  )}
-                </div>
-              )}
+                    {disabled && (
+                      <div
+                        className="absolute inset-0 z-10"
+                        onClick={handleDisabledClick}
+                        style={{ cursor: 'not-allowed' }}
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <DraggableBoardingPass
+                selectedCard={selectedCard}
+                isLikeListOpen={isLikeListOpen}
+              />
             </div>
-
-
-            <DraggableBoardingPass selectedCard={selectedCard} isLikeListOpen={isLikeListOpen} />
-
           </div>
         </div>
       </div>
-      </div>
     </LoadScript>
   );
-  
 };
 
 export default UserRoom;

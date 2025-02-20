@@ -1,28 +1,33 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import clock from '../../../assets/clock.png'; // 상대 경로로 수정
 import trashCan from '../../../assets/trash_can.png'; // 상대 경로로 수정
 import {
   SelectedPlacesContainer,
   SelectedPlacesContent,
 } from './style/SchedulePlacesStyle';
+import TimeModal from './TimeModal';
 
 const Schedule = ({
   selectedPlaces,
   timeData,
   onDeletePlace,
-  handleTimeInputToggle,
-  showTimeInput,
   handleTimeChange,
   handleSaveTime,
   computeDuration,
 }) => {
   const containerRef = useRef(null);
+  const [openTimeModalId, setOpenTimeModalId] = useState(null);
 
   useEffect(() => {
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight; // 새로운 항목이 추가될 때마다 가장 아래로 스크롤
     }
   }, [selectedPlaces]);
+
+  // 현재 모달에서 시간 설정 중인 장소 객체
+  const currentPlace =
+    openTimeModalId &&
+    selectedPlaces.find((place) => place.placeId === openTimeModalId);
 
   return (
     <SelectedPlacesContainer ref={containerRef}>
@@ -44,7 +49,7 @@ const Schedule = ({
             <SelectedPlacesContent hasDuration={hasDuration}>
               <p className="place">{place.scheduleName}</p>
               <span className="btns">
-                <button onClick={() => handleTimeInputToggle(place.placeId)}>
+                <button onClick={() => setOpenTimeModalId(place.placeId)}>
                   {hasTimeInput ? (
                     <span className="duration-text">{duration}</span>
                   ) : (
@@ -55,66 +60,20 @@ const Schedule = ({
                   <img src={trashCan} alt="trashCan icon" className="w-6 h-6" />
                 </button>
               </span>
-
-              {/* 시간 입력 폼 */}
-              {showTimeInput === place.placeId && (
-                <div
-                  className="time-input"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    marginTop: '8px',
-                  }}
-                >
-                  <input
-                    type="time"
-                    step="300" // 5분 단위
-                    value={
-                      timeData[place.placeId]?.startTime ||
-                      place.startTime ||
-                      ''
-                    }
-                    onChange={(e) =>
-                      handleTimeChange(
-                        place.placeId,
-                        'startTime',
-                        e.target.value,
-                      )
-                    }
-                    style={{ marginRight: '8px' }}
-                  />
-                  <span style={{ marginRight: '8px' }}>~</span>
-                  <input
-                    type="time"
-                    step="300" // 5분 단위
-                    // 종료시간은 시작시간보다 늦은 값만 선택 가능
-                    min={
-                      timeData[place.placeId]?.startTime ||
-                      place.startTime ||
-                      ''
-                    }
-                    value={
-                      timeData[place.placeId]?.endTime || place.endTime || ''
-                    }
-                    onChange={(e) =>
-                      handleTimeChange(place.placeId, 'endTime', e.target.value)
-                    }
-                    style={{ marginRight: '8px' }}
-                  />
-                  <button
-                    className="btn"
-                    onClick={() =>
-                      handleSaveTime(place.placeId, place.dayNumber)
-                    }
-                  >
-                    완료
-                  </button>
-                </div>
-              )}
+              {/* 기존 인라인 시간 입력 폼은 제거 */}
             </SelectedPlacesContent>
           </div>
         );
       })}
+      {/* 모달 렌더링 */}
+      <TimeModal
+        isOpen={Boolean(openTimeModalId)}
+        onClose={() => setOpenTimeModalId(null)}
+        place={currentPlace}
+        timeData={timeData}
+        handleTimeChange={handleTimeChange}
+        handleSaveTime={handleSaveTime}
+      />
     </SelectedPlacesContainer>
   );
 };
