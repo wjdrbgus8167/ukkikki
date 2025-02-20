@@ -1,11 +1,9 @@
-// MeetingPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { OpenVidu } from 'openvidu-browser';
 
 function MeetingPage() {
   const { proposalId } = useParams();
-  // 쿼리 파라미터로부터 token, isHost 추출
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const isHost = searchParams.get('isHost') === 'true';
@@ -22,36 +20,42 @@ function MeetingPage() {
       return;
     }
 
+    // (1) OpenVidu 인스턴스 생성
     const OV = new OpenVidu();
+
+    // (2) 세션 초기화
     const newSession = OV.initSession();
 
+    // 스트림 생성 시 subscribe
     newSession.on('streamCreated', (event) => {
       const subscriber = newSession.subscribe(event.stream, undefined);
       setSubscribers((prev) => [...prev, subscriber]);
     });
 
+    // 스트림 파괴 시 unsubscribe
     newSession.on('streamDestroyed', (event) => {
       setSubscribers((prev) =>
         prev.filter((sub) => sub !== event.stream.streamManager)
       );
     });
 
+    // 세션 연결
     newSession
       .connect(token)
       .then(() => {
         let pub;
         if (isHost) {
-          // 호스트: 기본적으로 카메라 스트림으로 퍼블리셔 생성
+          // 호스트: 카메라 + 마이크
           pub = OV.initPublisher(undefined, {
-            videoSource: undefined, // 기본 웹캠 사용
-            audioSource: undefined, // 기본 마이크 사용
+            videoSource: undefined,
+            audioSource: undefined,
             publishVideo: true,
             publishAudio: true,
             resolution: '640x480',
             frameRate: 30,
           });
         } else {
-          // 일반 사용자는 오디오만
+          // 일반 사용자: 오디오만
           pub = OV.initPublisher(undefined, {
             videoSource: false,
             audioSource: true,
@@ -67,6 +71,7 @@ function MeetingPage() {
         console.error('Error connecting to the session:', err);
       });
 
+    // 컴포넌트 언마운트 시 세션 해제
     return () => {
       if (newSession) {
         newSession.disconnect();
@@ -80,42 +85,53 @@ function MeetingPage() {
       console.error('Session is not initialized.');
       return;
     }
+
     if (screenSharing) {
-      // 화면 공유 중단: 현재 공유 스트림 언퍼블리시, 기존 카메라 퍼블리셔 재게시
+      // 이미 화면 공유 중이라면 -> 중단
       if (screenPublisher) {
-        session.unpublish(screenPublisher);
+        session.unpublish(screenPublisher); // 공유 스트림 언퍼블리시
         if (isHost && publisher) {
+          // 호스트의 기존 카메라 퍼블리셔 다시 게시
           session.publish(publisher);
         }
         setScreenSharing(false);
         setScreenPublisher(null);
       }
     } else {
-      // 화면 공유 시작: 호스트의 경우 기존 카메라 퍼블리셔 언퍼블리시 후 공유 스트림 시작
+      // 화면 공유 시작
       if (isHost && publisher) {
+        // 호스트의 기존 카메라 퍼블리셔 언퍼블리시
         session.unpublish(publisher);
       }
       try {
-        // 새 화면 공유 퍼블리셔 생성 (비디오 source를 'screen'으로 지정)
-        const OV = new OpenVidu();
-        const newScreenPublisher = await OV.initPublisherAsync(undefined, {
+        /**
+         * 기존 코드에서 `new OpenVidu()` 로 새 인스턴스를 만드는 대신
+         * 이미 연결된 `session` 객체를 통해 initPublisherAsync를 사용
+         */
+        const newScreenPublisher = await session.initPublisherAsync(undefined, {
           videoSource: 'screen',
           publishAudio: false,
           publishVideo: true,
           resolution: '1280x720',
           frameRate: 30,
         });
+
         newScreenPublisher.once('accessAllowed', async () => {
           await session.publish(newScreenPublisher);
           setScreenPublisher(newScreenPublisher);
           setScreenSharing(true);
           console.log('Screen sharing started successfully.');
-          // 화면 공유 종료 이벤트 리스너 (사용자가 시스템 UI로 공유 중단 시)
-          newScreenPublisher.stream.getMediaStream().getVideoTracks()[0].addEventListener('ended', () => {
-            console.log('Screen sharing ended by user.');
-            toggleScreenShare();
-          });
+
+          // 사용자가 시스템 UI에서 공유를 중단했을 때 이벤트
+          newScreenPublisher.stream
+            .getMediaStream()
+            .getVideoTracks()[0]
+            .addEventListener('ended', () => {
+              console.log('Screen sharing ended by user.');
+              toggleScreenShare();
+            });
         });
+
         newScreenPublisher.once('accessDenied', () => {
           console.warn('Screen sharing access denied.');
         });
@@ -129,6 +145,8 @@ function MeetingPage() {
     <div>
       <h2>Meeting Page (proposalId: {proposalId})</h2>
       <p>{isHost ? '호스트 모드' : '참가자 모드'}</p>
+      
+      {/* 호스트만 화면 공유 버튼이 보이도록 */}
       {isHost && (
         <div>
           <button onClick={toggleScreenShare}>
@@ -136,6 +154,7 @@ function MeetingPage() {
           </button>
         </div>
       )}
+
       <div>
         <h3>My Stream (Camera)</h3>
         {publisher && (
@@ -150,6 +169,7 @@ function MeetingPage() {
           />
         )}
       </div>
+
       {screenSharing && screenPublisher && (
         <div>
           <h3>Screen Sharing</h3>
@@ -164,6 +184,7 @@ function MeetingPage() {
           />
         </div>
       )}
+
       <div>
         <h3>Other Streams</h3>
         {subscribers.map((sub, i) => (
@@ -175,6 +196,7 @@ function MeetingPage() {
                 if (ref) sub.addVideoElement(ref);
               }}
             />
+            {/* sub.stream.connection.data가 서버에서 건너온 memberName */}
             <p>{sub.stream.connection.data}</p>
           </div>
         ))}
