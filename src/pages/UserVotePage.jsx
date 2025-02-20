@@ -5,6 +5,8 @@ import Header from '../components/layout/Header';
 import AgencyList from '../components/vote/AgencyList';
 import { publicRequest } from '../hooks/requestMethod';
 import Swal from 'sweetalert2';
+import ReservationDepositModal from '../components/vote/ReservationDepositModal'; // 예약금 결제 모달
+import { IoIosArrowBack } from 'react-icons/io';
 
 const UserVotePage = () => {
   const { travelPlanId } = useParams();
@@ -14,6 +16,7 @@ const UserVotePage = () => {
   const { selectedCard } = location.state || {};
   const [agencies, setAgencies] = useState([]);
   const [hasAcceptedProposal, setHasAcceptedProposal] = useState(false); // Flag for accepted proposal
+  const [showDepositModal, setShowDepositModal] = useState(false); // 예약금 결제 모달 표시 여부
 
   // 제안 목록(API 호출) - 투표 시작 후 이 페이지에서 조회
   useEffect(() => {
@@ -130,7 +133,28 @@ const UserVotePage = () => {
     });
   };
 
-  // 홍보 미팅 참여 함수
+  // 예약금 결제 모달 띄우기
+  const handleDeposit = () => {
+    setShowDepositModal(true);
+  };
+
+  // 결제 처리 함수
+  const handlePayment = async (agencyId) => {
+    try {
+      const response = await publicRequest.post(
+        `/api/v1/travel-plans/${travelPlanId}/proposals/${agencyId}/deposit`
+      );
+      if (response.status === 200) {
+        Swal.fire('결제 완료', '예약금이 결제되었습니다.', 'success');
+        setShowDepositModal(false); // 모달 닫기
+      }
+    } catch (error) {
+      console.error('결제 실패:', error);
+      Swal.fire('오류', '결제 중 오류가 발생했습니다.', 'error');
+    }
+  };
+
+  // 예약금 결제 모달 컴포넌트
   const handleJoinMeeting = async (agency) => {
     try {
       // 백엔드로부터 참가자 권한 토큰을 발급
@@ -164,9 +188,31 @@ const UserVotePage = () => {
           onDetail={handleDetail}
           onJoinMeeting={handleJoinMeeting} 
         />
+
+        {/* 예약금 결제 버튼 */}
+        {hasAcceptedProposal && (
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={handleDeposit}
+              className="px-8 py-3 rounded text-brown bg-yellow"
+            >
+              예약금 결제하러 가기
+            </button>
+          </div>
+        )}
       </div>
 
       <Footer />
+
+      {/* 예약금 결제 모달 */}
+      {showDepositModal && (
+        <ReservationDepositModal
+          travelPlanId={travelPlanId}
+          agency={agencies[0]}  // 예시로 첫 번째 여행사를 선택
+          onClose={() => setShowDepositModal(false)} // 모달 닫기
+          onPayment={handlePayment} // 결제 처리
+        />
+      )}
     </div>
   );
 };
