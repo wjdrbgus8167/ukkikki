@@ -80,6 +80,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(permitAll).permitAll()
 
+                        .requestMatchers("/companies/**").hasRole("COMPANY")
+                        .requestMatchers("/members/**").hasRole("MEMBER")
+
                         // === ProposalController (여행계획 내 제안서 관련) ===
                         // 회원 전용 엔드포인트
                         .requestMatchers(HttpMethod.GET, "/travel-plans/*/proposals").hasRole("MEMBER")
