@@ -88,7 +88,7 @@ const TravelPackageCarousel = () => {
   useEffect(() => {
     const fetchTravelPlans = async () => {
       try {
-        const response = await publicRequest.get('/api/v1/travel-plans');
+        const response = await publicRequest.get('/api/v1/travel-plans/all');
         if (response.status === 200 && response.data?.data?.travelPlans) {
           setTravelPlans(response.data.data.travelPlans);
         } else {
