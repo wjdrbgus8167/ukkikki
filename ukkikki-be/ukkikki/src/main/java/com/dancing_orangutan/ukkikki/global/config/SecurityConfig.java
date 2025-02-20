@@ -153,7 +153,8 @@ public class SecurityConfig {
             "/geography/**",
             "/travel-plans",
             "/ws/**",
-            "/sessions/**"
+            "/sessions/**",
+            "/travel-plans/all"
     };
 
 }

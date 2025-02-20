@@ -208,7 +208,7 @@ public class ProposalService {
     public String generateToken(Integer proposalId, boolean isHost, String memberName) {
         try {
             String sessionId = getOrCreateSession(proposalId);
-            log.info("토큰 생성 시작 - proposalId: {}, sessionId: {}", proposalId, sessionId);
+            log.info("토큰 생성 시작 - proposalId: {}, sessionId: {}, isHost: {}", proposalId, sessionId, isHost);
 
             // 활성 세션 확인
             Session session = openVidu.getActiveSession(sessionId);

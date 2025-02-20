@@ -266,7 +266,7 @@ public class ProposalController {
 
         String token = proposalService.generateToken(
                 proposalId,
-                getConnectionRequest.isHost(),
+                getConnectionRequest.getIsHost(),
                 getConnectionRequest.getMemberName()
         );
 
