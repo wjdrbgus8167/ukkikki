@@ -10,16 +10,13 @@ import com.dancing_orangutan.ukkikki.proposal.domain.schedule.Schedule;
 import com.dancing_orangutan.ukkikki.proposal.domain.traveler.Traveler;
 import com.dancing_orangutan.ukkikki.proposal.ui.request.*;
 import com.dancing_orangutan.ukkikki.proposal.ui.response.*;
-import com.dancing_orangutan.ukkikki.travelPlan.domain.travelPlan.TravelPlanEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
