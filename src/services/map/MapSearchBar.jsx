@@ -70,16 +70,8 @@ const MapSearchBar = ({
     autocompleteRef.current = autocomplete;
   };
 
-  // Autocomplete에서 장소 선택 시 처리
-  const onPlaceChanged = () => {
-    if (!autocompleteRef.current) return;
-    const place = autocompleteRef.current.getPlace();
-    if (!place || !place.geometry) {
-      console.warn('유효한 장소가 선택되지 않았습니다.');
-      return;
-    }
-    console.log('선택된 place:', place);
-    // 여러 장의 사진이 있으면 배열로 저장
+  // 여러 장의 사진이 있으면 배열로 저장하고, 새 장소 정보를 반환하는 함수
+  const extractPlaceDetails = (place) => {
     const photos =
       place.photos && place.photos.length > 0
         ? place.photos.map((photo) =>
@@ -101,7 +93,23 @@ const MapSearchBar = ({
       placeId: place.place_id || Date.now().toString(),
     };
     console.log('새 장소 정보:', newPlace);
+    return newPlace;
+  };
 
+  // Autocomplete에서 장소 선택 시 처리
+  const onPlaceChanged = () => {
+    if (!autocompleteRef.current) return;
+    const place = autocompleteRef.current.getPlace();
+    if (!place || !place.geometry) {
+      console.warn('유효한 장소가 선택되지 않았습니다.');
+      return;
+    }
+    processPlace(place);
+  };
+
+  // 공통: place 정보 처리 함수
+  const processPlace = (place) => {
+    const newPlace = extractPlaceDetails(place);
     // 중복 등록 방지
     const isDuplicate = favorites.some(
       (fav) => fav.placeId === newPlace.placeId || fav.name === newPlace.name,
@@ -212,6 +220,56 @@ const MapSearchBar = ({
     }
   }, [searchedPlace]);
 
+  // 엔터 키 입력 시, 예측 결과가 선택되지 않았다면 첫 번째 예측 결과 강제 선택
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (!autocompleteRef.current) return;
+      const place = autocompleteRef.current.getPlace();
+      if (!place || !place.geometry) {
+        // 현재 입력값으로 예측 결과 가져오기
+        if (window.google && window.google.maps && window.google.maps.places) {
+          const autocompleteService =
+            new window.google.maps.places.AutocompleteService();
+          autocompleteService.getPlacePredictions(
+            { input: inputValue },
+            (predictions, status) => {
+              if (
+                status === window.google.maps.places.PlacesServiceStatus.OK &&
+                predictions &&
+                predictions.length > 0
+              ) {
+                const firstPrediction = predictions[0];
+                const placesService =
+                  new window.google.maps.places.PlacesService(
+                    document.createElement('div'),
+                  );
+                placesService.getDetails(
+                  { placeId: firstPrediction.place_id },
+                  (placeDetails, status) => {
+                    if (
+                      status ===
+                      window.google.maps.places.PlacesServiceStatus.OK
+                    ) {
+                      processPlace(placeDetails);
+                    } else {
+                      console.error('Place details fetch failed:', status);
+                    }
+                  },
+                );
+              } else {
+                console.warn('예측 결과가 없습니다.');
+              }
+            },
+          );
+        }
+      } else {
+        // 이미 선택된 결과가 있다면 그대로 처리
+        onPlaceChanged();
+      }
+    }
+  };
+
   return (
     <div>
       <Autocomplete onLoad={handleLoad} onPlaceChanged={onPlaceChanged}>
@@ -221,6 +279,7 @@ const MapSearchBar = ({
             placeholder="장소 검색"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
             className="w-full h-12 pl-4 pr-12 text-base bg-transparent rounded-full focus:outline-none"
           />
           <div className="absolute inset-y-0 flex items-center text-xl text-gray-400 pointer-events-none right-4">
