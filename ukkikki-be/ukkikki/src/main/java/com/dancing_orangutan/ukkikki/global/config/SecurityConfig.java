@@ -77,9 +77,11 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/oauth2/**", "/swagger-ui/**", "/login/oauth2/code/**", "/geography/**", "/travel-plans", "/ws/**", "/sessions/**").permitAll()
+                        .requestMatchers(permitAll).permitAll()
+                        .requestMatchers(permitMember).hasRole("MEMBER")
+                        .requestMatchers(permitCompany).hasRole("COMPANY")
                         .anyRequest().authenticated()
-                ) .exceptionHandling(exceptions -> exceptions
+                ).exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint())
                         .accessDeniedHandler(jwtAccessDeniedHandler())
                 )
@@ -96,6 +98,23 @@ public class SecurityConfig {
         return http.build();
     }
 
+    private final String[] permitAll = {
+            "/auth/**",
+            "/oauth2/**",
+            "/login/oauth2/code/**",
+            "/geography/**",
+            "/travel-plans",
+            "/ws/**",
+            "/sessions/**"
+    };
+
+    private final String[] permitMember = {
+            "/chat/**/history",
+
+    };
+    private final String[] permitCompany = {
+
+    };
 }
 
 
