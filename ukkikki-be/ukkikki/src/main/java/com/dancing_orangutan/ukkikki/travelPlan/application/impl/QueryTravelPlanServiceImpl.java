@@ -6,6 +6,7 @@ import com.dancing_orangutan.ukkikki.global.error.ErrorCode;
 import com.dancing_orangutan.ukkikki.proposal.domain.voteSurvey.VoteSurveyEntity;
 import com.dancing_orangutan.ukkikki.proposal.infrastructure.voteSurvey.JpaVoteSurveyRepository;
 import com.dancing_orangutan.ukkikki.travelPlan.application.QueryTravelPlanService;
+import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchAllTravelPlansQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchAvailableTravelPlanQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQuery;
 import com.dancing_orangutan.ukkikki.travelPlan.application.query.FetchTravelPlanDetailsQueryByMember;
@@ -51,6 +52,12 @@ public class QueryTravelPlanServiceImpl implements QueryTravelPlanService {
 	@Override
 	public Page<TravelPlanEntity> fetchAvailableTravelPlans(final FetchAvailableTravelPlanQuery query) {
 		return travelPlanRepository.findByPlanningStatusNot(PlanningStatus.CONFIRMED, query.pageable());
+	}
+
+	@Override
+	public Page<TravelPlanEntity> fetchAllTravelPlans(FetchAllTravelPlansQuery query) {
+		return travelPlanRepository.findByPlanningStatusNot(PlanningStatus.CONFIRMED,
+				query.pageable());
 	}
 
 	@Override

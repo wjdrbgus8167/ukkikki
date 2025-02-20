@@ -39,7 +39,6 @@ public class TravelPlanResponseMapper {
 		return SearchMyTravelPlanResponse.fromEntities(entities, memberId);
 	}
 
-
 	public FetchSuggestedTravelPlansResponse fetchSuggestedTravelPlansResponse(
 			final List<TravelPlanEntity> entities) {
 		return FetchSuggestedTravelPlansResponse.fromEntities(entities);
@@ -48,6 +47,11 @@ public class TravelPlanResponseMapper {
 	public FetchAvailableTravelPlansResponse fetchAvailableTravelPlansResponse(
 			final Page<TravelPlanEntity> page, Integer memberId) {
 		return FetchAvailableTravelPlansResponse.fromEntities(page,memberId);
+	}
+
+	public FetchAllTravelPlansResponse fetchAllTravelPlansResponse(
+			final Page<TravelPlanEntity> page) {
+		return FetchAllTravelPlansResponse.fromEntities(page);
 	}
 
 	public FetchTravelPlanDetailsByCompanyResponse fetchTravelPlanDetailsResponse(
@@ -62,10 +66,7 @@ public class TravelPlanResponseMapper {
 				voteSurveyEntity);
 	}
 
-
 	public FetchKeywordsResponse fetchKeywordsResponse(final List<KeywordEntity> entities) {
 		return FetchKeywordsResponse.fromEntities(entities);
 	}
-
-
 }

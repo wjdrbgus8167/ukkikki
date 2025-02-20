@@ -107,6 +107,12 @@ public class TravelPlanController {
 		return ApiUtils.success(travelPlanServiceFacade.fetchAvailableTravelPlans(tmpPageable,memberUserDetails.getMemberId()));
 	}
 
+
+	@GetMapping("/all")
+	public ApiUtils.ApiResponse<FetchAllTravelPlansResponse> fetchAllTravelPlans(Pageable pageable) {
+		return ApiUtils.success(travelPlanServiceFacade.fetchAllTravelPlans(pageable));
+	}
+
 	@GetMapping("/{travelPlanId}")
 	public ApiUtils.ApiResponse<FetchTravelPlanDetailsByCompanyResponse> getTravelPlanDetails(
 			@PathVariable(name = "travelPlanId") Integer travelPlanId) {
