@@ -132,7 +132,7 @@ function MeetingPage() {
     if (result.isConfirmed) {
       setShouldDisconnect(true);
       // 예시: 메인/목록 페이지로 이동 (마음대로 수정 가능)
-      navigate('/some-other-page');
+      navigate('/user-vote/:travelPlanId');
     }
   };
 
@@ -208,7 +208,7 @@ function MeetingPage() {
         {/* 제목: 호스트 닉네임 or proposalId */}
         <h2 className="text-2xl font-bold mb-2">
           {hostNickname
-            ? `Meeting with [${hostNickname}]`
+            ? `[${hostNickname}]의 홍보 라이브 방송`
             : `Meeting Page (proposalId: ${proposalId})`}
         </h2>
 
@@ -265,7 +265,7 @@ function MeetingPage() {
         {/* 화면 공유 영역 */}
         {screenSharing && screenPublisher && (
           <div className="w-full flex flex-col items-center mb-4">
-            <h3 className="text-lg font-semibold mb-2">Screen Sharing</h3>
+            <h3 className="text-lg font-semibold mb-2">여행사 화면 공유</h3>
             <video
               autoPlay
               className="border border-gray-300 w-full max-w-screen-xl"
