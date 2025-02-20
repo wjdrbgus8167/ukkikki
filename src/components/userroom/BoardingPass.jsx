@@ -3,7 +3,7 @@ import { FaPlane, FaExpand, FaCompress } from 'react-icons/fa';
 import ProposalButton from './ProposalButton';
 import { THEME_COLORS } from '../../constants';
 
-const BoardingPass = ({ selectedCard, zoomLevel = 0.6, isSmall, toggleSize }) => {
+const BoardingPass = ({ selectedCard, zoomLevel = 0.6 }) => {
   if (!selectedCard) return null;
 
   // 상태 레이블 매핑
@@ -42,6 +42,14 @@ const BoardingPass = ({ selectedCard, zoomLevel = 0.6, isSmall, toggleSize }) =>
 
   const departureCityName = selectedCard.departureCity?.name || '출발도시';
   const arrivalCityName = selectedCard.arrivalCity?.name || '도착도시';
+
+  // 크기 상태 관리 (true: 축소 상태, false: 확대 상태)
+  const [isSmall, setIsSmall] = useState(false);
+
+  // 크기 토글 함수
+  const toggleSize = () => {
+    setIsSmall((prev) => !prev);
+  };
 
   return (
     <div
