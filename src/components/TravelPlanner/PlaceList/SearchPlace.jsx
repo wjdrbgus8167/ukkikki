@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Autocomplete } from '@react-google-maps/api';
 import banana from '../../../assets/loading-spinner.png';
+
 const SearchPlace = ({
   isLoaded,
   autocompleteRef,
@@ -9,6 +10,9 @@ const SearchPlace = ({
   onSelectPlace,
   setSearchedPlace, // 부모에서 상태 업데이트를 위한 함수 전달 (또는 내부 상태로 관리 가능)
 }) => {
+  // 검색 입력값을 위한 상태 추가
+  const [inputValue, setInputValue] = useState('');
+
   // 리뷰를 불러오는 useEffect
   useEffect(() => {
     // searchedPlace가 설정되어 있고, 아직 reviews가 없는 경우에만 실행
@@ -72,6 +76,87 @@ const SearchPlace = ({
     }
   };
 
+  // 엔터 키 입력 시, 예측 결과가 선택되지 않았다면 첫 번째 예측 결과 강제 선택
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (!autocompleteRef.current) return;
+      const place = autocompleteRef.current.getPlace();
+      if (!place || !place.geometry) {
+        // 현재 입력값(inputValue)으로 예측 결과 가져오기
+        if (window.google && window.google.maps && window.google.maps.places) {
+          const autocompleteService =
+            new window.google.maps.places.AutocompleteService();
+          autocompleteService.getPlacePredictions(
+            { input: inputValue },
+            (predictions, status) => {
+              if (
+                status === window.google.maps.places.PlacesServiceStatus.OK &&
+                predictions &&
+                predictions.length > 0
+              ) {
+                const firstPrediction = predictions[0];
+                const placesService =
+                  new window.google.maps.places.PlacesService(
+                    document.createElement('div'),
+                  );
+                placesService.getDetails(
+                  {
+                    placeId: firstPrediction.place_id,
+                    fields: [
+                      'formatted_address',
+                      'name',
+                      'place_id',
+                      'photos',
+                      'rating',
+                      'geometry',
+                    ],
+                  },
+                  (placeDetails, status2) => {
+                    if (
+                      status2 ===
+                        window.google.maps.places.PlacesServiceStatus.OK &&
+                      placeDetails &&
+                      placeDetails.geometry
+                    ) {
+                      // 처리 로직은 handlePlaceChanged와 동일하게 진행
+                      const photoUrl =
+                        placeDetails.photos && placeDetails.photos.length > 0
+                          ? placeDetails.photos[0].getUrl({
+                              maxWidth: 400,
+                              maxHeight: 400,
+                            })
+                          : null;
+                      const rating = placeDetails.rating || null;
+                      const newPlace = {
+                        id: Date.now(),
+                        placeId: placeDetails.place_id,
+                        name: placeDetails.name,
+                        address: placeDetails.formatted_address,
+                        latitude: placeDetails.geometry.location.lat(),
+                        longitude: placeDetails.geometry.location.lng(),
+                        photoUrl,
+                        rating,
+                      };
+                      setSearchedPlace(newPlace);
+                    } else {
+                      console.error('Place details fetch failed:', status2);
+                    }
+                  },
+                );
+              } else {
+                console.warn('예측 결과가 없습니다.');
+              }
+            },
+          );
+        }
+      } else {
+        // 이미 유효한 결과가 있다면 기존 onPlaceChanged 처리
+        handlePlaceChanged();
+      }
+    }
+  };
+
   return (
     <>
       <div>
@@ -83,6 +168,9 @@ const SearchPlace = ({
             <input
               type="text"
               placeholder="장소를 입력해주세요"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
               className="w-full p-2 border rounded-xl"
             />
           </Autocomplete>
@@ -102,7 +190,7 @@ const SearchPlace = ({
               />
             ) : (
               <img
-                src={banana} // 여기에 기본 이미지 경로를 지정합니다.
+                src={banana} // 기본 이미지 경로
                 alt="Default"
                 className="object-cover w-24 h-24 mr-4 aspect-square"
               />

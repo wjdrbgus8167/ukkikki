@@ -84,11 +84,11 @@ const Header = () => {
           </>
         ) : userRole === 'company' ? (
           <>
-            {/* 데스크탑: 제안현황 버튼 추가 */}
+            {/* 데스크탑: 제안 관리 버튼은 md 이상에서 보임 */}
             <div className="items-center hidden space-x-6 md:flex">
               <NavLink to="/proposal">제안 관리</NavLink>
             </div>
-            {/* 공통: 프로필 드롭다운 (마이페이지, 로그아웃) */}
+            {/* 공통: 프로필 드롭다운 */}
             <div className="relative">
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -102,6 +102,17 @@ const Header = () => {
               </button>
               {isDropdownOpen && (
                 <div className="absolute right-0 z-50 w-40 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg">
+                  {/* 모바일 전용: 제안 관리 항목 추가 (md 미만에서만 보임) */}
+                  <div className="md:hidden">
+                    <NavLink
+                      to="/proposal"
+                      onClick={() => setIsDropdownOpen(false)}
+                      className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-100 text-left !justify-start" // !justify-start 추가
+                      style={{ display: 'block', textAlign: 'left' }} // 인라인 스타일 추가
+                    >
+                      제안 관리
+                    </NavLink>
+                  </div>
                   <Link
                     to="/myprofile"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
@@ -125,7 +136,6 @@ const Header = () => {
         ) : (
           <>
             {/* 기존 유저(일반 사용자)용 네비게이션 */}
-            {/* 데스크탑 네비게이션: md 이상에서만 보임 */}
             <div className="items-center hidden space-x-6 md:flex">
               <NavLink to="/search-room">전체여행방</NavLink>
               <NavLink to="/myroom">내여행방</NavLink>
@@ -140,7 +150,6 @@ const Header = () => {
                 방만들기
               </button>
             </div>
-            {/* 공통: 프로필 드롭다운 */}
             <div className="relative">
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -154,7 +163,6 @@ const Header = () => {
               </button>
               {isDropdownOpen && (
                 <div className="absolute right-0 z-50 w-40 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg">
-                  {/* 모바일 전용 메뉴: md 미만에서 보임 */}
                   <div className="md:hidden">
                     <Link
                       to="/search-room"

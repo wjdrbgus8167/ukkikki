@@ -2,6 +2,7 @@ import React from 'react';
 import { FaPlane, FaExpand, FaCompress } from 'react-icons/fa';
 import ProposalButton from './ProposalButton';
 import { THEME_COLORS } from '../../constants';
+import { QRCodeCanvas } from 'qrcode.react';
 
 const BoardingPass = ({
   selectedCard,
@@ -93,46 +94,16 @@ const BoardingPass = ({
               </p>
             </div>
 
-            {/* 바코드 영역 */}
-            <div className="mt-8">
-              <svg
-                className="w-full h-20"
-                viewBox="0 0 504 80"
-                preserveAspectRatio="none"
-              >
-                <rect x="0" y="0" width="8" height="80" fill="#000" />
-                <rect x="16" y="0" width="4" height="80" fill="#000" />
-                <rect x="28" y="0" width="12" height="80" fill="#000" />
-                <rect x="48" y="0" width="4" height="80" fill="#000" />
-                <rect x="60" y="0" width="8" height="80" fill="#000" />
-                <rect x="76" y="0" width="4" height="80" fill="#000" />
-                <rect x="88" y="0" width="16" height="80" fill="#000" />
-                <rect x="112" y="0" width="8" height="80" fill="#000" />
-                <rect x="132" y="0" width="4" height="80" fill="#000" />
-                <rect x="144" y="0" width="12" height="80" fill="#000" />
-                <rect x="164" y="0" width="4" height="80" fill="#000" />
-                <rect x="176" y="0" width="8" height="80" fill="#000" />
-                <rect x="192" y="0" width="4" height="80" fill="#000" />
-                <rect x="208" y="0" width="12" height="80" fill="#000" />
-                <rect x="228" y="0" width="8" height="80" fill="#000" />
-                <rect x="244" y="0" width="4" height="80" fill="#000" />
-                <rect x="256" y="0" width="16" height="80" fill="#000" />
-                <rect x="280" y="0" width="8" height="80" fill="#000" />
-                <rect x="296" y="0" width="4" height="80" fill="#000" />
-                <rect x="308" y="0" width="12" height="80" fill="#000" />
-                <rect x="328" y="0" width="4" height="80" fill="#000" />
-                <rect x="340" y="0" width="8" height="80" fill="#000" />
-                <rect x="356" y="0" width="4" height="80" fill="#000" />
-                <rect x="372" y="0" width="8" height="80" fill="#000" />
-                <rect x="388" y="0" width="4" height="80" fill="#000" />
-                <rect x="400" y="0" width="16" height="80" fill="#000" />
-                <rect x="424" y="0" width="8" height="80" fill="#000" />
-                <rect x="440" y="0" width="4" height="80" fill="#000" />
-                <rect x="452" y="0" width="12" height="80" fill="#000" />
-                <rect x="472" y="0" width="4" height="80" fill="#000" />
-                <rect x="484" y="0" width="8" height="80" fill="#000" />
-                <rect x="500" y="0" width="4" height="80" fill="#000" />
-              </svg>
+            {/* QR 코드 영역 */}
+            <div className="flex justify-center mt-8">
+              <QRCodeCanvas
+                value={`${window.location.origin}/ukiki`}
+                size={150}
+                bgColor="transparent"
+                fgColor="#000000"
+                level="H"
+                includeMargin={true}
+              />
             </div>
           </div>
 

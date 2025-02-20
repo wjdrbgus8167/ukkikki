@@ -61,6 +61,7 @@ export const Table = styled.table`
   border-top: 1px solid #e2e8f0;
   border-bottom: 1px solid #e2e8f0;
   color: #4a5568;
+  table-layout: fixed; /* 컬럼의 너비를 균등하게 고정 */
 `;
 
 export const TableHead = styled.thead`
@@ -80,6 +81,19 @@ export const TableHeadCell = styled.th`
   font-size: 1.5625rem;
   color: #cbd5e0;
   opacity: 0.7;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+export const TableCell = styled.td`
+  padding: 1rem;
+  text-align: center;
+  background-color: transparent;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+  font-size: 1.2rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 export const TableBody = styled.tbody``;
@@ -91,15 +105,6 @@ export const TableRow = styled.tr`
     transform: scale(1.02);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
-`;
-
-export const TableCell = styled.td`
-  padding: 1rem; /* 패딩을 기존보다 키움 */
-  text-align: center;
-  background-color: transparent;
-  border-bottom: 1px solid #e2e8f0;
-  white-space: nowrap;
-  font-size: 1.2rem; /* 글자 크기를 키움 */
 `;
 
 export const Status = styled.span`
