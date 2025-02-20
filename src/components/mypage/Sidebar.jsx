@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaUser, FaHistory, FaSignOutAlt } from 'react-icons/fa';
 import SidebarItem from './SidebarItem';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -10,6 +10,11 @@ const Sidebar = ({ onMenuClick }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { userRole } = useAuthStore();
+  const [activeItem, setActiveItem] = useState(location.pathname);
+
+  useEffect(() => {
+    setActiveItem(location.pathname);
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     try {
@@ -80,8 +85,7 @@ const Sidebar = ({ onMenuClick }) => {
           },
         ]
       : [
-          // 일반 사용자인 경우
-          { label: '프로필', href: '/myprofile', icon: <FaUser /> },
+          { label: '프로필', to: '/myprofile', icon: <FaUser /> },
           {
             label: '로그아웃',
             onClick: handleLogout,
