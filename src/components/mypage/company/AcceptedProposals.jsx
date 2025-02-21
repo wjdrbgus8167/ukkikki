@@ -29,7 +29,8 @@ const AcceptedProposals = () => {
       try {
         const data = await AgencyProposalslist();
         console.log("진행중인 목록 API 응답 데이터:", data);
-        setProposals(data);
+        // 데이터가 배열인지 확인하고 배열이 아니면 빈 배열로 처리
+        setProposals(Array.isArray(data) ? data : []);
       } catch (error) {
         setError("제안서를 불러오는 데 실패했습니다.");
         console.error("Error:", error);
@@ -50,8 +51,10 @@ const AcceptedProposals = () => {
     V: "투표중"
   };
 
-  // 'A' 상태인 제안서만 필터링
-  const acceptedProposals = proposals.filter(proposal => proposal.proposalStatus === "A");
+  // 'A' 상태인 제안서만 필터링, 필터링된 결과가 배열이 아닐 경우 빈 배열로 처리
+  const acceptedProposals = Array.isArray(proposals)
+    ? proposals.filter(proposal => proposal.proposalStatus === "A")
+    : []; // proposals가 배열이 아닌 경우 빈 배열로 처리
 
   return (
     <Container>

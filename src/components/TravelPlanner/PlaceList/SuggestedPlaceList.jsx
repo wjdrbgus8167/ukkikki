@@ -39,7 +39,6 @@ const SuggestedPlaceList = ({ places, onSelectPlace, onSelectDay }) => {
   return (
     <div>
       {sortedPlaces.map((place) => {
-          console.log('likeCount for', place.name, ':', place.likeCount);
         const key = place.id || uuidv4(); // ID가 없으면 uuid 생성
         return (
           <StylePlaceList key={key}>
