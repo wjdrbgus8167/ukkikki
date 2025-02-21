@@ -1,32 +1,85 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.4.1'
-	id 'io.spring.dependency-management' version '1.1.7'
+    id 'java'
+    id 'org.springframework.boot' version '3.4.1'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.dancing-orangutan'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	implementation 'mysql:mysql-connector-java:8.0.32'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+    // DB
+    implementation 'mysql:mysql-connector-java:8.0.32'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.1.1'
+
+    // security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.security:spring-security-oauth2-jose'
+
+    // DTO 검증
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // mapstruct 의존성 추가
+    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+
+	//QueryDsl 의존성 추가
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
+    annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+
+    // Websocket 의존성 추가
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    // MongoDb 의존성 추가
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+    // Openvidu 의존성 추가
+    implementation group: 'io.openvidu', name: 'openvidu-java-client', version: '2.29.0'
+}
+
+// 1. Q-Class를 생성할 디렉토리 경로 설정
+def querydslSrcDir = 'src/main/generated'
+
+//2. JavaCompile Task를 수행하는 경우 생성된 소스코드의 출력 디렉토리를 설정
+tasks.withType(JavaCompile).configureEach {
+    options.generatedSourceOutputDirectory = file(querydslSrcDir)
+}
+
+//3. 소스 코드로 인식할 디렉토리에 Q-Class 파일을 추가. Q-Class가 JAVA의 클래스 처럼 취급됨.
+sourceSets {
+    main.java.srcDir querydslSrcDir
+}
+
+//4. Clean Task를 수행하는 경우 지정한 디렉토리를 삭제하도록 설정.
+clean {
+    delete file(querydslSrcDir)
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
