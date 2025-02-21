@@ -60,28 +60,29 @@ const MyRoomsPage = () => {
 
       {/* 메인 컨테이너 */}
       <div className="max-w-screen-xl px-6 py-10 mx-auto">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-center mb-8">
           {/* 가운데: 필터 옵션 */}
-          <div className="flex justify-center space-x-8">
-            {FILTER_OPTIONS.map((option) => (
-              <button
-                key={option.label}
-                onClick={() => handleFilterChange(option)}
-                className={`relative py-2 text-sm font-medium transition-colors ${
-                  selectedFilter.label === option.label
-                    ? 'text-brown'
-                    : 'text-gray-500 hover:text-brown'
-                }`}
-              >
-                {option.label}
-                {selectedFilter.label === option.label && (
-                  <div className="absolute left-0 bottom-0 w-full h-0.5 bg-brown"></div>
-                )}
-              </button>
-            ))}
+          {/* 수정 후 */}
+          <div className="flex justify-center mb-8">
+            <div className="flex justify-center space-x-8">
+              {FILTER_OPTIONS.map((option) => (
+                <button
+                  key={option.label}
+                  onClick={() => handleFilterChange(option)}
+                  className={`relative py-2 text-sm font-medium transition-colors ${
+                    selectedFilter.label === option.label
+                      ? 'text-brown'
+                      : 'text-gray-500 hover:text-brown'
+                  }`}
+                >
+                  {option.label}
+                  {selectedFilter.label === option.label && (
+                    <div className="absolute left-0 bottom-0 w-full h-0.5 bg-brown"></div>
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
-          {/* 오른쪽: 뒤로가기 버튼 */}
-          <div className="w-10" />
         </div>
 
         {/* 카드 목록 영역 */}

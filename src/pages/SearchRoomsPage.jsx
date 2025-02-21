@@ -51,7 +51,7 @@ const SearchRoom = () => {
 
   const statusMap = {
     IN_PROGRESS: '진행중',
-    BIDDING: '검토',
+    BIDDING: '검토중',
     BOOKING: '예약중',
     CONFIRMED: '여행확정',
   };
@@ -98,7 +98,7 @@ const SearchRoom = () => {
         <Sidebar onFilter={handleFilter} />
         <div className="flex-1 p-4">
           {/* 오른쪽 상단에 도착 도시 필터 선택창 추가 */}
-          <div className="flex justify-between mb-4">
+          <div className="flex justify-end mb-4">
             <select
               value={selectedArrivalCity}
               onChange={(e) => setSelectedArrivalCity(e.target.value)}
