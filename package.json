@@ -1,0 +1,80 @@
+{
+  "name": "ukiki-fe",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@fontsource/pretendard": "^5.1.0",
+    "@react-google-maps/api": "^2.20.5",
+    "@stomp/stompjs": "^7.0.0",
+    "@tanstack/react-query": "^5.66.0",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^13.0.0",
+    "@testing-library/user-event": "^13.2.1",
+    "aos": "^2.3.4",
+    "axios": "^1.7.9",
+    "date-fns": "^4.1.0",
+    "framer-motion": "^12.0.6",
+    "js-cookie": "^3.0.5",
+    "lucide-react": "^0.475.0",
+    "moment-timezone": "^0.5.47",
+    "openvidu-browser": "^2.31.0",
+    "qrcode.react": "^4.2.0",
+    "react": "^19.0.0",
+    "react-beautiful-dnd": "^13.1.1",
+    "react-calendar": "^5.1.0",
+    "react-cookie": "^7.2.2",
+    "react-currency-input-field": "^3.9.0",
+    "react-datepicker": "^8.0.0",
+    "react-dom": "^19.0.0",
+    "react-draggable": "^4.4.6",
+    "react-icons": "^5.4.0",
+    "react-modal": "^3.16.3",
+    "react-paginate": "^8.3.0",
+    "react-query": "^3.39.3",
+    "react-router": "^7.1.3",
+    "react-router-dom": "^7.1.3",
+    "react-scripts": "5.0.1",
+    "react-scroll": "^1.9.3",
+    "react-select": "^5.10.0",
+    "react-slick": "^0.30.3",
+    "react-time-picker": "^7.0.0",
+    "react-times": "^3.1.12",
+    "slick-carousel": "^1.8.1",
+    "sockjs-client": "^1.6.1",
+    "stompjs": "^2.3.3",
+    "styled-components": "^6.1.15",
+    "sweetalert2": "^11.16.0",
+    "tailwind-scrollbar-hide": "^2.0.0",
+    "three.js": "^0.77.1",
+    "uuid": "^11.0.5",
+    "web-vitals": "^2.1.0",
+    "zustand": "^5.0.3"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.11"
+  }
+}
