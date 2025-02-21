@@ -50,7 +50,8 @@ const OngoingProposals = () => {
       try {
         const data = await AgencyProposalslist();
         console.log('진행중인 목록 API 응답 데이터:', data);
-        setProposals(data);
+        // 데이터가 배열이 아니면 빈 배열로 처리
+        setProposals(Array.isArray(data) ? data : []);
       } catch (error) {
         setError('제안서를 불러오는 데 실패했습니다.');
         console.log('Error:', error);
@@ -87,10 +88,9 @@ const OngoingProposals = () => {
   // 페이지네이션을 위한 데이터 분할 (필터된 결과에서)
   const indexOfLastProposal = (currentPage + 1) * proposalsPerPage;
   const indexOfFirstProposal = indexOfLastProposal - proposalsPerPage;
-  const currentProposals = filteredProposals.slice(
-    indexOfFirstProposal,
-    indexOfLastProposal,
-  );
+  const currentProposals = Array.isArray(filteredProposals)
+    ? filteredProposals.slice(indexOfFirstProposal, indexOfLastProposal)
+    : []; // filteredProposals가 배열이 아니면 빈 배열로 처리
 
   const handlePageClick = (event) => {
     setCurrentPage(event.selected);
