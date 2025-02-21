@@ -35,7 +35,7 @@ const UserRoom = () => {
     e.stopPropagation();
     Swal.fire({
       title: '기능 제한',
-      html: '현재 여행방 상태가 검토중, 예약중, 또는 여행확정 상태이므로 <br>일부 기능은 제한됩니다.',
+      html: '현재 여행방 상태가 요청중, 예약중, 또는 여행확정 상태이므로 <br>일부 기능은 제한됩니다.',
       icon: 'warning',
       confirmButtonText: '확인',
     });

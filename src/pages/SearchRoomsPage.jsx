@@ -51,7 +51,7 @@ const SearchRoom = () => {
 
   const statusMap = {
     IN_PROGRESS: '진행중',
-    BIDDING: '검토중',
+    BIDDING: '요청중',
     BOOKING: '예약중',
     CONFIRMED: '여행확정',
   };

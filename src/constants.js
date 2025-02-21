@@ -1,6 +1,6 @@
 export const STATUS_MAP = {
   IN_PROGRESS: '진행중',
-  BIDDING: '검토중',
+  BIDDING: '요청중',
   BOOKING: '예약중',
   CONFIRMED: '확정됨',
 };
