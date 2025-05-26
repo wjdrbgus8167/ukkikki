@@ -87,7 +87,7 @@ logging:
     io.lettuce.core: INFO
 
 jwt:
-  secret_key: nD/99zQMrX/fypNsi0J2IG+h46ePk0hddF3uCwRQITw=
+  secret_key: ${JWT_SECRET_KEY}
   access_expiration: 86400000
   refresh_expiration: 604800000
 
